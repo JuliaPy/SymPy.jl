@@ -208,6 +208,15 @@ dsolve(eq, f(x))		# c1 * sin(x) + c2 * cos(x)
 ```
 
 
+The `sympy` package has much more functionality than indicated here. For example, there is lot of functionality related to polynomials and matrices we haven't exposed. For matrices, we can still do some things -- it is just a bit cumbersome. We have a constructor, but none of the methods (though these can easily be added if they seem useful). So to find a determinant of a symbolic matrix can be done, but a bit akwardly:
+
+```
+m = SymMatrix([1 x; x 1])	# a matrix
+m[:det]()			# a PyObject with the polynomial -x^2 + 1
+Sym(m[:det]())			# make a sym object so that we can call:
+solve(SymMatrix([1 x; x 1]), x)	# an Any Array of PyObjects
+map(u -> convert(Real, u), solve(Sym(m[:det]()) , x)) | float      # converts to float [-1.0, 1.0]
+```
 
 
 
