@@ -2,7 +2,27 @@ module SymPy
 
 using GoogleCharts
 using PyCall
-@pyimport sympy
+
+## Hack to workaround issue with reserved names and types on initialization
+function our_pywrap(o::PyObject)
+#    @pyinitialize
+    members = convert(Vector{(String,PyObject)}, 
+                      pycall(PyCall.inspect["getmembers"], PyObject, o))
+    filter!(m -> !contains(PyCall.reserved, m[1]), members)
+    tname = gensym("PyCall_PyWrapper")
+    @eval begin
+        $(Expr(:type, true, Expr(:<:, tname, :PyWrapper),
+               Expr(:block, :(___jl_PyCall_PyObject___::PyObject),
+                    map(m -> Expr(:(::), symbol(m[1] * "__" ), 
+                                  PyCall.typesymbol(pytype_query(m[2]))), 
+                        members)...)))
+        $(Expr(:call, tname, o,
+               [ convert(PyAny, members[i][2]) for i = 1:length(members) ]...))
+    end
+end
+sympy = our_pywrap(pyimport("sympy"))
+
+## @pyimport sympy
 
 
 import Base.getindex
