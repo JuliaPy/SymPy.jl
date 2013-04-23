@@ -100,6 +100,8 @@ plot(exp(-x) * sin(x), 0, 2pi)	# opens plot in browser
 plot( (sin(x), diff(sin(x), x) ), 0, 2pi)
 ```
 
+<img src="charts-plot.png"></img>
+
 ### Calculus
 
 The `limit` function computes simple limits:
