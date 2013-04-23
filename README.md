@@ -74,7 +74,7 @@ together(1/x + 1/x^2 + x)	# (x^3 + x + 1) / x^2
 The `expand` function breaks them up;
 
 ```
-expand( (x + 1)*(x+2))		# x^2 + 3 * x + 2
+expand( (x + 1)*(x+2) )		# x^2 + 3 * x + 2
 ```
 
 The `apart` function does partial fraction decomposition:
@@ -98,6 +98,7 @@ Plotting is done with the `GoogleCharts` package. This is temporary while other 
 ```
 plot(exp(-x) * sin(x), 0, 2pi)	# opens plot in browser
 plot( (sin(x), diff(sin(x), x) ), 0, 2pi)
+```
 
 ### Calculus
 
