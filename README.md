@@ -101,8 +101,10 @@ plot(exp(-x) * sin(x), 0, 2pi)	# opens plot in browser
 plot( [sin(x), diff(sin(x), x) ], 0, 2pi)
 ```
 
+<img src="charts-plot.png"></img>
 
-The key to this is forming a function object from the `Sym` object.
+
+The key to this working is forming a function object from the `Sym` object.
 Here is one pattern to do so where we need to be careful to match the
 variable we substitute with (`x`) with the expression.
 
@@ -110,15 +112,11 @@ variable we substitute with (`x`) with the expression.
 u -> n(subs( exp(-x) * sin(x), x, u)) # anonymous function to evaluate expression
 ```
 
-This can be done with the unexported, `as_function` function:
-
-```
-g1 = as_function(exp(-x) * sin(x))
-```
+This is what happens in the call: `convert(Function, exp(-x) * sin(x))`. This can be used to plot expressions with `julia`'s other plotting packages.
 
 
 
-<img src="charts-plot.png"></img>
+
 
 ### Calculus
 
