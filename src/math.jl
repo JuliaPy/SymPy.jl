@@ -82,7 +82,7 @@ end
 
 ## Polynomial functions. There are many, but here we have
 poly(s::Sym) = Sym( sympy[:poly](project(s)) )
-real_roots(s::Sym) = Float[convert(Real, u) for u in sympy[:real_roots](project(s))]
+real_roots(s::Sym) = [convert(Real, u) for u in sympy[:real_roots](project(s))] | float
 nroots(s::Sym) = [Sym(u) for u in sympy[:roots](project(s))]
 
 ## solve
