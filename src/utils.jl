@@ -37,7 +37,7 @@ convert(Integer, x::Sym) = convert(Integer, project(x))
 
 ## Conversion to function a bit tricky as we *assume* variable is called x.
 ## can use subs(xsym, sym"u", sym"x") first if it is u, say.
-convert(Function, xsym::Sym) = u -> n(subs(xsym, sym"x", u))
+#convert(Function, xsym::Sym) = u -> n(subs(xsym, sym"x", u))
 convert(Sym, x::Sym) = x
 
 ## call method of a symoblic instance
