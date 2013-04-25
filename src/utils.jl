@@ -6,11 +6,12 @@ type Sym
     Sym(x::PyCall.PyObject) = new(x)
 end
 
+Sym(args...) = map(Sym, args)
+
 macro sym_str(x)
     Sym(x)
 end
 
-Sym(args...) = map(Sym, args)
 
 project(x::Any) = x
 project(x::Sym) = x.x
@@ -24,29 +25,37 @@ end
 
 
 ## format
-show(io::IO, s::Sym) = pprint(s)
+show(io::IO, s::Sym) = print(io, sympy.pretty(project(s))) #pprint(s)
+_str(s::Sym) = s[:__str__]()
+_str(a::Array{Sym}) = map(_str, a)
+
 pprint(s::Sym, args...) = sympy[:pprint](project(s), project(args)...)
 latex(s::Sym, args...)  = sympy[:latex ](project(s), project(args)...)
 
-convert(String,  x::Sym) = convert(String,  project(x))
-convert(Complex, x::Sym) = convert(Complex, project(x))
-convert(Real,    x::Sym) = convert(Real,    project(x))
-convert(Rational,x::Sym) = convert(Rational,project(x))
-convert(Integer, x::Sym) = convert(Integer, project(x))
+convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
+convert(::Type{String},  x::Sym) = convert(String,  project(x))
+
+convert(::Type{Complex}, x::Sym) = complex(map(float, x[:as_real_imag]())...)
+complex(x::Sym) = convert(Complex, x)
+complex(xs::Array{Sym}) = map(complex, xs)
 
 
 ## Conversion to function a bit tricky as we *assume* variable is called x.
 ## can use subs(xsym, sym"u", sym"x") first if it is u, say.
-convert(::Type{Function}, xsym::Sym) = u -> n(subs(xsym, sym"x", u))
-convert(Sym, x::Sym) = x
+convert(::Type{Function}, xsym::Sym) = u -> float(subs(xsym, sym"x", u))
+
 
 ## call method of a symoblic instance
 call_meth(x::Sym, meth::Symbol, args::Tuple) = Sym(project(x)[meth](project(args)))
 call_meth(x::Sym, meth::Symbol, args...) = Sym(project(x)[meth](project(args)...))
 
 ## From PyCall.pywrap:
-function members(o::Sym)
+function members(o::Union(PyObject, Sym))
     out = convert(Vector{(String,PyObject)}, 
                   pycall(PyCall.inspect["getmembers"], PyObject, project(o)))
     String[u[1] for u in out]
 end
+
+
+
+doc(x::Sym) = print(x[:__doc__]())

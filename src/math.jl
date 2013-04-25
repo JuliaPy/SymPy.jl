@@ -50,9 +50,16 @@ SymFunction(nm::Union(Symbol, String)) = (args...) -> Sym(sympy[:Function](nm)(p
 
 ## Some sympy function interfaces
 
-## return Real valued object 
-n(x::Sym, args...) = convert(Real, call_meth(x, :n, args...).x)
+## SymPy's n. truncates a value at a certain point, makes numeric if not.
+## Not quite what we want, n(pi, 3000) is not correct
+n(x::Sym, args...) = call_meth(x, :n, args...)
+
 subs(s::Sym, x::Sym, arg) = call_meth(s, :subs, x, arg)
+
+## This is *experimental* syntax to lessen the typing of subs
+## THis would work  ex | (x == 2) --> subs(ex, x, 2)
+=={T <: Union(Real, Complex)}(x::Sym, y::T) = (ex) -> subs(ex, x, y)
+
 
 for meth in (:expand, :together, :apart,
              :limit, :diff,
@@ -87,11 +94,23 @@ nroots(s::Sym) = [Sym(u) for u in sympy[:roots](project(s))]
 
 ## solve
 
+## Is this a good idea? I want to be able to solve equations with
+## solve(x^2 +x == x, x)
+==(x::Sym, y::Sym) = solve(x - y)
 
 
 ## solve. Returns array of PyObjects
 ## Trying to return an array of Sym objects printed funny!
-solve(ex::Sym, x::Sym, args...) = sympy[:solve](project(ex), project(x), project(args)...)
+function solve(ex::Sym, x::Sym, args...)
+    out = Array(Sym, 0)
+    [push!(out, Sym(u)) for u in sympy.solve(project(ex), project(x), project(args)...)]
+    out
+end
+function solve(ex::Sym)
+    out = Array(Sym, 0)
+    [push!(out, Sym(u)) for u in sympy.solve(project(ex))]
+    out
+end
 function solve(exs::Vector{Sym}, xs::Vector{Sym})
     sympy[:solve](map(project, exs), map(project, xs)) #  dictionary with keys, values as PyObjects
 end

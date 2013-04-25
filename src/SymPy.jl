@@ -3,31 +3,11 @@ module SymPy
 using GoogleCharts
 using PyCall
 
-## Hack to workaround issue with reserved names and types on initialization
-function our_pywrap(o::PyObject)
-#    @pyinitialize
-    members = convert(Vector{(String,PyObject)}, 
-                      pycall(PyCall.inspect["getmembers"], PyObject, o))
-    filter!(m -> !contains(PyCall.reserved, m[1]), members)
-    tname = gensym("PyCall_PyWrapper")
-    @eval begin
-        $(Expr(:type, true, Expr(:<:, tname, :PyWrapper),
-               Expr(:block, :(___jl_PyCall_PyObject___::PyObject),
-                    map(m -> Expr(:(::), symbol(m[1] * "__" ), 
-                                  PyCall.typesymbol(pytype_query(m[2]))), 
-                        members)...)))
-        $(Expr(:call, tname, o,
-               [ convert(PyAny, members[i][2]) for i = 1:length(members) ]...))
-    end
-end
-sympy = our_pywrap(pyimport("sympy"))
-
-## @pyimport sympy
-
+@pyimport sympy
 
 import Base.getindex
 import Base.show
-import Base.convert
+import Base.convert, Base.complex
 import Base.sin, Base.cos, Base.tan, Base.sinh, Base.cosh, Base.tanh, Base.asin, Base.acos,
        Base.atan, Base.asinh, Base.acosh, Base.atanh, Base.sec, Base.csc, Base.cot, Base.asec,
        Base.acsc, Base.acot, Base.sech, Base.csch, Base.coth, Base.asech, Base.acsch, Base.acoth,
@@ -39,6 +19,7 @@ import Base.sin, Base.cos, Base.tan, Base.sinh, Base.cosh, Base.tanh, Base.asin,
        Base.trunc, Base.round, Base.significand
 import Base.factorial, Base.gamma, Base.beta
 import Base.solve
+import Base.==
 
 export sympy
 export Sym, @sym_str
@@ -52,7 +33,7 @@ export SymFunction, SymMatrix,
        dsolve,
        plot,
        poly, nroots, real_roots
-export members
+export members, doc, _str
 
        
 
