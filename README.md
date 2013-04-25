@@ -28,7 +28,7 @@ As this multiplication is done at the python level and is not a method of `sympy
 
 ```
 x = sympy.Symbol("x")
-y = pyeval("k*x", {:k=>pi, :x=>x}) # PyObject 3.14159265358979*x
+y = pyeval("k*x", k=pi, =x)     # PyObject 3.14159265358979*x
 z = sympy.sin(y)		# PyObject sin(3.14159265358979*x)
 z[:subs](x, 1) | float		# 1.2246467991473532e-16
 ```

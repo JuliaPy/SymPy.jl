@@ -1,29 +1,29 @@
 ## Math functions
 
-+(x::Sym, y::Sym) =  Sym(pyeval("x + y", {:x => project(x), :y => project(y)}))
-+(x::Sym, y::Real) = Sym(pyeval("x + y", {:x => project(x), :y => project(y)}))
-+(x::Real, y::Sym) = Sym(pyeval("x + y", {:x => project(x), :y => project(y)}))
++(x::Sym, y::Sym) =  Sym(pyeval("x + y", x = project(x), y = project(y)))
++(x::Sym, y::Real) = Sym(pyeval("x + y", x = project(x), y = project(y)))
++(x::Real, y::Sym) = Sym(pyeval("x + y", x = project(x), y = project(y)))
 
--(x::Sym, y::Sym) =  Sym(pyeval("x - y", {:x => project(x), :y => project(y)}))
--(x::Sym, y::Real) = Sym(pyeval("x - y", {:x => project(x), :y => project(y)}))
--(x::Real, y::Sym) = Sym(pyeval("x - y", {:x => project(x), :y => project(y)}))
-
-
--(x::Sym) = Sym(pyeval("-x", {:x => project(x)}))
-
-*(x::Sym, y::Sym) =  Sym(pyeval("x * y", {:x => project(x), :y => project(y)}))
-*(x::Sym, y::Real) = Sym(pyeval("x * y", {:x => project(x), :y => project(y)}))
-*(x::Real, y::Sym) = Sym(pyeval("x * y", {:x => project(x), :y => project(y)}))
+-(x::Sym, y::Sym) =  Sym(pyeval("x - y", x = project(x), y = project(y)))
+-(x::Sym, y::Real) = Sym(pyeval("x - y", x = project(x), y = project(y)))
+-(x::Real, y::Sym) = Sym(pyeval("x - y", x = project(x), y = project(y)))
 
 
-/(x::Sym, y::Sym) =  Sym(pyeval("x / y", {:x => project(x), :y => project(y)}))
-/(x::Sym, y::Real) = Sym(pyeval("x / y", {:x => project(x), :y => project(y)}))
-/(x::Real, y::Sym) = Sym(pyeval("x / y", {:x => project(x), :y => project(y)}))
+-(x::Sym) = Sym(pyeval("-x", x = project(x)))
 
-^(x::Sym, y::Sym) =     Sym(pyeval("x ** y", {:x => project(x), :y => project(y)}))
-^(x::Sym, y::Integer) = Sym(pyeval("x ** y", {:x => project(x), :y => project(y)}))
-^(x::Sym, y::Real) =    Sym(pyeval("x ** y", {:x => project(x), :y => project(y)}))
-^(x::Real, y::Sym) =    Sym(pyeval("x ** y", {:x => project(x), :y => project(y)}))
+*(x::Sym, y::Sym) =  Sym(pyeval("x * y", x = project(x), y = project(y)))
+*(x::Sym, y::Real) = Sym(pyeval("x * y", x = project(x), y = project(y)))
+*(x::Real, y::Sym) = Sym(pyeval("x * y", x = project(x), y = project(y)))
+
+
+/(x::Sym, y::Sym) =  Sym(pyeval("x / y", x = project(x), y = project(y)))
+/(x::Sym, y::Real) = Sym(pyeval("x / y", x = project(x), y = project(y)))
+/(x::Real, y::Sym) = Sym(pyeval("x / y", x = project(x), y = project(y)))
+
+^(x::Sym, y::Sym) =     Sym(pyeval("x ** y", x = project(x), y = project(y)))
+^(x::Sym, y::Integer) = Sym(pyeval("x ** y", x = project(x), y = project(y)))
+^(x::Sym, y::Real) =    Sym(pyeval("x ** y", x = project(x), y = project(y)))
+^(x::Real, y::Sym) =    Sym(pyeval("x ** y", x = project(x), y = project(y)))
 
 
 
