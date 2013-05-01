@@ -17,8 +17,9 @@ import Base.sin, Base.cos, Base.tan, Base.sinh, Base.cosh, Base.tanh, Base.asin,
        Base.log10, Base.log1p, Base.exponent, Base.exp, Base.exp2, Base.expm1, Base.cbrt, Base.sqrt,
        Base.square, Base.erf, Base.erfc, Base.erfcx, Base.erfi, Base.dawson, Base.ceil, Base.floor,
        Base.trunc, Base.round, Base.significand
+       Base.abs
 import Base.factorial, Base.gamma, Base.beta
-import Base.solve
+import Base.solve, Base.length
 import Base.==
 
 export sympy
@@ -27,6 +28,7 @@ export pprint, latex
 export SymFunction, SymMatrix,
        n, subs,
        expand, together, apart,
+       abs,
        limit, diff, series, integrate, summation,
        I, oo,
        Ylm, assoc_legendre, chebyshevt, legendre, hermite,

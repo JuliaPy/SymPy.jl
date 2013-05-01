@@ -44,6 +44,8 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
     @eval ($fn)(x::Sym) = Sym( sympy[symbol($meth)](project(x)) )
 end
 
+## add
+abs(x::Sym) = Sym(sympy[:Abs](project(x)))
 
 ## Make a function argument, but munge arguments from Sym -> PyObject class
 SymFunction(nm::Union(Symbol, String)) = (args...) -> Sym(sympy[:Function](nm)(project(args)...))
@@ -54,7 +56,8 @@ SymFunction(nm::Union(Symbol, String)) = (args...) -> Sym(sympy[:Function](nm)(p
 ## Not quite what we want, n(pi, 3000) is not correct
 n(x::Sym, args...) = call_meth(x, :n, args...)
 
-subs(s::Sym, x::Sym, arg) = call_meth(s, :subs, x, arg)
+subs(ex::Sym, x::Sym, arg) = call_meth(ex, :subs, x, arg)
+subs(exs::Array{Sym}, x::Sym, arg) = [subs(ex, x, arg) for ex in exs]
 
 ## This is *experimental* syntax to lessen the typing of subs
 ## THis would work  ex | (x == 2) --> subs(ex, x, 2)

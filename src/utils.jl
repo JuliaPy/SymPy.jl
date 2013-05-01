@@ -12,6 +12,7 @@ macro sym_str(x)
     Sym(x)
 end
 
+length(x::Sym) = 1
 
 project(x::Any) = x
 project(x::Sym) = x.x
