@@ -1,16 +1,17 @@
 type Sym
     x::PyCall.PyObject
-    function Sym(x::Union(Symbol, String))
-        new(sympy[:symbols](string(x)))
-    end
-    Sym(x::PyCall.PyObject) = new(x)
 end
-
+Sym(s::Sym) = s
+Sym(s::Union(Symbol, String)) = sympy[:symbols](string(s))
 Sym(args...) = map(Sym, args)
 
 macro sym_str(x)
     Sym(x)
 end
+
+convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
+PyCall.pytype_query_add(sympy.basic["Basic"], Sym)
+PyCall.pytype_query_add(sympy.matrices["MatrixBase"], Sym)
 
 length(x::Sym) = 1
 
