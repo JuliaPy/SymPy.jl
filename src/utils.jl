@@ -1,4 +1,4 @@
-type Sym
+immutable Sym
     x::PyCall.PyObject
 end
 Sym(s::Sym) = s
@@ -9,11 +9,30 @@ macro sym_str(x)
     Sym(x)
 end
 
+basictype = sympy.basic["Basic"]
+matrixtype = sympy.matrices["MatrixBase"]
 convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
-PyCall.pytype_query_add(sympy.basic["Basic"], Sym)
-PyCall.pytype_query_add(sympy.matrices["MatrixBase"], Sym)
+convert(::Type{PyObject}, s::Sym) = s.x
+PyCall.pytype_query_add(basictype, Sym)
+PyCall.pytype_query_add(matrixtype, Sym)
 
-length(x::Sym) = 1
+length(x::Sym) = *(size(x)...)
+function size(x::Sym)
+    if pyisinstance(x.x, matrixtype)
+        return x[:shape]
+    else
+        return ()
+    end
+end
+function size(x::Sym, dim::Integer)
+    if dim <= 0
+        error("dimension out of range")
+    elseif dim <= 2 && pyisinstance(x.x, matrixtype)
+        return x[:shape][dim]
+    else
+        return 1
+    end
+end
 
 project(x::Any) = x
 project(x::Sym) = x.x

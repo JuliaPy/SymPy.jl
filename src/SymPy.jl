@@ -18,8 +18,8 @@ import Base.sin, Base.cos, Base.tan, Base.sinh, Base.cosh, Base.tanh, Base.asin,
        Base.square, Base.erf, Base.erfc, Base.erfcx, Base.erfi, Base.dawson, Base.ceil, Base.floor,
        Base.trunc, Base.round, Base.significand
        Base.abs
-import Base.factorial, Base.gamma, Base.beta
-import Base.solve, Base.length
+import Base: factorial, gamma, beta
+import Base: solve, length,  size
 import Base.==
 
 export sympy
