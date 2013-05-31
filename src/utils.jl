@@ -1,18 +1,38 @@
-type Sym
+immutable Sym
     x::PyCall.PyObject
-    function Sym(x::Union(Symbol, String))
-        new(sympy[:symbols](string(x)))
-    end
-    Sym(x::PyCall.PyObject) = new(x)
 end
-
+Sym(s::Sym) = s
+Sym(s::Union(Symbol, String)) = sympy[:symbols](string(s))
 Sym(args...) = map(Sym, args)
 
 macro sym_str(x)
     Sym(x)
 end
 
-length(x::Sym) = 1
+basictype = sympy.basic["Basic"]
+matrixtype = sympy.matrices["MatrixBase"]
+convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
+convert(::Type{PyObject}, s::Sym) = s.x
+pytype_mapping(basictype, Sym)
+pytype_mapping(matrixtype, Sym)
+
+length(x::Sym) = *(size(x)...)
+function size(x::Sym)
+    if pyisinstance(x.x, matrixtype)
+        return x[:shape]
+    else
+        return ()
+    end
+end
+function size(x::Sym, dim::Integer)
+    if dim <= 0
+        error("dimension out of range")
+    elseif dim <= 2 && pyisinstance(x.x, matrixtype)
+        return x[:shape][dim]
+    else
+        return 1
+    end
+end
 
 project(x::Any) = x
 project(x::Sym) = x.x
