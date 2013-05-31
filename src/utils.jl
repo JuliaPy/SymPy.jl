@@ -13,8 +13,8 @@ basictype = sympy.basic["Basic"]
 matrixtype = sympy.matrices["MatrixBase"]
 convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
 convert(::Type{PyObject}, s::Sym) = s.x
-PyCall.pytype_query_add(basictype, Sym)
-PyCall.pytype_query_add(matrixtype, Sym)
+pytype_mapping(basictype, Sym)
+pytype_mapping(matrixtype, Sym)
 
 length(x::Sym) = *(size(x)...)
 function size(x::Sym)
