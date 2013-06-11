@@ -23,7 +23,7 @@ import Base: solve, length,  size
 import Base.==
 
 export sympy
-export Sym, @sym_str
+export Sym, @sym_str, @syms
 export pprint, latex
 export SymFunction, SymMatrix,
        n, subs,

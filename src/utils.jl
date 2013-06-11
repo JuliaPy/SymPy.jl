@@ -2,8 +2,20 @@ immutable Sym
     x::PyCall.PyObject
 end
 Sym(s::Sym) = s
-Sym(s::Union(Symbol, String)) = sympy[:symbols](string(s))
+
+## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y)
+Sym(s::Union(Symbol, String)) = Sym(sympy[:symbols](string(s)))
 Sym(args...) = map(Sym, args)
+
+## (a,b,c) = @syms a b c --- no commas on right hand side!
+macro syms(x...)
+       q=Expr(:block)
+       for s in x
+         push!(q.args, Expr(:(=), s, Expr(:call, :Sym, Expr(:quote, s))))
+       end
+       push!(q.args, Expr(:tuple,x...))
+       q
+end
 
 macro sym_str(x)
     Sym(x)
@@ -13,8 +25,9 @@ basictype = sympy.basic["Basic"]
 matrixtype = sympy.matrices["MatrixBase"]
 convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
 convert(::Type{PyObject}, s::Sym) = s.x
-pytype_mapping(basictype, Sym)
-pytype_mapping(matrixtype, Sym)
+## Not working until merged into pycall
+#pytype_mapping(basictype, Sym)
+#pytype_mapping(matrixtype, Sym)
 
 length(x::Sym) = *(size(x)...)
 function size(x::Sym)
