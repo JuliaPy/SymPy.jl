@@ -4,6 +4,8 @@ end
 Sym(s::Sym) = s
 
 ## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y)
+## have to add Sym here, as conversion isn't working below
+##Sym(s::Union(Symbol, String)) = sympy[:symbols](string(s))
 Sym(s::Union(Symbol, String)) = Sym(sympy[:symbols](string(s)))
 Sym(args...) = map(Sym, args)
 
@@ -59,7 +61,11 @@ end
 
 
 ## format
-show(io::IO, s::Sym) = print(io, sympy.pretty(project(s))) #pprint(s)
+
+show(io::IO, s::Sym) = print(io, sympy.pretty(project(s)))
+show(io::IO, s::Array{Sym}) = show(io, map(project, s))
+
+
 _str(s::Sym) = s[:__str__]()
 _str(a::Array{Sym}) = map(_str, a)
 

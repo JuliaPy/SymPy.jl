@@ -1,3 +1,10 @@
+## Numbers
+function convert{T <: Real}(::Type{Sym}, x::T)
+    a = Sym(randstring(10))
+    a | (a == x)
+end
+
+
 ## Math functions
 
 +(x::Sym, y::Sym) =  Sym(pyeval("x + y", x = project(x), y = project(y)))
@@ -43,6 +50,16 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
     meth = string(fn)
     @eval ($fn)(x::Sym) = Sym( sympy[symbol($meth)](project(x)) )
 end
+
+
+for (jfn, pfn) in ((:conj, :conjugate),
+                   )
+    meth = string(pfn)
+    @eval ($jfn)(x::Sym) = Sym( sympy[symbol($meth)](project(x)) )
+end
+
+    
+
 
 ## add
 abs(x::Sym) = Sym(sympy[:Abs](project(x)))
@@ -128,9 +145,12 @@ dsolve(ex::Sym, fx::Sym) = Sym(sympy[:dsolve]( project(ex), project(fx)))
 
 ## Matrix constructor
 ## There are issues, as for some reason we can't put Sym objects into an array
-Base.Array(::Type{Sym}, args...) = Base.Array(PyObject, args...)
-Sym{N}(o::Array{PyObject,N}) = Sym(sympy[:Matrix](o))
-Sym{T,N}(o::Array{T,N}) = Sym(convert(Array{PyObject,N}, o))
+#Base.Array(::Type{Sym}, args...) = Base.Array(PyObject, args...)
+#Sym{N}(o::Array{PyObject,N}) = Sym(sympy[:Matrix](o))
+#Sym{T,N}(o::Array{T,N}) = Sym(convert(Array{PyObject,N}, o))
 const SymMatrix = Sym
 
+
 getindex(s::SymMatrix, i::Integer...) = Sym(pyeval("x[i]", x=s.x, i=tuple(([i...]-1)...)))
+
+

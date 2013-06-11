@@ -8,19 +8,20 @@ using PyCall
 import Base.getindex
 import Base.show
 import Base.convert, Base.complex
-import Base.sin, Base.cos, Base.tan, Base.sinh, Base.cosh, Base.tanh, Base.asin, Base.acos,
-       Base.atan, Base.asinh, Base.acosh, Base.atanh, Base.sec, Base.csc, Base.cot, Base.asec,
-       Base.acsc, Base.acot, Base.sech, Base.csch, Base.coth, Base.asech, Base.acsch, Base.acoth,
-       Base.sinc, Base.cosc, Base.cosd, Base.cotd, Base.cscd, Base.secd, Base.sind, Base.tand,
-       Base.acosd, Base.acotd, Base.acscd, Base.asecd, Base.asind, Base.atand, Base.atan2,
-       Base.radians2degrees, Base.degrees2radians, Base.log, Base.log2,
-       Base.log10, Base.log1p, Base.exponent, Base.exp, Base.exp2, Base.expm1, Base.cbrt, Base.sqrt,
-       Base.square, Base.erf, Base.erfc, Base.erfcx, Base.erfi, Base.dawson, Base.ceil, Base.floor,
-       Base.trunc, Base.round, Base.significand,
-       Base.abs
+import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
+       atan, asinh, acosh, atanh, sec, csc, cot, asec,
+       acsc, acot, sech, csch, coth, asech, acsch, acoth,
+       sinc, cosc, cosd, cotd, cscd, secd, sind, tand,
+       acosd, acotd, acscd, asecd, asind, atand, atan2,
+       radians2degrees, degrees2radians, log, log2,
+       log10, log1p, exponent, exp, exp2, expm1, cbrt, sqrt,
+       square, erf, erfc, erfcx, erfi, dawson, ceil, floor,
+       trunc, round, significand,
+       abs
 import Base: factorial, gamma, beta
 import Base: solve, length,  size
-import Base.==
+import Base: ==
+import Base: conj
 
 export sympy
 export Sym, @sym_str, @syms
