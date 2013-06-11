@@ -128,4 +128,9 @@ dsolve(ex::Sym, fx::Sym) = Sym(sympy[:dsolve]( project(ex), project(fx)))
 
 ## Matrix constructor
 ## There are issues, as for some reason we can't put Sym objects into an array
-SymMatrix(m::Array) = Sym(sympy[:Matrix]([project(m[i,j]) for i in 1:size(m)[1], j in 1:size(m)[2]]))
+Base.Array(::Type{Sym}, args...) = Base.Array(PyObject, args...)
+Sym{N}(o::Array{PyObject,N}) = Sym(sympy[:Matrix](o))
+Sym{T,N}(o::Array{T,N}) = Sym(convert(Array{PyObject,N}, o))
+const SymMatrix = Sym
+
+getindex(s::SymMatrix, i::Integer...) = Sym(pyeval("x[i]", x=s.x, i=tuple(([i...]-1)...)))
