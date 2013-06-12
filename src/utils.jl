@@ -10,13 +10,14 @@ Sym(s::Union(Symbol, String)) = Sym(sympy[:symbols](string(s)))
 Sym(args...) = map(Sym, args)
 
 ## (a,b,c) = @syms a b c --- no commas on right hand side!
+## (x,) @syms x is needed for single arguments
 macro syms(x...)
-       q=Expr(:block)
-       for s in x
-         push!(q.args, Expr(:(=), s, Expr(:call, :Sym, Expr(:quote, s))))
-       end
-       push!(q.args, Expr(:tuple,x...))
-       q
+    q=Expr(:block)
+    for s in x
+        push!(q.args, Expr(:(=), s, Expr(:call, :Sym, Expr(:quote, s))))
+    end
+    push!(q.args, Expr(:tuple, x...))
+    q
 end
 
 macro sym_str(x)
@@ -27,6 +28,7 @@ basictype = sympy.basic["Basic"]
 matrixtype = sympy.matrices["MatrixBase"]
 convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
 convert(::Type{PyObject}, s::Sym) = s.x
+## Not quite sure how much this will do, but hopefull alot
 ## Not working until merged into pycall
 #pytype_mapping(basictype, Sym)
 #pytype_mapping(matrixtype, Sym)
@@ -61,9 +63,15 @@ end
 
 
 ## format
+## Can only have pretty for non-array objects, o/w priting is all messed up
 
+## as values use embedded \n values to align which don't have any idea of a cell
 show(io::IO, s::Sym) = print(io, sympy.pretty(project(s)))
-show(io::IO, s::Array{Sym}) = show(io, map(project, s))
+
+## need to call pretty on SymPy matrix object, not julia matrix of sympy objects
+show(io::IO, s::Array{Sym}) =  print(io, summary(s), "\n", convert(Sym, s))
+repl_show(io::IO, s::Vector{Sym}) =  print(io, summary(s), "\n", convert(Sym, s))
+
 
 
 _str(s::Sym) = s[:__str__]()
@@ -72,10 +80,17 @@ _str(a::Array{Sym}) = map(_str, a)
 pprint(s::Sym, args...) = sympy[:pprint](project(s), project(args)...)
 latex(s::Sym, args...)  = sympy[:latex ](project(s), project(args)...)
 
+promote_rule{T <: Number}(::Type{Sym}, ::Type{T}) = Sym
 convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 convert(::Type{String},  x::Sym) = convert(String,  project(x))
 
+
+
+
+
 convert(::Type{Complex}, x::Sym) = complex(map(float, x[:as_real_imag]())...)
+
+
 complex(x::Sym) = convert(Complex, x)
 complex(xs::Array{Sym}) = map(complex, xs)
 

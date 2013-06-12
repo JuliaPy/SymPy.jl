@@ -6,7 +6,7 @@ using PyCall
 @pyimport sympy
 
 import Base.getindex
-import Base.show
+import Base: show, repl_show
 import Base.convert, Base.complex
 import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        atan, asinh, acosh, atanh, sec, csc, cot, asec,
@@ -20,8 +20,10 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        abs
 import Base: factorial, gamma, beta
 import Base: solve, length,  size
-import Base: ==
-import Base: conj
+import Base: !=, ==
+import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj, 
+              cross, eigvals, eigvecs, rref, trace
+import Base: promote_rule
 
 export sympy
 export Sym, @sym_str, @syms
@@ -37,7 +39,6 @@ export SymFunction, SymMatrix,
        poly, nroots, real_roots
 export members, doc, _str
 
-       
 
 include("utils.jl")
 include("math.jl")
