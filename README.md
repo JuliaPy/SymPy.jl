@@ -22,7 +22,7 @@ The only point to this package is that using `PyCall` to access
 a symbolic value `x`, take its sine, then evaluate at `pi`, say:
 
 ```
-using PyCall
+using PyCall			
 @pyimport sympy
 x = sympy.Symbol("x")
 y = sympy.sin(x)
@@ -52,19 +52,27 @@ z[:subs](x, 1) | float		# 1.2246467991473532e-16
 This gets replaced by a more `julia`n syntax:
 
 ```
-using SymPy
+using SymPy                     # some warnings need cleaning up
 x = sym"x"			# or Sym("x") or Sym(:x) or (x,) = @syms x
 y = sin(pi*x)
 subs(y, x, 1) | float
 ```
 
-The object `x` we create is of type `Sym`, a simple proxy for the underlying `PyObject`. We then overload the familiar math functions so that working with symbolic expressions can use natural `julia` idioms.
+The object `x` we create is of type `Sym`, a simple proxy for the
+underlying `PyObject`. We then overload the familiar math functions so
+that working with symbolic expressions can use natural `julia` idioms.
 
-However, the `PyCall` interface is needed for serious work, as only a small portion of the `SymPy` interface is exposed.  To dig the `PyObject` out of a `Sym` object, you access its property `x`, as in `y.x`. This is useful if passing a `Sym` object to a method call, though `getindex` is overridden for `Sym` objects and symbol indices to call the method.
+However, the `PyCall` interface is needed for serious work, as only a
+small portion of the `SymPy` interface is exposed.  To dig the
+`PyObject` out of a `Sym` object, you access its property `x`, as in
+`y.x`. This is useful if passing a `Sym` object to a method call,
+though `getindex` is overridden for `Sym` objects and symbol indices
+to call the method.
 
 ## Examples
 
-To make a symbolic object (of type `Sym`) we have the `Sym` constructor, the convenient `sym` macro, and `@syms`
+To make a symbolic object (of type `Sym`) we have the `Sym`
+constructor, the convenient `sym` macro, and `@syms`
 
 ```
 x = Sym("x")
@@ -72,7 +80,8 @@ h, y = Sym("h", :y)
 a, b, c = @syms a b c
 ```
 
-Operator overloading of the basic math functions allows symbolic expressions to be combined without fuss:
+Operator overloading of the basic math functions allows symbolic
+expressions to be combined without fuss:
 
 ```
 1/x + 1/x^2 + x			# pretty prints x + 1/x + 1/x^2
@@ -100,9 +109,7 @@ apart(1/(x +2)/(x + 1))		# -1/(x+2) + 1/(x+1)
 
 The `subs` command is used to substitute values. These values are typically numeric, though they may be other symbols:
 
-```
-subs(x + y, x, 3)		# y + 3
-subs(x*y, y,  24 - 2x) 		# x*(-2*x + 24)
+``` subs(x + y, x, 3) # y + 3 subs(x*y, y, 24 - 2x) # x*(-2*x + 24)
 ```
 
 Somehow that syntax isn't so natural. We introduce the following
