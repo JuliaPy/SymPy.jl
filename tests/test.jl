@@ -71,13 +71,11 @@ SymPy.cholesky(A)
 b = subs(a, x, 2)
 map(u -> convert(Sym, u),  b[:QRdecomposition]()) # tuple of matrices
 
-a[:is_square]()
+a[:is_square]
 a[:is_symmetric]()
 
 
 eigvals(A)
-cross(A, b)
-dot(A, b)
 
 
 ## Ops
@@ -114,17 +112,17 @@ s * a
 a * s 
 
 s / v  ## broadcasts s
-s ./ v ## XXX issue with show and vectors
+s ./ v 
 v / s 
 s / rv ## broadcasts s
 s ./ rv
 rv / s 
 s / a ## broadcasts s
-s ./ a ## XXX
+s ./ a 
 a / s
 
 s ^ v ## error
-s .^ v  ## XXX show is wrong
+s .^ v  
 v ^ s ## error
 v .^ s 
 s ^ rv ## error
@@ -176,7 +174,7 @@ v .^ a
 ## matrix matrix
 a + a
 a + b ## error
-a + 2a ## XXX issue .*(Int64,Sym)
+a + 2a
 a - a
 a - b ## error
 a * a
