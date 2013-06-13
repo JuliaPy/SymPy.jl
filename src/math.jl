@@ -85,7 +85,7 @@ SymFunction(nm::Union(Symbol, String)) = (args...) -> Sym(sympy[:Function](nm)(p
 
 ## subs
 function subs(ex::Sym, x::Sym, arg)
-    convert(Sym, sympy.subs(project(ex), project(x), project(arg)))
+    convert(Sym, project(ex)[:subs](project(x), project(arg)))
 end
 subs(exs::Array{Sym}, x::Sym, arg) = map(ex->subs(ex, x, arg), exs)
 
