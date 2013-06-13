@@ -44,6 +44,7 @@ export SymFunction, SymMatrix,
        dsolve,
        plot,
        poly, nroots, real_roots
+export jacobian
 export members, doc, _str
 
 

@@ -280,3 +280,9 @@ end
     
 
 
+## What other functions have this in common?
+function jacobian(x::Array{Sym}, y::Array{Sym})
+    X = convert(SymMatrix, x)
+    Y = convert(SymMatrix, y)
+    call_matrix_meth(X, :jacobian, Y)
+end
