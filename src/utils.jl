@@ -109,7 +109,14 @@ convert(::Type{Function}, xsym::Sym) = u -> float(subs(xsym, sym"x", u))
 ## hyperexpand(args...; kwargs...) = call_meth(:hyperexpand, args...; kwargs...)
 call_meth(meth::Symbol, args...; kwargs...) = convert(Sym, sympy[meth](map(project, args)...; kwargs...))
 call_meth_nosimplify(meth::Symbol, args...; kwargs...) = sympy[meth](map(project, args)...; kwargs...)
-
+function call_object_meth(object::Sym, meth::Symbol, args...; kwargs...)
+    out = project(object)[meth](map(project, args)...; kwargs...)
+    convert(Sym, out)
+end
+function call_matrix_meth(object::Sym, meth::Symbol, args...; kwargs...) 
+    out = call_object_meth(object, meth, args...; kwargs...)
+    convert(SymMatrix, out)
+end
 ## From PyCall.pywrap:
 function members(o::Union(PyObject, Sym))
     out = convert(Vector{(String,PyObject)}, 

@@ -26,7 +26,7 @@ import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj,
               cross, eigvals, eigvecs, rref, trace
 import Base: promote_rule
 
-export sympy, call_meth, call_meth_nosimplify
+export sympy, call_meth, call_meth_nosimplify, call_object_meth, call_matrix_meth
 export Sym, @sym_str, @syms
 export pprint, latex
 export SymFunction, SymMatrix,
