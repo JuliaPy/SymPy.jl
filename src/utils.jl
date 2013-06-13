@@ -108,6 +108,7 @@ convert(::Type{Function}, xsym::Sym) = u -> float(subs(xsym, sym"x", u))
 ## Makes it possible to call in a sympy method, e.g.,
 ## hyperexpand(args...; kwargs...) = call_meth(:hyperexpand, args...; kwargs...)
 call_meth(meth::Symbol, args...; kwargs...) = convert(Sym, sympy[meth](map(project, args)...; kwargs...))
+call_meth_nosimplify(meth::Symbol, args...; kwargs...) = sympy[meth](map(project, args)...; kwargs...)
 
 ## From PyCall.pywrap:
 function members(o::Union(PyObject, Sym))
