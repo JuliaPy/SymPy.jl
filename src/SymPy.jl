@@ -27,7 +27,7 @@ import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj,
 import Base: promote_rule
 
 export sympy, call_meth, call_meth_nosimplify, call_object_meth, call_matrix_meth
-export Sym, @sym_str, @syms
+export Sym, @sym_str, @syms, symbols
 export pprint, latex
 export SymFunction, SymMatrix,
        n,  subs,
@@ -44,7 +44,7 @@ export SymFunction, SymMatrix,
        dsolve,
        plot,
        poly, nroots, real_roots
-export jacobian
+export jacobian, hessian
 export members, doc, _str
 
 

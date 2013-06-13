@@ -24,6 +24,12 @@ macro sym_str(x)
     Sym(x)
 end
 
+## define one or more symbols
+## symbols("a,b,c", commutative=false)
+function symbols(x::String; commutative::Bool=true) 
+    map(u -> convert(Sym, u), sympy.symbols(x, commutative=commutative))
+end
+
 basictype = sympy.basic["Basic"]
 matrixtype = sympy.matrices["MatrixBase"]
 convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)

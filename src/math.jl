@@ -280,9 +280,17 @@ end
     
 
 
-## What other functions have this in common?
+## What other functions have these in common?
 function jacobian(x::Array{Sym}, y::Array{Sym})
     X = convert(SymMatrix, x)
     Y = convert(SymMatrix, y)
     call_matrix_meth(X, :jacobian, Y)
+end
+
+
+## x, y = symbols("x y")
+## f = x^2 - 2x*y
+## hessian(f, [x,y])
+function hessian(f::Sym, x::Array{Sym})
+    call_meth(:hessian, f, convert(SymMatrix, x))
 end
