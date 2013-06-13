@@ -83,11 +83,10 @@ SymFunction(nm::Union(Symbol, String)) = (args...) -> Sym(sympy[:Function](nm)(p
 
 ## Some sympy function interfaces
 
-## SymPy's n. truncates a value at a certain point, makes numeric if not.
-## Not quite what we want, n(pi, 3000) is not correct
-n(x::Sym, args...) = call_meth(x, :n, args...)
-
-subs(ex::Sym, x::Sym, arg) = call_meth(ex, :subs, x, arg)
+## subs
+function subs(ex::Sym, x::Sym, arg)
+    convert(Sym, sympy.subs(project(ex), project(x), project(arg)))
+end
 subs(exs::Array{Sym}, x::Sym, arg) = map(ex->subs(ex, x, arg), exs)
 
 ## This is *experimental* syntax to lessen the typing of subs
@@ -111,12 +110,22 @@ function !={T <: Complex}(x::Sym, y::T)
 end
 
 
-for meth in (:expand, :together, :apart,
+for meth in (:n,
+             :simplify, :nsimplify, :factor, :collect, :separate,
+             :radsimp, :ratsimp,  :trigsimp, :powsimp, :combsimp, :hypersimp,
+             :primitive, :gcd, :resultant, :cancel,
+             :expand, :together, :apart,
              :limit, :diff,
              :series, :integrate)
     meth_name = string(meth)
-    @eval ($meth)(s::Sym, args...) = call_meth(s, symbol($meth_name), project(args)...)
+    @eval ($meth)(args...; kwargs...) = call_meth(symbol($meth_name), args...; kwargs...)
 end
+
+## different conversions
+fraction(args...; kwargs...) = sympy.fraction(project(args)...; kwargs...) | os -> map(u -> convert(Sym, u), os)
+
+
+
 
 ## Alternate interface for simple integral
 integrate(s::Sym, x::Sym, from::Real, to::Real) = integrate(s, (x, from, to))
@@ -134,6 +143,7 @@ for fn in (:summation,
            :assoc_legendre, :chebyshevt, :legendre, :hermite
            )
     meth = string(fn)
+    
     @eval ($fn)(args...) = Sym(sympy[symbol($meth)](project(args)...))
 end
 

@@ -408,7 +408,6 @@ convert(Array{Sym}, convert(SymMatrix, J)) # need to work to get out components
 ```
 
 
-
 ### More ...
 
 The `sympy` package has much more functionality than indicated
@@ -418,8 +417,24 @@ polynomials we haven't exposed.
 If useful parts of `SymPy` could add to this package, please pass
 along a request.
 
+The `call_meth` function can make it easy to bring in sympy functions to `julia`. For example, to define a `cancel` function which in sympy has signature `(ex, extension=x)` can be done with:
 
+```
+Kancel(args...; kwargs...) = call_meth(:cancel, args...; kwargs...) ## already have cancel
+sq2 = (sqrt(x) | (x==2))
+f = x^3 + (sq2- 2)*x^2 - (2*sq2 + 3)*x - 3*sq2
+g = x^2 - 2
+Kancel(f/g)
+Kancel(f/g, extension=true) | 
+```
 
+For functions without keyword arguments, it is even easier:
+
+```
+harmonic(n::Integer) = call_meth(:harmonic, n)
+harmonic(30)
+convert(Rational, harmonic(30))
+```
 
 
 

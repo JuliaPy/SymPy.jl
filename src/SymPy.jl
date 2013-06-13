@@ -20,18 +20,25 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        abs
 import Base: factorial, gamma, beta
 import Base: solve, length,  size
+import Base: factor, gcd, expand
 import Base: !=, ==
 import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj, 
               cross, eigvals, eigvecs, rref, trace
 import Base: promote_rule
 
-export sympy
+export sympy, call_meth
 export Sym, @sym_str, @syms
 export pprint, latex
 export SymFunction, SymMatrix,
-       n, subs,
+       n,  subs,
+       simplify, nsimplify, factor, collect, separate, 
+       radsimp, ratsimp, trigsimp, powsimp, combsimp,hypersimp,
+       fraction,
+       primitive, gcd, resultant, cancel,
        expand, together, apart,
-       limit, diff, series, integrate, summation,
+       limit, diff, 
+       series, integrate, 
+       summation,
        I, oo,
        Ylm, assoc_legendre, chebyshevt, legendre, hermite,
        dsolve,

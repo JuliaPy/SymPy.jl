@@ -83,7 +83,12 @@ latex(s::Sym, args...)  = sympy[:latex ](project(s), project(args)...)
 promote_rule{T <: Number}(::Type{Sym}, ::Type{T}) = Sym
 convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 convert(::Type{String},  x::Sym) = convert(String,  project(x))
-
+function convert(::Type{Rational}, x::Sym)
+    ## issues with conversion: compare convert(Rational, sympy.harmonic(30)) to sympy.harmonic(30)
+    out = fraction(x)
+    int(out[1]) // int(out[2])
+end
+    
 
 
 
@@ -100,9 +105,9 @@ complex(xs::Array{Sym}) = map(complex, xs)
 convert(::Type{Function}, xsym::Sym) = u -> float(subs(xsym, sym"x", u))
 
 
-## call method of a symoblic instance
-call_meth(x::Sym, meth::Symbol, args::Tuple) = Sym(project(x)[meth](project(args)))
-call_meth(x::Sym, meth::Symbol, args...) = Sym(project(x)[meth](project(args)...))
+## Makes it possible to call in a sympy method, e.g.,
+## hyperexpand(args...; kwargs...) = call_meth(:hyperexpand, args...; kwargs...)
+call_meth(meth::Symbol, args...; kwargs...) = convert(Sym, sympy[meth](map(project, args)...; kwargs...))
 
 ## From PyCall.pywrap:
 function members(o::Union(PyObject, Sym))
