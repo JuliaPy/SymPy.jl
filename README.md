@@ -109,7 +109,8 @@ apart(1/(x +2)/(x + 1))		# -1/(x+2) + 1/(x+1)
 
 The `subs` command is used to substitute values. These values are typically numeric, though they may be other symbols:
 
-``` subs(x + y, x, 3) # y + 3 subs(x*y, y, 24 - 2x) # x*(-2*x + 24)
+``` 
+subs(x + y, x, 3) # y + 3 subs(x*y, y, 24 - 2x) # x*(-2*x + 24)
 ```
 
 Somehow that syntax isn't so natural. We introduce the following
