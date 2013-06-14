@@ -88,6 +88,16 @@ _str(a::Array{Sym}) = map(_str, a)
 pprint(s::Sym, args...) = sympy[:pprint](project(s), project(args)...)
 latex(s::Sym, args...)  = sympy[:latex ](project(s), project(args)...)
 
+function jprint(x::Sym)
+  out = PyCall.pyeval("str(x)", x = x.x)
+
+  if ismatch(r"\*\*", out)
+    return replace(out, "**", "^")
+  else
+    return out
+  end
+end
+
 promote_rule{T <: Number}(::Type{Sym}, ::Type{T}) = Sym
 convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 convert(::Type{String},  x::Sym) = convert(String,  project(x))
