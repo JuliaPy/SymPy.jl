@@ -189,3 +189,7 @@ a ^ a ## error
 a .^ a
 a ^ b ## error
 a .^ b ## error
+
+## Test conversion of SymPy symbol to Julia expression
+x = sym"x"
+convert(Expr, simplify(x*(x+1)-x+2))
