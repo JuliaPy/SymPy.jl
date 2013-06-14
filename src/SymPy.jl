@@ -1,9 +1,8 @@
 module SymPy
 
-using GoogleCharts
 using PyCall
-
 @pyimport sympy
+using GoogleCharts
 
 import Base.getindex
 import Base: show, repl_show
@@ -20,21 +19,23 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        abs
 import Base: factorial, gamma, beta
 import Base: solve, length,  size
-import Base: factor, gcd, expand
+import Base: factor, gcd, lcm, expand
 import Base: !=, ==
 import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj, 
               cross, eigvals, eigvecs, rref, trace
 import Base: promote_rule
+## poly.jl
+import Base: div
 
-export sympy, call_meth, call_meth_nosimplify, call_object_meth, call_matrix_meth
+export sympy, sympy_meth, call_meth, object_meth, call_object_meth, call_matrix_meth
 export Sym, @sym_str, @syms, symbols
-export pprint, latex
+export pprint, latex, jprint
 export SymFunction, SymMatrix,
        n,  subs,
        simplify, nsimplify, factor, collect, separate, 
        radsimp, ratsimp, trigsimp, powsimp, combsimp,hypersimp,
        fraction,
-       primitive, gcd, resultant, cancel,
+       primitive, sqf, resultant, cancel,
        expand, together, apart,
        limit, diff, 
        series, integrate, 
@@ -43,13 +44,16 @@ export SymFunction, SymMatrix,
        Ylm, assoc_legendre, chebyshevt, legendre, hermite,
        dsolve,
        plot,
-       poly, nroots, real_roots
+       poly,  nroots, real_roots
 export jacobian, hessian
 export members, doc, _str
 
 
 include("utils.jl")
+include("mathops.jl")
 include("math.jl")
+include("poly.jl")
+include("matrix.jl")
 include("plot.jl")
 
 end

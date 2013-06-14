@@ -1,4 +1,7 @@
 using SymPy
+using Base.Test
+#### utils
+
 
 ## syms
 x = Sym("x")
@@ -7,6 +10,7 @@ x = Sym(:x)
 (x,) = @syms x
 x,y = Sym(:x, :y)
 x,y = @syms x y
+a,b,c = symbols("a b c", commutative=false)
 
 ## subs, | (x == number)
 f(x) = x^2 - 2
@@ -25,7 +29,12 @@ x1 = (x + 1)*(x+2)
 convert(Sym, x1[:expand]())     #  alternate syntax, perhaps will get easier with pytype_mapping support
 
 
+## Test conversion of SymPy symbol to Julia expression
+x = sym"x"
+convert(Expr, simplify(x*(x+1)-x+2))
 
+
+#### Math
 ## limits
 @assert limit(sin(x)/x, x, 0) | float == 1
 (x, h) = @syms x h
@@ -52,7 +61,7 @@ integrate(sin(x), (x, a, b)) | (a == 0) | (b == pi)
 
 ## summation
 summation(1/x^2, (x, 1, 10))
-@assert convert(Rational, summation(1/x^2, (x, 1, 10)) | float) == sum([1//x^2 for  x in 1:10])
+@assert convert(Rational, summation(1/x^2, (x, 1, 10)))  == sum([1//x^2 for  x in 1:10])
 
 ## matrices
 (x,) = @syms x
@@ -67,18 +76,19 @@ a[:inv]("LU")                   # pass argument to function
 SymPy.adjoint(A)
 SymPy.dual(A)
 SymPy.cholesky(A)
+
 ## other functions, could wrap
 b = subs(a, x, 2)
 map(u -> convert(Sym, u),  b[:QRdecomposition]()) # tuple of matrices
 
-a[:is_square]
-a[:is_symmetric]()
+@test a[:is_square] == true
+@test a[:is_symmetric]() == true
 
 
 eigvals(A)
 
 
-## Ops
+#### math-ops
 s = 3
 x = Sym("x")
 v = [x, 1]
@@ -87,12 +97,12 @@ a = [x 1; 1 x]
 b = [x 1 2; 1 2 x]
 
 ## scalar, [vector, matrix]
-s + v
-v + s
-s + rv
-rv + s
-s + a
-a + s
+@test ( (s + v)  | (x==2) | float .== [3 + 2, 4]) | all
+@test ( (v + s)  | (x==2) | float .== [3 + 2, 4]) | all
+@test ( (s + rv) | (x==2) | float .== [5 4]) | all
+@test ( (s + rv) | (x==2) | float .== [5 4]) | all
+@test ( (s + a )  | (x==2) | float .== [2+3 4; 4 2+3]) | all
+@test ( (a + a)   | (x==2) | float .== [2+2 1+1; 1+1 2+2]) | all
 
 s - v
 v - s
@@ -121,15 +131,15 @@ s / a ## broadcasts s
 s ./ a 
 a / s
 
-s ^ v ## error
+@test_fails s ^ v ## error
 s .^ v  
-v ^ s ## error
+@test_fails v ^ s ## error
 v .^ s 
-s ^ rv ## error
+@test_fails s ^ rv ## error
 s .^ rv
-rv ^ s ## error
+@test_fails rv ^ s ## error
 rv .^ s 
-s ^ a ## error
+@test_fails s ^ a ## error
 s .^ a
 a ^ s
 a .^ s 
@@ -137,55 +147,66 @@ a .^ s
 
 ## vector vector
 v + v
-v + rv ## error
+@test_fails v + rv ## error
 v - v
-v - rv ## error
-v * v ## error
+@test_fails v - rv ## error
+@test_fails v * v ## error
 v .* v
 dot(v, v)
 v * rv ## 2x1 1x2 == 2x2
 rv * v ## 1x2 2 x 1 == 1x1
 v .* rv ## XXX ?? should be what? -- not 2 x 2
 rv .* v ## XXX ditto
-v / v ## error
+@test_fails v / v ## error
 v ./ v ## ones()
-v / rv ## error
+@test_fails v / rv ## error
 v ./ rv  ## ??
-v ^ v ## error
+@test_fails v ^ v ## error
 v .^ v
-v ^ rv ## error
+@test_fails v ^ rv ## error
 v .^ rv ## ??
 
 
 ## vector matrix
-v + a ## error (Broadcast?)
-a + v ## error
+@test_fails v + a ## error (Broadcast?)
+@test_fails a + v ## error
 v .+ a ## broadcasts
 a .+ v
-v - a ## error
+@test_fails v - a ## error
 v .- a
-v * a ## error
+@test_fails v * a ## error
 v .* a
-v / a ## error
+@test_fails v / a ## error
 v ./ a
-v ^ a ## error
+@test_fails v ^ a ## error
 v .^ a
 
 ## matrix matrix
 a + a
-a + b ## error
+@test_fails a + b ## error
 a + 2a
 a - a
-a - b ## error
+@test_fails a - b ## error
 a * a
 a .* a
 a * b ## 2x2 * 2*3 -- 2x3
-a .* b ## error -- wrong size
-a / a ## error
+@test_fails a .* b ## error -- wrong size
+@test_fails a / a ## error
 a ./ a ## ones
-a / b ## error
-a ./ b ## error
-a ^ a ## error
+@test_fails a / b ## error
+@test_fails a ./ b ## error
+@test_fails a ^ a ## error
 a .^ a
-a ^ b ## error
-a .^ b ## error
+@test_fails a ^ b ## error
+@test_fails a .^ b ## error
+
+
+#### poly.jl
+
+## div
+x,y,z = @syms x y z
+pf = 5*x^2 + 10*x + 3
+pg = 2*x + 2
+q, r = div(pf, pg, x, y)
+
+

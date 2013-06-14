@@ -33,6 +33,8 @@ end
 
 basictype = sympy.basic["Basic"]
 matrixtype = sympy.matrices["MatrixBase"]
+polytype = sympy.polys["polytools"]["Poly"]
+
 convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
 convert(::Type{PyObject}, s::Sym) = s.x
 ## Not quite sure how much this will do, but hopefull alot
@@ -122,19 +124,34 @@ complex(xs::Array{Sym}) = map(complex, xs)
 ## can use subs(xsym, sym"u", sym"x") first if it is u, say.
 convert(::Type{Function}, xsym::Sym) = u -> float(subs(xsym, sym"x", u))
 
+## Convert SymPy symbol to Julia expression
+convert(::Type{Expr}, x::Sym) = parse(jprint(x))
 
-## Makes it possible to call in a sympy method, e.g.,
+## Various means to call sympy or object methods. All convert input, not all convert output.
+
+## Makes it possible to call in a sympy method, witout worrying about Sym objects
+call_sympy_fun(fn::Function, args...; kwargs...) = fn(map(project, args)...; [(k,project(v)) for (k,v) in kwargs]...)
 ## hyperexpand(args...; kwargs...) = call_meth(:hyperexpand, args...; kwargs...)
-call_meth(meth::Symbol, args...; kwargs...) = convert(Sym, sympy[meth](map(project, args)...; kwargs...))
-call_meth_nosimplify(meth::Symbol, args...; kwargs...) = sympy[meth](map(project, args)...; kwargs...)
+## convert arguments
+sympy_meth(meth::Symbol, args...; kwargs...) = call_sympy_fun(sympy[meth], args...; kwargs...)
+## convert arguments, output
+call_meth(meth::Symbol, args...; kwargs...) = convert(Sym, sympy_meth(meth, args...; kwargs...))
+## meth of object, convert arguments
+object_meth(object::Sym, meth::Symbol, args...; kwargs...) =  call_sympy_fun(project(object)[meth],  args...; kwargs...)
+## meth of object, convert arguments, output
 function call_object_meth(object::Sym, meth::Symbol, args...; kwargs...)
-    out = project(object)[meth](map(project, args)...; kwargs...)
+    out = object_meth(object, meth, args...; kwargs...)
     convert(Sym, out)
 end
+## meth of object, convert arguments, output to SymMatrix 
 function call_matrix_meth(object::Sym, meth::Symbol, args...; kwargs...) 
-    out = call_object_meth(object, meth, args...; kwargs...)
-    convert(SymMatrix, out)
+    out = object_meth(object, meth, args...; kwargs...)
+    out = convert(SymMatrix, out)
+    convert(Array{Sym}, out)
 end
+
+
+
 ## From PyCall.pywrap:
 function members(o::Union(PyObject, Sym))
     out = convert(Vector{(String,PyObject)}, 
