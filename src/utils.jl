@@ -122,6 +122,8 @@ complex(xs::Array{Sym}) = map(complex, xs)
 ## can use subs(xsym, sym"u", sym"x") first if it is u, say.
 convert(::Type{Function}, xsym::Sym) = u -> float(subs(xsym, sym"x", u))
 
+## Convert SymPy symbol to Julia expression
+convert(::Type{Expr}, x::Sym) = parse(jprint(x))
 
 ## Makes it possible to call in a sympy method, e.g.,
 ## hyperexpand(args...; kwargs...) = call_meth(:hyperexpand, args...; kwargs...)

@@ -28,7 +28,7 @@ import Base: promote_rule
 
 export sympy, call_meth, call_meth_nosimplify, call_object_meth, call_matrix_meth
 export Sym, @sym_str, @syms, symbols
-export pprint, latex
+export pprint, latex, jprint
 export SymFunction, SymMatrix,
        n,  subs,
        simplify, nsimplify, factor, collect, separate, 
