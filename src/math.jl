@@ -292,5 +292,6 @@ end
 ## f = x^2 - 2x*y
 ## hessian(f, [x,y])
 function hessian(f::Sym, x::Array{Sym})
-    call_meth(:hessian, f, convert(SymMatrix, x))
+    out = call_meth(:hessian, f, x)
+    convert(SymMatrix, out)
 end

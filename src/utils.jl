@@ -24,10 +24,11 @@ macro sym_str(x)
     Sym(x)
 end
 
-## define one or more symbols
-## symbols("a,b,c", commutative=false)
+## define one or more symbols directly
+## a,b,c = symbols("a,b,c", commutative=false)
 function symbols(x::String; commutative::Bool=true) 
-    map(u -> convert(Sym, u), sympy.symbols(x, commutative=commutative))
+    out = sympy.symbols(x, commutative=commutative)
+    length(out) > 1 ? map(u -> convert(Sym, u), out) : out
 end
 
 basictype = sympy.basic["Basic"]
@@ -60,6 +61,7 @@ end
 project(x::Any) = x
 project(x::Sym) = x.x
 project(x::Tuple) = map(project, x)
+project(x::Array{Sym}) = project(convert(SymMatrix, x))
 
 ## convert args so that we can use obj[:methname](x,...) without needed to project
 function getindex(x::Sym, i::Symbol)
