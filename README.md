@@ -437,7 +437,7 @@ harmonic(30)
 convert(Rational, harmonic(30))
 ```
 
-Some conversions from `PyObject` to `Sym` are not automatic. In that case, use `call_meth_nosimplify` and work with the `PyObject`.
+Some conversions from `PyObject` to `Sym` are not automatic. In that case, use `sympy_meth` and work with the `PyObject`.
 
 
 
