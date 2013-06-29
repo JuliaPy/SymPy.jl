@@ -5,8 +5,8 @@ Sym(s::Sym) = s
 
 ## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y)
 ## have to add Sym here, as conversion isn't working below
-##Sym(s::Union(Symbol, String)) = sympy[:symbols](string(s))
-Sym(s::Union(Symbol, String)) = Sym(sympy[:symbols](string(s)))
+Sym(s::Union(Symbol, String)) = sympy[:symbols](string(s))
+#Sym(s::Union(Symbol, String)) = Sym(sympy[:symbols](string(s)))
 Sym(args...) = map(Sym, args)
 
 ## (a,b,c) = @syms a b c --- no commas on right hand side!
@@ -32,15 +32,19 @@ function symbols(x::String; commutative::Bool=true)
 end
 
 basictype = sympy.basic["Basic"]
+pytype_mapping(basictype, Sym)
+
 matrixtype = sympy.matrices["MatrixBase"]
+pytype_mapping(matrixtype, Sym)
+
 polytype = sympy.polys["polytools"]["Poly"]
+pytype_mapping(polytype, Sym)
 
 convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
 convert(::Type{PyObject}, s::Sym) = s.x
-## Not quite sure how much this will do, but hopefull alot
-## Not working until merged into pycall
-#pytype_mapping(basictype, Sym)
-#pytype_mapping(matrixtype, Sym)
+
+
+
 
 length(x::Sym) = *(size(x)...)
 function size(x::Sym)

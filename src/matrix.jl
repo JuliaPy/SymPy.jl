@@ -8,15 +8,30 @@
 #Sym{T,N}(o::Array{T,N}) = Sym(convert(Array{PyObject,N}, o))
 const SymMatrix = Sym
 
+## map for linear indexing. Should be a function in base, but don't know it
+function find_ijk(i, s)
+    out = Integer[]
+    while length(s) > 1
+        p = prod(s[1:end-1])
+        push!(out, iceil(i/p))
+        i = (i-1) % prod(s[1:end-1]) +1
+        s = s[1:end-1]
+    end
+        
+    push!(out, i)
+    tuple((reverse!(out) - 1)...)
+end
+## no linear indexing of matrices allowed here
 
-getindex(s::SymMatrix, i::Integer...) = Sym(pyeval("x[i]", x=s.x, i=tuple(([i...]-1)...)))
+getindex(s::SymMatrix, i::Integer...) = pyeval("x[i]", x=s.x, i= tuple(([i...]-1)...))
 getindex(s::SymMatrix, i::Symbol) = project(s)[i] # is_nilpotent, ... many such predicates
 
 ## we want our matrices to be arrays of Sym objects so that julia manages them
 ## it is convenient (for printing, say) to convert to a sympy matrix
 convert(SymMatrix, a::Array{Sym}) = Sym(sympy.Matrix(map(project, a)))
 function convert(::Type{Array{Sym}}, a::SymMatrix)
-    ndims = length(size(a))
+    sz = size(a)
+    ndims = length(sz)
     if ndims == 0
         a
     elseif ndims == 1
@@ -24,8 +39,9 @@ function convert(::Type{Array{Sym}}, a::SymMatrix)
     elseif ndims == 2
         Sym[a[i,j] for i in 1:size(a)[1], j in 1:size(a)[2]]
     else
-        b = Sym[a[i] for i in 1:length(a)]
-        reshape(b, size(a))
+        ## need something else for arrays... XXX -- can't linear index a
+        b = Sym[a[find_ijk(i, sz)] for i in 1:length(a)]
+        reshape(b, sz)
     end
 end
     
@@ -43,12 +59,12 @@ end
 
 ## return an array
 for fn in (:inv,
-           :adjoint, ## conj | ctranspose
+           :adjoint, ## conj |> ctranspose
            :cholesky,
            :conjugate, ## conj
            :dual, 
            :exp)
-    ## alternate Sym(convert(SymMatrix,a)[:meth]()) | u -> convert(Array{Sym}, u)
+    ## alternate Sym(convert(SymMatrix,a)[:meth]()) |> u -> convert(Array{Sym}, u)
     cmd = "x." * string(fn) * "()"
     @eval ($fn)(a::SymMatrix) = convert(Array{Sym}, Sym(pyeval(($cmd), x=project(a))))
     @eval ($fn)(a::Array{Sym, 2}) = ($fn)(convert(SymMatrix, a))
