@@ -65,7 +65,7 @@ core_sympy_methods = (:Wild, :Dummy,
 
 for meth in core_sympy_methods
     meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = call_meth(symbol($meth_name), ex, args...; kwargs...)
+    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
     eval(Expr(:export, meth))
 end
 
@@ -78,5 +78,5 @@ core_sympy_methods_base = (:factorial,
 for meth in core_sympy_methods_base
     meth_name = string(meth)
     @eval ($meth)(ex::Sym, args...; kwargs...) = 
-      call_meth(symbol($meth_name), ex, args...; kwargs...)
+      sympy_meth(symbol($meth_name), ex, args...; kwargs...)
 end

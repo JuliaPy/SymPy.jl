@@ -29,7 +29,7 @@ import Base: has, match, replace, round
 ## poly.jl
 import Base: div
 
-export sympy, sympy_meth, call_meth, object_meth, call_object_meth, call_matrix_meth
+export sympy, sympy_meth, object_meth, call_matrix_meth
 export Sym, @sym_str, @syms, symbols
 export pprint, latex, jprint
 export SymFunction, SymMatrix,

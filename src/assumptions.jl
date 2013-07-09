@@ -33,7 +33,7 @@ logic_sympy_meths = (
 
 for meth in logic_sympy_meths
     meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = call_meth(symbol($meth_name), ex, args...; kwargs...)
+    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
     eval(Expr(:export, meth))
 end
 

@@ -61,7 +61,7 @@ polynomial_sympy_methods = (:div, :rem,
 
 for meth in polynomial_sympy_methods
     meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = call_meth(symbol($meth_name), ex, args...; kwargs...)
+    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
     eval(Expr(:export, meth))
 end
 
@@ -73,7 +73,7 @@ polynomial_sympy_methods_import = (:expand,
                             
 for meth in polynomial_sympy_methods_import
     meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = call_meth(symbol($meth_name), ex, args...; kwargs...)
+    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
 end
 
 ## Poly class methods that aren't sympy methods

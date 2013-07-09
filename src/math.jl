@@ -22,7 +22,7 @@ end
 
 
 ## add
-abs(x::Sym) = call_meth(:Abs, x)
+abs(x::Sym) = sym_meth(:Abs, x)
 abs(a::Array{Sym}) = map(abs, a)
 
 ## Some sympy function interfaces
@@ -64,7 +64,7 @@ for meth in (:n, :N,
              :diff, :Derivative,
              :integrate)
     meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = call_meth(symbol($meth_name), ex, args...; kwargs...)
+    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
     
 end
 
@@ -125,4 +125,4 @@ SymFunction(nm::Union(Symbol, String)) = (args...) -> Sym(sympy[:Function](nm)(p
 ## x = Sym("x")
 ## dsolve(diff(f(x), x) + f(x), f(x)) ## solve f'(x) + f(x) = 0
 ## dsolve(diff(f(x), x, x) + f(x), f(x)) ## solve f''(x) + f(x) = 0
-dsolve(ex::Sym, fx::Sym) = call_meth(:dsolve, ex, fx)
+dsolve(ex::Sym, fx::Sym) = sympy_meth(:dsolve, ex, fx)

@@ -1,12 +1,14 @@
+## Symbol class for controlling dispatch
+
 immutable Sym
     x::PyCall.PyObject
 end
 Sym(s::Sym) = s
 
+## Many (too many) ways to create symbolobjects
 ## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y)
-## have to add Sym here, as conversion isn't working below
+
 Sym(s::Union(Symbol, String)) = sympy[:symbols](string(s))
-#Sym(s::Union(Symbol, String)) = Sym(sympy[:symbols](string(s)))
 Sym(args...) = map(Sym, args)
 
 ## (a,b,c) = @syms a b c --- no commas on right hand side!
@@ -29,6 +31,9 @@ end
 function symbols(x::String; kwargs...) 
     out = sympy.symbols(x; kwargs...)
 end
+
+
+## Automatic conversion of python types to Sym class.
 
 basictype = sympy.basic["Basic"]
 pytype_mapping(basictype, Sym)
@@ -61,6 +66,7 @@ function size(x::Sym, dim::Integer)
     end
 end
 
+## pull out x property of Sym objects or leave alone
 project(x::Any) = x
 project(x::Sym) = x.x
 project(x::Tuple) = map(project, x)
@@ -85,6 +91,10 @@ repl_show(io::IO, s::Vector{Sym}) =  print(io, summary(s), "\n", convert(Sym, s)
 
 
 
+
+
+doc(x::Sym) = print(x[:__doc__]())
+
 _str(s::Sym) = s[:__str__]()
 _str(a::Array{Sym}) = map(_str, a)
 
@@ -100,6 +110,9 @@ function jprint(x::Sym)
     return out
   end
 end
+
+## Convert SymPy symbol to Julia expression
+convert(::Type{Expr}, x::Sym) = parse(jprint(x))
 
 ## Number types
 promote_rule{T <: Number}(::Type{Sym}, ::Type{T}) = Sym
@@ -117,24 +130,21 @@ complex(xs::Array{Sym}) = map(complex, xs)
 ## can use subs(xsym, sym"u", sym"x") first if it is u, say.
 convert(::Type{Function}, xsym::Sym) = u -> float(subs(xsym, sym"x", u))
 
-## Convert SymPy symbol to Julia expression
-convert(::Type{Expr}, x::Sym) = parse(jprint(x))
 
-## Various means to call sympy or object methods. All convert input, not all convert output.
+## Various means to call sympy or object methods. All convert input,
+## not all convert output.
+##
+## we may have sympy.method
+## or we may have object.method
 
 ## Makes it possible to call in a sympy method, witout worrying about Sym objects
 call_sympy_fun(fn::Function, args...; kwargs...) = fn(map(project, args)...; [(k,project(v)) for (k,v) in kwargs]...)
-## hyperexpand(args...; kwargs...) = call_meth(:hyperexpand, args...; kwargs...)
-## convert arguments
 sympy_meth(meth::Symbol, args...; kwargs...) = call_sympy_fun(sympy[meth], args...; kwargs...)
-## convert arguments, output
-call_meth(meth::Symbol, args...; kwargs...) = sympy_meth(meth, args...; kwargs...)
+
 ## meth of object, convert arguments
 object_meth(object::Sym, meth::Symbol, args...; kwargs...) =  call_sympy_fun(project(object)[meth],  args...; kwargs...)
-## meth of object, convert arguments, output
-function call_object_meth(object::Sym, meth::Symbol, args...; kwargs...)
-    object_meth(object, meth, args...; kwargs...)
-end
+
+
 ## meth of object, convert arguments, output to SymMatrix 
 function call_matrix_meth(object::Sym, meth::Symbol, args...; kwargs...) 
     out = object_meth(object, meth, args...; kwargs...)
@@ -150,7 +160,3 @@ function members(o::Union(PyObject, Sym))
                   pycall(PyCall.inspect["getmembers"], PyObject, project(o)))
     String[u[1] for u in out]
 end
-
-
-
-doc(x::Sym) = print(x[:__doc__]())
