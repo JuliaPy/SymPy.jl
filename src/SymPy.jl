@@ -17,13 +17,15 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        square, erf, erfc, erfcx, erfi, dawson, ceil, floor,
        trunc, round, significand,
        abs
-import Base: factorial, gamma, beta
+import Base: factorial, gcd, lcm, isqrt
+import Base: gamma, beta
 import Base: solve, length,  size
-import Base: factor, gcd, lcm, expand
+import Base: factor, expand
 import Base: !=, ==
 import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj, 
               cross, eigvals, eigvecs, rref, trace
 import Base: promote_rule
+import Base: has, match, replace, round
 ## poly.jl
 import Base: div
 
@@ -32,11 +34,12 @@ export Sym, @sym_str, @syms, symbols
 export pprint, latex, jprint
 export SymFunction, SymMatrix,
        n,  subs,
-       simplify, nsimplify, factor, collect, separate, 
-       radsimp, ratsimp, trigsimp, powsimp, combsimp,hypersimp,
+       simplify, nsimplify, 
+       expand, factor, trunc,
+       collect, separate, 
        fraction,
        primitive, sqf, resultant, cancel,
-       expand, together, apart,
+       expand, together,
        limit, diff, 
        series, integrate, 
        summation,
@@ -46,14 +49,19 @@ export SymFunction, SymMatrix,
        plot,
        poly,  nroots, real_roots
 export jacobian, hessian
-export members, doc, _str
+export members, doc, _sbtr
 
 
 include("utils.jl")
 include("mathops.jl")
 include("math.jl")
+include("core.jl")
+include("simplify.jl")
+include("series.jl")
+include("assumptions.jl")
 include("poly.jl")
 include("matrix.jl")
 include("plot.jl")
+
 
 end

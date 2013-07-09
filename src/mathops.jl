@@ -1,7 +1,7 @@
 ## Numbers. Should be a better way to make a value numeric
 function convert{T <: Real}(::Type{Sym}, x::T)
     a = Sym(randstring(10))
-    a | (a == x)
+    a |> (a == x)
 end
 
 

@@ -125,15 +125,15 @@ s / a ## broadcasts s
 s ./ a 
 a / s
 
-@test_fails s ^ v ## error
+@test_throws s ^ v ## error
 s .^ v  
-@test_fails v ^ s ## error
+@test_throws v ^ s ## error
 v .^ s 
-@test_fails s ^ rv ## error
+@test_throws s ^ rv ## error
 s .^ rv
-@test_fails rv ^ s ## error
+@test_throws rv ^ s ## error
 rv .^ s 
-@test_fails s ^ a ## error
+@test_throws s ^ a ## error
 s .^ a
 a ^ s
 a .^ s 
@@ -141,55 +141,55 @@ a .^ s
 
 ## vector vector
 v + v
-@test_fails v + rv ## error
+@test_throws v + rv ## error
 v - v
-@test_fails v - rv ## error
-@test_fails v * v ## error
+@test_throws v - rv ## error
+@test_throws v * v ## error
 v .* v
 dot(v, v)
 v * rv ## 2x1 1x2 == 2x2
 rv * v ## 1x2 2 x 1 == 1x1
 v .* rv ## XXX ?? should be what? -- not 2 x 2
 rv .* v ## XXX ditto
-@test_fails v / v ## error
+@test_throws v / v ## error
 v ./ v ## ones()
-@test_fails v / rv ## error
+@test_throws v / rv ## error
 v ./ rv  ## ??
-@test_fails v ^ v ## error
+@test_throws v ^ v ## error
 v .^ v
-@test_fails v ^ rv ## error
+@test_throws v ^ rv ## error
 v .^ rv ## ??
 
 
 ## vector matrix
-@test_fails v + a ## error (Broadcast?)
-@test_fails a + v ## error
+@test_throws v + a ## error (Broadcast?)
+@test_throws a + v ## error
 v .+ a ## broadcasts
 a .+ v
-@test_fails v - a ## error
+@test_throws v - a ## error
 v .- a
-@test_fails v * a ## error
+@test_throws v * a ## error
 v .* a
-@test_fails v / a ## error
+@test_throws v / a ## error
 v ./ a
-@test_fails v ^ a ## error
+@test_throws v ^ a ## error
 v .^ a
 
 ## matrix matrix
 a + a
-@test_fails a + b ## error
+@test_throws a + b ## error
 a + 2a
 a - a
-@test_fails a - b ## error
+@test_throws a - b ## error
 a * a
 a .* a
 a * b ## 2x2 * 2*3 -- 2x3
-@test_fails a .* b ## error -- wrong size
-@test_fails a / a ## error
+@test_throws a .* b ## error -- wrong size
+@test_throws a / a ## error
 a ./ a ## ones
-@test_fails a / b ## error
-@test_fails a ./ b ## error
-@test_fails a ^ a ## error
+@test_throws a / b ## error
+@test_throws a ./ b ## error
+@test_throws a ^ a ## error
 a .^ a
-@test_fails a ^ b ## error
-@test_fails a .^ b ## error
+@test_throws a ^ b ## error
+@test_throws a .^ b ## error

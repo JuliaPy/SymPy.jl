@@ -26,9 +26,8 @@ end
 
 ## define one or more symbols directly
 ## a,b,c = symbols("a,b,c", commutative=false)
-function symbols(x::String; commutative::Bool=true) 
-    out = sympy.symbols(x, commutative=commutative)
-    length(out) > 1 ? map(u -> convert(Sym, u), out) : out
+function symbols(x::String; kwargs...) 
+    out = sympy.symbols(x; kwargs...)
 end
 
 basictype = sympy.basic["Basic"]
@@ -42,8 +41,6 @@ pytype_mapping(polytype, Sym)
 
 convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
 convert(::Type{PyObject}, s::Sym) = s.x
-
-
 
 
 length(x::Sym) = *(size(x)...)
@@ -104,19 +101,11 @@ function jprint(x::Sym)
   end
 end
 
+## Number types
 promote_rule{T <: Number}(::Type{Sym}, ::Type{T}) = Sym
 convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 convert(::Type{String},  x::Sym) = convert(String,  project(x))
-function convert(::Type{Rational}, x::Sym)
-    ## issues with conversion: compare convert(Rational, sympy.harmonic(30)) to sympy.harmonic(30)
-    out = fraction(x)
-    int(out[1]) // int(out[2])
-end
-    
-
-
-
-
+convert(::Type{Rational}, s::Sym) = Rational(project(s)[:p], project(s)[:q])
 convert(::Type{Complex}, x::Sym) = complex(map(float, x[:as_real_imag]())...)
 
 
@@ -139,13 +128,12 @@ call_sympy_fun(fn::Function, args...; kwargs...) = fn(map(project, args)...; [(k
 ## convert arguments
 sympy_meth(meth::Symbol, args...; kwargs...) = call_sympy_fun(sympy[meth], args...; kwargs...)
 ## convert arguments, output
-call_meth(meth::Symbol, args...; kwargs...) = convert(Sym, sympy_meth(meth, args...; kwargs...))
+call_meth(meth::Symbol, args...; kwargs...) = sympy_meth(meth, args...; kwargs...)
 ## meth of object, convert arguments
 object_meth(object::Sym, meth::Symbol, args...; kwargs...) =  call_sympy_fun(project(object)[meth],  args...; kwargs...)
 ## meth of object, convert arguments, output
 function call_object_meth(object::Sym, meth::Symbol, args...; kwargs...)
-    out = object_meth(object, meth, args...; kwargs...)
-    convert(Sym, out)
+    object_meth(object, meth, args...; kwargs...)
 end
 ## meth of object, convert arguments, output to SymMatrix 
 function call_matrix_meth(object::Sym, meth::Symbol, args...; kwargs...) 

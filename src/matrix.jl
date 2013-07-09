@@ -62,8 +62,8 @@ for fn in (:inv,
            :adjoint, ## conj |> ctranspose
            :cholesky,
            :conjugate, ## conj
-           :dual, 
-           :exp)
+           :dual
+           )
     ## alternate Sym(convert(SymMatrix,a)[:meth]()) |> u -> convert(Array{Sym}, u)
     cmd = "x." * string(fn) * "()"
     @eval ($fn)(a::SymMatrix) = convert(Array{Sym}, Sym(pyeval(($cmd), x=project(a))))

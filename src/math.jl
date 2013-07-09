@@ -11,9 +11,9 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
            :ceil, :floor, :trunc, :round, :significand
            )
 
-
+    
     meth = string(fn)
-    @eval ($fn)(x::Sym) = convert(Sym, sympy[symbol($meth)](project(x)) )
+    @eval ($fn)(x::Sym) = sympy[symbol($meth)](project(x))
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
@@ -53,16 +53,19 @@ function !={T <: Complex}(x::Sym, y::T)
     end
 end
 
+## evalf, n, N
 
-for meth in (:n,
-             :simplify, :nsimplify, :factor, :collect, :separate,
-             :radsimp, :ratsimp,  :trigsimp, :powsimp, :combsimp, :hypersimp,
-             :primitive, :gcd, :lcm, :sqf, :resultant, :cancel,
-             :expand, :together, :apart,
-             :limit, :diff,
-             :series, :integrate)
+for meth in (:n, :N,
+             :separate, :flatten, 
+             :igcd, :ilcm,
+             :sqf,
+             :together, 
+             :limit, 
+             :diff, :Derivative,
+             :integrate)
     meth_name = string(meth)
-    @eval ($meth)(args...; kwargs...) = call_meth(symbol($meth_name), args...; kwargs...)
+    @eval ($meth)(ex::Sym, args...; kwargs...) = call_meth(symbol($meth_name), ex, args...; kwargs...)
+    
 end
 
 ## different conversions
@@ -83,7 +86,7 @@ oo = Sym(sympy[:oo])
 
 ## functions which are methods of sympy, not a symbolic instance
 for fn in (:summation,
-           :Ylm, :factorial, :gamma, :beta,
+           :Ylm, :gamma, :beta,
            :assoc_legendre, :chebyshevt, :legendre, :hermite
            )
     meth = string(fn)
