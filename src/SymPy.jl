@@ -22,7 +22,7 @@ import Base: gamma, beta
 import Base: solve, length,  size
 import Base: factor, expand
 import Base: !=, ==
-import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj, 
+import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj,
               cross, eigvals, eigvecs, rref, trace
 import Base: promote_rule
 import Base: has, match, replace, round
@@ -48,7 +48,6 @@ export SymFunction, SymMatrix,
        dsolve,
        plot,
        poly,  nroots, real_roots
-export jacobian, hessian
 export members, doc, _sbtr
 
 
@@ -58,6 +57,7 @@ include("math.jl")
 include("core.jl")
 include("simplify.jl")
 include("series.jl")
+include("integrate.jl")
 include("assumptions.jl")
 include("poly.jl")
 include("matrix.jl")

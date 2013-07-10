@@ -61,8 +61,8 @@ for meth in (:n, :N,
              :sqf,
              :together, 
              :limit, 
-             :diff, :Derivative,
-             :integrate)
+             :diff, :Derivative
+             )
     meth_name = string(meth)
     @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
     
@@ -73,9 +73,6 @@ fraction(args...; kwargs...) = sympy.fraction(project(args)...; kwargs...) | os 
 
 
 
-
-## Alternate interface for simple integral
-integrate(s::Sym, x::Sym, from::Real, to::Real) = integrate(s, (x, from, to))
 
 ## special numbers
 I = Sym(sympy[:I])

@@ -1,9 +1,11 @@
 ## Symbol class for controlling dispatch
 
-immutable Sym
+abstract SymbolicObject
+
+immutable Sym <: SymbolicObject
     x::PyCall.PyObject
 end
-Sym(s::Sym) = s
+Sym(s::SymbolicObject) = s
 
 ## Many (too many) ways to create symbolobjects
 ## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y)
@@ -38,9 +40,6 @@ end
 basictype = sympy.basic["Basic"]
 pytype_mapping(basictype, Sym)
 
-matrixtype = sympy.matrices["MatrixBase"]
-pytype_mapping(matrixtype, Sym)
-
 polytype = sympy.polys["polytools"]["Poly"]
 pytype_mapping(polytype, Sym)
 
@@ -48,15 +47,15 @@ convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
 convert(::Type{PyObject}, s::Sym) = s.x
 
 
-length(x::Sym) = *(size(x)...)
-function size(x::Sym)
+length(x::SymbolicObject) = *(size(x)...)
+function size(x::SymbolicObject)
     if pyisinstance(x.x, matrixtype)
         return x[:shape]
     else
         return ()
     end
 end
-function size(x::Sym, dim::Integer)
+function size(x::SymbolicObject, dim::Integer)
     if dim <= 0
         error("dimension out of range")
     elseif dim <= 2 && pyisinstance(x.x, matrixtype)
@@ -68,12 +67,14 @@ end
 
 ## pull out x property of Sym objects or leave alone
 project(x::Any) = x
-project(x::Sym) = x.x
+project(x::SymbolicObject) = x.x
 project(x::Tuple) = map(project, x)
-project(x::Array{Sym}) = project(convert(SymMatrix, x))
+
 
 ## convert args so that we can use obj[:methname](x,...) without needed to project
-function getindex(x::Sym, i::Symbol)
+## python: obj.method(arg1, arg2, ...) -> julia: obj[:meth](args...) 
+## no kwargs though!
+function getindex(x::SymbolicObject, i::Symbol)
     out = project(x)[i]
     isa(out, Function) ? (args...) -> out(project(args)...) : out
 end
@@ -83,7 +84,7 @@ end
 ## Can only have pretty for non-array objects, o/w priting is all messed up
 
 ## as values use embedded \n values to align which don't have any idea of a cell
-show(io::IO, s::Sym) = print(io, sympy.pretty(project(s)))
+show(io::IO, s::SymbolicObject) = print(io, sympy.pretty(project(s)))
 
 ## need to call pretty on SymPy matrix object, not julia matrix of sympy objects
 show(io::IO, s::Array{Sym}) =  print(io, summary(s), "\n", convert(Sym, s))
@@ -93,15 +94,15 @@ repl_show(io::IO, s::Vector{Sym}) =  print(io, summary(s), "\n", convert(Sym, s)
 
 
 
-doc(x::Sym) = print(x[:__doc__]())
+doc(x::SymbolicObject) = print(x[:__doc__]())
 
-_str(s::Sym) = s[:__str__]()
-_str(a::Array{Sym}) = map(_str, a)
+_str(s::SymbolicObject) = s[:__str__]()
+_str(a::Array{SymbolicObject}) = map(_str, a)
 
-pprint(s::Sym, args...) = sympy[:pprint](project(s), project(args)...)
-latex(s::Sym, args...)  = sympy[:latex ](project(s), project(args)...)
+pprint(s::SymbolicObject, args...) = sympy[:pprint](project(s), project(args)...)
+latex(s::SymbolicObject, args...)  = sympy[:latex ](project(s), project(args)...)
 
-function jprint(x::Sym)
+function jprint(x::SymbolicObject)
   out = PyCall.pyeval("str(x)", x = x.x)
 
   if ismatch(r"\*\*", out)
@@ -112,7 +113,7 @@ function jprint(x::Sym)
 end
 
 ## Convert SymPy symbol to Julia expression
-convert(::Type{Expr}, x::Sym) = parse(jprint(x))
+convert(::Type{Expr}, x::SymbolicObject) = parse(jprint(x))
 
 ## Number types
 promote_rule{T <: Number}(::Type{Sym}, ::Type{T}) = Sym
@@ -142,14 +143,20 @@ call_sympy_fun(fn::Function, args...; kwargs...) = fn(map(project, args)...; [(k
 sympy_meth(meth::Symbol, args...; kwargs...) = call_sympy_fun(sympy[meth], args...; kwargs...)
 
 ## meth of object, convert arguments
-object_meth(object::Sym, meth::Symbol, args...; kwargs...) =  call_sympy_fun(project(object)[meth],  args...; kwargs...)
+object_meth(object::SymbolicObject, meth::Symbol, args...; kwargs...) =  
+  call_sympy_fun(project(object)[meth],  args...; kwargs...)
 
 
 ## meth of object, convert arguments, output to SymMatrix 
-function call_matrix_meth(object::Sym, meth::Symbol, args...; kwargs...) 
+function call_matrix_meth(object::SymbolicObject, meth::Symbol, args...; kwargs...) 
     out = object_meth(object, meth, args...; kwargs...)
-    out = convert(SymMatrix, out)
-    convert(Array{Sym}, out)
+    if isa(out, SymMatrix) 
+        convert(Array{Sym}, out)
+    elseif  length(out) == 1
+        out 
+    else
+        map(u -> isa(u, SymMatrix) ? convert(Array{Sym}, u) : u, out)
+    end
 end
 
 
