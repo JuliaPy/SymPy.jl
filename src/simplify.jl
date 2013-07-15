@@ -12,10 +12,4 @@ simplify_sympy_meths = (:collect, :rcollect, :separatevars,
 
 
 
-for meth in simplify_sympy_meths
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
-    eval(Expr(:export, meth))
-end
-
 ## didn't do traversal tools, EPath tools

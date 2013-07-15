@@ -21,12 +21,6 @@ integrals_sympy_methods = (:integrate,
                            :trigintegrate
                            )
 
-for meth in integrals_sympy_methods
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
-    eval(Expr(:export, meth))
-end
-
 
 integrals_instance_methods = (:as_sum,
                               :limits,
@@ -34,13 +28,6 @@ integrals_instance_methods = (:as_sum,
                               :variables)
                               
   
-for meth in integrals_instance_methods
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = object_meth(ex, symbol($meth_name), args...; kwargs...)
-    eval(Expr(:export, meth))
-end
-                         
-
 
                            
 
@@ -56,27 +43,5 @@ summations_sympy_methods = (
 summations_instance_methods  = (
                                 :euler_maclaurin,
                                 )
-summations_properties  = (:is_zero, :is_number)
+summations_object_properties  = (:is_zero, :is_number)
 
-
-for meth in summations_sympy_methods
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
-    eval(Expr(:export, meth))
-end
-
-
-
-for meth in summations_instance_methods
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = object_meth(ex, symbol($meth_name), args...; kwargs...)
-    eval(Expr(:export, meth))
-end
-      
-
-for meth in summations_properties
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = object_meth(ex, symbol($meth_name), args...; kwargs...)
-    eval(Expr(:export, meth))
-end
-      

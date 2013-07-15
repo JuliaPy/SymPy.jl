@@ -59,13 +59,6 @@ polynomial_sympy_methods = (:div, :rem,
 
 
 
-for meth in polynomial_sympy_methods
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
-    eval(Expr(:export, meth))
-end
-
-
 polynomial_sympy_methods_import = (:expand,
                                    :factor,
                                    :trunc
@@ -79,7 +72,7 @@ end
 ## Poly class methods that aren't sympy methods
 ## e.g., must be called as obj.method(...), but not method(obj, ...)       
 ## not coeffs(x^2 -1), rather poly(x^2 - 1)  |> coeffs
-polynomial_object_methods = (:EC, :ET, :LC, :LM, :LT, :TC, ## no .abs()
+polynomial_instance_methods = (:EC, :ET, :LC, :LM, :LT, :TC, ## no .abs()
                               :add_ground, 
                               :all_monoms, :all_roots, :all_terms, 
                               :as_dict, :as_expr, :as_list,
@@ -106,13 +99,6 @@ polynomial_object_methods = (:EC, :ET, :LC, :LM, :LT, :TC, ## no .abs()
                               )
 
 
-for meth in polynomial_object_methods
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = object_meth(ex, symbol($meth_name), args...; kwargs...)
-    eval(Expr(:export, meth))
-end
-
-
 
 polynomial_predicates = (
                          :is_cyclotomic,
@@ -132,11 +118,6 @@ polynomial_predicates = (
 
 
 
-for prop in polynomial_predicates
-    prop_name = string(prop)
-    @eval ($prop)(ex::Sym) = ex[symbol($prop_name)]
-    eval(Expr(:export, prop))
-end
 
 
 ## special cases due to output

@@ -162,7 +162,7 @@ Basic conversions from `SymPy` numeric types to the corresponding
 ```
 x, y = @syms x y
 x |> (x == 1) |> int
-convert(Rational, harmonic(30))
+convert(Rational, sympy.harmonic(30))
 ```
 
 The `sympy` function `N` can be used to form a numerical value from an

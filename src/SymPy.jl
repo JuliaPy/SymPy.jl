@@ -64,4 +64,41 @@ include("matrix.jl")
 include("plot.jl")
 
 
+## create some methods
+
+for meth in union(core_sympy_methods,
+                  simplify_sympy_meths,
+                  series_sympy_meths,
+                  integrals_sympy_methods,
+                  summations_sympy_methods,
+                  logic_sympy_methods,
+                  polynomial_sympy_methods)
+
+    meth_name = string(meth)
+    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+    eval(Expr(:export, meth))
+end
+
+
+for meth in union(core_object_methods,
+                  integrals_instance_methods,
+                  summations_instance_methods,
+                  polynomial_instance_methods)
+
+    meth_name = string(meth)
+    @eval ($meth)(ex::Sym, args...; kwargs...) = object_meth(ex, symbol($meth_name), args...; kwargs...)
+    eval(Expr(:export, meth))
+end
+
+
+
+for prop in union(core_object_properties,
+                  summations_object_properties,
+                  polynomial_predicates)
+    
+    prop_name = string(prop)
+    @eval ($prop)(ex::Sym) = ex[symbol($prop_name)]
+    eval(Expr(:export, prop))
+end
+
 end

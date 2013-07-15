@@ -31,12 +31,6 @@ core_object_methods = (:args, :as_poly, :atoms,
                        )
 
 
-for meth in core_object_methods
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = object_meth(ex, symbol($meth_name), args...; kwargs...)
-    eval(Expr(:export, meth))
-end
-
 core_object_properties = (:assumptions0,
                           :is_even, :is_odd,
                           :is_number, :is_integer, :is_real, :is_complex, :is_rational,
@@ -44,12 +38,6 @@ core_object_properties = (:assumptions0,
                           :free_symbols # a bit funny, returns a set
                           )
 
-
-for prop in core_object_properties
-    prop_name = string(prop)
-    @eval ($prop)(ex::Sym) = ex[symbol($prop_name)]
-    eval(Expr(:export, prop))
-end
 
 
 core_sympy_methods = (:Wild, :Dummy,
@@ -63,12 +51,6 @@ core_sympy_methods = (:Wild, :Dummy,
                       :igcd, :ilcm
                       )
 
-
-for meth in core_sympy_methods
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
-    eval(Expr(:export, meth))
-end
 
 
 ## need to import these

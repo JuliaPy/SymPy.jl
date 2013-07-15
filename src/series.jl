@@ -9,10 +9,3 @@ series_sympy_meths = (:limit,
                       )
 
 
-
-for meth in series_sympy_meths
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
-    eval(Expr(:export, meth))
-end
-

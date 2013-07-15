@@ -24,18 +24,13 @@ end
 
 
 ## simple methods (x, args) -> y (y coercion happens via PyCall)
-logic_sympy_meths = (
+logic_sympy_methods = (
                      :And, :Or, :Not, 
                      :Xor, :Nand, :Nor, :Implies,
                      :Equivalent,
                      :satisfiable
                      )
 
-for meth in logic_sympy_meths
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
-    eval(Expr(:export, meth))
-end
 
 ## ask. Returns true, false or nothing
 ##
