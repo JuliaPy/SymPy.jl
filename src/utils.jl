@@ -11,6 +11,7 @@ Sym(s::SymbolicObject) = s
 ## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y)
 
 Sym(s::Union(Symbol, String)) = sympy[:symbols](string(s))
+Sym{T <: Number}(s::T) = convert(Sym, sympy.sympify(s))
 Sym(args...) = map(Sym, args)
 
 ## (a,b,c) = @syms a b c --- no commas on right hand side!

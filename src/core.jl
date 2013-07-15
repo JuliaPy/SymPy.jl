@@ -4,7 +4,7 @@
 
 core_object_methods = (:args, :as_poly, :atoms,
                        :compare, :compare_pretty,
-                       :count, :doit, :dummy_eq, :free_symbols,
+                       :count, :doit, :dummy_eq, 
                        :has, :match, :replace,
                        :rewrite, :sort_key, 
                        :xreplace,
@@ -40,7 +40,8 @@ end
 core_object_properties = (:assumptions0,
                           :is_even, :is_odd,
                           :is_number, :is_integer, :is_real, :is_complex, :is_rational,
-                          :is_commutative
+                          :is_commutative, 
+                          :free_symbols # a bit funny, returns a set
                           )
 
 

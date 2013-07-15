@@ -29,7 +29,6 @@ end
 
 
 integrals_instance_methods = (:as_sum,
-                              :free_symbols,
                               :limits,
                               :transform,
                               :variables)
@@ -47,3 +46,37 @@ end
 
 ## Alternate interface for simple integral
 integrate(s::Sym, x::Sym, from::Real, to::Real) = integrate(s, (x, from, to))
+
+
+## summation
+summations_sympy_methods = (
+                            :summation, :Sum
+                            )
+
+summations_instance_methods  = (
+                                :euler_maclaurin,
+                                )
+summations_properties  = (:is_zero, :is_number)
+
+
+for meth in summations_sympy_methods
+    meth_name = string(meth)
+    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+    eval(Expr(:export, meth))
+end
+
+
+
+for meth in summations_instance_methods
+    meth_name = string(meth)
+    @eval ($meth)(ex::Sym, args...; kwargs...) = object_meth(ex, symbol($meth_name), args...; kwargs...)
+    eval(Expr(:export, meth))
+end
+      
+
+for meth in summations_properties
+    meth_name = string(meth)
+    @eval ($meth)(ex::Sym, args...; kwargs...) = object_meth(ex, symbol($meth_name), args...; kwargs...)
+    eval(Expr(:export, meth))
+end
+      

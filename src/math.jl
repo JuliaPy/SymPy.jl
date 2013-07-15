@@ -22,7 +22,7 @@ end
 
 
 ## add
-abs(x::Sym) = sym_meth(:Abs, x)
+abs(x::Sym) = sympy_meth(:Abs, x)
 abs(a::Array{Sym}) = map(abs, a)
 
 ## Some sympy function interfaces
@@ -65,7 +65,7 @@ for meth in (:n, :N,
              )
     meth_name = string(meth)
     @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
-    
+    eval(Expr(:export, meth))
 end
 
 ## different conversions
@@ -81,14 +81,23 @@ oo = Sym(sympy[:oo])
 ## Special functions
 ## Spherical harmonic
 
+
+
 ## functions which are methods of sympy, not a symbolic instance
-for fn in (:summation,
-           :Ylm, :gamma, :beta,
-           :assoc_legendre, :chebyshevt, :legendre, :hermite
-           )
-    meth = string(fn)
-    
-    @eval ($fn)(args...) = Sym(sympy[symbol($meth)](project(args)...))
+
+
+sympy_math_methods = ( :Prod,
+                      :Ylm, 
+                      :gamma, :beta, # need import
+                      :assoc_legendre, 
+                      :chebyshevt, 
+                      :legendre, 
+                      :hermite
+                      )
+for meth in sympy_math_methods 
+    meth_name = string(meth)
+    @eval ($meth)(ex::Sym, args...) = Sym(sympy[symbol($meth_name)](project(ex), project(args)...))
+    eval(Expr(:export, meth))
 end
 
 ## solve
@@ -102,15 +111,30 @@ end
 ## Trying to return an array of Sym objects printed funny!
 function solve(ex::Sym, x::Sym, args...)
     ans = sympy.solve(project(ex), project(x), project(args)...)
-    Sym[u for u in ans]
+    ans
+    #Sym[u for u in ans]
 end
 function solve(ex::Sym)
     ans = sympy.solve(project(ex))
-    Sym[u for u in ans]
+    ans
+    #Sym[u for u in ans]
 end
+
+
 function solve(exs::Vector{Sym}, xs::Vector{Sym})
-    sympy[:solve](map(project, exs), map(project, xs)) #  dictionary with keys, values as PyObjects
+    ans = sympy[:solve](map(project, exs), map(project, xs)) #  dictionary with keys, values as PyObjects
+    [string(k) => v for (k,v) in ans]
 end
+
+## Numeric solutions
+nsolve(ex::Sym, x::Sym, x0::Number) = sympy.nsolve(project(ex), project(x), x0) |> float
+nsolve(ex::Sym, x0::Number) =  sympy.nsolve(project(ex), x0) |> float
+function nsolve{T <: Number}(ex::Vector{Sym}, x::Vector{Sym}, x0::Vector{T}; kwargs...)
+    ans = sympy.nsolve(tuple(map(project,ex)...), tuple(map(project,x)...), tuple(x0...); kwargs...)
+    ## ans is matrix object -- convert
+    convert(Array{Sym}, sympy.Matrix(ans)) |> float
+end
+export nsolve
 
 ## dsolve
 ## Make a function argument, but munge arguments from Sym -> PyObject class

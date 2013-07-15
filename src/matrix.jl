@@ -102,7 +102,7 @@ map_matrix_methods = (:LDLsolve,
                       :cholesky, :cholesky_solve, :cofactor, :conjugate, 
                       :cross, 
                       :diagaonal_solve, :diagonalize, :diff, :dot, :dual,
-                      :exp, :expand,
+                      :expand,
                       :integrate, 
                       :inv, :inverse_ADJ, :inverse_GE, :inverse_LU,
                       :jordan_cells, :jordan_form,
@@ -127,6 +127,8 @@ end
 
 
 ### Some special functions
+exp(ex::Array{Sym}) = convert(Array{Sym}, object_meth(convert(SymMatrix, ex), :exp))
+
 
 Base.conj(a::SymMatrix) = conjugate(a)
 
@@ -151,7 +153,7 @@ end
 
 function rref(a::Array{Sym, 2}; kwargs...)
     d = convert(SymMatrix, a)[:rref](; kwargs...)
-    convert(Array{Sym}, convert(Sym, d[1]))
+    (convert(Array{Sym}, d[1]), d[2])
 end
 
 ## call with a (A,b), return array
