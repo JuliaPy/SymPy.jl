@@ -139,11 +139,10 @@ Even when the value is numeric, the result of `subs` is a symbolic
 object. To bring into `julia`, one must coerce the value with `float`
 or `int`, say.
 
-Somehow the `subs` syntax isn't so natural. We overload `replace` to
-create the function `ex -> subs(ex, x, y)` allowing for chaining:
+As the role of `subs` is somewhat similar to julia's `replace` function for strings, we overload `replace` for symbolic objects to call `subs` and create a Curried version for use with pipelines:
 
 ```
-x*y |> replace(y, 3)
+x*y |> replace(y, 3)		# does subs(x*y, y, 3)
 ```
 
 ### Conversion
@@ -187,7 +186,9 @@ x = subs(x, x, pi)
 N(x, 60)			# 3.14159265358979311599796346854418516159057617187500000000000
 ```
 
-as the value substituted is `julia`'s floating point representation of `pi`, not the symbolic value `sympi.pi`, so gets truncated after enough digits.
+as the value substituted is `julia`'s floating point representation of
+`pi`, not the symbolic value `sympi.pi`, so gets truncated after
+enough digits.
 
 For another example, consider this:
 
