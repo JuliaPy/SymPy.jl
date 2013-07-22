@@ -5,7 +5,7 @@
 core_object_methods = (:args, :as_poly, :atoms,
                        :compare, :compare_pretty,
                        :count, :doit, :dummy_eq, 
-                       :has, :match, :replace,
+                       :has, :match, ##:replace,
                        :rewrite, :sort_key, 
                        :xreplace,
                        :args_cnc,

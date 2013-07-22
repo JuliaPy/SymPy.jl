@@ -26,7 +26,7 @@ using PyCall
 @pyimport sympy
 x = sympy.Symbol("x")
 y = sympy.sin(x)
-y[:subs](x, pi) | float
+y[:subs](x, pi) |> float
 ```
 
 The `Symbol` and `sin` function of `SymPy` are found within the
@@ -46,7 +46,7 @@ need to evaluate python code. Here is one solution:
 x = sympy.Symbol("x")
 y = pyeval("k*x", k=pi, =x)     # PyObject 3.14159265358979*x
 z = sympy.sin(y)		# PyObject sin(3.14159265358979*x)
-z[:subs](x, 1) | float		# 1.2246467991473532e-16
+z[:subs](x, 1) |> float		# 1.2246467991473532e-16
 ```
 
 This gets replaced by a more `julia`n syntax:
@@ -55,7 +55,7 @@ This gets replaced by a more `julia`n syntax:
 using SymPy                     # some warnings need cleaning up
 x = sym"x"			# or Sym("x") or Sym(:x) or (x,) = @syms x
 y = sin(pi*x)
-subs(y, x, 1) | float
+subs(y, x, 1) |> float
 ```
 
 The object `x` we create is of type `Sym`, a simple proxy for the
@@ -110,21 +110,17 @@ apart(1/(x +2)/(x + 1))		# -1/(x+2) + 1/(x+1)
 The `subs` command is used to substitute values. These values are typically numeric, though they may be other symbols:
 
 ``` 
-subs(x + y, x, 3) # y + 3 subs(x*y, y, 24 - 2x) # x*(-2*x + 24)
+subs(x + y, x, 3)     # y + 3
+subs(x*y, y, 24 - 2x) # x*(-2*x + 24)
 ```
 
-Somehow that syntax isn't so natural. We introduce the following
-non-`SymPy` construction to mimic some math notation used with
-integration:
 
+Somehow that syntax isn't so natural. We introduce `replace` with a signature (`Sym`, `Any`) to use inline:
 ```
-x*y | (y == 3)
+x*y |> replace(y, 3)
 ```
 
-(The parentheses are necessary due to the order of operations in
-`julia`. To do this, we overload `==` for the pair (`Sym`,
-`Union(Real, Complex`) which doesn't really make sense to use for
-comparison anyways.)
+(This was `==(x::Sym, y::Number)` but `==` is now used with `solve`.)
 
 ### Printing
 
@@ -192,8 +188,8 @@ The `sympy` function `n` can be used to form a numerical value from an
 expression, though the expression is still a `Sym` instance.
 
 ```
-sqrt(x + 1) | (x == 2)		# pretty print sqrt(3)
-sqrt(x + 1) | (x == 2) | n	# 1.73205080756888 as Sym object
+sqrt(x + 1) | replace(x, 2)       # pretty print sqrt(3)
+sqrt(x + 1) | replace(x, 2) | n	  # 1.73205080756888 as Sym object
 ```
 
 
@@ -315,7 +311,7 @@ series(cos(x), x, 0, 3)		# 1 - x^2/2 + O(x^3)  (around 0, of order 3)
 These could also be generated through the `diff` function:
 
 ```
-[diff(cos(y), y, i)/factorial(i)*x^i for i in 0:3] | sum | (y == 0) # - x^2/2 + 1
+[diff(cos(y), y, i)/factorial(i)*x^i for i in 0:3] |> sum |> replace(y, 0) # - x^2/2 + 1
 ```
 
 * The `solve` function can solve equations.
@@ -329,7 +325,7 @@ The output is not simplified. In this case, we can convert to real with `float`:
 
 
 ```
-solve(x^2 - 2, x) | float	# [-1.41421, 1.41421]
+solve(x^2 - 2, x) |> float	# [-1.41421, 1.41421]
 ```
 
 It may turn out to be a bad idea, but for now the `==` operator for
@@ -422,11 +418,11 @@ The `call_meth` function can make it easy to bring in sympy functions to `julia`
 
 ```
 Kancel(args...; kwargs...) = call_meth(:cancel, args...; kwargs...) ## already have cancel
-sq2 = (sqrt(x) | (x==2))
+sq2 = (sqrt(x) |> replace(x, 2))
 f = x^3 + (sq2- 2)*x^2 - (2*sq2 + 3)*x - 3*sq2
 g = x^2 - 2
 Kancel(f/g)
-Kancel(f/g, extension=true) | 
+Kancel(f/g, extension=true)  
 ```
 
 For functions without keyword arguments, it is even easier:

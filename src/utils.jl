@@ -1,11 +1,4 @@
-## Symbol class for controlling dispatch
 
-abstract SymbolicObject
-
-immutable Sym <: SymbolicObject
-    x::PyCall.PyObject
-end
-Sym(s::SymbolicObject) = s
 
 ## Many (too many) ways to create symbolobjects
 ## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y)
@@ -36,31 +29,14 @@ function symbols(x::String; kwargs...)
 end
 
 
-## Automatic conversion of python types to Sym class.
-
-basictype = sympy.basic["Basic"]
-pytype_mapping(basictype, Sym)
-
-polytype = sympy.polys["polytools"]["Poly"]
-pytype_mapping(polytype, Sym)
-
-convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
-convert(::Type{PyObject}, s::Sym) = s.x
-
-
 length(x::SymbolicObject) = *(size(x)...)
 function size(x::SymbolicObject)
-    if pyisinstance(x.x, matrixtype)
-        return x[:shape]
-    else
-        return ()
-    end
+    return ()
 end
 function size(x::SymbolicObject, dim::Integer)
     if dim <= 0
         error("dimension out of range")
-    elseif dim <= 2 && pyisinstance(x.x, matrixtype)
-        return x[:shape][dim]
+   
     else
         return 1
     end

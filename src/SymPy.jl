@@ -51,6 +51,7 @@ export SymFunction, SymMatrix,
 export members, doc, _sbtr
 
 
+include("types.jl")
 include("utils.jl")
 include("mathops.jl")
 include("math.jl")

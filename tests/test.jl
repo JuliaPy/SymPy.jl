@@ -13,12 +13,12 @@ x,y = @syms x y
 f(x) = x^2 - 2
 y = f(x)
 @assert float(subs(y, x, 1)) == f(1)
-@assert float( y |> (x == 1) ) == f(1)
+@assert float( y |> replace(x,1) ) == f(1)
 
 y = sym"y"
 z = x - 3 + y
 subs(z, y, 3)
-@assert (z |> (x ==2) |> (y == 3) |> float) == (2 - 3 + 3)
+@assert (z |> replace(x, 2) |> replace(y, 3) |> float) == (2 - 3 + 3)
 
 ## algebra
 expand((x + 1)*(x+2))
@@ -31,13 +31,13 @@ convert(Sym, x1[:expand]())     #  alternate syntax, perhaps will get easier wit
 @assert limit(sin(x)/x, x, 0) |> float == 1
 (x, h) = @syms x h
 out = limit((sin(x+h) - sin(x))/h, h, 0)
-@assert (out |> (x == pi) |> float) == -1.0
+@assert (out |> replace(x, pi) |> float) == -1.0
 
 
 ## diff
 diff(sin(x), x)
 out = diff(sin(x), x, 2)
-@assert abs((out |> (x == pi/4) |> float) - - sin(pi/4)) < sqrt(eps())
+@assert abs((out |> replace(x, pi/4) |> float) - - sin(pi/4)) < sqrt(eps())
 
 x,y = @syms x y
 diff(x^2 + x*y^2, x, 1)         # partial derivatives
@@ -48,7 +48,7 @@ integrate(sin(x))
 integrate(sin(x), (x, 0, pi))
 a,b = @syms a b
 integrate(sin(x), (x, a, b))
-integrate(sin(x), (x, a, b)) |> (a == 0) |> (b == pi)
+integrate(sin(x), (x, a, b)) |> replace(a, 0) |> replace(b, pi)
 
 
 ## summation
@@ -73,7 +73,7 @@ SymPy.dual(A)
 SymPy.cholesky(A)
 ## other functions, could wrap
 b = subs(a, x, 2)
-map(u -> convert(Sym, u),  b[:QRdecomposition]()) # tuple of matrices
+map(u -> convert(Sym, u),  convert(Tuple, b[:QRdecomposition]())) # tuple of matrices
 
 a[:is_square]
 a[:is_symmetric]()

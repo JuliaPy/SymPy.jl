@@ -28,14 +28,19 @@ abs(a::Array{Sym}) = map(abs, a)
 ## Some sympy function interfaces
 
 ## subs
-function subs(ex::Sym, x::Sym, arg)
-    convert(Sym, project(ex)[:subs](project(x), project(arg)))
+function subs{T <: SymbolicObject, S <: SymbolicObject}(ex::T, x::S, arg)
+    object_meth(ex, :subs, x, arg)
 end
-subs(exs::Array{Sym}, x::Sym, arg) = map(ex->subs(ex, x, arg), exs)
+subs{T <: SymbolicObject, S <: SymbolicObject}(exs::Array{T}, x::S, arg) = map(ex->subs(ex, x, arg), exs)
 
-## This is *experimental* syntax to lessen the typing of subs
-## THis would work  ex | (x == 2) --> subs(ex, x, 2)
-=={T <: Union(Real, Complex)}(x::Sym, y::T) = (ex) -> subs(ex, x, y)
+Base.replace(ex::SymbolicObject, x::SymbolicObject, y) = subs(ex, x, y)
+## curried version to use through |> as in
+## ex |> replace(x, 2)
+Base.replace(x::SymbolicObject, y) = ex -> subs(ex, x, y)
+
+
+
+
 function !={T <: Real}(x::Sym, y::T) 
     try 
         x = float(x)
@@ -102,9 +107,17 @@ end
 
 ## solve
 
+## DEPRECATED
 ## Is this a good idea? I want to be able to solve equations with
 ## solve(x^2 +x == x, x)
-==(x::Sym, y::Sym) = solve(x - y)
+##==(x::Sym, y::Sym) = solve(x - y)
+
+
+<(x::Sym,  args...; kwargs...) = sympy_meth(:Lt, x, args...; kwargs...)
+<=(x::Sym, args...; kwargs...) = sympy_meth(:Le, x, args...; kwargs...)
+==(x::Sym, args...; kwargs...) = sympy_meth(:Eq, x, args...; kwargs...)
+>=(x::Sym, args...; kwargs...) = sympy_meth(:Ge, x, args...; kwargs...)
+>(x::Sym, args...; kwargs...)  = sympy_meth(:Gt, x, args...; kwargs...)
 
 
 ## solve. Returns array of PyObjects

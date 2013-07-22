@@ -15,7 +15,8 @@ tabs.next("About")
 
 ## About
 
-The `SymPy` package for `julia` brings the symbolic math capabilities of Python's `sympy` to `julia` users through the `PyCall` package
+The `SymPy` package for `julia` brings the symbolic math capabilities
+of Python's `sympy` to `julia` users through the `PyCall` package
 
 
 The `sympy` package (http://sympy.org/) is a Python library for symbolic mathematics. With the excellent `PyCall` package of `julia`, one has access to the many features of `sympy` from a `julia` session.
@@ -138,18 +139,12 @@ Even when the value is numeric, the result of `subs` is a symbolic
 object. To bring into `julia`, one must coerce the value with `float`
 or `int`, say.
 
-Somehow the `subs` syntax isn't so natural. We introduce the following
-non-`SymPy` construction to mimic some math notation used with
-integration (though this looked better before `|` became `|>`):
+Somehow the `subs` syntax isn't so natural. We overload `replace` to
+create the function `ex -> subs(ex, x, y)` allowing for chaining:
 
 ```
-x*y |> (y == 3)
+x*y |> replace(y, 3)
 ```
-
-(The parentheses are necessary due to the order of operations in
-`julia`. To do this, we overload `==` for the pair (`Sym`,
-`Union(Real, Complex`) which doesn't really make sense to use for
-comparison anyways.)
 
 ### Conversion
 
@@ -161,7 +156,7 @@ Basic conversions from `SymPy` numeric types to the corresponding
 
 ```
 x, y = @syms x y
-x |> (x == 1) |> int
+x |> replace(x, 1) |> int
 convert(Rational, sympy.harmonic(30))
 ```
 
@@ -169,8 +164,8 @@ The `sympy` function `N` can be used to form a numerical value from an
 expression, though the expression is still a `Sym` instance.
 
 ```
-sqrt(x + 1) | (x == 2)		# pretty print sqrt(3)
-sqrt(x + 1) | (x == 2) | N	# 1.73205080756888 as Sym object
+sqrt(x + 1) | replace(x, 2)		# pretty print sqrt(3)
+sqrt(x + 1) | replace(x, 2) | N	# 1.73205080756888 as Sym object
 ```
 
 We don't try to convert numeric values into `julia` objects, as `sympy` can use arbitrary precision. For example,
@@ -272,7 +267,7 @@ trigsimp(a)			# (x^2 + x) / x
 The `simplify` function has an argument `ratio` to determine how aggressive the simplification should be:
 
 ```
-root = 1/(sqrt(x) + 3) |> (x == 2) # want sqrt(2) to be symbolic
+root = 1/(sqrt(x) + 3) |> replace(x, 2) # want sqrt(2) to be symbolic
 simplify(root, ratio=1)		   # 1/(sqrt(2) + 3)
 simplify(root, ratio=oo)	   # -2/sqrt(7) + 3/sqrt(7)
 ```
@@ -323,23 +318,26 @@ solve(x^2 + 3*x + 2, x)
 solve(a*x^2 + b*x + c, x)
 ```
 
-Just the left hand expression is specified. The `==` operator is overloaded for symbolic objects to solve equations:
+Just the left hand expression is specified. The `==` operator is overloaded for symbolic objects to create equations:
 
 ```
-x^2 + 3x == -2x
-x^2 + 3x == -Sym(2)		#  not -2, as rhs must be Sym object
+eq = x^2 + 3x == -2x		# an equation
+solve(eq, x)
+solve(x^2 + 3x == 2)	        # don't need ex = 0
 ```
 
 
 Simultaneous equations can be specified with vector notation:
 
 ```
-eq1 = x + y - 1
-eq2 = x - y + 2
-solve([eq1, eq2], [x, y])	# {"x"=>-1/2,"y"=>3/2}
+eq1 = x + y == 1
+eq2 = x - y == 2
+solve([eq1, eq2], [x, y])	# {"x"=>3/2,"y"=>-1/2}
 ```
 
-The `nsolve` function provides numeric solutions to one or more equations. Again equations are written as expressions equal to $0$. Unlike `sovle`, the `nsolve` function requires a starting point.
+The `nsolve` function provides numeric solutions to one or more
+equations. Again equations are written as expressions equal to
+$0$. Unlike `sovle`, the `nsolve` function requires a starting point.
 
 ```
 nsolve(sin(x) - cos(x), x, 0)
@@ -410,7 +408,7 @@ We can make tangent lines:
 ```
 f(x) = x^x
 c = 2
-m = diff(f(x), x) |> (x == c)
+m = diff(f(x), x) |> replace(x, c)
 ```
 
 ```{asis=true}

@@ -2,15 +2,8 @@
 ## XXX work with Array{Sym}, not python array objects
 ## requires conversion from SymMatrix -> Array{Sym} in outputs, as appropriate
 
-immutable SymMatrix <: SymbolicObject
-    x::PyCall.PyObject
-end
-
-## convert SymPy matrices to SymMatrix
-matrixtype = sympy.matrices["MatrixBase"]
-pytype_mapping(matrixtype, SymMatrix)
-convert(::Type{SymMatrix}, o::PyCall.PyObject) = SymMatrix(o)
-
+## covert back to Array{Sym}
+subs(ex::SymMatrix, x::SymbolicObject, y) = convert(Array{Sym}, subs(convert(Sym, ex), x, y))
 
 
 ## map for linear indexing. Should be a function in base, but don't know it
@@ -32,6 +25,20 @@ end
 getindex(s::SymMatrix, i::Integer...) = pyeval("x[i]", x=s.x, i= tuple(([i...]-1)...))
 getindex(s::SymMatrix, i::Symbol) = project(s)[i] # is_nilpotent, ... many such predicates
 getindex(s::Array{Sym}, i::Symbol) = project(s)[i] # digaonalize..
+
+## size
+function size(x::SymMatrix)
+    a = x[:shape]               # a PyObject tuple
+    (a[:__getitem__](0), a[:__getitem__](1))
+end
+
+function size(x::SymMatrix, dim::Integer)
+    if dim <= 2 && pyisinstance(x.x, matrixtype)
+        return x[:shape][dim]
+    else
+        return 1
+    end
+end
 
 ## we want our matrices to be arrays of Sym objects, not symbolic matrices
 ## so that julia manages them
