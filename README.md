@@ -117,10 +117,10 @@ subs(x*y, y, 24 - 2x) # x*(-2*x + 24)
 The `subs` function is similar in spirit to `replace`, so we overload `replace` for symbolic expressions and create a Curried version for use in pipelines:
 
 ```
-x*y |> replace(y, 3)
+x*y |> replace(y, 3)		# 3x
 ```
 
-(This has been `==(x::Sym, y::Number)` but `==` is now used with `solve`.)
+(This had been `==(x::Sym, y::Number)` but `==` is now used with `solve`.)
 
 ### Printing
 

@@ -3,11 +3,10 @@
 for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
            :asinh, :acosh, :atanh, :sec, :csc, :cot, :asec, :acsc, :acot, 
            :sech, :csch, :coth, :asech, :acsch, :acoth, :sinc, :cosc, 
-           :cosd, :cotd, :cscd, :secd, :sind, :tand,
-           :acosd, :acotd, :acscd, :asecd, :asind, :atand, :atan2,
+           :atan2,
            :radians2degrees, :degrees2radians,
            :log, :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
-           :cbrt, :sqrt, :square, :erf, :erfc, :erfcx, :erfi, :dawson,
+           :sqrt, :square, :erf, :erfc, :erfcx, :erfi, :dawson,
            :ceil, :floor, :trunc, :round, :significand
            )
 
@@ -17,8 +16,17 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
+## in julia, not SymPy
+cbrt(x::Sym) = PyCall.pyeval("x ** (1/3)", x=project(x)) 
+   
+for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
+          :acosd, :acotd, :acscd, :asecd, :asind, :atand)
 
-    
+    rad_fn = string(fn)[1:end-1]
+    @eval ($fn)(x::Sym) = sympy[symbol($rad_fn)](project(x * Sym(sympy.pi)/180))
+    @eval ($fn)(a::Array{Sym}) = map($fn, a)
+end
+                                           
 
 
 ## add
@@ -122,15 +130,9 @@ end
 
 ## solve. Returns array of PyObjects
 ## Trying to return an array of Sym objects printed funny!
-function solve(ex::Sym, x::Sym, args...)
-    ans = sympy.solve(project(ex), project(x), project(args)...)
-    ans
-    #Sym[u for u in ans]
-end
-function solve(ex::Sym)
-    ans = sympy.solve(project(ex))
-    ans
-    #Sym[u for u in ans]
+function solve(ex::Sym, args...)
+    ans = sympy.solve(project(ex), map(project, args)...)
+    Sym[u for u in ans]
 end
 
 

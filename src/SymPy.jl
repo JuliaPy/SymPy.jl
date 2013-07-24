@@ -2,7 +2,7 @@ module SymPy
 
 using PyCall
 @pyimport sympy
-using GoogleCharts
+using Gadfly
 
 import Base.getindex
 import Base: show, repl_show

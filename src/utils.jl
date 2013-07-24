@@ -88,6 +88,7 @@ function jprint(x::SymbolicObject)
     return out
   end
 end
+jprint(x::Array) = map(jprint, x)
 
 ## Convert SymPy symbol to Julia expression
 convert(::Type{Expr}, x::SymbolicObject) = parse(jprint(x))
@@ -104,10 +105,23 @@ complex(x::Sym) = convert(Complex, x)
 complex(xs::Array{Sym}) = map(complex, xs)
 
 
-## Conversion to function a bit tricky as we *assume* variable is called x.
-## can use subs(xsym, sym"u", sym"x") first if it is u, say.
-convert(::Type{Function}, xsym::Sym) = u -> float(subs(xsym, sym"x", u))
-
+## Conversion to function a bit hacky
+## we use free_symbols to get the free symbols, then create a function
+## with arguments in this order. No problem with only one variable, but
+## may be confusing when more than one in ex.
+function convert(::Type{Function}, ex::Sym)
+    free = free_symbols(ex)
+    vars = map(i -> free[:pop](), 1:free[:__len__]()) # Sym Objects
+    len = length(vars)
+    local out
+    (args...) -> begin
+        out = ex
+        for i in 1:length(vars)
+            out = out[:subs](vars[i], args[i])
+        end
+        out
+    end
+end
 
 ## Various means to call sympy or object methods. All convert input,
 ## not all convert output.
@@ -117,7 +131,15 @@ convert(::Type{Function}, xsym::Sym) = u -> float(subs(xsym, sym"x", u))
 
 ## Makes it possible to call in a sympy method, witout worrying about Sym objects
 call_sympy_fun(fn::Function, args...; kwargs...) = fn(map(project, args)...; [(k,project(v)) for (k,v) in kwargs]...)
-sympy_meth(meth::Symbol, args...; kwargs...) = call_sympy_fun(sympy[meth], args...; kwargs...)
+function sympy_meth(meth::Symbol, args...; kwargs...) 
+    ans = call_sympy_fun(sympy[meth], args...; kwargs...)
+    ## make nicer...
+    if isa(ans, Vector)
+        ans = Sym[i for i in ans]
+    end
+    ans
+end
+        
 
 ## meth of object, convert arguments
 object_meth(object::SymbolicObject, meth::Symbol, args...; kwargs...) =  

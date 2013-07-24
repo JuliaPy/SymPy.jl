@@ -1,11 +1,16 @@
-## simple plotting of expressions using GoogleCharts
+## simple plotting of expressions of a single free variable using Gadfly
 
 
-plot(ex::Sym, x::Sym, a::Real, b::Real) = GoogleCharts.plot(convert(Function, subs(ex, x, sym"x")), a, b)
-plot(ex::Sym, a::Real, b::Real) = plot(ex, sym"x", a, b)
+
+function plot(ex::Sym, a::Real, b::Real) 
+    tmp = convert(Function, ex)
+    Gadfly.plot(x -> float(tmp(x)), a, b)
+end
 
 ## plot( [x^2, diff(x^2, x)], 0, 4)
-plot(exs::Vector{Sym}, x::Sym, a::Real, b::Real) =
-    (GoogleCharts.plot(map(ex -> convert(Function, subs(ex, x, sym"x")), exs), a, b))
-plot(exs::Vector{Sym}, a::Real, b::Real) =   plot(exs, sym"x", a, b)
+function plot(exs::Vector{Sym}, a::Real, b::Real) 
+    tmp = map(ex -> convert(Function, ex), exs)
+    tmp = map(f -> (x -> float(f(x))), tmp)
+    Gadfly.plot(tmp, a, b)
+end
 
