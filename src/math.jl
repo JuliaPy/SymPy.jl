@@ -82,14 +82,14 @@ for meth in (:n, :N,
 end
 
 ## different conversions
-fraction(args...; kwargs...) = sympy.fraction(project(args)...; kwargs...) | os -> map(u -> convert(Sym, u), os)
+fraction(args...; kwargs...) = sympy.fraction(project(args)...; kwargs...) |> os -> map(u -> convert(Sym, u), os)
 
 
 
 
 ## special numbers
-I = Sym(sympy[:I])
-oo = Sym(sympy[:oo])
+I = Sym(sympy.I)
+oo = Sym(sympy.oo)
 
 ## Special functions
 ## Spherical harmonic
@@ -130,14 +130,14 @@ end
 
 ## solve. Returns array of PyObjects
 ## Trying to return an array of Sym objects printed funny!
-function solve(ex::Sym, args...)
-    ans = sympy.solve(project(ex), map(project, args)...)
+function solve(ex::Sym, args...; kwargs...)
+    ans = sympy.solve(project(ex), map(project, args)...; kwargs...)
     Sym[u for u in ans]
 end
 
 
-function solve(exs::Vector{Sym}, xs::Vector{Sym})
-    ans = sympy[:solve](map(project, exs), map(project, xs)) #  dictionary with keys, values as PyObjects
+function solve(exs::Vector{Sym}, xs::Vector{Sym}, args...; kwargs...)
+    ans = sympy[:solve](map(project, exs), map(project, xs), args...; kwargs...) #  dictionary with keys, values as PyObjects
     [string(k) => v for (k,v) in ans]
 end
 

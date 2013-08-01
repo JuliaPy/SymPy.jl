@@ -74,6 +74,7 @@ end
 ## not coeffs(x^2 -1), rather poly(x^2 - 1)  |> coeffs
 polynomial_instance_methods = (:EC, :ET, :LC, :LM, :LT, :TC, ## no .abs()
                               :add_ground, 
+                               :all_coeffs,
                               :all_monoms, :all_roots, :all_terms, 
                               :as_dict, :as_expr, :as_list,
                               :clear_denoms,
