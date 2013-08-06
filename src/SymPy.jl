@@ -26,6 +26,7 @@ import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj,
               cross, eigvals, eigvecs, rref, trace
 import Base: promote_rule
 import Base: has, match, replace, round
+import Base: ^, .^
 ## poly.jl
 import Base: div
 

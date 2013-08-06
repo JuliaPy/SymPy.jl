@@ -43,7 +43,7 @@ convert{T <: Real}(::Type{Sym}, x::T) = sympy.sympify(x)
 ^(x::SymbolicObject, y::Real) =    Sym(pyeval("x ** y", x = project(x), y = project(y)))
 ^(x::Real, y::SymbolicObject) =    Sym(pyeval("x ** y", x = project(x), y = project(y)))
 .^(x::SymbolicObject, y::SymbolicObject) = convert(Array{Sym}, x) .^ convert(Array{Sym}, y)
-.^{T <: Number}(x::T, y::Array{Sym}) = map(u -> x^u, y)
+#.^{T <: Number}(x::T, y::Array{Sym}) = map(u -> x^u, y) # conflict with e^[...] so don't define
 .^{T <: Number}(x::Array{Sym}, y::T) = map(u -> u^y, x)
 
 
