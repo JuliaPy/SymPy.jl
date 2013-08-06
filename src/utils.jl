@@ -3,7 +3,7 @@
 ## Many (too many) ways to create symbolobjects
 ## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y)
 
-Sym(s::Union(Symbol, String)) = sympy[:symbols](string(s))
+Sym(s::Union(Symbol, String)) = sympy.symbols(string(s))
 Sym{T <: Number}(s::T) = convert(Sym, sympy.sympify(s))
 Sym(args...) = map(Sym, args)
 
@@ -76,8 +76,8 @@ doc(x::SymbolicObject) = print(x[:__doc__]())
 _str(s::SymbolicObject) = s[:__str__]()
 _str(a::Array{SymbolicObject}) = map(_str, a)
 
-pprint(s::SymbolicObject, args...) = sympy[:pprint](project(s), project(args)...)
-latex(s::SymbolicObject, args...)  = sympy[:latex ](project(s), project(args)...)
+pprint(s::SymbolicObject, args...) = sympy.pprint(project(s), project(args)...)
+latex(s::SymbolicObject, args...)  = sympy.latex(project(s), project(args)...)
 
 function jprint(x::SymbolicObject)
   out = PyCall.pyeval("str(x)", x = x.x)
@@ -132,7 +132,7 @@ end
 ## Makes it possible to call in a sympy method, witout worrying about Sym objects
 call_sympy_fun(fn::Function, args...; kwargs...) = fn(map(project, args)...; [(k,project(v)) for (k,v) in kwargs]...)
 function sympy_meth(meth::Symbol, args...; kwargs...) 
-    ans = call_sympy_fun(sympy[meth], args...; kwargs...)
+    ans = call_sympy_fun(sympy.(meth), args...; kwargs...)
     ## make nicer...
     if isa(ans, Vector)
         ans = Sym[i for i in ans]

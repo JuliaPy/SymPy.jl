@@ -12,7 +12,7 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
 
     
     meth = string(fn)
-    @eval ($fn)(x::Sym) = sympy[symbol($meth)](project(x))
+    @eval ($fn)(x::Sym) = sympy.(symbol($meth))(project(x))
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
@@ -23,7 +23,7 @@ for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
           :acosd, :acotd, :acscd, :asecd, :asind, :atand)
 
     rad_fn = string(fn)[1:end-1]
-    @eval ($fn)(x::Sym) = sympy[symbol($rad_fn)](project(x * Sym(sympy.pi)/180))
+    @eval ($fn)(x::Sym) = sympy.(symbol($rad_fn))(project(x * Sym(sympy.pi)/180))
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
                                            
@@ -109,7 +109,7 @@ sympy_math_methods = ( :Prod,
                       )
 for meth in sympy_math_methods 
     meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...) = Sym(sympy[symbol($meth_name)](project(ex), project(args)...))
+    @eval ($meth)(ex::Sym, args...) = Sym(sympy.(symbol($meth_name))(project(ex), project(args)...))
     eval(Expr(:export, meth))
 end
 
@@ -137,7 +137,7 @@ end
 
 
 function solve(exs::Vector{Sym}, xs::Vector{Sym}, args...; kwargs...)
-    ans = sympy[:solve](map(project, exs), map(project, xs), args...; kwargs...) #  dictionary with keys, values as PyObjects
+    ans = sympy.solve(map(project, exs), map(project, xs), args...; kwargs...) #  dictionary with keys, values as PyObjects
     [string(k) => v for (k,v) in ans]
 end
 
@@ -153,7 +153,7 @@ export nsolve
 
 ## dsolve
 ## Make a function argument, but munge arguments from Sym -> PyObject class
-SymFunction(nm::Union(Symbol, String)) = (args...) -> Sym(sympy[:Function](nm)(project(args)...))
+SymFunction(nm::Union(Symbol, String)) = (args...) -> Sym(sympy.Function(nm)(project(args)...))
 
 
 ##  A little trickier to use
