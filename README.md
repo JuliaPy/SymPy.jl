@@ -114,7 +114,9 @@ subs(x + y, x, 3)     # y + 3
 subs(x*y, y, 24 - 2x) # x*(-2*x + 24)
 ```
 
-The `subs` function is similar in spirit to `replace`, so we overload `replace` for symbolic expressions and create a Curried version for use in pipelines:
+The `subs` function is similar in spirit to `replace`, so we overload
+`replace` for symbolic expressions and create a Curried version for
+use in pipelines:
 
 ```
 x*y |> replace(y, 3)		# 3x

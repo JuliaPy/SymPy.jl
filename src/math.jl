@@ -40,6 +40,8 @@ function subs{T <: SymbolicObject, S <: SymbolicObject}(ex::T, x::S, arg)
     object_meth(ex, :subs, x, arg)
 end
 subs{T <: SymbolicObject, S <: SymbolicObject}(exs::Array{T}, x::S, arg) = map(ex->subs(ex, x, arg), exs)
+## curried version to use with |>
+subs(x::SymbolicObject, y) = ex -> subs(ex, x, y)
 
 Base.replace(ex::SymbolicObject, x::SymbolicObject, y) = subs(ex, x, y)
 ## curried version to use through |> as in
