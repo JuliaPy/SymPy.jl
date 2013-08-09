@@ -44,6 +44,7 @@ end
 ## so that julia manages them
 ## it is convenient (for printing, say) to convert to a sympy matrix
 convert(::Type{SymMatrix}, a::Array{Sym}) = Sym(sympy.Matrix(map(project, a)))
+convert(::Type{Sym}, a::Array{Sym}) = Sym(sympy.Matrix(map(project, a)))
 function convert(::Type{Array{Sym}}, a::SymMatrix)
     sz = size(a)
     ndims = length(sz)

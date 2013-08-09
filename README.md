@@ -155,16 +155,15 @@ julia> _str([1/x, 1/x^2])
 
 ### Plotting
 
-Plotting is done with the `GoogleCharts` package. This is temporary
-while other plotting interfaces stabilize. We can plot expressions or
-vectors of expressions (in figure):
+Plotting is done with the `Gadfly` package, through its `plot`
+function. We can plot expressions or vectors of expressions (in
+figure):
 
 ```
 plot(exp(-x) * sin(x), 0, 2pi)	# opens plot in browser
 plot( [sin(x), diff(sin(x), x) ], 0, 2pi)
 ```
 
-<img src="charts-plot.png"></img>
 
 ## Conversion
 
@@ -176,9 +175,10 @@ variable we substitute with (`x`) with the expression.
 u -> float(subs( exp(-x) * sin(x), x, u)) # anonymous function to evaluate expression
 ```
 
-This is what happens in the call: `convert(Function, exp(-x) *
-sin(x))`. This can be used to plot expressions with `julia`'s other
-plotting packages.
+This is basically what happens in the call: `convert(Function, exp(-x)
+* sin(x))`, though that call replaces a lone free variable, not
+necessarily one named `x`. This conversion can be used to plot
+expressions with `julia`'s other plotting packages.
 
 Basic conversions from `SymPy` numeric types to the corresponding
 `julia` objects may be done with the functions `integer`, `float`, and

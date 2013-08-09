@@ -76,8 +76,8 @@ doc(x::SymbolicObject) = print(x[:__doc__]())
 _str(s::SymbolicObject) = s[:__str__]()
 _str(a::Array{SymbolicObject}) = map(_str, a)
 
-pprint(s::SymbolicObject, args...) = sympy.pprint(project(s), project(args)...)
-latex(s::SymbolicObject, args...)  = sympy.latex(project(s), project(args)...)
+pprint(s::SymbolicObject, args...; kwargs...) = sympy.pprint(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+latex(s::SymbolicObject, args...; kwargs...)  = sympy.latex(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
 
 function jprint(x::SymbolicObject)
   out = PyCall.pyeval("str(x)", x = x.x)
@@ -165,4 +165,36 @@ function members(o::Union(PyObject, Sym))
     out = convert(Vector{(String,PyObject)}, 
                   pycall(PyCall.inspect["getmembers"], PyObject, project(o)))
     String[u[1] for u in out]
+end
+
+
+## add writemime support
+## how to pass "mode" to writemime
+import Base.writemime
+export writemime
+## various ways to write out mime equations
+writemime(io::IO, ::@MIME("application/x-latex"), x::Sym) = print(io, latex(x, mode="equation*", itex=true))
+function writemime(io::IO, ::@MIME("application/x-latex"), x::Array{Sym}) 
+    function toeqnarray(x::Array)
+        sz = size(x)
+        a = join([join(map(latex, x[i,:]), "&") for i in 1:sz[1]], "\\\\")
+        "\\begin{bmatrix}$a\\end{bmatrix}"
+    end
+    print(io, toeqnarray(x))
+end
+ 
+## attempt to write out a dict. Likely not too robust, but simple cases look good.
+## Not sure this belongs here ...
+function writemime(io::IO, ::@MIME("application/x-latex"), d::Dict)    
+    Latex(x::Sym) = latex(x)
+    Latex(x) = string(x)
+
+    out = "\\begin{equation*}\\begin{cases}"
+    for (k,v) in d
+        out = out * string(k) * " & \\text{=>} &" * Latex(v) * "\\\\"
+    end
+    out = out * "\\end{cases}\\end{equation*}"
+    print(io, out)
+
+
 end
