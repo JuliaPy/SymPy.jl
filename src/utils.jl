@@ -173,8 +173,8 @@ end
 import Base.writemime
 export writemime
 ## various ways to write out mime equations
-writemime(io::IO, ::@MIME("application/x-latex"), x::Sym) = print(io, latex(x, mode="equation*", itex=true))
-function writemime(io::IO, ::@MIME("application/x-latex"), x::Array{Sym}) 
+writemime(io::IO, ::MIME"application/x-latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
+function writemime(io::IO, ::MIME"application/x-latex", x::Array{Sym}) 
     function toeqnarray(x::Array)
         sz = size(x)
         a = join([join(map(latex, x[i,:]), "&") for i in 1:sz[1]], "\\\\")
@@ -185,7 +185,7 @@ end
  
 ## attempt to write out a dict. Likely not too robust, but simple cases look good.
 ## Not sure this belongs here ...
-function writemime(io::IO, ::@MIME("application/x-latex"), d::Dict)    
+function writemime(io::IO, ::MIME"application/x-latex", d::Dict)    
     Latex(x::Sym) = latex(x)
     Latex(x) = string(x)
 
