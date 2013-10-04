@@ -111,7 +111,10 @@ complex(xs::Array{Sym}) = map(complex, xs)
 ## may be confusing when more than one in ex.
 function convert(::Type{Function}, ex::Sym)
     free = free_symbols(ex)
-    vars = map(i -> free[:pop](), 1:free[:__len__]()) # Sym Objects
+    vars = [free[:pop]()]
+    for i in 1:free[:__len__]()
+        push!(vars, free[:pop]())
+    end
     len = length(vars)
     local out
     (args...) -> begin
