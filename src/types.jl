@@ -35,8 +35,11 @@ end
 
 
 ## convert SymPy matrices to SymMatrix
-matrixtype = sympy.matrices["MatrixBase"]
-pytype_mapping(matrixtype, SymMatrix)
+try
+    matrixtype = sympy.matrices["MatrixBase"]
+    pytype_mapping(matrixtype, SymMatrix)
+catch e
+end
 convert(::Type{SymMatrix}, o::PyCall.PyObject) = SymMatrix(o)
 convert(::Type{Sym}, o::SymMatrix) = Sym(o.x)
 convert(::Type{SymMatrix}, o::Sym) = SymMatrix(o.x)
