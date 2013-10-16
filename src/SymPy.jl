@@ -2,6 +2,7 @@ module SymPy
 
 using PyCall
 @pyimport sympy
+using DataFrames
 using Gadfly
 
 import Base.getindex
@@ -17,6 +18,7 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        square, erf, erfc, erfcx, erfi, dawson, ceil, floor,
        trunc, round, significand,
        abs
+import Base: transpose
 import Base: factorial, gcd, lcm, isqrt
 import Base: gamma, beta
 import Base: solve, length,  size
@@ -29,6 +31,7 @@ import Base: has, match, replace, round
 import Base: ^, .^
 ## poly.jl
 import Base: div
+import Base: trunc
 
 export sympy, sympy_meth, object_meth, call_matrix_meth
 export Sym, @sym_str, @syms, symbols

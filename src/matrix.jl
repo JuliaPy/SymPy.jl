@@ -29,7 +29,7 @@ getindex(s::Array{Sym}, i::Symbol) = project(s)[i] # digaonalize..
 ## size
 function size(x::SymMatrix)
     a = x[:shape]               # a PyObject tuple
-    (a[:__getitem__](0), a[:__getitem__](1))
+    isa(a, PyObject) ? (a[:__getitem__](0), a[:__getitem__](1)) : a
 end
 
 function size(x::SymMatrix, dim::Integer)
@@ -74,8 +74,7 @@ for meth in (:det,
            :has,
            :is_anti_symmetric, :is_diagonal, :is_diagonalizable,:is_nilpotent, 
            :is_symbolic, :is_symmetric, 
-           :norm,
-           :trace
+           :norm
            )
 
     cmd = "x." * string(meth) * "()"
@@ -108,11 +107,10 @@ map_matrix_methods = (:LDLsolve,
                       :QRdecomposition, :QRsolve,
                       :adjoint, :adjugate,
                       :cholesky, :cholesky_solve, :cofactor, :conjugate, 
-                      :cross, 
                       :diagaonal_solve, :diagonalize, :diff, :dot, :dual,
                       :expand,
                       :integrate, 
-                      :inv, :inverse_ADJ, :inverse_GE, :inverse_LU,
+                      :inverse_ADJ, :inverse_GE, :inverse_LU,
                       :jordan_cells, :jordan_form,
                       :limit,
                       :lower_triangular_solve,
@@ -121,7 +119,6 @@ map_matrix_methods = (:LDLsolve,
                       :permuteBkwd, :permuteFwd,
                       :print_nonzero,
                       :singular_values,
-                      :transpose,
                       :upper_triangular_solve,
                       :vec, :vech
                       )
@@ -203,3 +200,10 @@ function hessian(f::Sym, x::Array{Sym})
     convert(SymMatrix, out) |> u -> convert(Array{Sym}, u)
 end
 export hessian
+
+## dont' define inv -- it has amiguity with base inv
+inverse(ex::SymMatrix) = call_matrix_meth(ex, :inv)
+inverse(ex::Array{Sym}) = call_matrix_meth(convert(SymMatrix, ex),:inv)
+export inverse
+
+

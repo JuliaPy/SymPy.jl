@@ -60,8 +60,8 @@ polynomial_sympy_methods = (:div, :rem,
 
 
 polynomial_sympy_methods_import = (:expand,
-                                   :factor,
-                                   :trunc
+                                   :factor #,
+                                   #:trunc
                                    )
                             
 for meth in polynomial_sympy_methods_import

@@ -123,11 +123,11 @@ end
 ##==(x::Sym, y::Sym) = solve(x - y)
 
 
-<(x::Sym,  args...; kwargs...) = sympy_meth(:Lt, x, args...; kwargs...)
-<=(x::Sym, args...; kwargs...) = sympy_meth(:Le, x, args...; kwargs...)
-==(x::Sym, args...; kwargs...) = sympy_meth(:Eq, x, args...; kwargs...)
->=(x::Sym, args...; kwargs...) = sympy_meth(:Ge, x, args...; kwargs...)
->(x::Sym, args...; kwargs...)  = sympy_meth(:Gt, x, args...; kwargs...)
+<(x::Sym,  y::Sym, args...; kwargs...) = sympy_meth(:Lt, x, y, args...; kwargs...)
+<=(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Le, x, y, args...; kwargs...)
+==(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Eq, x, y, args...; kwargs...)
+>=(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Ge, x, y, args...; kwargs...)
+>(x::Sym, y::Sym, args...; kwargs...)  = sympy_meth(:Gt, x, y, args...; kwargs...)
 
 
 ## solve. Returns array of PyObjects

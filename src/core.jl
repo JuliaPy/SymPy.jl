@@ -25,7 +25,7 @@ core_object_methods = (:args, :as_poly, :atoms,
                        :integer_nthroot,
                        :leadterm, 
                        :primitive, 
-                       :removeO, :round,
+                       :removeO,
                        :series,
                        :expand
                        )
