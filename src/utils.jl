@@ -9,13 +9,19 @@ Sym(args...) = map(Sym, args)
 
 ## (a,b,c) = @syms a b c --- no commas on right hand side!
 ## (x,) @syms x is needed for single arguments
+## Thanks to vtjnash for this!
 macro syms(x...)
     q=Expr(:block)
+    if length(x) == 1 && isa(x[1],Expr)
+        assert(x[1].head === :tuple, "@syms expected a list of symbols")
+        x = x[1].args
+    end 
     for s in x
+        assert(isa(s,Symbol), "@syms expected a list of symbols")
         push!(q.args, Expr(:(=), s, Expr(:call, :Sym, Expr(:quote, s))))
-    end
+           end 
     push!(q.args, Expr(:tuple, x...))
-    q
+    q   
 end
 
 macro sym_str(x)
