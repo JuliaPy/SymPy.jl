@@ -2,8 +2,6 @@ module SymPy
 
 using PyCall
 @pyimport sympy
-using DataFrames
-using Gadfly
 
 import Base.getindex
 import Base: show, repl_show
@@ -32,6 +30,7 @@ import Base: ^, .^
 ## poly.jl
 import Base: div
 import Base: trunc
+import Base: isinf, isnan
 
 export sympy, sympy_meth, object_meth, call_matrix_meth
 export Sym, @sym_str, @syms, symbols
@@ -51,7 +50,7 @@ export SymFunction, SymMatrix,
        I, oo,
        Ylm, assoc_legendre, chebyshevt, legendre, hermite,
        dsolve,
-       plot,
+#       plot,
        poly,  nroots, real_roots
 export members, doc, _sbtr
 
@@ -67,7 +66,7 @@ include("integrate.jl")
 include("assumptions.jl")
 include("poly.jl")
 include("matrix.jl")
-include("plot.jl")
+##include("plot.jl")
 
 
 ## create some methods

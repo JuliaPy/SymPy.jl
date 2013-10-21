@@ -155,13 +155,15 @@ julia> _str([1/x, 1/x^2])
 
 ### Plotting
 
-Plotting is done with the `Gadfly` package, through its `plot`
-function. We can plot expressions or vectors of expressions (in
-figure):
+The plotting of symbolic expressions is made convenient through their coercion to functions. 
+The basic call `convert(Function, symbolic_expression)` produces a function, but the values are symbolic. To plot a function, say with `Winston`, we have:
 
 ```
-plot(exp(-x) * sin(x), 0, 2pi)	# opens plot in browser
-plot( [sin(x), diff(sin(x), x) ], 0, 2pi)
+using SymPy, Winston
+x = sym"x"
+f1 = convert(Function, x^2 - 2x + 1)
+a = linspace(0, 3)
+plot(a, map(u -> float(f1(u)), a))
 ```
 
 

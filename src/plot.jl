@@ -1,4 +1,8 @@
 ## simple plotting of expressions of a single free variable using Gadfly
+## by removing this, the package will not depend on Gadfly and DataFrames -- this should load much faster
+
+#using DataFrames
+#using Gadfly
 
 
 

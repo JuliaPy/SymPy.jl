@@ -129,6 +129,8 @@ end
 >=(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Ge, x, y, args...; kwargs...)
 >(x::Sym, y::Sym, args...; kwargs...)  = sympy_meth(:Gt, x, y, args...; kwargs...)
 
+Base.isinf(x::Sym) = try isinf(float(x)) catch e false end
+Base.isnan(x::Sym) = try isnan(float(x)) catch e false end
 
 ## solve. Returns array of PyObjects
 ## Trying to return an array of Sym objects printed funny!
