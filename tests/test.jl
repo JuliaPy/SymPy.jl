@@ -23,7 +23,8 @@ subs(z, y, 3)
 ## algebra
 expand((x + 1)*(x+2))
 x1 = (x + 1)*(x+2)
-convert(Sym, x1[:expand]())     #  alternate syntax, perhaps will get easier with pytype_mapping support
+expand(x1)
+
 
 
 
@@ -64,19 +65,21 @@ A = [x 1; 1 x]
 a = convert(SymMatrix, A) ## for [:meth] calls
 b = [x, 2]
 det(A)
-a[:det]() |> u -> convert(Sym, u)
-inv(A)
-a[:inv]() |> u -> convert(SymMatrix, u) |> u -> convert(Array{Sym}, u)
+det(a)
+
+## we use inverse for A[:inv]()
+inverse(A)
+a[:inv]() |> u -> convert(Array{Sym}, u)
 a[:inv]("LU")                   # pass argument to function
-SymPy.adjoint(A)
-SymPy.dual(A)
-SymPy.cholesky(A)
+adjoint(A)
+dual(A)
+cholesky(A)
 ## other functions, could wrap
 b = subs(a, x, 2)
-map(u -> convert(Sym, u),  convert(Tuple, b[:QRdecomposition]())) # tuple of matrices
+QRdecomposition(b)
 
-a[:is_square]
-a[:is_symmetric]()
+@assert is_square(a) == true
+@assert is_symmetric(a) == true
 
 
 eigvals(A)
