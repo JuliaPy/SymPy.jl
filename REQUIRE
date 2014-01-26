@@ -1,2 +1,4 @@
 julia 0.2-
 PyCall
+DataFrames
+Gadfly

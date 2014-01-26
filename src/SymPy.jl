@@ -66,7 +66,9 @@ include("integrate.jl")
 include("assumptions.jl")
 include("poly.jl")
 include("matrix.jl")
-##include("plot.jl")
+
+## takes far too long
+# include("plot.jl")
 
 
 ## create some methods
