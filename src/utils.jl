@@ -13,11 +13,11 @@ Sym(args...) = map(Sym, args)
 macro syms(x...)
     q=Expr(:block)
     if length(x) == 1 && isa(x[1],Expr)
-        assert(x[1].head === :tuple, "@syms expected a list of symbols")
+        @assert x[1].head === :tuple "@syms expected a list of symbols"
         x = x[1].args
     end 
     for s in x
-        assert(isa(s,Symbol), "@syms expected a list of symbols")
+        @assert isa(s,Symbol) "@syms expected a list of symbols"
         push!(q.args, Expr(:(=), s, Expr(:call, :Sym, Expr(:quote, s))))
            end 
     push!(q.args, Expr(:tuple, x...))
