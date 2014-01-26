@@ -162,8 +162,16 @@ The basic call `convert(Function, symbolic_expression)` produces a function, but
 using SymPy, Winston
 x = sym"x"
 f1 = convert(Function, x^2 - 2x + 1)
-a = linspace(0, 3)
-plot(a, map(u -> float(f1(u)), a))
+plot(x -> float(f1(x)), 0, 3)
+```
+
+We can encapsulate this into a function call with:
+
+```
+function plt(ex::SymPy.Sym, args...)
+   f = x -> float(convert(Function, ex)(x))
+   plot(f, args...)
+end
 ```
 
 
@@ -192,8 +200,8 @@ The `sympy` function `n` can be used to form a numerical value from an
 expression, though the expression is still a `Sym` instance.
 
 ```
-sqrt(x + 1) | replace(x, 2)       # pretty print sqrt(3)
-sqrt(x + 1) | replace(x, 2) | n	  # 1.73205080756888 as Sym object
+sqrt(x + 1) |> replace(x, 2)       # pretty print sqrt(3)
+sqrt(x + 1) |> replace(x, 2) |> n	 # 1.73205080756888 as Sym object
 ```
 
 
@@ -214,8 +222,7 @@ This is a somewhat awkward way to get `pi` into a symbolic expression. This also
 PI = Sym("pi")
 ```
 
-But this does not `Sym(pi)` (with no quotes, as `Sym` expects
-character data. This causes a crash!) Nor does substitution along the
+A substitution along the
 lines of
 
 ```
@@ -224,9 +231,9 @@ x = subs(x, x, pi)
 n(x, 60)			# 3.14159265358979311599796346854418516159057617187500000000000
 ```
 
-As the value substituted is `julia`'s floating point representation of
-`pi`, not the symbolic value `sympi.pi`, so gets truncated after
-enough digits.
+loses precision, as the value substituted is `julia`'s floating point
+representation of `pi`, not the symbolic value `sympi.pi`, so gets
+truncated after enough digits.
 
 
 
@@ -246,6 +253,23 @@ One can take limits at infinity using `oo` (but not `Inf`):
 limit(sin(x)/x, x, Inf)		# ERRORS!
 limit(sin(x)/x, x, oo)		# 0
 ```
+
+The `limit` function performs better on some functions than simply
+trying to explore limits numerically. The functionality is based on Gruntz's
+algorithm. For example, numerically it appears that this limit is $0$:
+
+```
+f(x) = x^(1 - log(log(log(log(1/x)))))
+x1 = 10.0.^(-[5:16])
+[x1 map(f, x1)]
+```
+
+But in fact this limit blows up:
+
+```
+limit(f(x), x, 0)
+```
+
 
 * Derivatives, higher-order derivatives and partial derivatives are all computed by `diff`. 
 

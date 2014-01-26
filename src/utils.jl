@@ -100,8 +100,10 @@ jprint(x::Array) = map(jprint, x)
 convert(::Type{Expr}, x::SymbolicObject) = parse(jprint(x))
 
 ## Number types
-promote_rule{T <: Number}(::Type{Sym}, ::Type{T}) = Sym
+promote_rule{T <: Number}(::Type{SymbolicObject}, ::Type{T}) = Sym
 convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
+convert(::Type{Sym}, x::Number) = sympy.Symbol(string(x))
+convert(::Type{Sym}, x::Complex) = real(x) == 0 ? sympy.Symbol("$(imag(x))*I") : sympy.Symbol("$(real(x)) + $(imag(x))*I")
 convert(::Type{String},  x::Sym) = convert(String,  project(x))
 convert(::Type{Rational}, s::Sym) = Rational(project(s)[:p], project(s)[:q])
 convert(::Type{Complex}, x::Sym) = complex(map(float, x[:as_real_imag]())...)
@@ -184,7 +186,11 @@ export writemime
 ## various ways to write out mime equations
 writemime(io::IO, ::MIME"application/x-latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
 function writemime(io::IO, ::MIME"application/x-latex", x::Array{Sym}) 
-    function toeqnarray(x::Array)
+    function toeqnarray(x::Vector{Sym})
+        a = join([latex(x[i]) for i in 1:length(x)], "\\\\")
+        "\\begin{bmatrix}$a\\end{bmatrix}"
+    end
+    function toeqnarray(x::Array{Sym,2})
         sz = size(x)
         a = join([join(map(latex, x[i,:]), "&") for i in 1:sz[1]], "\\\\")
         "\\begin{bmatrix}$a\\end{bmatrix}"

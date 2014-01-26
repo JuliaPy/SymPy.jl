@@ -7,7 +7,7 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
            :radians2degrees, :degrees2radians,
            :log, :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
            :sqrt, :square, :erf, :erfc, :erfcx, :erfi, :dawson,
-           :ceil, :floor, :trunc, :round, :significand
+           :ceiling, :floor, :trunc, :round, :significand
            )
 
     
@@ -18,6 +18,8 @@ end
 
 ## in julia, not SymPy
 cbrt(x::Sym) = PyCall.pyeval("x ** (1/3)", x=project(x)) 
+Base.ceil(x::Sym) = ceiling(x)
+
    
 for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
           :acosd, :acotd, :acscd, :asecd, :asind, :atand)
@@ -32,6 +34,10 @@ end
 ## add
 abs(x::Sym) = sympy_meth(:Abs, x)
 abs(a::Array{Sym}) = map(abs, a)
+
+Base.isless(a::Real, b::Sym) = isless(a, float(b))
+Base.isless(a::Sym, b::Real) = isless(b, a)
+Base.isfinite(x::Sym) = isfinite(float(x))
 
 ## Some sympy function interfaces
 
