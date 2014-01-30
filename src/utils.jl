@@ -101,6 +101,7 @@ convert(::Type{Expr}, x::SymbolicObject) = parse(jprint(x))
 
 ## Number types
 promote_rule{T <: Number}(::Type{SymbolicObject}, ::Type{T}) = Sym
+promote_rule{T <: Number}(::Type{Sym}, ::Type{T}) = Sym
 convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 convert(::Type{Sym}, x::Number) = sympy.Symbol(string(x))
 convert(::Type{Sym}, x::Complex) = real(x) == 0 ? sympy.Symbol("$(imag(x))*I") : sympy.Symbol("$(real(x)) + $(imag(x))*I")
