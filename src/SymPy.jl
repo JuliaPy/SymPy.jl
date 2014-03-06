@@ -20,10 +20,10 @@ import Base: transpose
 import Base: factorial, gcd, lcm, isqrt
 import Base: gamma, beta
 import Base: solve, length,  size
-import Base: factor, expand
+import Base: factor, expand, collect
 import Base: !=, ==
 import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj,
-              cross, eigvals, eigvecs, rref, trace
+              cross, eigvals, eigvecs, rref, trace, norm
 import Base: promote_rule
 import Base: has, match, replace, round
 import Base: ^, .^
