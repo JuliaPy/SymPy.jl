@@ -11,9 +11,7 @@ easier.
 
 To use it, both `Python` and the `SymPy` package must be installed on
 your system. (Install `Python` then download the `sympy` library from
-http://code.google.com/p/sympy/downloads/list and install.) [This may
-not work on Windows until the zlib issue is resolved.]
-
+http://code.google.com/p/sympy/downloads/list and install.)
 
 ## The `PyCall` interface to `SymPy`
 
@@ -185,8 +183,8 @@ variable we substitute with (`x`) with the expression.
 u -> float(subs( exp(-x) * sin(x), x, u)) # anonymous function to evaluate expression
 ```
 
-This is basically what happens in the call: `convert(Function, exp(-x)
-* sin(x))`, though that call replaces a lone free variable, not
+This is basically what happens in the call: `convert(Function, exp(-x)*sin(x))`, 
+though that call replaces a lone free variable, not
 necessarily one named `x`. This conversion can be used to plot
 expressions with `julia`'s other plotting packages.
 
@@ -354,14 +352,6 @@ The output is not simplified. In this case, we can convert to real with `float`:
 
 ```
 solve(x^2 - 2, x) |> float	# [-1.41421, 1.41421]
-```
-
-It may turn out to be a bad idea, but for now the `==` operator for
-`(Sym, Sym)` comparisons is overloaded to `solve`. (Note `Sym` on the
-right, earlier we mentioned overloading for a number on the right).
-
-```
-sin(x) == cos(x)		# [-3*pi/4, pi/4] as Sym array
 ```
 
 
