@@ -104,6 +104,7 @@ promote_rule{T <: Number}(::Type{SymbolicObject}, ::Type{T}) = Sym
 promote_rule{T <: Number}(::Type{Sym}, ::Type{T}) = Sym
 convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 convert(::Type{Sym}, x::Number) = sympy.Symbol(string(x))
+convert(::Type{SymbolicObject}, x::Number) = sympy.Symbol(string(x))
 convert(::Type{Sym}, x::Complex) = real(x) == 0 ? sympy.Symbol("$(imag(x))*I") : sympy.Symbol("$(real(x)) + $(imag(x))*I")
 convert(::Type{String},  x::Sym) = convert(String,  project(x))
 convert(::Type{Rational}, s::Sym) = Rational(project(s)[:p], project(s)[:q])
