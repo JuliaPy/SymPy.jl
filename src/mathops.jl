@@ -38,6 +38,7 @@ convert{T <: Real}(::Type{Sym}, x::T) = sympy.sympify(x)
 ./{T <: Number}(x::T, y::SymbolicObject) = convert(Sym, x) / y
 ./{T <: Number}(x::SymbolicObject, y::T) = x / convert(Sym, y)
 
+
 ^(x::SymbolicObject, y::SymbolicObject) =     Sym(pyeval("x ** y", x = project(x), y = project(y)))
 ^(x::SymbolicObject, y::Integer) = x^convert(Sym, y)
 ^(x::SymbolicObject, y::Number) =    Sym(pyeval("x ** y", x = project(x), y = project(y)))

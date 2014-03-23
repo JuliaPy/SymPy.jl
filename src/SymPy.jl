@@ -66,6 +66,7 @@ include("integrate.jl")
 include("assumptions.jl")
 include("poly.jl")
 include("matrix.jl")
+include("ntheory.jl")
 
 ## takes far too long
 # include("plot.jl")
@@ -79,7 +80,9 @@ for meth in union(core_sympy_methods,
                   integrals_sympy_methods,
                   summations_sympy_methods,
                   logic_sympy_methods,
-                  polynomial_sympy_methods)
+                  polynomial_sympy_methods,
+                  ntheory_sympy_methods
+                  )
 
     meth_name = string(meth)
     @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)

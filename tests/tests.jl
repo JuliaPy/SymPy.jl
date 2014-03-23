@@ -118,13 +118,13 @@ rv .* s
 s .* a 
 a .* s 
 
-s / v  ## broadcasts s
+## s / v  ## broadcasts s Depreacated
 s ./ v 
 v / s 
-s / rv ## broadcasts s
+## s / rv ## broadcasts s Deprecated
 s ./ rv
 rv / s 
-s / a ## broadcasts s
+## s / a ## broadcasts s Deprecated
 s ./ a 
 a / s
 
@@ -143,9 +143,9 @@ a .^ s
 
 
 ## vector vector
-v + v
-@test_throws v + rv ## error
-v - v
+v .+ v
+##@test_throws v .+ rv ##  no longer an error, broadcase
+v .- v
 @test_throws v - rv ## error
 @test_throws v * v ## error
 v .* v
@@ -196,3 +196,19 @@ a ./ a ## ones
 a .^ a
 @test_throws a ^ b ## error
 @test_throws a .^ b ## error
+
+
+## Number theory
+@test isprime(100) == isprime(Sym(100))
+@test prime(Sym(100)) == 541
+@test int(collect(primerange(Sym(2),10))) == primes(10)
+@test multiplicity(Sym(10), 100) == 2
+@test factorint(Sym(100)) == factor(100)
+
+## polynomials
+x,y = @syms x y
+f1 = 5x^2  + 10x + 3
+g1 = 2x + 2
+q,r = polydiv(f1,g1, domain="QQ") # not div, as can't disambiguate div(Sym(7), 5)) to do integer division
+@test r == Sym(-2)
+@test simplify(q*g1 + r - f1) == Sym(0)

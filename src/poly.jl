@@ -7,8 +7,21 @@
 
 const SymPoly = Sym
 
+## rename these, their use is special to polynomials, so we prefix
+polynomial_sympy_methods_renamed = ((:div, :polydiv),
+                                   (:rem, :polyrem),
+                                   (:divrem, :polydivrem))
 
-polynomial_sympy_methods = (:div, :rem,
+                       
+for (meth, newmeth) in polynomial_sympy_methods_renamed
+    meth_name = string(meth)
+    @eval ($newmeth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+    eval(Expr(:export, newmeth))
+end
+
+
+
+polynomial_sympy_methods = (
                             :sqf_list,
                             :groebner,
                             :solve_poly_system,

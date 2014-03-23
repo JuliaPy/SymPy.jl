@@ -17,12 +17,12 @@ function find_ijk(i, s)
     end
         
     push!(out, i)
-    tuple((reverse!(out) - 1)...)
+    tuple((reverse!(out) .- 1)...)
 end
 
 
 ## no linear indexing of matrices allowed here
-getindex(s::SymMatrix, i::Integer...) = pyeval("x[i]", x=s.x, i= tuple(([i...]-1)...))
+getindex(s::SymMatrix, i::Integer...) = pyeval("x[i]", x=s.x, i= tuple(([i...].-1)...))
 getindex(s::SymMatrix, i::Symbol) = project(s)[i] # is_nilpotent, ... many such predicates
 getindex(s::Array{Sym}, i::Symbol) = project(s)[i] # digaonalize..
 

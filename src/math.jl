@@ -138,6 +138,12 @@ end
 Base.isinf(x::Sym) = try isinf(float(x)) catch e false end
 Base.isnan(x::Sym) = try isnan(float(x)) catch e false end
 
+
+Base.div(x::Sym, y) = convert(Sym, sympy.floor(project(x/convert(Sym,y))))
+
+Base.rem(x::Sym, y) = x-Sym(y)*Sym(sympy.floor(project(x/y)))
+
+
 ## solve. Returns array of PyObjects
 ## Trying to return an array of Sym objects printed funny!
 function solve(ex::Sym, args...; kwargs...)
