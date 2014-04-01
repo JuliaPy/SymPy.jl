@@ -70,12 +70,15 @@ to call the method.
 ## Examples
 
 To make a symbolic object (of type `Sym`) we have the `Sym`
-constructor, the convenient `sym` macro, and `@syms`
+constructor, the convenient `sym` macro, `@syms`, and `symbols` (which
+allows the passing of keyword arguments, such as
+`"commutative=false"`:
 
 ```
-x = Sym("x")
 h, y = Sym("h", :y)
+x = sym"x"
 a, b, c = @syms a b c
+A,B = symbols("A, B", commutative=false)
 ```
 
 Operator overloading of the basic math functions allows symbolic
@@ -153,24 +156,16 @@ julia> _str([1/x, 1/x^2])
 
 ### Plotting
 
-The plotting of symbolic expressions is made convenient through their coercion to functions. 
-The basic call `convert(Function, symbolic_expression)` produces a function, but the values are symbolic. To plot a function, say with `Winston`, we have:
+If one loads either the `Gadfly` or `Winston` packages **before** `SymPy`, then the `plot(expr, a, b)` and `plot([exprs...], a, b)` syntax can be used to create graphics using those underlying packages. For example
 
 ```
-using SymPy, Winston
-x = sym"x"
-f1 = convert(Function, x^2 - 2x + 1)
-plot(x -> float(f1(x)), 0, 3)
+using Winston
+using SymPy
+x = Sym(:x)
+plot(x^2 - 2x - 2, -3, 3)
 ```
 
-We can encapsulate this into a function call with:
-
-```
-function plt(ex::SymPy.Sym, args...)
-   f = x -> float(convert(Function, ex)(x))
-   plot(f, args...)
-end
-```
+Will create a plot.
 
 
 ## Conversion
@@ -183,9 +178,9 @@ variable we substitute with (`x`) with the expression.
 u -> float(subs( exp(-x) * sin(x), x, u)) # anonymous function to evaluate expression
 ```
 
-This is basically what happens in the call: `convert(Function, exp(-x)*sin(x))`, 
-though that call replaces a lone free variable, not
-necessarily one named `x`. This conversion can be used to plot
+This is basically what happens in the call: `convert(Function,
+exp(-x)*sin(x))`, though that call replaces a lone free variable, not
+necessarily one named `x`. This conversion is then used to plot
 expressions with `julia`'s other plotting packages.
 
 Basic conversions from `SymPy` numeric types to the corresponding
@@ -194,24 +189,24 @@ Basic conversions from `SymPy` numeric types to the corresponding
 `convert(Rational, ex )`.
 
 
-The `sympy` function `n` can be used to form a numerical value from an
+The `sympy` function `N` can be used to form a numerical value from an
 expression, though the expression is still a `Sym` instance.
 
 ```
 sqrt(x + 1) |> replace(x, 2)       # pretty print sqrt(3)
-sqrt(x + 1) |> replace(x, 2) |> n	 # 1.73205080756888 as Sym object
+sqrt(x + 1) |> replace(x, 2) |> N	 # 1.73205080756888 as Sym object
 ```
 
 
 
 
-The `n` function takes an argument to control the number of
+The `N` function takes an argument to control the number of
 digits. For example, we can do
 
 ```
 sympy.pi			# a PyObject with pi
 PI = Sym(sympy.pi)		# a Sym object
-n(PI, 60)			# 3.14159265358979323846264338327950288419716939937510582097494
+N(PI, 60)			# 3.14159265358979323846264338327950288419716939937510582097494
 ```
 
 This is a somewhat awkward way to get `pi` into a symbolic expression. This also works
@@ -226,7 +221,7 @@ lines of
 ```
 x = sym"x"
 x = subs(x, x, pi)
-n(x, 60)			# 3.14159265358979311599796346854418516159057617187500000000000
+N(x, 60)			# 3.14159265358979311599796346854418516159057617187500000000000
 ```
 
 loses precision, as the value substituted is `julia`'s floating point

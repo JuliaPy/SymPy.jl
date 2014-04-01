@@ -208,7 +208,7 @@ function writemime(io::IO, ::MIME"application/x-latex", d::Dict)
 
     out = "\\begin{equation*}\\begin{cases}"
     for (k,v) in d
-        out = out * string(k) * " & \\text{=>} &" * Latex(v) * "\\\\"
+        out = out * Latex(k) * " & \\text{=>} &" * Latex(v) * "\\\\"
     end
     out = out * "\\end{cases}\\end{equation*}"
     print(io, out)
