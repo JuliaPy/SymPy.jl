@@ -111,4 +111,19 @@ for prop in union(core_object_properties,
     eval(Expr(:export, prop))
 end
 
+## Conditional loads for graphing purposes
+## user must load Gadfly or Winston first *before* loading SymPy
+
+## add to plot if Gadfly is loaded
+if :Gadfly in names(Main)
+    using Gadfly
+    Gadfly.plot(ex::Sym, args...; kwargs...) = plot(convert(Function, ex), args...; kwargs...)
+    Gadfly.plot{T<:Sym}(exs::Vector{T}, args...; kwargs...) = plot(map(ex -> convert(Function, ex), exs), args...; kwargs...)
+elseif :Winston in names(Main)
+    using Winston
+    Winston.plot(ex::Sym, args...; kwargs...) = plot(convert(Function, ex), args...; kwargs...)
+    Winston.plot{T<:Sym}(exs::Vector{T}, args...; kwargs...) = plot(map(ex -> convert(Function, ex), exs), args...; kwargs...)
+end
+
+
 end
