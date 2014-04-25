@@ -19,7 +19,7 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
 import Base: transpose
 import Base: factorial, gcd, lcm, isqrt
 import Base: gamma, beta
-import Base: solve, length,  size
+import Base: length,  size
 import Base: factor, expand, collect
 import Base: !=, ==
 import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj,
@@ -124,6 +124,7 @@ elseif :Winston in names(Main)
     Winston.plot(ex::Sym, args...; kwargs...) = plot(convert(Function, ex), args...; kwargs...)
     Winston.plot{T<:Sym}(exs::Vector{T}, args...; kwargs...) = plot(map(ex -> convert(Function, ex), exs), args...; kwargs...)
 end
+
 
 
 end
