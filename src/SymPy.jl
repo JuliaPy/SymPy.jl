@@ -15,7 +15,9 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        log10, log1p, exponent, exp, exp2, expm1, cbrt, sqrt,
        square, erf, erfc, erfcx, erfi, dawson, ceil, floor,
        trunc, round, significand,
-       abs
+       abs, max, min,
+       sign, dot,
+       zero
 import Base: transpose
 import Base: factorial, gcd, lcm, isqrt
 import Base: gamma, beta
@@ -61,6 +63,7 @@ include("mathops.jl")
 include("math.jl")
 include("core.jl")
 include("simplify.jl")
+include("functions.jl")
 include("series.jl")
 include("integrate.jl")
 include("assumptions.jl")
@@ -76,6 +79,7 @@ include("ntheory.jl")
 
 for meth in union(core_sympy_methods,
                   simplify_sympy_meths,
+                  functions_sympy_methods,
                   series_sympy_meths,
                   integrals_sympy_methods,
                   summations_sympy_methods,

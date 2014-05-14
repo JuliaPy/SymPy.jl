@@ -132,6 +132,7 @@ end
 <(x::Sym,  y::Sym, args...; kwargs...) = sympy_meth(:Lt, x, y, args...; kwargs...)
 <=(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Le, x, y, args...; kwargs...)
 ==(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Eq, x, y, args...; kwargs...)
+isequal(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Eq, x, y, args...; kwargs...)
 >=(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Ge, x, y, args...; kwargs...)
 >(x::Sym, y::Sym, args...; kwargs...)  = sympy_meth(:Gt, x, y, args...; kwargs...)
 
@@ -143,6 +144,8 @@ Base.div(x::Sym, y) = convert(Sym, sympy.floor(project(x/convert(Sym,y))))
 
 Base.rem(x::Sym, y) = x-Sym(y)*Sym(sympy.floor(project(x/y)))
 
+Base.zero(x::Sym) = oftype(Sym, 0)
+Base.zero{T<:Sym}(::Type{T}) = oftype(T,0)
 
 ## solve. Returns array of PyObjects
 ## Trying to return an array of Sym objects printed funny!

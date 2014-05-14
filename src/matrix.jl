@@ -72,8 +72,7 @@ for meth in (:det,
            :trace,
            :condition_number,
            :has,
-           :is_anti_symmetric, :is_diagonal, :is_diagonalizable,:is_nilpotent, 
-           :is_symbolic, :is_symmetric, 
+         
            :norm
            )
 
@@ -83,6 +82,14 @@ for meth in (:det,
     eval(Expr(:export, meth))
 end
 
+for meth in  (:is_anti_symmetric, :is_diagonal, :is_diagonalizable,:is_nilpotent, 
+                :is_symbolic, :is_symmetric)
+    
+    meth_name = string(meth)
+    @eval ($meth)(ex::SymMatrix, args...; kwargs...) = ex[symbol($meth_name)]()
+    @eval ($meth)(ex::Array{Sym}, args...; kwargs...) = ex[symbol($meth_name)]()
+    eval(Expr(:export, meth))
+end
 
 
 ## methods called as properties
@@ -107,7 +114,7 @@ map_matrix_methods = (:LDLsolve,
                       :QRdecomposition, :QRsolve,
                       :adjoint, :adjugate,
                       :cholesky, :cholesky_solve, :cofactor, :conjugate, 
-                      :diagaonal_solve, :diagonalize, :diff, :dot, :dual,
+                      :diagaonal_solve, :diagonalize, :diff,:dual,
                       :expand,
                       :integrate, 
                       :inverse_ADJ, :inverse_GE, :inverse_LU,
@@ -136,6 +143,8 @@ exp(ex::Array{Sym}) = convert(Array{Sym}, object_meth(convert(SymMatrix, ex), :e
 
 
 Base.conj(a::SymMatrix) = conjugate(a)
+Base.conj(a::Sym) = conjugate(a)
+
 
 ## :eigenvals, returns {val => mult, val=> mult} ## eigvals
 function eigvals(a::Array{Sym,2})
@@ -163,8 +172,7 @@ end
 
 ## call with a (A,b), return array
 for fn in (:cross,
-           :LUSolve, 
-           :dot)
+           :LUSolve)
     cmd = "x." * string(fn) * "()"
     @eval ($fn)(A::SymMatrix, b::Sym) = convert(Array{Sym}, pyeval(($cmd), A=project(A), b=project(b)))
     @eval ($fn)(A::Array{Sym, 2}, b::Vector{Sym}) = $(fn)(convert(SymMatrix,A), convert(SymMatrix, b))
