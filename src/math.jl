@@ -89,6 +89,15 @@ for meth in (:n, :N,
     eval(Expr(:export, meth))
 end
 
+## bring over for function calls (not expressions)
+## returns a symbolic expression
+function limit(f::Function, a::Real)
+    x = Sym("x")
+    a = a == Inf ? oo : (a == -Inf ? -oo : a)
+    limit(f(x), x, a)
+end
+
+
 ## different conversions
 fraction(args...; kwargs...) = sympy.fraction(project(args)...; kwargs...) |> os -> map(u -> convert(Sym, u), os)
 
