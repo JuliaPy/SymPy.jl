@@ -34,6 +34,18 @@ integrals_instance_methods = (:as_sum,
 ## Alternate interface for simple integral
 integrate(s::Sym, x::Sym, from::Real, to::Real) = integrate(s, (x, from, to))
 
+## conveniences for integrating a univariate function, if possible
+function integrate(f::Function)
+    x = Sym("x")
+    integrate(f(x), x)
+end
+
+function integrate(f::Function, from::Real, to::Real)
+    x = Sym("x")
+    integrate(f(x), x, from, to) |> float
+end
+
+
 
 ## summation
 summations_sympy_methods = (
