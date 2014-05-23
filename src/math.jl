@@ -98,6 +98,13 @@ function limit(f::Function, c::Real; kwargs...)
     limit(f(x), x, c; kwargs...)
 end
 
+## find symbolic derivatives from a function
+function diff(f::Function, k::Int=1)
+    x = Sym("x")
+    diff(f(x), x, k)
+end
+    
+
 
 ## different conversions
 fraction(args...; kwargs...) = sympy.fraction(project(args)...; kwargs...) |> os -> map(u -> convert(Sym, u), os)
