@@ -91,10 +91,11 @@ end
 
 ## bring over for function calls (not expressions)
 ## returns a symbolic expression
-function limit(f::Function, a::Real)
+## limit(f, c) or limit(f,c,dir="-") or limit(f, c, dir="-")
+function limit(f::Function, c::Real; kwargs...)
     x = Sym("x")
-    a = a == Inf ? oo : (a == -Inf ? -oo : a)
-    limit(f(x), x, a)
+    c = c == Inf ? oo : (c == -Inf ? -oo : c)
+    limit(f(x), x, c; kwargs...)
 end
 
 
