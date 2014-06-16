@@ -103,7 +103,8 @@ convert(::Type{Expr}, x::SymbolicObject) = parse(jprint(x))
 promote_rule{T <: Number}(::Type{SymbolicObject}, ::Type{T}) = Sym
 promote_rule{T <: Number}(::Type{Sym}, ::Type{T}) = Sym
 convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
-convert(::Type{Sym}, x::Number) = sympy.Symbol(string(x))
+
+convert(::Type{Sym}, x::Number)  = sympy.Symbol(string(x))
 convert(::Type{SymbolicObject}, x::Number) = sympy.Symbol(string(x))
 convert(::Type{Sym}, x::Rational) = sympy.Rational(x.num, x.den)
 convert(::Type{SymbolicObject}, x::Rational) = sympy.Rational(x.num, x.den)

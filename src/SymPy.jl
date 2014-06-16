@@ -15,7 +15,7 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        log10, log1p, exponent, exp, exp2, expm1, cbrt, sqrt,
        square, erf, erfc, erfcx, erfi, dawson, ceil, floor,
        trunc, round, significand,
-       abs, max, min,
+       abs, max, min, maximum, minimum,
        sign, dot,
        zero
 import Base: transpose

@@ -92,9 +92,16 @@ end
 ## bring over for function calls (not expressions)
 ## returns a symbolic expression
 ## limit(f, c) or limit(f,c,dir="-") or limit(f, c, dir="-")
-function limit(f::Function, c::Real; kwargs...)
+function limit(f::Function, c::Number=0; kwargs...)
     x = Sym("x")
-    c = c == Inf ? oo : (c == -Inf ? -oo : c)
+    ## catch some values...
+    if abs(c) == Inf
+        c = sign(c) * oo
+    elseif c == Base.pi
+        c = Sym(sympy.pi)
+    elseif c == Base.e
+        c = Sym(sympy.exp(1))
+    end
     limit(f(x), x, c; kwargs...)
 end
 
