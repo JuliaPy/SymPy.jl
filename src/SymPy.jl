@@ -17,7 +17,7 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        trunc, round, significand,
        abs, max, min, maximum, minimum,
        sign, dot,
-       zero
+       zero, one
 import Base: transpose
 import Base: factorial, gcd, lcm, isqrt
 import Base: gamma, beta

@@ -171,6 +171,9 @@ Base.rem(x::Sym, y) = x-Sym(y)*Sym(sympy.floor(project(x/y)))
 Base.zero(x::Sym) = oftype(Sym, 0)
 Base.zero{T<:Sym}(::Type{T}) = oftype(T,0)
 
+Base.one(x::Sym) = oftype(Sym, 1)
+Base.one{T<:Sym}(::Type{T}) = oftype(T, 1)
+
 ## solve. Returns array of PyObjects
 ## Trying to return an array of Sym objects printed funny!
 function solve(ex::Sym, args...; kwargs...)
