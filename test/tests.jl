@@ -84,6 +84,10 @@ QRdecomposition(b)
 
 eigvals(A)
 
+a = [1 0 0; 0 1 0; 0 0 x]
+evecs = eigvecs(a)
+@assert float(evecs) == eye(3)
+
 
 ## Ops
 s = 3
