@@ -152,13 +152,16 @@ end
 ## solve(x^2 +x == x, x)
 ##==(x::Sym, y::Sym) = solve(x - y)
 
-
+## Not sure these are such a good idea ...
 <(x::Sym,  y::Sym, args...; kwargs...) = sympy_meth(:Lt, x, y, args...; kwargs...)
 <=(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Le, x, y, args...; kwargs...)
 ==(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Eq, x, y, args...; kwargs...)
-isequal(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Eq, x, y, args...; kwargs...)
 >=(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Ge, x, y, args...; kwargs...)
 >(x::Sym, y::Sym, args...; kwargs...)  = sympy_meth(:Gt, x, y, args...; kwargs...)
+
+
+##isequal(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Eq, x, y, args...; kwargs...)
+Base.isequal(x::Sym, y::Sym) = isequal(x.x, y.y)
 
 Base.isinf(x::Sym) = try isinf(float(x)) catch e false end
 Base.isnan(x::Sym) = try isnan(float(x)) catch e false end

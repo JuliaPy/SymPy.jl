@@ -69,12 +69,6 @@ project(x::Array{Sym}) = convert(SymMatrix, x) |> project
 ## return a "scalar"
 #for (nm, meth) in ((:det, "det"), )
 for meth in (:condition_number,
-#             :det,
-#           :trace,
-#           
-#           :has,
-#         
-#           :norm
            )
 
     cmd = "x." * string(meth) * "()"
@@ -89,7 +83,7 @@ for meth in (:det,
            :norm
            )
     meth_name = string(meth)
-    @eval ($meth)(a::SymMatrix, args...; kwargs...) = sympy_meth(symbol($meth_name), a, args...;kwargs...)
+    @eval ($meth)(a::SymMatrix, args...; kwargs...) = object_meth(a, symbol($meth_name), args...;kwargs...)
     @eval ($meth)(a::Array{Sym, 2}, args...; kwargs...) = ($meth)(convert(SymMatrix, a), args...;kwargs...)
     eval(Expr(:export, meth))
 end
@@ -161,23 +155,22 @@ Base.conj(a::SymMatrix) = conjugate(a)
 Base.conj(a::Sym) = conjugate(a)
 
 
-## :eigenvals, returns {val => mult, val=> mult} ## eigvals
+## :eigenvals, returns {val => mult, val=> mult} 
+## we return an array of eigen values, as eigvals does
 function eigvals(a::Array{Sym,2})
-    d = a[:eigenvals]()
-    out = Sym[]
-    for (k, v) in d
-        for i in 1:v
-            push!(out, Sym(k))
-        end
-    end
-    out
+    ## this is a hack, as  d = a[:eigenvals]() may not convert to a Julia dict (Ubuntu...)
+    ds = a[:eigenvects]()
+    [d[1] for d in ds]
 end
 eigvals(a::SymMatrix) = eigvals(convert(Array{Sym}, a))
 
-## eigenvects ## returns list of triples (eigenval, multiplicity, basis).
+## :eigenvects ## returns list of triples (eigenval, multiplicity, basis).
 function eigvecs(a::Array{Sym,2})
-    d = a[:eigenvects]()
-    [{:eigenvalue=>Sym(u[1]), :multiplicity=>u[2], :basis=>map(x -> Sym(x), u[3])} for u in d]
+    ds = a[:eigenvects]()
+
+    hcat([repmat(convert(Array{Sym}, d[3][1]), 1, d[2]) for d in ds]...)
+
+#    [{:eigenvalue=>Sym(u[1]), :multiplicity=>u[2], :basis=>map(x -> Sym(x), u[3])} for u in d]
 end
 eigvecs(a::SymMatrix) = eigvecs(convert(Array{Sym}, a))   
 
