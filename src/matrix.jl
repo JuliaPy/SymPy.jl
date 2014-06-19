@@ -168,9 +168,8 @@ eigvals(a::SymMatrix) = eigvals(convert(Array{Sym}, a))
 function eigvecs(a::Array{Sym,2})
     ds = a[:eigenvects]()
 
-    hcat([repmat(convert(Array{Sym}, d[3][1]), 1, d[2]) for d in ds]...)
+    hcat([hcat([convert(Array{Sym}, v) for v in d[3]]...) for d in ds]...)
 
-#    [{:eigenvalue=>Sym(u[1]), :multiplicity=>u[2], :basis=>map(x -> Sym(x), u[3])} for u in d]
 end
 eigvecs(a::SymMatrix) = eigvecs(convert(Array{Sym}, a))   
 
