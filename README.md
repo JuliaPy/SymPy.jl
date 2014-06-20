@@ -450,7 +450,28 @@ Some conversions from `PyObject` to `Sym` are not automatic. In that case, use `
 
 
 
+## Notes
 
+Some aspects of `SymPy` require more modern versions of `sympy` to be
+installed. For example, the matrix functions rely on features of
+`sympy` that are not exposed in the `sympy` installed with Ubuntu LTS
+12.04. 
+
+In that particular instance, calls such as
+
+```
+x = Sym("x")
+a = [x 1; 1 x]
+det(a)
+```
+
+Can be replaced with
+
+```
+a[:det]()
+```
+
+Similarly for  `:trace`, `:eigenvects`, ... . Note these are `sympy` methods, not `Julia` methods that have been ported. (Hence, `:eigenvects` and not `eigvecs`.)
 
 
 
