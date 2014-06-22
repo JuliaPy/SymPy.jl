@@ -163,6 +163,8 @@ end
 ## use equality if a python level.
 #Base.isequal(x::Sym, y::Sym) = isequal(x.x, y.x)
 ==(x::Sym, y::Sym) = x.x == y.x
+==(x::Sym, y::Number) = x == convert(Sym, y)
+==(x::Number, y::Sym) = convert(Sym,x) == y
 
 Base.isinf(x::Sym) = try isinf(float(x)) catch e false end
 Base.isnan(x::Sym) = try isnan(float(x)) catch e false end
