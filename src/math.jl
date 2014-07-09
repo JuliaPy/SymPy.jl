@@ -152,13 +152,21 @@ end
 ## solve(x^2 +x == x, x)
 ##==(x::Sym, y::Sym) = solve(x - y)
 
-## Not sure these are such a good idea ...
-# <(x::Sym,  y::Sym, args...; kwargs...) = sympy_meth(:Lt, x, y, args...; kwargs...)
-# <=(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Le, x, y, args...; kwargs...)
-# ==(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Eq, x, y, args...; kwargs...)
-# >=(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Ge, x, y, args...; kwargs...)
-# >(x::Sym, y::Sym, args...; kwargs...)  = sympy_meth(:Gt, x, y, args...; kwargs...)
+## Experimental! Not sure these are such a good idea ...
+## but used with piecewise
+<(x::Sym,  y) = PyCall.pyeval("x < y", x=project(x), y=project(y))
+<=(x::Sym, y) = PyCall.pyeval("x <= y", x=project(x), y=project(y))
+>=(x::Sym, y) = PyCall.pyeval("x >= y", x=project(x), y=project(y))
+>(x::Sym, y)  = PyCall.pyeval("x > y", x=project(x), y=project(y))
+∨(x::Sym, y::Sym) = PyCall.pyeval("x & y", x=project(x), y=project(y))
+∧(x::Sym, y::Sym) = PyCall.pyeval("x ! y", x=project(x), y=project(y))
+!(x::Sym) = PyCall.pyeval("~x", x= project(x))
+
+
+## ==(x::Sym, y) = sympy_meth(:Eq, x, y, args...; kwargs...)
 ##isequal(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Eq, x, y, args...; kwargs...)
+
+
 
 ## use equality if a python level.
 #Base.isequal(x::Sym, y::Sym) = isequal(x.x, y.x)
@@ -214,3 +222,12 @@ SymFunction(nm::Union(Symbol, String)) = (args...) -> Sym(sympy.Function(nm)(pro
 ## dsolve(diff(f(x), x) + f(x), f(x)) ## solve f'(x) + f(x) = 0
 ## dsolve(diff(f(x), x, x) + f(x), f(x)) ## solve f''(x) + f(x) = 0
 dsolve(ex::Sym, fx::Sym) = sympy_meth(:dsolve, ex, fx)
+
+
+## Piecewise
+## pass in tuples, eg.
+## p = piecewise((1, x < 1), (2, (1 <= x) ∨ (x <= 2)), (3, x > 2)) ## using ∨ and ∧ for & and or
+function piecewise(args...)
+    args = [map(project, x) for x in args]
+    sympy.Piecewise(args...)
+end

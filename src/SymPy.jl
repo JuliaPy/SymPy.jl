@@ -29,6 +29,7 @@ import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj,
 import Base: promote_rule
 import Base: has, match, replace, round
 import Base: ^, .^
+import Base: &, !, >, >=, ==, <=, <
 ## poly.jl
 import Base: div
 import Base: trunc
@@ -53,7 +54,9 @@ export SymFunction, SymMatrix,
        Ylm, assoc_legendre, chebyshevt, legendre, hermite,
        dsolve,
 #       plot,
-       poly,  nroots, real_roots
+       poly,  nroots, real_roots,
+       ∨, ∧
+export relation, piecewise
 export members, doc, _sbtr
 
 
