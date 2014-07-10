@@ -154,12 +154,18 @@ end
 
 ## Experimental! Not sure these are such a good idea ...
 ## but used with piecewise
-<(x::Sym,  y) = PyCall.pyeval("x < y", x=project(x), y=project(y))
-<=(x::Sym, y) = PyCall.pyeval("x <= y", x=project(x), y=project(y))
->=(x::Sym, y) = PyCall.pyeval("x >= y", x=project(x), y=project(y))
->(x::Sym, y)  = PyCall.pyeval("x > y", x=project(x), y=project(y))
+<(x::Sym,  y::Number) = PyCall.pyeval("x < y", x=project(x), y=project(y))
+<=(x::Sym, y::Number) = PyCall.pyeval("x <= y", x=project(x), y=project(y))
+>=(x::Sym, y::Number) = PyCall.pyeval("x >= y", x=project(x), y=project(y))
+>(x::Sym, y::Number)  = PyCall.pyeval("x > y", x=project(x), y=project(y))
+<(x::Number, y::Sym)  = y > x
+<=(x::Number, y::Sym) = y >= x
+>=(x::Number, y::Sym) = y <= x
+>(x::Number, y::Sym)  = y < x
+## use ∨ for & and ∧ for | (\vee<tab> and \wedge<tab>)
 ∨(x::Sym, y::Sym) = PyCall.pyeval("x & y", x=project(x), y=project(y))
 ∧(x::Sym, y::Sym) = PyCall.pyeval("x ! y", x=project(x), y=project(y))
+## would like ¬x (\neg<tab>x) but that isn't valid syntax
 !(x::Sym) = PyCall.pyeval("~x", x= project(x))
 
 
