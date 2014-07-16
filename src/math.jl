@@ -48,6 +48,8 @@ end
 subs{T <: SymbolicObject, S <: SymbolicObject}(exs::Array{T}, x::S, arg) = map(ex->subs(ex, x, arg), exs)
 ## curried version to use with |>
 subs(x::SymbolicObject, y) = ex -> subs(ex, x, y)
+## convenience method to use symbol
+subs{T <:SymbolicObject}(ex::T, x::Symbol, arg) = subs(ex, Sym(x), arg)
 
 Base.replace(ex::SymbolicObject, x::SymbolicObject, y) = subs(ex, x, y)
 ## curried version to use through |> as in

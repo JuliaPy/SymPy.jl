@@ -51,6 +51,7 @@ end
 ## pull out x property of Sym objects or leave alone
 project(x::Any) = x
 project(x::SymbolicObject) = x.x
+project(x::Symbol) = project(Sym(x)) # can use :x instead of Sym(x)
 project(x::Tuple) = map(project, x)
 
 
