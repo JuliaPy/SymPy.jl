@@ -71,7 +71,7 @@ show(io::IO, s::SymbolicObject) = print(io, sympy.pretty(project(s)))
 
 ## need to call pretty on SymPy matrix object, not julia matrix of sympy objects
 show(io::IO, s::Array{Sym}) =  print(io, summary(s), "\n", convert(Sym, s))
-repl_show(io::IO, s::Vector{Sym}) =  print(io, summary(s), "\n", convert(Sym, s))
+
 
 
 

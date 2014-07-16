@@ -10,3 +10,6 @@ functions_sympy_methods = (
 abs(ex::Sym, args...; kwargs...) = sympy_meth(:Abs, ex, args...; kwargs...)
 minimum(ex::Sym, args...; kwargs...) = sympy_meth(:Min, ex, args...; kwargs...)
 maximum(ex::Sym, args...; kwargs...) = sympy_meth(:Max, ex, args...; kwargs...)
+
+Base.real(x::Sym) = sympy.re(project(x))
+Base.imag(x::Sym) = sympy.im(project(x))

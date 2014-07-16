@@ -319,26 +319,19 @@ solve(x^2 + 3*x + 2, x)
 solve(a*x^2 + b*x + c, x)
 ```
 
-Just the left hand expression is specified. The `==` operator is overloaded for symbolic objects to create equations:
-
-```
-eq = x^2 + 3x == -2x		# an equation
-solve(eq, x)
-solve(x^2 + 3x == 2)	        # don't need ex = 0
-```
 
 
 Simultaneous equations can be specified with vector notation:
 
 ```
-eq1 = x + y == 1
-eq2 = x - y == 2
+eq1 = x + y - 1
+eq2 = x - y - 2
 solve([eq1, eq2], [x, y])	# {"x"=>3/2,"y"=>-1/2}
 ```
 
 The `nsolve` function provides numeric solutions to one or more
 equations. Again equations are written as expressions equal to
-$0$. Unlike `sovle`, the `nsolve` function requires a starting point.
+$0$. Unlike `solve`, the `nsolve` function requires a starting point.
 
 ```
 nsolve(sin(x) - cos(x), x, 0)

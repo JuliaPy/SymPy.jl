@@ -4,7 +4,7 @@ using PyCall
 @pyimport sympy
 
 import Base.getindex
-import Base: show, repl_show
+import Base: show, writemime
 import Base.convert, Base.complex
 import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        atan, asinh, acosh, atanh, sec, csc, cot, asec,
@@ -13,7 +13,7 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        acosd, acotd, acscd, asecd, asind, atand, atan2,
        radians2degrees, degrees2radians, log, log2,
        log10, log1p, exponent, exp, exp2, expm1, cbrt, sqrt,
-       square, erf, erfc, erfcx, erfi, dawson, ceil, floor,
+       erf, erfc, erfcx, erfi, dawson, ceil, floor,
        trunc, round, significand,
        abs, max, min, maximum, minimum,
        sign, dot,
@@ -27,13 +27,14 @@ import Base: !=, ==
 import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj,
               cross, eigvals, eigvecs, rref, trace, norm
 import Base: promote_rule
-import Base: has, match, replace, round
+import Base: match, replace, round
 import Base: ^, .^
 import Base: &, !, >, >=, ==, <=, <
 ## poly.jl
 import Base: div
 import Base: trunc
 import Base: isinf, isnan
+import Base: real, imag
 
 export sympy, sympy_meth, object_meth, call_matrix_meth
 export Sym, @sym_str, @syms, symbols
@@ -45,7 +46,7 @@ export SymFunction, SymMatrix,
        collect, separate, 
        fraction,
        primitive, sqf, resultant, cancel,
-       expand, together,
+       expand, together, square,
        solve,
        limit, diff, 
        series, integrate, 

@@ -62,7 +62,7 @@ function !={T <: Real}(x::Sym, y::T)
         x = float(x)
         x != y
     catch
-        false
+        true
     end
 end
 function !={T <: Complex}(x::Sym, y::T) 
@@ -70,7 +70,7 @@ function !={T <: Complex}(x::Sym, y::T)
         x = complex(x)
         x != y
     catch
-        false
+        true
     end
 end
 
