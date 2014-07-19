@@ -216,3 +216,11 @@ g1 = 2x + 2
 q,r = polydiv(f1,g1, domain="QQ") # not div, as can't disambiguate div(Sym(7), 5)) to do integer division
 @test r == Sym(-2)
 @test simplify(q*g1 + r - f1) == Sym(0)
+
+
+## piecewise
+x = sym"x"
+p = piecewise((x, x>0), (0, x < 0), (1, x==0))
+@assert int(subs(p,x,2)) == 2
+@assert int(subs(p,x,-1)) == 0
+@assert int(subs(p,x,0)) == 1

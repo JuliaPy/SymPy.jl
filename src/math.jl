@@ -156,19 +156,33 @@ end
 
 ## Experimental! Not sure these are such a good idea ...
 ## but used with piecewise
+
+
+Base.&(x::Sym, y::Sym) = PyCall.pyeval("x & y", x=project(x), y=project(y))
+Base.|(x::Sym, y::Sym) = PyCall.pyeval("x | y", x=project(x), y=project(y))
+!(x::Sym)         =      PyCall.pyeval("~x",    x=project(x))
+## version 0.3 forward
+if VERSION >= v"0.3.0-rc1+82"
+    ## use ∨, ∧, ¬ for |,&,! (\vee<tab>, \wedge<tab>, \neg<tab>)
+    ∨(x::Sym, y::Sym) = x | y
+    ∧(x::Sym, y::Sym) = x & y
+    ¬(x::Sym) = !x
+end
+
+
 <(x::Sym,  y::Number) = PyCall.pyeval("x < y", x=project(x), y=project(y))
 <=(x::Sym, y::Number) = PyCall.pyeval("x <= y", x=project(x), y=project(y))
 >=(x::Sym, y::Number) = PyCall.pyeval("x >= y", x=project(x), y=project(y))
 >(x::Sym, y::Number)  = PyCall.pyeval("x > y", x=project(x), y=project(y))
+## hacky, but == is something else to SymPy
+==(x::Sym, y::Number) = (x <= y) & (x >= y)
+
 <(x::Number, y::Sym)  = y > x
 <=(x::Number, y::Sym) = y >= x
 >=(x::Number, y::Sym) = y <= x
 >(x::Number, y::Sym)  = y < x
-## use ∨ for & and ∧ for | (\vee<tab> and \wedge<tab>)
-∨(x::Sym, y::Sym) = PyCall.pyeval("x & y", x=project(x), y=project(y))
-∧(x::Sym, y::Sym) = PyCall.pyeval("x ! y", x=project(x), y=project(y))
-## would like ¬x (\neg<tab>x) but that isn't valid syntax
-!(x::Sym) = PyCall.pyeval("~x", x= project(x))
+
+
 
 
 ## ==(x::Sym, y) = sympy_meth(:Eq, x, y, args...; kwargs...)
@@ -179,8 +193,8 @@ end
 ## use equality if a python level.
 #Base.isequal(x::Sym, y::Sym) = isequal(x.x, y.x)
 ==(x::Sym, y::Sym) = x.x == y.x
-==(x::Sym, y::Number) = x == convert(Sym, y)
-==(x::Number, y::Sym) = convert(Sym,x) == y
+# ==(x::Sym, y::Number) = x == convert(Sym, y)
+# ==(x::Number, y::Sym) = convert(Sym,x) == y
 
 Base.isinf(x::Sym) = try isinf(float(x)) catch e false end
 Base.isnan(x::Sym) = try isnan(float(x)) catch e false end

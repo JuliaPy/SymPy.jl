@@ -29,7 +29,7 @@ import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj,
 import Base: promote_rule
 import Base: match, replace, round
 import Base: ^, .^
-import Base: &, !, >, >=, ==, <=, <
+import Base: &, |, !, >, >=, ==, <=, <
 ## poly.jl
 import Base: div
 import Base: trunc
