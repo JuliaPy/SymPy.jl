@@ -5,9 +5,10 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
            :sech, :csch, :coth, :asech, :acsch, :acoth, :sinc, :cosc, 
            :atan2,
            :radians2degrees, :degrees2radians,
-           :log, :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
+           :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
            :sqrt, :square, :erf, :erfc, :erfcx, :erfi, :dawson,
-           :ceiling, :floor, :trunc, :round, :significand
+           :ceiling, :floor, :trunc, :round, :significand,
+           :factorial2
            )
 
     
@@ -15,6 +16,9 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
     @eval ($fn)(x::Sym) = sympy.(symbol($meth))(project(x))
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
+
+log(x::Sym) = sympy.log(project(x))
+log(b::Sym, x::Sym) = sympy.log(project(x), project(b))
 
 ## in julia, not SymPy
 cbrt(x::Sym) = PyCall.pyeval("x ** (1/3)", x=project(x)) 

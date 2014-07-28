@@ -42,7 +42,7 @@ end
 
 function integrate(f::Function, from::Real, to::Real)
     x = Sym("x")
-    integrate(f(x), x, from, to) |> float
+    integrate(f(x), x, from, to)
 end
 
 
