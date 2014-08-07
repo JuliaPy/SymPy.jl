@@ -98,19 +98,19 @@ a = [x 1; 1 x]
 b = [x 1 2; 1 2 x]
 
 ## scalar, [vector, matrix]
-s .+ v
-v .+ s
-s .+ rv
-rv .+ s
-s .+ a
-a .+ s
+s + v
+v + s
+s + rv
+rv + s
+s + a
+a + s
 
-s .- v
-v .- s
-s .- rv
-rv .- s
-s .- a
-a .- s
+s - v
+v - s
+s - rv
+rv - s
+s - a
+a - s
 
 2v   
 2rv  

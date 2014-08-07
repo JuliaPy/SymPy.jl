@@ -9,12 +9,23 @@ convert{T <: Real}(::Type{Sym}, x::T) = sympy.sympify(x)
 +(y::Number, x::SymbolicObject) = x + y
 +(a::Array, x::SymbolicObject) = map(u -> u + x, a)
 +(x::SymbolicObject, a::Array) = map(u -> x + u, a)
+.+{T <: Number}(x::T, y::SymbolicObject) = convert(Sym, x) + y
+.+{T <: Number}(x::SymbolicObject, y::T) = x + convert(Sym, y)
+.+(x::SymbolicObject, y::SymbolicObject) = convert(Sym, convert(Array{Sym}, x) .+ convert(Array{Sym}, y))
+.+(x::SymbolicObject, a::Array) = map(u -> x+u, a)
+.+(a::Array, x::SymbolicObject) = map(u -> x+u, a)
+
 
 -(x::SymbolicObject, y::SymbolicObject) =  Sym(pyeval("x - y", x = project(x), y = project(y)))
 -(x::SymbolicObject, y::Number) = x - convert(Sym, y)
 -(y::Number, x::SymbolicObject) = -(x-y)
 -(a::Array, x::SymbolicObject) = map(u -> u - x, a)
 -(x::SymbolicObject, a::Array) = map(u -> x - u, a)
+.-{T <: Number}(x::T, y::SymbolicObject) = convert(Sym, x) - y
+.-{T <: Number}(x::SymbolicObject, y::T) = x - convert(Sym, y)
+.-(x::SymbolicObject, y::SymbolicObject) = convert(Sym, convert(Array{Sym}, x) .- convert(Array{Sym}, y))
+.-(x::SymbolicObject, a::Array) = map(u -> x-u, a)
+.-(a::Array, x::SymbolicObject) = map(u -> x-u, a)
 
 -(x::SymbolicObject) = Sym(pyeval("-x", x = project(x)))
 
