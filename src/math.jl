@@ -8,17 +8,69 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
            :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
            :sqrt, :square, :erf, :erfc, :erfcx, :erfi, :dawson,
            :ceiling, :floor, :trunc, :round, :significand,
-           :factorial2
+           :factorial2,
+           :airyai, :airybi
            )
 
     
     meth = string(fn)
-    @eval ($fn)(x::Sym) = sympy.(symbol($meth))(project(x))
+    @eval ($fn)(x::Sym;kwargs...) = sympy.(symbol($meth))(project(x),[(k,project(v)) for (k,v) in kwargs]...)
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
+## Handle arguments differently
 log(x::Sym) = sympy.log(project(x))
 log(b::Sym, x::Sym) = sympy.log(project(x), project(b))
+
+## these have (parameter, x) signature. Does derivative::Int keyword not work???
+for fn in (:besselj, :bessely, :besseli, :besselk)
+    meth = string(fn)
+    @eval ($fn)(nu::Union(Sym, Number), x::Sym;kwargs...) = sympy.(symbol($meth))(project(nu), project(x),[(k,project(v)) for (k,v) in kwargs]...)
+    @eval ($fn)(nu::Union(Sym, Number), a::Array{Sym}) = map(x ->$fn(nu, x), a)
+end
+
+
+
+## simple (x;...) signature, export
+for fn in (:airyaizero, :airybizero, 
+           :scorergi, :scorerhi
+           )
+    meth = string(fn)
+    @eval ($fn)(x::Union(Sym, Number); kwargs...) = sympy.(symbol($meth))(project(x);[(k,project(v)) for (k,v) in kwargs]...)
+    eval(Expr(:export, fn))
+end
+
+
+## (x,y;...) signature, export
+for fn in (:besseljzero, :besselyzero,
+           :hankel2,             # hankel function of second kind H_n^2(x) = J_n(x) - iY_n(x)
+           :ber,:bei,:ker,:kei,
+           :struveh,:struvel,
+           :angerj,
+           :webere,
+           :coulombc,
+           :pcfd, :pcfu, :pcfv, :pcfw
+)
+    meth = string(fn)
+    @eval ($fn)(nu::Union(Sym, Number), x::Sym;kwargs...) = sympy.(symbol($meth))(project(nu), project(x),[(k,project(v)) for (k,v) in kwargs]...)
+    eval(Expr(:export, fn))
+end
+
+
+## (x,y,z;...) signature, export
+for fn in (:lommels1, :lommels2,
+           :coulombf, :coulombg,
+           :hyperu,
+           :whitm, :whitw
+)
+    meth = string(fn)
+    @eval ($fn)(u::Union(Sym, Number),v::Union(Sym, Number),z::Union(Sym, Number);kwargs...) = 
+      sympy.(symbol($meth))(project(u), project(v), project(z),[(k,project(v)) for (k,v) in kwargs]...)
+    eval(Expr(:export, fn))
+end
+
+
+
 
 ## in julia, not SymPy
 cbrt(x::Sym) = PyCall.pyeval("x ** (1/3)", x=project(x)) 

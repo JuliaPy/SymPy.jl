@@ -17,6 +17,8 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        trunc, round, significand,
        abs, max, min, maximum, minimum,
        sign, dot,
+       besseli, besselj, besselk, bessely,
+       airyai, airybi,
        zero, one
 import Base: transpose
 import Base: factorial, gcd, lcm, isqrt
