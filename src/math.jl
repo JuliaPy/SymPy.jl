@@ -31,45 +31,45 @@ end
 
 
 
-## simple (x;...) signature, export
+## simple (x::Union(Sym, Number;...) signature, export
 for fn in (:airyaizero, :airybizero, 
-           :scorergi, :scorerhi
-           )
-    meth = string(fn)
-    @eval ($fn)(x::Union(Sym, Number); kwargs...) = sympy.(symbol($meth))(project(x);[(k,project(v)) for (k,v) in kwargs]...)
-    eval(Expr(:export, fn))
-end
-
-
-## (x,y;...) signature, export
-for fn in (:besseljzero, :besselyzero,
+           :scorergi, :scorerhi,
+           :besseljzero, :besselyzero,
            :hankel2,             # hankel function of second kind H_n^2(x) = J_n(x) - iY_n(x)
            :ber,:bei,:ker,:kei,
            :struveh,:struvel,
            :angerj,
            :webere,
            :coulombc,
-           :pcfd, :pcfu, :pcfv, :pcfw
-)
-    meth = string(fn)
-    @eval ($fn)(nu::Union(Sym, Number), x::Sym;kwargs...) = sympy.(symbol($meth))(project(nu), project(x),[(k,project(v)) for (k,v) in kwargs]...)
-    eval(Expr(:export, fn))
-end
-
-
-## (x,y,z;...) signature, export
-for fn in (:lommels1, :lommels2,
+           :pcfd, :pcfu, :pcfv, :pcfw,
+           :lommels1, :lommels2,
            :coulombf, :coulombg,
            :hyperu,
-           :whitm, :whitw
-)
+           :whitm, :whitw,
+           )
     meth = string(fn)
-    @eval ($fn)(u::Union(Sym, Number),v::Union(Sym, Number),z::Union(Sym, Number);kwargs...) = 
-      sympy.(symbol($meth))(project(u), project(v), project(z),[(k,project(v)) for (k,v) in kwargs]...)
+    @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) = 
+      sympy.(symbol($meth))([project(x) for x in xs]...,[(k,project(v)) for (k,v) in kwargs]...)
     eval(Expr(:export, fn))
 end
 
-
+## in mpmath module
+for fn in (:hyp0f1, 
+           :hyp1f1, :hyp1f2, 
+           :hyp2f0, :hyp2f1, :hyp2f2, :hyp2f3,
+           :hyp3f2,
+           :hyper, :hypercomb,
+           :meijerg,
+           :bihyper,
+           :hyper2d,
+           :appellf1, :appellf2, :appellf3, :appellf4
+           )
+           meth = string(fn)
+           @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) = 
+           Sym(sympy.mpmath[(symbol($meth))]([project(x) for x in xs]...,[(k,project(v)) for (k,v) in kwargs]...))
+    eval(Expr(:export, fn))
+end
+           
 
 
 ## in julia, not SymPy
