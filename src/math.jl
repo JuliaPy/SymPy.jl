@@ -1,5 +1,6 @@
 
-## Math functions       
+## Imported math functions
+## make vectorized version while we are at it
 for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
            :asinh, :acosh, :atanh, :sec, :csc, :cot, :asec, :acsc, :acot, 
            :sech, :csch, :coth, :asech, :acsch, :acoth, :sinc, :cosc, 
@@ -22,30 +23,40 @@ end
 log(x::Sym) = sympy.log(project(x))
 log(b::Sym, x::Sym) = sympy.log(project(x), project(b))
 
-## these have (parameter, x) signature. Does derivative::Int keyword not work???
+## these have (parameter, x) signature. Use symbolic x to call sympy version, othewise
+## should dispatch to julia version.
 for fn in (:besselj, :bessely, :besseli, :besselk)
     meth = string(fn)
     @eval ($fn)(nu::Union(Sym, Number), x::Sym;kwargs...) = sympy.(symbol($meth))(project(nu), project(x),[(k,project(v)) for (k,v) in kwargs]...)
     @eval ($fn)(nu::Union(Sym, Number), a::Array{Sym}) = map(x ->$fn(nu, x), a)
 end
 
+## export these sympy functions ...
+
+## (x:Sym, ...) , export
+sympy_math_methods = (:Prod,
+                      :Ylm, 
+                      :gamma, :beta, # need import
+                      :assoc_legendre, 
+                      :chebyshevt
+                      )
+for meth in sympy_math_methods 
+    meth_name = string(meth)
+    @eval ($meth)(ex::Sym, args...) = Sym(sympy.(symbol($meth_name))(project(ex), project(args)...))
+    eval(Expr(:export, meth))
+end
+
+
 
 
 ## simple (x::Union(Sym, Number;...) signature, export
-for fn in (:airyaizero, :airybizero, 
-           :scorergi, :scorerhi,
-           :besseljzero, :besselyzero,
-           :hankel2,             # hankel function of second kind H_n^2(x) = J_n(x) - iY_n(x)
-           :ber,:bei,:ker,:kei,
-           :struveh,:struvel,
-           :angerj,
-           :webere,
-           :coulombc,
-           :pcfd, :pcfu, :pcfv, :pcfw,
-           :lommels1, :lommels2,
-           :coulombf, :coulombg,
-           :hyperu,
-           :whitm, :whitw,
+for fn in (
+           :hankel1, :hankel2,             # hankel function of second kind H_n^2(x) = J_n(x) - iY_n(x)
+           :legendre,
+           :jacobi, 
+           :gegenbauer,
+           :hermite,
+           :laguerre
            )
     meth = string(fn)
     @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) = 
@@ -62,7 +73,23 @@ for fn in (:hyp0f1,
            :meijerg,
            :bihyper,
            :hyper2d,
-           :appellf1, :appellf2, :appellf3, :appellf4
+           :appellf1, :appellf2, :appellf3, :appellf4,
+           :ber,:bei,:ker,:kei,
+           :struveh,:struvel,
+           :angerj,
+           :webere,
+           :coulombc,
+           :legenp, :legenq,
+           :chebyt, :chebyu, 
+           :pcfd, :pcfu, :pcfv, :pcfw,
+           :lommels1, :lommels2,
+           :coulombf, :coulombg,
+           :hyperu,
+           :whitm, :whitw,
+           :scorergi, :scorerhi,
+           :spherharm,
+           :airyaizero, :airybizero, 
+           :besseljzero, :besselyzero
            )
            meth = string(fn)
            @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) = 
@@ -76,7 +103,7 @@ end
 cbrt(x::Sym) = PyCall.pyeval("x ** (1/3)", x=project(x)) 
 Base.ceil(x::Sym) = ceiling(x)
 
-   
+## degree functions   
 for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
           :acosd, :acotd, :acscd, :asecd, :asind, :atand)
 
@@ -186,22 +213,6 @@ oo = Sym(sympy.oo)
 
 
 
-## functions which are methods of sympy, not a symbolic instance
-
-
-sympy_math_methods = ( :Prod,
-                      :Ylm, 
-                      :gamma, :beta, # need import
-                      :assoc_legendre, 
-                      :chebyshevt, 
-                      :legendre, 
-                      :hermite
-                      )
-for meth in sympy_math_methods 
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...) = Sym(sympy.(symbol($meth_name))(project(ex), project(args)...))
-    eval(Expr(:export, meth))
-end
 
 ## solve
 

@@ -23,6 +23,12 @@ pytype_mapping(basictype, Sym)
 polytype = sympy.polys["polytools"]["Poly"]
 pytype_mapping(polytype, Sym)
 
+## complex float
+## this cause issue with printing on non-complex objects
+#mpctype = sympy.mpmath["ctx_mp_python"]
+#pytype_mapping(mpctype, Sym)
+
+
 convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
 convert(::Type{PyObject}, s::Sym) = s.x
 

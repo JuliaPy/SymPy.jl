@@ -224,3 +224,10 @@ p = piecewise((x, x>0), (0, x < 0), (1, x==0))
 @assert int(subs(p,x,2)) == 2
 @assert int(subs(p,x,-1)) == 0
 @assert int(subs(p,x,0)) == 1
+
+## mpmath functions
+x = sym"x"
+@assert limit(besselj(1,1/x), x, 0) == Sym(0)
+complex(hankel2(2, pi))
+bei(2, 3.5)
+bei(1+im, 2+3im)
