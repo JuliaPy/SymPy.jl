@@ -32,7 +32,7 @@ integrals_instance_methods = (:as_sum,
                            
 
 ## Alternate interface for simple integral
-integrate(s::Sym, x::Sym, from::Real, to::Real) = integrate(s, (x, from, to))
+integrate(s::Sym, x::Sym, from::Union(Real, Sym), to::Union(Real, Sym)) = integrate(s, (x, from, to))
 
 ## conveniences for integrating a univariate function, if possible
 function integrate(f::Function)
@@ -40,7 +40,7 @@ function integrate(f::Function)
     integrate(f(x), x)
 end
 
-function integrate(f::Function, from::Real, to::Real)
+function integrate(f::Function, from::Union(Real, Sym), to::Union(Real, Sym))
     x = Sym("x")
     integrate(f(x), x, from, to)
 end
