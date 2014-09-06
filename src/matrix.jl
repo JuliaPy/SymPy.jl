@@ -173,13 +173,18 @@ function eigvecs(a::Array{Sym,2})
 end
 eigvecs(a::SymMatrix) = eigvecs(convert(Array{Sym}, a))   
 
+## Take any matrix and return reduced row-echelon form and indices of pivot vars
+## To simplify elements before finding nonzero pivots set simplified=True
+## We return only the rref form -- not the pivot vars. 
 function rref(a::Array{Sym, 2}; kwargs...)
     d = convert(SymMatrix, a)[:rref](; kwargs...)
-    (convert(Array{Sym}, d[1]), d[2])
+    convert(Array{Sym}, d[1])
 end
+
+## rref. The sympy method returns 
 function rref(a::SymMatrix) 
   d = a[:rref]()
-  (convert(Array{Sym}, d[1]), d[2]) ## return Array{Sym}, not SymMatrix
+  convert(Array{Sym}, d[1]) ## return Array{Sym}, not SymMatrix
 end
 
 ## call with a (A,b), return array

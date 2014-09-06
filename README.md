@@ -209,14 +209,13 @@ PI = Sym(sympy.pi)		# a Sym object
 N(PI, 60)			# 3.14159265358979323846264338327950288419716939937510582097494
 ```
 
-This is a somewhat awkward way to get `pi` into a symbolic expression. This also works
+The above shows a somewhat awkward way to get `pi` into a symbolic expression. This also works
 
 ```
 PI = Sym("pi")
 ```
 
-A substitution along the
-lines of
+This can be useful, for example a substitution along the lines of
 
 ```
 x = sym"x"
@@ -225,7 +224,7 @@ N(x, 60)			# 3.14159265358979311599796346854418516159057617187500000000000
 ```
 
 loses precision, as the value substituted is `julia`'s floating point
-representation of `pi`, not the symbolic value `sympi.pi`, so gets
+representation of `pi`, not the symbolic value `sympi.pi`, so it gets
 truncated after enough digits.
 
 
@@ -263,6 +262,13 @@ But in fact this limit blows up:
 limit(f(x), x, 0)
 ```
 
+For convenience, there is an "operator" interface for function objects:
+
+```
+f(x) = sin(x)/x
+limit(f, 0)
+```
+
 
 * Derivatives, higher-order derivatives and partial derivatives are all computed by `diff`. 
 
@@ -272,6 +278,13 @@ diff(sin(x*y), x, 2)		# -y^2 * sin(x⋅y)    (second derivative in x)
 diff(sin(x*y), x, y)		# -x * y * sin(x * y) + cos(x * y)  (mixed partials)
 ```
 
+Again, for functions of a single real variable, there is an operator version:
+
+```
+f(x) = sin(x)/x
+diff(f)
+diff(f, 2)
+```
 
 * Integration is done through `integrate`. Both definite and indefinite integrals are possible:
 
@@ -314,6 +327,13 @@ integrate(x*y, (x, 0, 1), (y, 0, 1)) # still 1/4
 As well, the inner limits can be expressed using outer variables: ```
 integrate(x*y, (x, 0, y), (y, 0,1)) # 1/8 ```
 
+Again for functions of a single real variable, there is an "operator" version:
+
+```
+f(x) = x^2 - 2
+integrate(f)			# indefinite
+integrate(f, 0, 1)		# definite
+```
 
 * Summations can be done through the `summation` function:
 
@@ -379,7 +399,7 @@ v = [x, 1]
 A = [x 1; 1 -x]
 ```
 
-Basic math operations should match those of `julia` (though there could be mistakes!)
+Basic math operations should match those of `julia` (though there could be mistakes!). 
 
 ```
 v .* v				# 2 element array
@@ -390,11 +410,15 @@ A^2
 A.^2				#
 ```
 
+However, the printing of matrices may be problematic at the
+console. Within `IJulia`, the output is very nice, as `sympy` outputs
+latex-ready output for display through MathJax.
+
 These are arrays of symbolic objects. Some functions are defined for such:
 
 ```
 det(A)				# determinant
-inv(A)				# inverse
+inverse(A)			# inverse is `inverse` -- not `inv`
 exp(A)				# matrix exponential, many screenfuls
 trace(A)
 eigvals(A)
@@ -427,7 +451,9 @@ polynomials we haven't exposed.
 If useful parts of `SymPy` could add to this package, please pass
 along a request.
 
-The `call_meth` function can make it easy to bring in sympy functions to `julia`. For example, to define a `cancel` function which in sympy has signature `(ex, extension=x)` can be done with:
+The `call_meth` function can make it easy to bring in sympy functions
+to `julia`. For example, to define a `cancel` function which in sympy
+has signature `(ex, extension=x)` can be done with:
 
 ```
 Kancel(args...; kwargs...) = call_meth(:cancel, args...; kwargs...) ## already have cancel
@@ -446,7 +472,8 @@ harmonic(30)
 convert(Rational, harmonic(30))
 ```
 
-Some conversions from `PyObject` to `Sym` are not automatic. In that case, use `sympy_meth` and work with the `PyObject`.
+Some conversions from `PyObject` to `Sym` are not automatic. In that
+case, use `sympy_meth` and work with the `PyObject`.
 
 
 
@@ -455,7 +482,7 @@ Some conversions from `PyObject` to `Sym` are not automatic. In that case, use `
 Some aspects of `SymPy` require more modern versions of `sympy` to be
 installed. For example, the matrix functions rely on features of
 `sympy` that are not exposed in the `sympy` installed with Ubuntu LTS
-12.04. 
+12.04.
 
 In that particular instance, calls such as
 
@@ -471,7 +498,9 @@ Can be replaced with
 a[:det]()
 ```
 
-Similarly for  `:trace`, `:eigenvects`, ... . Note these are `sympy` methods, not `Julia` methods that have been ported. (Hence, `:eigenvects` and not `eigvecs`.)
+Similarly for `:trace`, `:eigenvects`, ... . Note these are `sympy`
+methods, not `Julia` methods that have been ported. (Hence,
+`:eigenvects` and not `eigvecs`.)
 
 
 

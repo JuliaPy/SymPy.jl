@@ -132,7 +132,7 @@ if :Gadfly in names(Main)
 elseif :Winston in names(Main)
     using Winston
     Winston.plot(ex::Sym, args...; kwargs...) = plot(convert(Function, ex), args...; kwargs...)
-    Winston.plot{T<:Sym}(exs::Vector{T}, args...; kwargs...) = plot(map(ex -> convert(Function, ex), exs), args...; kwargs...)
+#    Winston.plot{T<:Sym}(exs::Vector{T}, args...; kwargs...) = plot(map(ex -> convert(Function, ex), exs), args...; kwargs...)
 end
 
 
