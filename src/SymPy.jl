@@ -40,7 +40,7 @@ import Base: real, imag
 
 export sympy, sympy_meth, object_meth, call_matrix_meth
 export Sym, @sym_str, @syms, symbols
-export pprint, latex, jprint
+export pprint,  jprint
 export SymFunction, SymMatrix,
        n,  subs,
        simplify, nsimplify, 
