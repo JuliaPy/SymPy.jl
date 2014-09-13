@@ -1,7 +1,7 @@
 
 
 ## Many (too many) ways to create symbolobjects
-## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y)
+## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y), @syms x y, symbols("x y")
 
 Sym(s::Union(Symbol, String)) = sympy.symbols(string(s))
 Sym{T <: Number}(s::T) = convert(Sym, sympy.sympify(s))
@@ -58,9 +58,38 @@ project(x::Tuple) = map(project, x)
 ## convert args so that we can use obj[:methname](x,...) without needed to project
 ## python: obj.method(arg1, arg2, ...) -> julia: obj[:meth](args...) 
 ## no kwargs though!
+##
+## Examples:
+## ```
+## x = Sym("x")
+## (x^2 - 2x + 1)[:diff]()
+## (x^2 - 2x + 1)[:integrate]((x,0,1))
+## ```
 function getindex(x::SymbolicObject, i::Symbol)
-    out = project(x)[i]
-    isa(out, Function) ? (args...) -> out(project(args)...) : out
+    ## find method
+    if haskey(project(x), i)
+        out = project(x)[i]
+        if isa(out, Function) 
+            function f(args...;kwargs...) 
+                out(project(args)...;kwargs...)
+            end
+            return f
+        else
+            return out
+        end
+    elseif i in names(sympy)
+        out = sympy.(i)
+        if isa(out, Function) 
+            function f(args...;kwargs...) 
+                out(project(x), project(args)...;kwargs...) 
+            end
+            return f
+        else
+            return out
+        end
+    else
+        MethodError()
+    end
 end
 
 
@@ -78,7 +107,7 @@ show(io::IO, s::Array{Sym}) =  print(io, summary(s), "\n", convert(Sym, s))
 
 
 
-doc(x::SymbolicObject) = print(x[:__doc__]())
+doc(x::SymbolicObject) = print(x[:__doc__])
 
 _str(s::SymbolicObject) = s[:__str__]()
 _str(a::Array{SymbolicObject}) = map(_str, a)
