@@ -62,6 +62,7 @@ export SymFunction, SymMatrix,
 export relation, piecewise
 export members, doc, _sbtr
 
+export PI, E
 
 include("types.jl")
 include("utils.jl")

@@ -348,3 +348,7 @@ function piecewise(args...)
     args = [map(project, x) for x in args]
     sympy.Piecewise(args...)
 end
+
+## This is a convenient alternative to Sym("pi")
+const PI = Sym(sympy.pi)
+const E = Sym(sympy.exp(1))

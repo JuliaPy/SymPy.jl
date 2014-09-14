@@ -451,30 +451,28 @@ polynomials we haven't exposed.
 If useful parts of `SymPy` could add to this package, please pass
 along a request.
 
-The `call_meth` function can make it easy to bring in sympy functions
-to `julia`. For example, to define a `cancel` function which in sympy
-has signature `(ex, extension=x)` can be done with:
+For many methods, access is provided via `[:symbol]`. For example, the `cancel` function in `SymPy` can be used:
+
 
 ```
-Kancel(args...; kwargs...) = call_meth(:cancel, args...; kwargs...) ## already have cancel
 sq2 = (sqrt(x) |> replace(x, 2))
 f = x^3 + (sq2- 2)*x^2 - (2*sq2 + 3)*x - 3*sq2
 g = x^2 - 2
-Kancel(f/g)
-Kancel(f/g, extension=true)  
+(f/g)[:cancel]()
+(f/g)[:cancel](extension=true)  
 ```
 
-For functions without keyword arguments, it is even easier:
+The value of `f/g` is passed as the first argument to `cancel` and keyword arguments are passed along.
+
+The `sympy_meth` function can be used to call a method, when the argument is not-symbolic:
 
 ```
-harmonic(n::Integer) = call_meth(:harmonic, n)
-harmonic(30)
-convert(Rational, harmonic(30))
+harmonic(n::Integer) = sympy_meth(:harmonic, n)
+harmonic(30)			
+convert(Rational, harmonic(30))	# 9304682830147//2329089562800
 ```
 
-Some conversions from `PyObject` to `Sym` are not automatic. In that
-case, use `sympy_meth` and work with the `PyObject`.
-
+Some conversions from `PyObject` to `Sym` are not automatic.
 
 
 ## Notes
