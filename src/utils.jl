@@ -113,6 +113,7 @@ _str(s::SymbolicObject) = s[:__str__]()
 _str(a::Array{SymbolicObject}) = map(_str, a)
 
 pprint(s::SymbolicObject, args...; kwargs...) = sympy.pprint(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+## This is not exported
 latex(s::SymbolicObject, args...; kwargs...)  = sympy.latex(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
 
 function jprint(x::SymbolicObject)
