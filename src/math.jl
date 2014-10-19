@@ -15,7 +15,7 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
 
     
     meth = string(fn)
-    @eval ($fn)(x::Sym;kwargs...) = sympy.(symbol($meth))(project(x),[(k,project(v)) for (k,v) in kwargs]...)
+    @eval ($fn)(x::Sym;kwargs...) = getfield(sympy,symbol($meth))(project(x),[(k,project(v)) for (k,v) in kwargs]...)
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
@@ -27,7 +27,7 @@ log(b::Sym, x::Sym) = sympy.log(project(x), project(b))
 ## should dispatch to julia version.
 for fn in (:besselj, :bessely, :besseli, :besselk)
     meth = string(fn)
-    @eval ($fn)(nu::Union(Sym, Number), x::Sym;kwargs...) = sympy.(symbol($meth))(project(nu), project(x),[(k,project(v)) for (k,v) in kwargs]...)
+    @eval ($fn)(nu::Union(Sym, Number), x::Sym;kwargs...) = getfield(sympy,symbol($meth))(project(nu), project(x),[(k,project(v)) for (k,v) in kwargs]...)
     @eval ($fn)(nu::Union(Sym, Number), a::Array{Sym}) = map(x ->$fn(nu, x), a)
 end
 
@@ -42,7 +42,7 @@ sympy_math_methods = (:Prod,
                       )
 for meth in sympy_math_methods 
     meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...) = Sym(sympy.(symbol($meth_name))(project(ex), project(args)...))
+    @eval ($meth)(ex::Sym, args...) = Sym(getfield(sympy,symbol($meth_name))(project(ex), project(args)...))
     eval(Expr(:export, meth))
 end
 
@@ -60,7 +60,7 @@ for fn in (
            )
     meth = string(fn)
     @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) = 
-      sympy.(symbol($meth))([project(x) for x in xs]...,[(k,project(v)) for (k,v) in kwargs]...)
+    getfield(sympy,symbol($meth))([project(x) for x in xs]...,[(k,project(v)) for (k,v) in kwargs]...)
     eval(Expr(:export, fn))
 end
 
@@ -108,7 +108,7 @@ for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
           :acosd, :acotd, :acscd, :asecd, :asind, :atand)
 
     rad_fn = string(fn)[1:end-1]
-    @eval ($fn)(x::Sym) = sympy.(symbol($rad_fn))(project(x * Sym(sympy.pi)/180))
+    @eval ($fn)(x::Sym) = getfield(sympy, symbol($rad_fn))(project(x * Sym(sympy.pi)/180))
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
                                            

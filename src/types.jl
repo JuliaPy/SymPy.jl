@@ -14,6 +14,8 @@ immutable SymMatrix <: SymbolicObject
     x::PyCall.PyObject
 end
 
+convert(::Type{Sym}, o::String) = Sym(o)
+convert(::Type{Sym}, o::Number) = Sym(o)
 
 ## Automatic conversion of python types to Sym class.
 

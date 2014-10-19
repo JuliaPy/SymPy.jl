@@ -179,7 +179,7 @@ end
 ## Makes it possible to call in a sympy method, witout worrying about Sym objects
 call_sympy_fun(fn::Function, args...; kwargs...) = fn(map(project, args)...; [(k,project(v)) for (k,v) in kwargs]...)
 function sympy_meth(meth::Symbol, args...; kwargs...) 
-    ans = call_sympy_fun(sympy.(meth), args...; kwargs...)
+    ans = call_sympy_fun(getfield(sympy,meth), args...; kwargs...)
     ## make nicer...
     if isa(ans, Vector)
         ans = Sym[i for i in ans]
