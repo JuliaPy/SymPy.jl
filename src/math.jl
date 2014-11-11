@@ -1,9 +1,11 @@
 
+
 ## Imported math functions
 ## make vectorized version while we are at it
 for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
            :asinh, :acosh, :atanh, :sec, :csc, :cot, :asec, :acsc, :acot, 
-           :sech, :csch, :coth, :asech, :acsch, :acoth, :sinc, :cosc, 
+           :sech, :csch, 
+           :coth, :acoth, 
            :atan2,
            :radians2degrees, :degrees2radians,
            :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
@@ -22,6 +24,21 @@ end
 ## Handle arguments differently
 log(x::Sym) = sympy.log(project(x))
 log(b::Sym, x::Sym) = sympy.log(project(x), project(b))
+
+## :asech, :acsch, :sinc, :cosc, 
+## These fail, so define from definitions
+## http://mathworld.wolfram.com/InverseHyperbolicSecant.html
+asech(z::Sym) = log(sqrt(1/z-1)*sqrt(1/z+1) + 1/z)
+asech(as::Array{Sym}) = map(asech, as)
+## http://mathworld.wolfram.com/InverseHyperbolicCosecant.html
+acsch(z::Sym) = log(sqrt(1+1/z^2) + 1/z)
+acsch(as::Array{Sym}) = map(acsch, as)
+sinc(x::Sym) = sin(Sym(PI*x))/(PI*x)
+sinc(as::Array{Sym}) = map(sinc, as)
+cosc(x::Sym) = diff(sinc(x))
+cosc(as::Array{Sym}) = map(cosc, as)
+
+
 
 ## these have (parameter, x) signature. Use symbolic x to call sympy version, othewise
 ## should dispatch to julia version.
