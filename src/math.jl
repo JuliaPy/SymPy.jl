@@ -221,9 +221,6 @@ fraction(args...; kwargs...) = sympy.fraction(project(args)...; kwargs...) |> os
 
 
 
-## special numbers
-I = Sym(sympy.I)
-oo = Sym(sympy.oo)
 
 ## Special functions
 ## Spherical harmonic
@@ -366,6 +363,8 @@ function piecewise(args...)
     sympy.Piecewise(args...)
 end
 
-## This is a convenient alternative to Sym("pi")
+## special numbers
 const PI = Sym(sympy.pi)
 const E = Sym(sympy.exp(1))
+const I = Sym(sympy.I)
+const oo = Sym(sympy.oo)
