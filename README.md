@@ -138,17 +138,16 @@ julia> 1/x
 x
 
 julia> [1/x, 1/x^2]
-2-element Sym Array
-⎡1 ⎤
-⎢─ ⎥
-⎢x ⎥
-⎢  ⎥
-⎢1 ⎥
-⎢──⎥
-⎢ 2⎥
-⎣x ⎦
+2-element Array{Sym,1}:
+ 1
+─
+x      
+ 1 
+──
+ 2
+x 
 
-julia> _str([1/x, 1/x^2])
+julia> map(SymPy._str,[1/x, 1/x^2])
 2-element ASCIIString Array:
  "1/x"    
  "x**(-2)"
@@ -156,10 +155,15 @@ julia> _str([1/x, 1/x^2])
 
 ### Plotting
 
-If one loads either the `Gadfly` or `Winston` packages **before** `SymPy`, then the `plot(expr, a, b)` and `plot([exprs...], a, b)` syntax can be used to create graphics using those underlying packages. For example
+There are several plotting functions available when either `Gadfly`,
+`Winston`, or `PyPlot` is loaded. In
+addition to `plot(expr, a, b)` to plot an expression of a single
+variable, there are methods (as available in the underlying plotting
+package) to plot parametric plots, surface plots, contour plots, and
+vector fields. The `PyPlot` package has the most features implemented.
 
 ```
-using Winston
+using PyPlot
 using SymPy
 x = Sym(:x)
 plot(x^2 - 2x - 2, -3, 3)

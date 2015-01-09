@@ -65,7 +65,7 @@ export SymFunction, SymMatrix,
        poly,  nroots, real_roots,
        ∨, ∧
 export relation, piecewise
-export members, doc, _sbtr
+export members, doc, _str
 
 export PI, E
 
