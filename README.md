@@ -273,7 +273,7 @@ limit(f, 0)
 * Derivatives, higher-order derivatives and partial derivatives are all computed by `diff`. 
 
 ```
-diff(sin(x*y), x)		# y⋅cos(x⋅y)         (first derivative, y as constant)
+diff(sin(x*y), x)		    # y⋅cos(x⋅y)         (first derivative, y as constant)
 diff(sin(x*y), x, 2)		# -y^2 * sin(x⋅y)    (second derivative in x)
 diff(sin(x*y), x, y)		# -x * y * sin(x * y) + cos(x * y)  (mixed partials)
 ```
@@ -500,7 +500,10 @@ Similarly for `:trace`, `:eigenvects`, ... . Note these are `sympy`
 methods, not `Julia` methods that have been ported. (Hence,
 `:eigenvects` and not `eigvecs`.)
 
+## TODO
 
+- Try `@doc` for documentation links back to SymPy's documentation.
+- integrate basic plotting for various packages (plot(f), plot([f1,f2]), plot((f1,f2)), contour, surf, arrow, ...)
 
 
 

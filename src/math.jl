@@ -191,6 +191,9 @@ for meth in (:n, :N,
     eval(Expr(:export, meth))
 end
 
+## diff for matrix doesn't handle vectors well, so we vectorize here
+diff(exs::Array{Sym}, args...; kwargs...) = map(ex -> diff(ex, args...;kwargs...), exs)
+
 ## bring over for function calls (not expressions)
 ## returns a symbolic expression
 ## limit(f, c) or limit(f,c,dir="-") or limit(f, c, dir="-")

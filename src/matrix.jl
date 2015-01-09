@@ -67,7 +67,6 @@ project(x::Array{Sym}) = convert(SymMatrix, x) |> project
 
 ## linear algebra functions that are methods of sympy.Matrix
 ## return a "scalar"
-#for (nm, meth) in ((:det, "det"), )
 for meth in (:condition_number,
            )
 
@@ -77,10 +76,18 @@ for meth in (:condition_number,
     eval(Expr(:export, meth))
 end
 
+## can be any dimension
+for meth in (:norm,
+             )
+    meth_name = string(meth)
+    @eval ($meth)(a::SymMatrix, args...; kwargs...) = object_meth(a, symbol($meth_name), args...;kwargs...)
+    @eval ($meth)(a::Array{Sym}, args...; kwargs...) = ($meth)(convert(SymMatrix, a), args...;kwargs...)
+    eval(Expr(:export, meth))
+end
+    
 for meth in (:det,
            :trace,
            :has,
-           :norm
            )
     meth_name = string(meth)
     @eval ($meth)(a::SymMatrix, args...; kwargs...) = object_meth(a, symbol($meth_name), args...;kwargs...)
@@ -122,7 +129,7 @@ map_matrix_methods = (:LDLsolve,
                       :QRdecomposition, :QRsolve,
                       :adjoint, :adjugate,
                       :cholesky, :cholesky_solve, :cofactor, :conjugate, 
-                      :diagaonal_solve, :diagonalize, :diff,:dual,
+                      :diagaonal_solve, :diagonalize, :dual,
                       :expand,
                       :integrate, 
                       :inverse_ADJ, :inverse_GE, :inverse_LU,

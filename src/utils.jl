@@ -148,17 +148,23 @@ convert(::Type{Complex}, x::Sym) = complex(map(float, x[:as_real_imag]())...)
 complex(x::Sym) = convert(Complex, x)
 complex(xs::Array{Sym}) = map(complex, xs)
 
-
-## Conversion to function a bit hacky
-## we use free_symbols to get the free symbols, then create a function
-## with arguments in this order. No problem with only one variable, but
-## may be confusing when more than one in ex.
-function convert(::Type{Function}, ex::Sym)
+## get the free symbols in a more convenient form that as returned by `free_symbols`
+function get_free_symbols(ex::Sym)
     free = free_symbols(ex)
     vars = [free[:pop]()]
     for i in 1:free[:__len__]()
         push!(vars, free[:pop]())
     end
+    vars
+end
+
+## Conversion to function a bit hacky
+## we use free_symbols to get the free symbols, then create a function
+## with arguments in this order. No problem with only one variable, but
+## may be confusing when more than one in ex.
+## We now coerce output to float
+function convert(::Type{Function}, ex::Sym)
+    vars = get_free_symbols(ex)
     len = length(vars)
     local out
     (args...) -> begin
@@ -169,6 +175,23 @@ function convert(::Type{Function}, ex::Sym)
         out
     end
 end
+
+## For plotting we need to know if a function has 1, 2, or 3 free variables
+function as_nfunction(ex::Sym, nvars=1)
+    free = free_symbols(ex)
+    vars = [free[:pop]()]
+    for i in 1:free[:__len__]()
+        push!(vars, free[:pop]())
+    end
+    len = length(vars)
+
+    if len == nvars
+        convert(Function, ex)
+    else
+        throw(DimensionMismatch("Expecting $nvars free variables and found $len"))
+    end
+end
+
 
 ## Various means to call sympy or object methods. All convert input,
 ## not all convert output.

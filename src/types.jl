@@ -8,6 +8,9 @@ immutable Sym <: SymbolicObject
 end
 Sym(s::SymbolicObject) = s
 
+Base.start(x::Sym) = 1
+Base.next(x::Sym, state) = (x.x, state-1)
+Base.done(x::Sym, state) = state <= 0
 
 ## Matrix type
 immutable SymMatrix <: SymbolicObject

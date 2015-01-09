@@ -3,6 +3,12 @@ module SymPy
 using PyCall
 @pyimport sympy
 
+## These are temporary. Jewel is in plot.jl. Docile is for @doc macro
+using Jewel
+if VERSION < v"0.4.0-dev"
+    using Docile
+end
+
 import Base.getindex
 import Base: show, writemime
 import Base.convert, Base.complex
@@ -76,9 +82,7 @@ include("assumptions.jl")
 include("poly.jl")
 include("matrix.jl")
 include("ntheory.jl")
-
-## takes far too long
-# include("plot.jl")
+include("plot.jl")
 
 
 ## create some methods
@@ -120,21 +124,6 @@ for prop in union(core_object_properties,
     @eval ($prop)(ex::Sym) = ex[symbol($prop_name)]
     eval(Expr(:export, prop))
 end
-
-## Conditional loads for graphing purposes
-## user must load Gadfly or Winston first *before* loading SymPy
-
-## add to plot if Gadfly is loaded
-if :Gadfly in names(Main)
-    using Gadfly
-    Gadfly.plot(ex::Sym, args...; kwargs...) = plot(convert(Function, ex), args...; kwargs...)
-    Gadfly.plot{T<:Sym}(exs::Vector{T}, args...; kwargs...) = plot(map(ex -> convert(Function, ex), exs), args...; kwargs...)
-elseif :Winston in names(Main)
-    using Winston
-    Winston.plot(ex::Sym, args...; kwargs...) = plot(convert(Function, ex), args...; kwargs...)
-#    Winston.plot{T<:Sym}(exs::Vector{T}, args...; kwargs...) = plot(map(ex -> convert(Function, ex), exs), args...; kwargs...)
-end
-
 
 
 end
