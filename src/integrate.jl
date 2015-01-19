@@ -32,14 +32,21 @@ integrals_instance_methods = (:as_sum,
                            
 
 ## Alternate interface for simple integral
+@doc """
+
+The `integrate` function has its limits specified with tuples of the type `(var, a, b)`. This
+profides a simpler interface for one-dimensional integrals: `integrate(ex, var, a, b)`
+
+""" ->
 integrate(s::Sym, x::Sym, from::Union(Real, Sym), to::Union(Real, Sym)) = integrate(s, (x, from, to))
 
-## conveniences for integrating a univariate function, if possible
+@doc "Symbolically integrate a function" ->
 function integrate(f::Function)
     x = Sym("x")
     integrate(f(x), x)
 end
 
+@doc "Symbolically integrate a function over `[a,b]`" ->
 function integrate(f::Function, from::Union(Real, Sym), to::Union(Real, Sym))
     x = Sym("x")
     integrate(f(x), x, from, to)

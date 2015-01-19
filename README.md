@@ -10,8 +10,11 @@ features of `SymPy` that makes working with `SymPy` objects a bit
 easier.
 
 To use it, both `Python` and the `SymPy` package must be installed on
-your system. (Install `Python` then download the `sympy` library from
-http://code.google.com/p/sympy/downloads/list and install.)
+your system. The `Anaconda` distribution is suggested, as it includes
+much more than `SymPy` that can be profitably accessed within `Julia`
+via `PyCall`. (Otherwise, install `Python` then download the `sympy`
+library from http://code.google.com/p/sympy/downloads/list and
+install.)
 
 ## The `PyCall` interface to `SymPy`
 
@@ -171,6 +174,10 @@ plot(x^2 - 2x - 2, -3, 3)
 
 Will create a plot.
 
+SymPy provides a few plotting functions in addition to
+`matplotlib`. The following are exported when `PyPlot` is loaded:
+`plot_implicit`, `plot_parametric`, `plot3d`,
+`plot3d_parametric_line`, `plot3d_parametric_surface`.
 
 ## Conversion
 

@@ -238,20 +238,43 @@ fraction(args...; kwargs...) = sympy.fraction(project(args)...; kwargs...) |> os
 ## solve(x^2 +x == x, x)
 ##==(x::Sym, y::Sym) = solve(x - y)
 
+## Logical operators for (Sym,Sym)
 ## Experimental! Not sure these are such a good idea ...
 ## but used with piecewise
-
-
 Base.&(x::Sym, y::Sym) = PyCall.pyeval("x & y", x=project(x), y=project(y))
 Base.|(x::Sym, y::Sym) = PyCall.pyeval("x | y", x=project(x), y=project(y))
 !(x::Sym)         =      PyCall.pyeval("~x",    x=project(x))
-## version 0.3 forward
-if VERSION >= v"0.3.0-rc1+82"
-    ## use ∨, ∧, ¬ for |,&,! (\vee<tab>, \wedge<tab>, \neg<tab>)
-    ∨(x::Sym, y::Sym) = x | y
-    ∧(x::Sym, y::Sym) = x & y
-    ¬(x::Sym) = !x
-end
+
+## use ∨, ∧, ¬ for |,&,! (\vee<tab>, \wedge<tab>, \neg<tab>)
+∨(x::Sym, y::Sym) = x | y
+∧(x::Sym, y::Sym) = x & y
+¬(x::Sym) = !x
+
+
+## These are useful with plot_implicit, but they cause  issues elsewhere with linear algebra functions
+#Base.isless(a::Sym, b::Sym) = Lt(a,b)
+#Base.isequal(a::Sym, b::Sym) = Eq(a,b)
+# ⩵(a::Sym, b::Sym) = isequal(a,b)
+#export ⩵
+## Instead we have:
+## We use unicode for visual appeal of infix operators, but the Lt, Le, Eq, Ge, Gt are the proper way:
+
+@doc "This is `\ll<tab>` mapped as an infix operator to `Lt`" ->
+(≪)(a::Sym, b::Sym) = Lt(a,b)  # \ll<tab>
+Base.(:≤)(a::Sym, b::Sym) = Le(a,b)  # \le<tab>
+
+@doc "For infix `Eq` one can use \Equal<tab> unicode operator" ->
+(⩵)(a::Sym, b::Sym) = Eq(a,b)  # \Equal<tab>
+
+@doc "use equality if a python level." ->
+==(x::Sym, y::Sym) = x.x == y.x
+
+Base.(:>=)(a::Sym, b::Sym) = Ge(a,b)
+(≫)(a::Sym, b::Sym) = Gt(a,b)
+
+
+
+export ≪,⩵,≫
 
 
 <(x::Sym,  y::Number) = PyCall.pyeval("x < y", x=project(x), y=project(y))
@@ -267,37 +290,7 @@ end
 >(x::Number, y::Sym)  = y < x
 
 
-## logical operations for SymPy
-## These are useful with plot_implicit, but they cause  issues elsewhere with linear algebra functions
-
-#Base.isless(a::Sym, b::Sym) = Lt(a,b)
-#Base.isequal(a::Sym, b::Sym) = Eq(a,b)
-#⩵(a::Sym, b::Sym) = isequal(a,b)
-#export ⩵
-
-## We use unicode for visual appeal, but the Lt, Le, Eq, Ge, Gt are the proper way:
-(≪)(a::Sym, b::Sym) = Lt(a,b)  # \ll<tab>
-Base.(:≤)(a::Sym, b::Sym) = Le(a,b)  # \le<tab>
-(⩵)(a::Sym, b::Sym) = Eq(a,b)  # \Equal<tab>
-Base.(:>=)(a::Sym, b::Sym) = Ge(a,b)
-(≫)(a::Sym, b::Sym) = Gt(a,b)
-
-export ≪,⩵,≫
-
-
-
-
-## ==(x::Sym, y) = sympy_meth(:Eq, x, y, args...; kwargs...)
-##isequal(x::Sym, y::Sym, args...; kwargs...) = sympy_meth(:Eq, x, y, args...; kwargs...)
-
-
-
-## use equality if a python level.
-#Base.isequal(x::Sym, y::Sym) = isequal(x.x, y.x)
-==(x::Sym, y::Sym) = x.x == y.x
-# ==(x::Sym, y::Number) = x == convert(Sym, y)
-# ==(x::Number, y::Sym) = convert(Sym,x) == y
-
+## Handle ininf, and isnan by coercion to float
 Base.isinf(x::Sym) = try isinf(float(x)) catch e false end
 Base.isnan(x::Sym) = try isnan(float(x)) catch e false end
 
@@ -312,8 +305,13 @@ Base.zero{T<:Sym}(::Type{T}) = oftype(T,0)
 Base.one(x::Sym) = oftype(Sym, 1)
 Base.one{T<:Sym}(::Type{T}) = oftype(T, 1)
 
-## solve. Returns array of PyObjects
-## Trying to return an array of Sym objects printed funny!
+@doc """
+
+    Solve an expression for any zeros.
+
+    Examples: `solve(x^2 - x + 1)`        
+
+""" -> 
 function solve(ex::Sym, args...; kwargs...)
     a = sympy.solve(project(ex), map(project, args)...; kwargs...)
 
@@ -348,7 +346,7 @@ function solve(ex::Sym, args...; kwargs...)
 end
 
 
-"""
+@doc """
 
 Solve a system of m equations with n unknowns, where the equations and
 unknowns are passed as `Vector{Sym}`. If the unknowns are not
@@ -359,7 +357,7 @@ of the form `string => Sym`, so to access the values, use `d[string(x)]` or `d["
 
 The individual components of the array display more nicely than the array.
 
-"""
+""" ->
 function solve(exs::Vector{Sym}, args...; kwargs...)
     ans = sympy.solve(map(project, exs),  args...; kwargs...) #  dictionary with keys, values as PyObjects
     tmp = map(get_free_symbols, exs)
@@ -388,11 +386,21 @@ function solve(exs::Vector{Sym}, xs::Vector{Sym}, args...; kwargs...)
         [d[string(k)]=v for (k,v) in out]
         d
     end
-    map(mapit, ans)
+    if isa(ans, Dict)
+        mapit(ans)              # XXX type unstable! should be array...
+    else
+        map(mapit, ans)
+    end
 end
 
 
 ## Numeric solutions
+
+@doc """
+        Numerically solve for a zero of an expression.
+
+        Examples: `solve(x^2 - x - 1, 1)`
+""" ->             
 nsolve(ex::Sym, x::Sym, x0::Number) = sympy.nsolve(project(ex), project(x), x0) |> float
 nsolve(ex::Sym, x0::Number) =  sympy.nsolve(project(ex), x0) |> float
 function nsolve{T <: Number}(ex::Vector{Sym}, x::Vector{Sym}, x0::Vector{T}; kwargs...)
@@ -407,24 +415,44 @@ export nsolve
 SymFunction(nm::Union(Symbol, String)) = (args...) -> Sym(sympy.Function(nm)(project(args)...))
 
 
-##  A little trickier to use
-## f = SymFunction("f")
-## x = Sym("x")
-## dsolve(diff(f(x), x) + f(x), f(x)) ## solve f'(x) + f(x) = 0
-## dsolve(diff(f(x), x, x) + f(x), f(x)) ## solve f''(x) + f(x) = 0
+@doc """
+
+            Solve a differential equation.
+            Examples:
+            ```
+            f = SymFunction("f")
+            x = Sym("x")
+            dsolve(diff(f(x), x) + f(x), f(x)) ## solve f'(x) + f(x) = 0
+            dsolve(diff(f(x), x, x) + f(x), f(x)) ## solve f''(x) + f(x) = 0
+            ```
+""" ->            
 dsolve(ex::Sym, fx::Sym) = sympy_meth(:dsolve, ex, fx)
 
 
-## Piecewise
-## pass in tuples, eg.
-## p = piecewise((1, x < 1), (2, (1 <= x) ∨ (x <= 2)), (3, x > 2)) ## using ∨ and ∧ for & and or
+@doc """
+
+Create a piecewise defined function.
+
+    Examples:
+    ```
+            p = piecewise((1, x < 1), (2, (1 <= x) ∨ (x <= 2)), (3, x > 2)) ## using ∨ and ∧ for & and or
+            subs(p, x, 2) ## 2
+            ```
+""" ->                
 function piecewise(args...)
     args = [map(project, x) for x in args]
     sympy.Piecewise(args...)
 end
 
 ## special numbers
+@doc "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors." ->
 const PI = Sym(sympy.pi)
+
+@doc "E is a symbolic  `e`. Using `julia`'s `e` will give round off errors." ->
 const E = Sym(sympy.exp(1))
+
+@doc "I is a symbolic `im`" ->
 const I = Sym(sympy.I)
+
+@doc "oo is a symbolic infinity. Example: `integrate(exp(-x), x, 0, oo)`" ->
 const oo = Sym(sympy.oo)

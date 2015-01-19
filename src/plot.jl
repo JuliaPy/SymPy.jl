@@ -185,7 +185,7 @@ Jewel.@require PyPlot begin
 
     ## SymPy.plotting also implements things
 
-    """
+@doc  """
 
 The SymPy Python module implements many plotting interfaces and
 displays them with matplotlib.  We refer to
@@ -193,8 +193,7 @@ http://docs.sympy.org/latest/modules/plotting.html for the
 details. Here we export the main functionality that is not otherwise
 given.
 
-    """
-
+    """ ->
     plot_implicit(ex, args...; kwargs...) = sympy.plotting[:plot_implicit](ex.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
     
     plot_parametric(ex1, ex2, args...; kwargs...) = sympy.plotting[:plot_implicit](ex1.x, ex2.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
