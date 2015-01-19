@@ -199,7 +199,7 @@ a * a
 a .* a
 a * b ## 2x2 * 2*3 -- 2x3
 @test_throws ErrorException  a .* b ## error -- wrong size
-@test_throws MethodError  a / a ## error
+@test_throws MethodError  a / a 
 a ./ a ## ones
 @test_throws MethodError  a / b ## error
 @test_throws ErrorException  a ./ b ## error

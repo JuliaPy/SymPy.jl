@@ -143,7 +143,7 @@ Base.isfinite(x::Sym) = isfinite(float(x))
 
 ## subs
 function subs{T <: SymbolicObject, S <: SymbolicObject}(ex::T, x::S, arg)
-    object_meth(ex, :subs, x, arg)
+    object_meth(ex, :subs, x, convert(Sym,arg))
 end
 subs{T <: SymbolicObject, S <: SymbolicObject}(exs::Array{T}, x::S, arg) = map(ex->subs(ex, x, arg), exs)
 ## curried version to use with |>
@@ -267,6 +267,24 @@ end
 >(x::Number, y::Sym)  = y < x
 
 
+## logical operations for SymPy
+## These are useful with plot_implicit, but they cause  issues elsewhere with linear algebra functions
+
+#Base.isless(a::Sym, b::Sym) = Lt(a,b)
+#Base.isequal(a::Sym, b::Sym) = Eq(a,b)
+#⩵(a::Sym, b::Sym) = isequal(a,b)
+#export ⩵
+
+## We use unicode for visual appeal, but the Lt, Le, Eq, Ge, Gt are the proper way:
+(≪)(a::Sym, b::Sym) = Lt(a,b)  # \ll<tab>
+Base.(:≤)(a::Sym, b::Sym) = Le(a,b)  # \le<tab>
+(⩵)(a::Sym, b::Sym) = Eq(a,b)  # \Equal<tab>
+Base.(:>=)(a::Sym, b::Sym) = Ge(a,b)
+(≫)(a::Sym, b::Sym) = Gt(a,b)
+
+export ≪,⩵,≫
+
+
 
 
 ## ==(x::Sym, y) = sympy_meth(:Eq, x, y, args...; kwargs...)
@@ -330,10 +348,49 @@ function solve(ex::Sym, args...; kwargs...)
 end
 
 
+"""
+
+Solve a system of m equations with n unknowns, where the equations and
+unknowns are passed as `Vector{Sym}`. If the unknowns are not
+specified, all the free symbols will be used.
+
+If succesful, returns an array of possible answers given by a dictionary. The dictionary is
+of the form `string => Sym`, so to access the values, use `d[string(x)]` or `d["x"]`, but not `d[x]`.
+
+The individual components of the array display more nicely than the array.
+
+"""
+function solve(exs::Vector{Sym}, args...; kwargs...)
+    ans = sympy.solve(map(project, exs),  args...; kwargs...) #  dictionary with keys, values as PyObjects
+    tmp = map(get_free_symbols, exs)
+    xs = shift!(tmp)
+    for ss in tmp
+        for s in ss
+            if !(s in xs)
+                push!(xs, s)
+            end
+        end
+    end
+
+    solve(exs, xs, args...; kwargs...)
+
+end
 function solve(exs::Vector{Sym}, xs::Vector{Sym}, args...; kwargs...)
     ans = sympy.solve(map(project, exs), map(project, xs), args...; kwargs...) #  dictionary with keys, values as PyObjects
-    [string(k) => v for (k,v) in ans]
+
+    function mapit(out) ## can be a tuple if m=n
+        d = Dict{String, Sym}()
+        [d[string(xs[i])] = out[i] for i in 1:length(out)]
+        d
+    end
+    function mapit(out::Dict)
+        d = Dict{String,Sym}()
+        [d[string(k)]=v for (k,v) in out]
+        d
+    end
+    map(mapit, ans)
 end
+
 
 ## Numeric solutions
 nsolve(ex::Sym, x::Sym, x0::Number) = sympy.nsolve(project(ex), project(x), x0) |> float

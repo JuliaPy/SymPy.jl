@@ -12,15 +12,16 @@
 ## Implementations
 #                                PyPlot     Gadfly    Winston
 # plot(::Sym)                     ✓           ✓          ✓
-# plot(::Vector{Sym})             
-# plot(::Tuple{Sym})              ✓                      ✓
-# parametricplot                  ✓           ✓          ✓
-# contour(::Vector{Sym})          ✓           ✓
-# vectorplot(::Vector{Sym})       ✓
-# plot_surface(::Vector{Sym})     ✓
-# add_arrow(p,v)                  ✓
+# plot(::Vector{Sym})             .           .          .
+# plot(::Tuple{Sym})              ✓           ✓(2D)      ✓(2D)
+# parametricplot                  ✓           ✓(2D)      ✓(2D)
+# contour(::Vector{Sym})          ✓           ✓          .
+# contour3D(::Vector{Sym})        ✓           .          .
+# vectorplot(::Vector{Sym})       ✓           .          .
+# plot_surface(::Vector{Sym})     ✓           .          .
+# add_arrow(p,v)                  ✓           .          .
+# text...                         .           .          .
 
-# text...
 function prepare_parametric(exs, t0, t1)
     n = length(exs)
     (n==2) | (n==3) || throw(DimensionMismatch("parametric plot requires the initial tuple to have 2 or 3 variables"))
@@ -39,6 +40,7 @@ end
 ## Try to support Winston, PyPlot, and Gadfly to varying degrees
 ## Basically our goal here is to massage the data and let args... and kwargs.. be from the
 ## plotting packages.
+
 Jewel.@require Winston begin
     import Winston: plot, oplot
     
@@ -87,6 +89,7 @@ Jewel.@require Winston begin
 
     function add_arrow(p::Vector, v::Vector)
         n = length(p)
+        p,v = map(float, p), map(float, v)
         n == 2 || error("Winston is only 2 dimensional")
         oplot([p[1], p[1] + v[1]], [p[2], p[2] + v[2]])
     end
@@ -95,13 +98,13 @@ Jewel.@require Winston begin
 end
 
 Jewel.@require PyPlot begin
-    import PyPlot: plot, plot3D, contour, plot_surface
+    import PyPlot: plot, plot3D, contour, contour3D, plot_surface
     
-    function plot(ex::Sym, a::Real, b::Real, args...; kwargs...)
+    function plot(ex::Sym, a::Real, b::Real, n=250, args...; kwargs...)
         vars = get_free_symbols(ex)
         if length(vars) == 1        
             f = convert(Function, ex)
-            xs = linspace(a,b, 250)
+            xs = linspace(a,b, n)
             ys = map(x->float(f(x)), xs)
             plot(xs, ys, args...; kwargs...)
         elseif length(vars) == 2
@@ -144,8 +147,6 @@ Jewel.@require PyPlot begin
         quiver(xs, ys, us, vs, args...; kwargs...)
     end
         
-
-        
     function contour(ex::Sym, x1,x2, y1, y2, args...; kwargs...)
          xs = linspace(sort([x1,x2])...)
          ys = linspace(sort([y1,y2])...)
@@ -153,12 +154,20 @@ Jewel.@require PyPlot begin
          zs = [float(f(x,y)) for x in xs, y in ys]
          PyPlot.contour(xs, ys, zs, args...; kwargs...)
     end
+    
+    function contour3D(ex::Sym, x1,x2, y1, y2, args...; kwargs...)
+         xs = linspace(sort([x1,x2])...)
+         ys = linspace(sort([y1,y2])...)
+         f = convert(Function, ex)
+         zs = [float(f(x,y)) for x in xs, y in ys]
+         PyPlot.contour3D(xs, ys, zs, args...; kwargs...)
+    end
 
-    function plot_surface(ex::Sym, x1,x2, y1, y2, args...; kwargs...)
+    function plot_surface(ex::Sym, x1,x2, y1, y2, n=250,  args...; kwargs...)
         nvars = length(get_free_symbols(ex))
         nvars == 2 || throw(DimensionMismatch("Expression has $nvars, expecting 2 for a surface plot"))
-        xs = linspace(sort([x1,x2])...)
-        ys = linspace(sort([y1,y2])...)
+        xs = linspace(sort([x1,x2])..., n)
+        ys = linspace(sort([y1,y2])..., n)
         f = convert(Function, ex)
         zs = [float(f(x,y)) for x in xs, y in ys]
         PyPlot.plot_surface(xs, ys, zs, args...; kwargs...)
@@ -174,7 +183,32 @@ Jewel.@require PyPlot begin
        end
      end
 
-     export parametricplot, vectorplot, add_arrow
+    ## SymPy.plotting also implements things
+
+    """
+
+The SymPy Python module implements many plotting interfaces and
+displays them with matplotlib.  We refer to
+http://docs.sympy.org/latest/modules/plotting.html for the
+details. Here we export the main functionality that is not otherwise
+given.
+
+    """
+
+    plot_implicit(ex, args...; kwargs...) = sympy.plotting[:plot_implicit](ex.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+    
+    plot_parametric(ex1, ex2, args...; kwargs...) = sympy.plotting[:plot_implicit](ex1.x, ex2.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+
+    ## NOT plot3D which is a PyPlot interface...
+    plot3d(ex, args...; kwargs...) = sympy.plotting[:plot3d](ex.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+
+    plot3d_parametric_line(ex1, ex2, ex3, args...; kwargs...) = sympy.plotting[:plot_implicit](ex1.x, ex2.x, ex3.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+
+    plot3d_parametric_surface(ex1, ex2, ex3, args...; kwargs...) = sympy.plotting[:plot3d_parametric_surface](ex1.x, ex2.x, ex3.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+    
+    export parametricplot, vectorplot, add_arrow
+    
+    export plot_implicit, plot_parametric, plot3d, plot3d_parametric_line, plot3d_parametric_surface
 end
 
 
