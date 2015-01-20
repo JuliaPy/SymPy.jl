@@ -126,8 +126,6 @@ use in pipelines:
 x*y |> replace(y, 3)		# 3x
 ```
 
-(This had been `==(x::Sym, y::Number)` but `==` is now used with `solve`.)
-
 ### Printing
 
 By default, `SymPy`'s pretty printing is used. This works well enough,
