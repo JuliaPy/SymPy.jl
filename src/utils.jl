@@ -48,7 +48,7 @@ end
 Function to create one or more symbolic objects. These are specified with a string,
 with commas separating different variables.
 
-This function allows the passing of assumptions about the variables such as `real=true` or `commutative=true`.
+This function allows the passing of assumptions about the variables such as `positive=true`, `real=true` or `commutative=true`. 
 
 Example:
 

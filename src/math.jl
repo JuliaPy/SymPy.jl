@@ -142,12 +142,41 @@ Base.isfinite(x::Sym) = isfinite(float(x))
 ## Some sympy function interfaces
 
 ## subs
+@doc """"
+
+`subs` is used to subsitute a value in an expression with another value. The `replace` function is also overrided to do this task.
+
+
+""" ->
 function subs{T <: SymbolicObject, S <: SymbolicObject}(ex::T, x::S, arg)
     object_meth(ex, :subs, x, convert(Sym,arg))
 end
 subs{T <: SymbolicObject, S <: SymbolicObject}(exs::Array{T}, x::S, arg) = map(ex->subs(ex, x, arg), exs)
+
 ## curried version to use with |>
 subs(x::SymbolicObject, y) = ex -> subs(ex, x, y)
+
+@doc """
+
+Substitute multiple values at once with `subs(ex, (var1, val1), (var2, val2), ...)`
+
+""" ->
+function subs(ex::SymbolicObject, x::(SymbolicObject, Any), args...)
+    ex = subs(ex, x[1], x[2])
+    if length(args) > 0
+        subs(ex, args...)
+    else
+        ex
+    end
+end
+
+@doc """
+
+substitute multiple values stored in array
+
+""" ->
+subs{T <: Any}(ex::SymbolicObject, xs::Vector{(Sym,T)}) = subs(ex, xs...)
+
 ## convenience method to use symbol
 subs{T <:SymbolicObject}(ex::T, x::Symbol, arg) = subs(ex, Sym(x), arg)
 
@@ -251,6 +280,14 @@ Base.|(x::Sym, y::Sym) = PyCall.pyeval("x | y", x=project(x), y=project(y))
 ¬(x::Sym) = !x
 
 
+"""
+
+In SymPy, symbolic equations are not represented by `=` or `==`,
+rather ther function `Eq` is used. Here we use the unicode
+`\Equal<tab>` for an infix operator. There are also unicode values to represent `<`, `<=`, `>=`. `>`.
+
+"""
+
 ## These are useful with plot_implicit, but they cause  issues elsewhere with linear algebra functions
 #Base.isless(a::Sym, b::Sym) = Lt(a,b)
 #Base.isequal(a::Sym, b::Sym) = Eq(a,b)
@@ -307,9 +344,24 @@ Base.one{T<:Sym}(::Type{T}) = oftype(T, 1)
 
 @doc """
 
-    Solve an expression for any zeros.
+Solve an expression for any zeros.
 
-    Examples: `solve(x^2 - x + 1)`        
+Examples: `solve(x^2 - x + 1)`
+
+The `SymPy` docs say this about `solve`:
+
+Note If solve returns [] or raises NotImplementedError, it
+doesn’t mean that the equation has no solutions. It just means
+that it couldn’t find any. Often this means that the solutions
+cannot be represented symbolically. For example, the equation
+`x=cos(x)` has a solution, but it cannot be represented
+symbolically using standard functions.
+
+In fact, solve makes no guarantees whatsoever about the completeness
+of the solutions it finds. Much of solve is heuristics, which may find
+some solutions to an equation or system of equations, but not all of
+them.
+        
 
 """ -> 
 function solve(ex::Sym, args...; kwargs...)
