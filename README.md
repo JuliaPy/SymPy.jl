@@ -190,7 +190,9 @@ u -> float(subs( exp(-x) * sin(x), x, u)) # anonymous function to evaluate expre
 This is basically what happens in the call: `convert(Function,
 exp(-x)*sin(x))`, though that call replaces a lone free variable, not
 necessarily one named `x`. This conversion is then used to plot
-expressions with `julia`'s other plotting packages.
+expressions with `julia`'s other plotting packages. (This can be
+somewhat slow, as each evaluation has to make the round trip from
+`julia` to `sympy` and back.)
 
 Basic conversions from `SymPy` numeric types to the corresponding
 `julia` objects may be done with the functions `integer`, `float`, and
@@ -236,7 +238,9 @@ loses precision, as the value substituted is `julia`'s floating point
 representation of `pi`, not the symbolic value `sympi.pi`, so it gets
 truncated after enough digits.
 
-
+Similarly, substituting `1/3` will cause loss due to floating point
+conversion prior to substitution, but substituting `1//3` will not, as
+rational numbers are converted without loss.
 
 ### Calculus
 
@@ -271,7 +275,7 @@ But in fact this limit blows up:
 limit(f(x), x, 0)
 ```
 
-For convenience, there is an "operator" interface for function objects:
+For convenience, there is an "operator" interface for function objects, assuming a single variable:
 
 ```
 f(x) = sin(x)/x
@@ -333,8 +337,11 @@ but for multiple integrals it proves much more convenient:
 integrate(x*y, (x, 0, 1), (y, 0, 1)) # still 1/4
 ```
 
-As well, the inner limits can be expressed using outer variables: ```
-integrate(x*y, (x, 0, y), (y, 0,1)) # 1/8 ```
+As well, the inner limits can be expressed using outer variables:
+
+```
+integrate(x*y, (x, 0, y), (y, 0,1)) # 1/8
+```
 
 Again for functions of a single real variable, there is an "operator" version:
 
@@ -347,7 +354,7 @@ integrate(f, 0, 1)		# definite
 * Summations can be done through the `summation` function:
 
 ```
-summation(1/x, (x, 1, 10))	# 7381 / 2520
+summation(1/x, (x, 1, 10))	    # 7381 / 2520
 summation(1/x, (x, 1, oo))      # zoo (complex infinity, though not sure why here)
 summation(1/x^2, (x, 1, oo))	# pi^2/6
 ```
@@ -364,6 +371,13 @@ These could also be generated through the `diff` function:
 [diff(cos(y), y, i)/factorial(i)*x^i for i in 0:3] |> sum |> replace(y, 0) # - x^2/2 + 1
 ```
 
+This can be useful, as otherwise the result of `series` will have the
+big `O` part. Though, this can be removed with the `removeO` function:
+
+```
+series(cos(x), x, 0, 3)	|> removeO
+```
+
 * The `solve` function can solve equations.
 
 ```
@@ -372,13 +386,9 @@ solve(x^2 - 2, x)		# a 2-element Sym Array
 
 The output is not simplified. In this case, we can convert to real with `float`:
 
-
-
 ```
 solve(x^2 - 2, x) |> float	# [-1.41421, 1.41421]
 ```
-
-
 
 
 * Differential equations can be solved with `dsolve`. Here we solve
@@ -397,6 +407,16 @@ Solving *f''(x) + f(x) = 0* is similar, we just take a second derivative
 ```
 eq = diff(f(x), x, 2) + f(x)
 dsolve(eq, f(x))		# c1 * sin(x) + c2 * cos(x)
+```
+
+`SymFunction` is useful for implicit differentiation too. For example, finding the implicit derivative of $x^2 + y^2 = 1$ can be done through assuming there is some functional representation for `y`, then substituting appropriately:
+
+```
+ex = x^2 + y^2 - 1
+F = SymFunction(:F)
+tmp = diff(subs(ex, y, F(x)), x)  # 2x  + 2F(x) d/dx(F(x))
+ex1 = solve(tmp, diff(F(x),x))    # solve for dF/dx in 2x + 2F(x) dF/dx, gives [-x/F(x)]
+tl = subs(ex1, F(x), y)           # now it is [-x/y]
 ```
 
 ### Vectors and matrices
@@ -419,8 +439,17 @@ A^2
 A.^2				#
 ```
 
-However, the printing of matrices may be problematic at the
-console. Within `IJulia`, the output is very nice, as `sympy` outputs
+The value of `dot(v,v)` has complex answers. If the variable is assumed to be real, this won't be the case:
+
+```
+x = symbols("x", real=true)
+v = [x,1]
+v ⋅ v                # using infix operator \dot<tab>
+```
+
+
+The printing of matrices may be problematic at the
+console. Within `IJulia`, the output is usually very nice, as `sympy` outputs
 latex-ready output for display through MathJax.
 
 These are arrays of symbolic objects. Some functions are defined for such:
@@ -460,7 +489,8 @@ polynomials we haven't exposed.
 If useful parts of `SymPy` could add to this package, please pass
 along a request.
 
-For many methods, access is provided via `[:symbol]`. For example, the `cancel` function in `SymPy` can be used:
+For many methods, access is provided via `[:symbol]`. For example, the
+`cancel` function in `SymPy` can be used in this manner:
 
 
 ```
@@ -512,7 +542,6 @@ methods, not `Julia` methods that have been ported. (Hence,
 ## TODO
 
 - Try `@doc` for documentation links back to SymPy's documentation.
-- integrate basic plotting for various packages (plot(f), plot([f1,f2]), plot((f1,f2)), contour, surf, arrow, ...)
 
 
 

@@ -16,8 +16,10 @@ module SymPy
 using PyCall
 @pyimport sympy
 
-## These are temporary. Jewel is in plot.jl. Docile is for @doc macro
-using Jewel
+## These are temporary:
+## * jewelrequire is for conditional loading of modeules
+## * Docile is for its @doc macro
+include("jewelrequire.jl")
 if VERSION < v"0.4.0-dev"
     using Docile
 end

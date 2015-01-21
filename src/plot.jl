@@ -41,7 +41,7 @@ end
 ## Basically our goal here is to massage the data and let args... and kwargs.. be from the
 ## plotting packages.
 
-Jewel.@require Winston begin
+JewelRequire.@require Winston begin
     import Winston: plot, oplot
     
     function plot(ex::Sym, a, b, args...; kwargs...)
@@ -97,7 +97,7 @@ Jewel.@require Winston begin
     export parametricplot, contour
 end
 
-Jewel.@require PyPlot begin
+JewelRequire.@require PyPlot begin
     import PyPlot: plot, plot3D, contour, contour3D, plot_surface
     
     function plot(ex::Sym, a::Real, b::Real, n=250, args...; kwargs...)
@@ -211,7 +211,7 @@ given.
 end
 
 
-Jewel.@require Gadfly begin
+JewelRequire.@require Gadfly begin
     import Gadfly: plot
 
     function plot(ex::Sym, a::Real, b::Real, args...; kwargs...)
