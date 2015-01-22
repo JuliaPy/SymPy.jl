@@ -173,9 +173,10 @@ plot(x^2 - 2x - 2, -3, 3)
 Will create a plot.
 
 SymPy provides a few plotting functions in addition to
-`matplotlib`. The following are exported 
-`plot_implicit`, `plot_parametric`, `plot3d`,
-`plot3d_parametric_line`, `plot3d_parametric_surface`. (When using `IJulia`, the `PyPlot` package must be loaded prior to calling these functions.)
+`matplotlib`. The following are exported `plot_implicit`,
+`plot_parametric`, `plot3d`, `plot3d_parametric_line`,
+`plot3d_parametric_surface`. (When using `IJulia`, the `PyPlot`
+package must be loaded prior to calling these functions.)
 
 ## Conversion
 
