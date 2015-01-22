@@ -16,14 +16,14 @@ module SymPy
 using PyCall
 @pyimport sympy
 
-## These are temporary:
-## * jewelrequire is for conditional loading of modeules
-## * Docile is for its @doc macro
-include("jewelrequire.jl")
+
+using Requires ## for @require macro
+
+## * Docile is used for documentation
 if VERSION < v"0.4.0-dev"
     using Docile
 end
-@docstrings
+@document
 
 import Base.getindex
 import Base: show, writemime
@@ -77,7 +77,6 @@ export SymFunction, SymMatrix,
        summation,
        I, oo,
        dsolve,
-#       plot,
        poly,  nroots, real_roots,
        ∨, ∧
 export relation, piecewise

@@ -3,25 +3,25 @@
 ## Many (too many) ways to create symbolobjects
 ## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y), @syms x y, symbols("x y")
 
-@doc "Create a symbolic object from a symbol or string" ->
+"Create a symbolic object from a symbol or string"
 Sym(s::Union(Symbol, String)) = sympy.symbols(string(s))
 
-@doc "Create a symbolic number" ->
+"Create a symbolic number"
 Sym{T <: Number}(s::T) = convert(Sym, sympy.sympify(s))
 
-@doc "vectorized version of `Sym`" ->
+"vectorized version of `Sym`"
 Sym(args...) = map(Sym, args)
 
 ## (a,b,c) = @syms a b c --- no commas on right hand side!
 ## (x,) @syms x is needed for single arguments
 ## Thanks to vtjnash for this!
-@doc """
+"""
 
 Macro to create many symbolic objects at once. (Written by `@vtjnash`.)
 
 Example: `a,b,c = @syms a b c`
 
-""" ->
+"""
 macro syms(x...)
     q=Expr(:block)
     if length(x) == 1 && isa(x[1],Expr)
@@ -36,14 +36,14 @@ macro syms(x...)
     q   
 end
 
-@doc "Macro to create a symbolic object: `sym\"x\"`" ->
+"Macro to create a symbolic object: `sym\"x\"`"
 macro sym_str(x)
     Sym(x)
 end
 
 ## define one or more symbols directly
 ## a,b,c = symbols("a,b,c", commutative=false)
-@doc """
+"""
 
 Function to create one or more symbolic objects. These are specified with a string,
 with commas separating different variables.
@@ -56,7 +56,7 @@ Example:
 x,y,z = symbols("x, y, z", real=true)
 ```
 
-""" ->
+"""
 function symbols(x::String; kwargs...) 
     out = sympy.symbols(x; kwargs...)
 end
@@ -82,7 +82,7 @@ project(x::Symbol) = project(Sym(x)) # can use :x instead of Sym(x)
 project(x::Tuple) = map(project, x)
 
 
-@doc """
+"""
 convert args so that we can use obj[:methname](x,...) without needing to project to
 python: obj.method(arg1, arg2, ...) -> julia: obj[:meth](args...) 
 
@@ -93,7 +93,7 @@ x = Sym("x")
 (x^2 - 2x + 1)[:integrate]((x,0,1))
 ```
 
-""" ->
+"""
 function getindex(x::SymbolicObject, i::Symbol)
     ## find method
     if haskey(project(x), i)
@@ -138,17 +138,19 @@ show(io::IO, s::Array{Sym}) =  print(io, summary(s), "\n", convert(Sym, s))
 
 doc(x::SymbolicObject) = print(x[:__doc__])
 
-@doc "Map a symbolic object to a string" ->
+"Map a symbolic object to a string"
 _str(s::SymbolicObject) = s[:__str__]()
+
+"Map an array of symbolic objects to a string"
 _str(a::Array{SymbolicObject}) = map(_str, a)
 
-@doc "call SymPy's pretty print" ->
+"call SymPy's pretty print"
 pprint(s::SymbolicObject, args...; kwargs...) = sympy.pprint(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
 
-@doc "Call SymPy's `latex` function. Not exported. " ->
+"Call SymPy's `latex` function. Not exported. "
 latex(s::SymbolicObject, args...; kwargs...)  = sympy.latex(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
 
-@doc "create basic printed output" ->
+"create basic printed output"
 function jprint(x::SymbolicObject)
   out = PyCall.pyeval("str(x)", x = x.x)
 
@@ -181,7 +183,7 @@ convert(::Type{Complex}, x::Sym) = complex(map(float, x[:as_real_imag]())...)
 complex(x::Sym) = convert(Complex, x)
 complex(xs::Array{Sym}) = map(complex, xs)
 
-@doc "get the free symbols in a more convenient form that as returned by `free_symbols`" ->
+"get the free symbols in a more convenient form that as returned by `free_symbols`"
 function get_free_symbols(ex::Sym)
     free = free_symbols(ex)
     vars = [free[:pop]()]

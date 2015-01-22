@@ -37,11 +37,107 @@ function prepare_parametric(exs, t0, t1)
 end
 
 
+
+    ## SymPy.plotting also implements things
+
+"""
+
+The SymPy Python module implements many plotting interfaces and
+displays them with matplotlib or textually.  We refer to
+http://docs.sympy.org/latest/modules/plotting.html for the
+details. Here we export the main functionality that is not otherwise
+given.
+
+"""
+
+"""
+
+Make an implicit plot of an expression. The expression may use logical
+values, but there are specifed with unicode operators: `\ll<tab>`,
+`\lt<tab>`, `\Equal<tab>`, `\gt<tab>`, and `\gg<tab>`.
+
+Warning, if using in `IJulia`, must be used **after** loading `PyPlot`.
+
+
+Examples:
+
+```
+x,y = symbols("x,y", real=true)
+plot_implicit(sin(x+y) - cos(x^2 + y^2), (x, -5,5), (y, -5, 5))
+plot_implicit(x ≫ y)  # over default region of [-5,5[ x [-5,5]
+```
+"""
+plot_implicit(ex, args...; kwargs...) = sympy.plotting[:plot_implicit](ex.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+    
+
+"""
+
+Make a parametric plot of the two expressions.
+
+Warning, if using in `IJulia`, must be used **after** loading `PyPlot`.
+
+Example:
+
+```
+t = symbols("t", real=true)
+plot_parametric(sin(t), cos(t), (t, 0, 2pi))
+```
+"""
+plot_parametric(ex1, ex2, args...; kwargs...) = sympy.plotting[:plot_parametric](ex1.x, ex2.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+
+
+"""
+
+Make 3d plot from an expression. 
+
+Warning, if using in `IJulia`, must be used **after** loading `PyPlot`.
+
+Note, this is not `plot3D`, which is from `PyPlot.jl`.
+
+Examples
+
+```
+x,y = symbols("x,y", real=true)
+plot3d(x^2 - 2x*y, (x, -5,5), (y, -5,5))
+```
+"""    
+plot3d(ex, args...; kwargs...) = sympy.plotting[:plot3d](ex.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+
+
+"""
+
+parametric lines in 3 dimensions in SymPy.
+
+```
+t = sym"t"
+plot(cos(t), sin(t), t, (t, 0, 4PI))
+```
+"""    
+plot3d_parametric_line(ex1, ex2, ex3, args...; kwargs...) = sympy.plotting[:plot3d_parametric_line](ex1.x, ex2.x, ex3.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+
+"""
+
+Parametric surfaces in SymPy
+
+Warning, if using in `IJulia`, must be used **after** loading `PyPlot`.
+
+```
+u,v = symbols("u, v", real=true)
+plot3d_parametric_surface(cos(u + v), sin(u - v), u-v, (u, -5, 5), (v, -5,5))
+```
+"""
+plot3d_parametric_surface(ex1, ex2, ex3, args...; kwargs...) = sympy.plotting[:plot3d_parametric_surface](ex1.x, ex2.x, ex3.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+
+
+export plot_implicit, plot_parametric, plot3d, plot3d_parametric_line, plot3d_parametric_surface
+    
+
+
 ## Try to support Winston, PyPlot, and Gadfly to varying degrees
 ## Basically our goal here is to massage the data and let args... and kwargs.. be from the
 ## plotting packages.
 
-JewelRequire.@require Winston begin
+Requires.@require Winston begin
     import Winston: plot, oplot
     
     function plot(ex::Sym, a, b, args...; kwargs...)
@@ -97,7 +193,7 @@ JewelRequire.@require Winston begin
     export parametricplot, contour
 end
 
-JewelRequire.@require PyPlot begin
+Requires.@require PyPlot begin
     import PyPlot: plot, plot3D, contour, contour3D, plot_surface
     
     function plot(ex::Sym, a::Real, b::Real, n=250, args...; kwargs...)
@@ -183,35 +279,13 @@ JewelRequire.@require PyPlot begin
        end
      end
 
-    ## SymPy.plotting also implements things
-
-@doc  """
-
-The SymPy Python module implements many plotting interfaces and
-displays them with matplotlib.  We refer to
-http://docs.sympy.org/latest/modules/plotting.html for the
-details. Here we export the main functionality that is not otherwise
-given.
-
-    """ ->
-    plot_implicit(ex, args...; kwargs...) = sympy.plotting[:plot_implicit](ex.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
-    
-    plot_parametric(ex1, ex2, args...; kwargs...) = sympy.plotting[:plot_implicit](ex1.x, ex2.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
-
-    ## NOT plot3D which is a PyPlot interface...
-    plot3d(ex, args...; kwargs...) = sympy.plotting[:plot3d](ex.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
-
-    plot3d_parametric_line(ex1, ex2, ex3, args...; kwargs...) = sympy.plotting[:plot_implicit](ex1.x, ex2.x, ex3.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
-
-    plot3d_parametric_surface(ex1, ex2, ex3, args...; kwargs...) = sympy.plotting[:plot3d_parametric_surface](ex1.x, ex2.x, ex3.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
     
     export parametricplot, vectorplot, add_arrow
     
-    export plot_implicit, plot_parametric, plot3d, plot3d_parametric_line, plot3d_parametric_surface
 end
 
 
-JewelRequire.@require Gadfly begin
+Requires.@require Gadfly begin
     import Gadfly: plot
 
     function plot(ex::Sym, a::Real, b::Real, args...; kwargs...)

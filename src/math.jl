@@ -142,12 +142,12 @@ Base.isfinite(x::Sym) = isfinite(float(x))
 ## Some sympy function interfaces
 
 ## subs
-@doc """"
+"""
 
 `subs` is used to subsitute a value in an expression with another value. The `replace` function is also overrided to do this task.
 
 
-""" ->
+""" 
 function subs{T <: SymbolicObject, S <: SymbolicObject}(ex::T, x::S, arg)
     object_meth(ex, :subs, x, convert(Sym,arg))
 end
@@ -156,11 +156,11 @@ subs{T <: SymbolicObject, S <: SymbolicObject}(exs::Array{T}, x::S, arg) = map(e
 ## curried version to use with |>
 subs(x::SymbolicObject, y) = ex -> subs(ex, x, y)
 
-@doc """
+"""
 
 Substitute multiple values at once with `subs(ex, (var1, val1), (var2, val2), ...)`
 
-""" ->
+"""
 function subs(ex::SymbolicObject, x::(SymbolicObject, Any), args...)
     ex = subs(ex, x[1], x[2])
     if length(args) > 0
@@ -170,11 +170,11 @@ function subs(ex::SymbolicObject, x::(SymbolicObject, Any), args...)
     end
 end
 
-@doc """
+"""
 
 substitute multiple values stored in array
 
-""" ->
+"""
 subs{T <: Any}(ex::SymbolicObject, xs::Vector{(Sym,T)}) = subs(ex, xs...)
 
 ## convenience method to use symbol
