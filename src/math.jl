@@ -369,7 +369,7 @@ function solve(ex::Sym, args...; kwargs...)
 
     ## Way too much work here to finesse into a nice enough output
     ## (Issue comes from solving without specifying variable when 2 or more variables in the expression
-    if isa(a[1], Dict)
+    if (length(a) > 0 && isa(a[1], Dict))
         d = Dict()
         for kv in a
             for (k,v) in kv
