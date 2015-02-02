@@ -22,8 +22,10 @@ using Requires ## for @require macro
 ## * Docile is used for documentation
 if VERSION < v"0.4.0-dev"
     using Docile
-@document
+else
+    macro document() nothing end    
 end
+@document
 
 import Base.getindex
 import Base: show, writemime
