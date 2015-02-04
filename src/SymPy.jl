@@ -51,7 +51,7 @@ import Base: length,  size
 import Base: factor, expand, collect
 import Base: !=, ==
 import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj,
-              cross, eigvals, eigvecs, rref, trace, norm
+              cross, eigvals, eigvecs, trace, norm
 import Base: promote_rule
 import Base: match, replace, round
 import Base: ^, .^
@@ -61,6 +61,11 @@ import Base: div
 import Base: trunc
 import Base: isinf, isnan
 import Base: real, imag
+
+## conditional imports
+if VERSION < v"0.4.0-dev"
+    import Base: rref
+end
 
 export sympy, sympy_meth, object_meth, call_matrix_meth
 export Sym, @sym_str, @syms, symbols

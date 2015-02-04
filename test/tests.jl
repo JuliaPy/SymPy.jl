@@ -104,6 +104,8 @@ rv = [x 1]
 a = [x 1; 1 x]
 b = [x 1 2; 1 2 x]
 
+const DIMERROR = VERSION < v"0.4.0-dev" ? ErrorException : DimensionMismatch
+
 ## scalar, [vector, matrix]
 s + v
 v + s
@@ -157,7 +159,7 @@ a .^ s
 v .+ v
 ##@test_throws MethodError  v .+ rv ##  no longer an error, broadcase
 v .- v
-@test_throws ErrorException  v - rv ## error
+@test_throws DIMERROR  v - rv
 @test_throws MethodError  v * v ## error
 v .* v
 dot(v, v)
@@ -176,11 +178,11 @@ v .^ rv ## ??
 
 
 ## vector matrix
-@test_throws ErrorException v + a ## error (Broadcast?)
-@test_throws ErrorException a + v ## error
+@test_throws DIMERROR v + a ## error (Broadcast?)
+@test_throws DIMERROR a + v ## error
 v .+ a ## broadcasts
 a .+ v
-@test_throws ErrorException  v - a ## error
+@test_throws DIMERROR  v - a ## error
 v .- a
 @test_throws DimensionMismatch  v * a ## error
 v .* a
@@ -191,22 +193,22 @@ v .^ a
 
 ## matrix matrix
 a + a
-@test_throws ErrorException  a + b ## error
+@test_throws DIMERROR  a + b ## error
 a + 2a
 a - a
-@test_throws ErrorException  a - b ## error
+@test_throws DIMERROR  a - b ## error
 a * a
 a .* a
 a * b ## 2x2 * 2*3 -- 2x3
-@test_throws ErrorException  a .* b ## error -- wrong size
+@test_throws DIMERROR  a .* b ## error -- wrong size
 @test_throws MethodError  a / a 
 a ./ a ## ones
 @test_throws MethodError  a / b ## error
-@test_throws ErrorException  a ./ b ## error
+@test_throws DIMERROR  a ./ b ## error
 @test_throws MethodError  a ^ a ## error
 a .^ a
 @test_throws MethodError  a ^ b ## error
-@test_throws ErrorException  a .^ b ## error
+@test_throws DIMERROR  a .^ b ## error
 
 
 ## Number theory
