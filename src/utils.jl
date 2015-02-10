@@ -9,6 +9,7 @@ Sym(s::Union(Symbol, String)) = sympy.symbols(string(s))
 "Create a symbolic number"
 Sym{T <: Number}(s::T) = convert(Sym, sympy.sympify(s))
 
+
 "vectorized version of `Sym`"
 Sym(args...) = map(Sym, args)
 
@@ -48,7 +49,8 @@ end
 Function to create one or more symbolic objects. These are specified with a string,
 with commas separating different variables.
 
-This function allows the passing of assumptions about the variables such as `positive=true`, `real=true` or `commutative=true`. 
+This function allows the passing of assumptions about the variables
+such as `positive=true`, `real=true` or `commutative=true`.
 
 Example:
 

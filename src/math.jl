@@ -284,11 +284,17 @@ Base.|(x::Sym, y::Sym) = PyCall.pyeval("x | y", x=project(x), y=project(y))
 
 In SymPy, symbolic equations are not represented by `=` or `==`,
 rather ther function `Eq` is used. Here we use the unicode
-`\Equal<tab>` for an infix operator. There are also unicode values to represent `<`, `<=`, `>=`. `>`.
+`\Equal<tab>` for an infix operator. There are also unicode values to represent `<`, `<=`, `>=`. `>`. These are
+
+* `<` is `\ll<tab>`
+* `<=` is `\le<tab>
+* `==` is `\Equal<tab>`
+* `>=` is `\ge<tab>`
+* `>` is `\gg<tab>`
 
 """
 
-## These are useful with plot_implicit, but they cause  issues elsewhere with linear algebra functions
+## These are useful with pairwise and plot_implicit, but they cause  issues elsewhere with linear algebra functions
 #Base.isless(a::Sym, b::Sym) = Lt(a,b)
 #Base.isequal(a::Sym, b::Sym) = Eq(a,b)
 # ⩵(a::Sym, b::Sym) = isequal(a,b)
@@ -344,24 +350,47 @@ Base.one{T<:Sym}(::Type{T}) = oftype(T, 1)
 
 @doc """
 
-Solve an expression for any zeros.
+Solve an expression for any zeros or a system of expressions passed a vector.
 
-Examples: `solve(x^2 - x + 1)`
+Examples: 
+
+```
+x,y, a,b,c = symbols("x, y, a, b, c", real=true)
+solve(x^2 - x + 1)
+solve(a*x^2  + b*x + c, x)
+solve([x - y - 1, x + y - 2], [x,y])
+solve([x - y - 1, x + y - 2])   # same as above, as it will assume all free variables.
+```
+
+Can solve a single expression for a lone free variable, or if a variable is passed as a second argument, solve for that variable in terms of the others.
+
+When passed a vector of expressions, `solve` looks for solutions to
+the system of m equations with n unknowns, where the equations and
+unknowns are passed as `Vector{Sym}`. If the unknowns are not
+specified, all the free symbols will be used.
+
 
 The `SymPy` docs say this about `solve`:
 
-Note If solve returns [] or raises NotImplementedError, it
-doesn’t mean that the equation has no solutions. It just means
-that it couldn’t find any. Often this means that the solutions
-cannot be represented symbolically. For example, the equation
-`x=cos(x)` has a solution, but it cannot be represented
-symbolically using standard functions.
-
-In fact, solve makes no guarantees whatsoever about the completeness
-of the solutions it finds. Much of solve is heuristics, which may find
-some solutions to an equation or system of equations, but not all of
-them.
+> Note If solve returns [] or raises NotImplementedError, it
+> doesn’t mean that the equation has no solutions. It just means
+> that it couldn’t find any. Often this means that the solutions
+> cannot be represented symbolically. For example, the equation
+> `x=cos(x)` has a solution, but it cannot be represented
+> symbolically using standard functions.
+> 
+> In fact, solve makes no guarantees whatsoever about the completeness
+> of the solutions it finds. Much of solve is heuristics, which may find
+> some solutions to an equation or system of equations, but not all of
+> them.
         
+
+If succesful, returns an array of possible answers, a dictionary, or an array of dictionaries. The dictionaries are
+of the form `string => Sym`, so to access the values, use `d[string(x)]` or `d["x"]`, but not `d[x]`, where `x` is symbolic.
+
+Note: The individual components of the array display more nicely than the array.
+
+Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html#algebraic-equations)
 
 """ -> 
 function solve(ex::Sym, args...; kwargs...)
@@ -406,18 +435,6 @@ function solve(ex::Sym, args...; kwargs...)
 end
 
 
-@doc """
-
-Solve a system of m equations with n unknowns, where the equations and
-unknowns are passed as `Vector{Sym}`. If the unknowns are not
-specified, all the free symbols will be used.
-
-If succesful, returns an array of possible answers given by a dictionary. The dictionary is
-of the form `string => Sym`, so to access the values, use `d[string(x)]` or `d["x"]`, but not `d[x]`.
-
-The individual components of the array display more nicely than the array.
-
-""" ->
 function solve(exs::Vector{Sym}, args...; kwargs...)
     ans = sympy.solve(map(project, exs),  args...; kwargs...) #  dictionary with keys, values as PyObjects
     tmp = map(get_free_symbols, exs)
@@ -457,9 +474,15 @@ end
 ## Numeric solutions
 
 @doc """
-        Numerically solve for a zero of an expression.
+Numerically solve for a zero of an expression.
 
-        Examples: `solve(x^2 - x - 1, 1)`
+Examples: 
+```
+solve(x^5 - x -1) # inconclusive
+nsolve(x^5 - x - 1, 1)
+```
+
+Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html#algebraic-equations)
 """ ->             
 nsolve(ex::Sym, x::Sym, x0::Number) = sympy.nsolve(project(ex), project(x), x0) |> float
 nsolve(ex::Sym, x0::Number) =  sympy.nsolve(project(ex), x0) |> float
@@ -477,14 +500,18 @@ SymFunction(nm::Union(Symbol, String)) = (args...) -> Sym(sympy.Function(nm)(pro
 
 @doc """
 
-            Solve a differential equation.
-            Examples:
-            ```
-            f = SymFunction("f")
-            x = Sym("x")
-            dsolve(diff(f(x), x) + f(x), f(x)) ## solve f'(x) + f(x) = 0
-            dsolve(diff(f(x), x, x) + f(x), f(x)) ## solve f''(x) + f(x) = 0
-            ```
+Solve an odinary differential equation.
+
+Examples:
+
+```
+f = SymFunction("f")
+x = Sym("x")
+dsolve(diff(f(x), x) + f(x), f(x)) ## solve f'(x) + f(x) = 0
+dsolve(diff(f(x), x, x) + f(x), f(x)) ## solve f''(x) + f(x) = 0
+```
+
+References: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/ode.html#ode-docs)
 """ ->            
 dsolve(ex::Sym, fx::Sym) = sympy_meth(:dsolve, ex, fx)
 
@@ -495,9 +522,12 @@ Create a piecewise defined function.
 
     Examples:
     ```
-            p = piecewise((1, x < 1), (2, (1 <= x) ∨ (x <= 2)), (3, x > 2)) ## using ∨ and ∧ for & and or
-            subs(p, x, 2) ## 2
-            ```
+    p = piecewise((1, x < 1), (2, (1 <= x) ∨ (x <= 2)), (3, x > 2)) ## using ∨ and ∧ for & and or
+    subs(p, x, 2) ## 2
+    x,a = symbols("x,a")
+    p = piecewise((1, Lt(x, a)), (2, Ge(x,a)))  # same as piecewise((1,  x ≪ a), (2, x ≥ a))
+    subs(p, x, a - 1)
+    ```
 """ ->                
 function piecewise(args...)
     args = [map(project, x) for x in args]
@@ -511,8 +541,8 @@ const PI = Sym(sympy.pi)
 @doc "E is a symbolic  `e`. Using `julia`'s `e` will give round off errors." ->
 const E = Sym(sympy.exp(1))
 
-@doc "I is a symbolic `im`" ->
-const I = Sym(sympy.I)
+@doc "IM is a symbolic `im`" ->
+const IM = Sym(sympy.I)
 
-@doc "oo is a symbolic infinity. Example: `integrate(exp(-x), x, 0, oo)`" ->
+@doc "oo is a symbolic infinity. Example: `integrate(exp(-x), x, 0, oo)`." ->
 const oo = Sym(sympy.oo)
