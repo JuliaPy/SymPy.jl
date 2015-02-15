@@ -262,7 +262,7 @@ limit(sin(x)/x, x, oo)		# 0
 
 The `limit` function performs better on some functions than simply
 trying to explore limits numerically. The functionality is based on Gruntz's
-algorithm. For example, numerically it appears that this limit is $0$:
+algorithm. For example, numerically it appears that this limit is 0:
 
 ```
 f(x) = x^(1 - log(log(log(log(1/x)))))
@@ -394,8 +394,8 @@ solve(x^2 - 2, x) |> float	# [-1.41421, 1.41421]
 
 * Differential equations can be solved with `dsolve`. Here we solve
   *f'(x) + f(x) = 0*. To do so, we need to create a `Function`
-  object. The `SymPy` constructor is call `Function`.  As that keyword
-  is reserved, we call the constructor `SymFunction`:
+  object. The `SymPy` constructor is called `Function`.  As that keyword
+  is reserved, we renamed the constructor `SymFunction`:
 
 ```
 f = SymFunction("f")
@@ -410,14 +410,17 @@ eq = diff(f(x), x, 2) + f(x)
 dsolve(eq, f(x))		# c1 * sin(x) + c2 * cos(x)
 ```
 
-`SymFunction` is useful for implicit differentiation too. For example, finding the implicit derivative of $x^2 + y^2 = 1$ can be done through assuming there is some functional representation for `y`, then substituting appropriately:
+`SymFunction` is useful for implicit differentiation too. For example, finding the implicit derivative of \(x^2 + y^2 = 1\) can be done through assuming there is some functional representation for `y`, then substituting appropriately:
 
 ```
+x,y = symbols("x,y")
 ex = x^2 + y^2 - 1
 F = SymFunction(:F)
-tmp = diff(subs(ex, y, F(x)), x)  # 2x  + 2F(x) d/dx(F(x))
-ex1 = solve(tmp, diff(F(x),x))    # solve for dF/dx in 2x + 2F(x) dF/dx, gives [-x/F(x)]
-tl = subs(ex1, F(x), y)           # now it is [-x/y]
+dF = diff(F(x), x)
+ex1 = subs(ex, y, F(x))
+tmp = diff(ex1, x)                # 2x  + 2F(x) d/dx(F(x))
+ex2 = solve(tmp, dF)              # solve for dF/dx in 2x + 2F(x) dF/dx, gives [-x/F(x)]
+tl = subs(ex2, F(x), y)           # now it is [-x/y]
 ```
 
 ### Vectors and matrices
@@ -429,7 +432,7 @@ v = [x, 1]
 A = [x 1; 1 -x]
 ```
 
-Basic math operations should match those of `julia` (though there could be mistakes!). 
+Basic math operations should match those of `julia`:
 
 ```
 v .* v				# 2 element array
