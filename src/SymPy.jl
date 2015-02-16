@@ -50,8 +50,8 @@ import Base: gamma, beta
 import Base: length,  size
 import Base: factor, expand, collect
 import Base: !=, ==
-import Base:  LinAlg.det, LinAlg.inv, LinAlg.conj,
-              cross, eigvals, eigvecs, trace, norm
+import Base: inv, conj
+import Base:  LinAlg.det, cross, eigvals, eigvecs, trace, norm
 import Base: promote_rule
 import Base: match, replace, round
 import Base: ^, .^
