@@ -27,9 +27,11 @@ else
 end
 @document
 
-import Base.getindex
 import Base: show, writemime
-import Base.convert, Base.complex
+import Base: convert, promote_rule
+import Base: getindex
+import Base: start, next, done
+import Base: complex
 import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        atan, asinh, acosh, atanh, sec, csc, cot, asec,
        acsc, acot, sech, csch, coth, asech, acsch, acoth,

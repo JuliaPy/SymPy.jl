@@ -124,15 +124,45 @@ function getindex(x::SymbolicObject, i::Symbol)
 end
 
 
-## format
-## Can only have pretty for non-array objects, o/w priting is all messed up
+## Display
 
-## as values use embedded \n values to align which don't have any idea of a cell
-show(io::IO, s::SymbolicObject) = print(io, sympy.pretty(project(s)))
+## display
+## text/plain
+writemime(io::IO, ::MIME"text/plain", s::Array{Sym}) =  print(io, summary(s), "\n", sympy.pretty(project(convert(SymMatrix, s))))
+writemime(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy.pretty(project(s)))
 
-## need to call pretty on SymPy matrix object, not julia matrix of sympy objects
-show(io::IO, s::Array{Sym}) =  print(io, summary(s), "\n", convert(Sym, s))
+## text/latex -- for IJulia
+function latex(s::SymbolicObject, args...; kwargs...)
+    sympy.latex(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+end
+writemime(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
+function writemime(io::IO, ::MIME"text/latex", x::Array{Sym}) 
+    function toeqnarray(x::Vector{Sym})
+        a = join([latex(x[i]) for i in 1:length(x)], "\\\\")
+        "\\begin{bmatrix}$a\\end{bmatrix}"
+    end
+    function toeqnarray(x::Array{Sym,2})
+        sz = size(x)
+        a = join([join(map(latex, x[i,:]), "&") for i in 1:sz[1]], "\\\\")
+        "\\begin{bmatrix}$a\\end{bmatrix}"
+    end
+    print(io, toeqnarray(x))
+end
 
+## Pretty print dicts
+function writemime(io::IO, ::MIME"text/latex", d::Dict)    
+    Latex(x::Sym) = latex(x)
+    Latex(x) = string(x)
+
+    out = "\\begin{equation*}\\begin{cases}"
+    for (k,v) in d
+        out = out * Latex(k) * " & \\text{=>} &" * Latex(v) * "\\\\"
+    end
+    out = out * "\\end{cases}\\end{equation*}"
+    print(io, out)
+
+
+end
 
 
 
@@ -168,22 +198,37 @@ jprint(x::Array) = map(jprint, x)
 convert(::Type{Expr}, x::SymbolicObject) = parse(jprint(x))
 
 ## Number types
-promote_rule{T <: Number}(::Type{SymbolicObject}, ::Type{T}) = Sym
-promote_rule{T <: Number}(::Type{Sym}, ::Type{T}) = Sym
+## promotion and conversion
+promote_rule{T<:SymbolicObject, S<:Number}(::Type{T}, ::Type{S} ) = T
+#promote_rule{T <: Number}(::Type{SymbolicObject}, ::Type{T}) = Sym
+#promote_rule{T <: Number}(::Type{Sym}, ::Type{T}) = Sym
 convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 
-convert(::Type{Sym}, x::Number)  = sympy.Symbol(string(x))
-convert(::Type{SymbolicObject}, x::Number) = sympy.Symbol(string(x))
-convert(::Type{Sym}, x::Rational) = sympy.Rational(x.num, x.den)
-convert(::Type{SymbolicObject}, x::Rational) = sympy.Rational(x.num, x.den)
+convert{T<:SymbolicObject}(::Type{T}, x::Rational) = sympy.Rational(x.num, x.den)
+convert{S<:SymbolicObject, T <: Real}(::Type{S}, x::T) = sympy.sympify(x)
 convert(::Type{Sym}, x::Complex) = real(x) == 0 ? sympy.Symbol("$(imag(x))*I") : sympy.Symbol("$(real(x)) + $(imag(x))*I")
-convert(::Type{String},  x::Sym) = convert(String,  project(x))
-convert(::Type{Rational}, s::Sym) = Rational(project(s)[:p], project(s)[:q])
+
 convert(::Type{Complex}, x::Sym) = complex(map(float, x[:as_real_imag]())...)
-
-
 complex(x::Sym) = convert(Complex, x)
 complex(xs::Array{Sym}) = map(complex, xs)
+
+convert(::Type{SymMatrix}, o::PyCall.PyObject) = SymMatrix(o)
+convert(::Type{Sym}, o::SymMatrix) = Sym(o.x)
+convert(::Type{SymMatrix}, o::Sym) = SymMatrix(o.x)
+
+
+# convert(::Type{Sym}, x::Number)  = sympy.Symbol(string(x))
+# convert(::Type{SymbolicObject}, x::Number) = sympy.Symbol(string(x))
+# convert(::Type{Sym}, x::Rational) = sympy.Rational(x.num, x.den)
+# convert(::Type{SymbolicObject}, x::Rational) = sympy.Rational(x.num, x.den)
+# convert(::Type{Sym}, x::Complex) = real(x) == 0 ? sympy.Symbol("$(imag(x))*I") : sympy.Symbol("$(real(x)) + $(imag(x))*I")
+# convert(::Type{String},  x::Sym) = convert(String,  project(x))
+# convert(::Type{Rational}, s::Sym) = Rational(project(s)[:p], project(s)[:q])
+# convert(::Type{Complex}, x::Sym) = complex(map(float, x[:as_real_imag]())...)
+
+
+# complex(x::Sym) = convert(Complex, x)
+# complex(xs::Array{Sym}) = map(complex, xs)
 
 "get the free symbols in a more convenient form that as returned by `free_symbols`"
 function get_free_symbols(ex::Sym)

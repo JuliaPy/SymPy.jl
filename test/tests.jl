@@ -186,11 +186,11 @@ a .+ v
 v .- a
 @test_throws DimensionMismatch  v * a ## error
 v .* a
-@test_throws MethodError  v / a ## error
+#@test_throws MethodError  v / a ## error
 v ./ a
 @test_throws MethodError  v ^ a ## error
 v .^ a
-
+v
 ## matrix matrix
 a + a
 @test_throws DIMERROR  a + b ## error
@@ -201,7 +201,7 @@ a * a
 a .* a
 a * b ## 2x2 * 2*3 -- 2x3
 @test_throws DIMERROR  a .* b ## error -- wrong size
-@test_throws MethodError  a / a 
+#@test_throws MethodError  a / a 
 a ./ a ## ones
 @test_throws MethodError  a / b ## error
 @test_throws DIMERROR  a ./ b ## error
