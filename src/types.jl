@@ -56,9 +56,11 @@ end
 ## rational
 convert{T<:SymbolicObject}(::Type{T}, x::Rational) = sympy.Rational(x.num, x.den)
 
+
 ## real
 convert{S<:SymbolicObject, T <: Real}(::Type{S}, x::T) = sympy.sympify(x)
 convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
+
 
 ## complex
 convert(::Type{Sym}, x::Complex) = real(x) == 0 ? sympy.Symbol("$(imag(x))*I") : sympy.Symbol("$(real(x)) + $(imag(x))*I")

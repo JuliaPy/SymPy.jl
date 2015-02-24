@@ -8,7 +8,13 @@ Sym(s::Union(Symbol, String)) = sympy.symbols(string(s))
 
 "Create a symbolic number"
 Sym(s::Rational) = convert(Sym, s)
+Sym(x::MathConst{:π}) = convert(Sym, x)
+Sym(x::MathConst{:e}) = convert(Sym, x)
+Sym(x::MathConst{:γ}) = convert(Sym, x)
+Sym(x::MathConst{:catalan}) = convert(Sym, x)
+Sym(x::MathConst{:φ}) = convert(Sym, x)
 Sym{T <: Number}(s::T) = sympy.sympify(s)
+
 
 
 "vectorized version of `Sym`"
@@ -83,6 +89,12 @@ project(x::Any) = x
 project(x::SymbolicObject) = x.x
 project(x::Symbol) = project(Sym(x)) # can use :x instead of Sym(x)
 project(x::Tuple) = map(project, x)
+project(x::MathConst{:π}) = project(convert(Sym, x))
+project(x::MathConst{:e}) = project(convert(Sym, x))
+project(x::MathConst{:γ}) = project(convert(Sym, x))
+project(x::MathConst{:catalan}) = project(convert(Sym, x))
+project(x::MathConst{:φ}) = project(convert(Sym, x))
+
 
 
 ## Iterator for Sym

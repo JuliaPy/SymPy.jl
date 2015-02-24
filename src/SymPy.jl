@@ -52,7 +52,7 @@ import Base: gamma, beta
 import Base: length,  size
 import Base: factor, expand, collect
 import Base: !=, ==
-import Base:  LinAlg.det, inv, conj,
+import Base:  inv, conj,
               cross, eigvals, eigvecs, trace, norm
 import Base: promote_rule
 import Base: match, replace, round
@@ -66,7 +66,7 @@ import Base: real, imag
 
 ## conditional imports
 if VERSION < v"0.4.0-dev"
-    import Base: rref
+    import Base: rref, det
 end
 
 export sympy, sympy_meth, object_meth, call_matrix_meth
@@ -87,7 +87,7 @@ export SymFunction, SymMatrix,
        I, oo,
        dsolve,
        poly,  nroots, real_roots,
-       ∨, ∧
+       ∨, ∧, ¬
 export relation, piecewise
 export members, doc, _str
 

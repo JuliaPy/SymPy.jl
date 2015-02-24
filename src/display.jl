@@ -1,6 +1,37 @@
 ## Display code
 
+## Add some of SymPy's displays
+## Some pretty printing
+doc(x::SymbolicObject) = print(x[:__doc__])
 
+"Map a symbolic object to a string"
+_str(s::SymbolicObject) = s[:__str__]()
+
+"Map an array of symbolic objects to a string"
+_str(a::Array{SymbolicObject}) = map(_str, a)
+
+"call SymPy's pretty print"
+pprint(s::SymbolicObject, args...; kwargs...) = sympy.pprint(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+
+"Call SymPy's `latex` function. Not exported. "
+latex(s::SymbolicObject, args...; kwargs...)  = sympy.latex(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+
+"create basic printed output"
+function jprint(x::SymbolicObject)
+  out = PyCall.pyeval("str(x)", x = x.x)
+
+  if ismatch(r"\*\*", out)
+    return replace(out, "**", "^")
+  else
+    return out
+  end
+end
+jprint(x::Array) = map(jprint, x)
+
+## show is called in printing tuples, ...
+## we would like to use pprint here, but it does a poor job on complicated multi-line expressions
+Base.show(io::IO, s::Sym) = print(io, jprint(s))
+Base.show(io::IO, s::Array{Sym}) = print(io, "\n", sympy.pretty(project(convert(SymMatrix, s))))
 
 ## We add writemime methods for the REPL (text/plain) and IJulia (text/latex)
 
@@ -42,33 +73,6 @@ function writemime(io::IO, ::MIME"text/latex", d::Dict)
 end
 
 
-## Add some of SymPy's displays
-## Some pretty printing
-doc(x::SymbolicObject) = print(x[:__doc__])
-
-"Map a symbolic object to a string"
-_str(s::SymbolicObject) = s[:__str__]()
-
-"Map an array of symbolic objects to a string"
-_str(a::Array{SymbolicObject}) = map(_str, a)
-
-"call SymPy's pretty print"
-pprint(s::SymbolicObject, args...; kwargs...) = sympy.pprint(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
-
-"Call SymPy's `latex` function. Not exported. "
-latex(s::SymbolicObject, args...; kwargs...)  = sympy.latex(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
-
-"create basic printed output"
-function jprint(x::SymbolicObject)
-  out = PyCall.pyeval("str(x)", x = x.x)
-
-  if ismatch(r"\*\*", out)
-    return replace(out, "**", "^")
-  else
-    return out
-  end
-end
-jprint(x::Array) = map(jprint, x)
 
 ## Convert SymPy symbol to Julia expression
 convert(::Type{Expr}, x::SymbolicObject) = parse(jprint(x))

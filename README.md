@@ -27,14 +27,14 @@ using PyCall
 @pyimport sympy
 x = sympy.Symbol("x")
 y = sympy.sin(x)
-y[:subs](x, pi) |> float
+y[:subs](x, sympy.pi) |> float
 ```
 
 The `Symbol` and `sin` function of `SymPy` are found within the
 imported `sympy` object. They may be referenced with `Python`'s dot
 notation. However, the `subs` method of the `y` object is accessed
 differently, using indexing notation with a symbol. The call above
-substitutes a value of `pi` for `x`. This leaves the object as a
+substitutes a value of `sympy.pi` for `x`. This leaves the object as a
 `PyObject` storing a number which can be brought back into `julia`
 through conversion, in this case with the `float` function.
 
@@ -45,17 +45,17 @@ need to evaluate python code. Here is one solution:
 
 ```
 x = sympy.Symbol("x")
-y = pyeval("k*x", k=pi, x=x)     # PyObject 3.14159265358979*x
-z = sympy.sin(y)		# PyObject sin(3.14159265358979*x)
-z[:subs](x, 1) |> float		# 1.2246467991473532e-16
+y = pyeval("k*x", k=sympy.pi, x=x)     
+z = sympy.sin(y)		
+z[:subs](x, 1) |> float		
 ```
 
 This gets replaced by a more `julia`n syntax:
 
 ```
 using SymPy                     # some warnings need cleaning up
-x = sym"x"			# or Sym("x") or Sym(:x) or (x,) = @syms x
-y = sin(pi*x)
+x = sym"x"			            # or Sym("x"), Sym(:x), symbols("x"), or (x,) = @syms x
+y = sin(pi*x)                    
 subs(y, x, 1) |> float
 ```
 
@@ -73,7 +73,7 @@ to call the method.
 ## Examples
 
 To make a symbolic object (of type `Sym`) we have the `Sym`
-constructor, the convenient `sym` macro, `@syms`, and `symbols` (which
+constructor, the convenient `sym` macro, the `@syms` macro, and `symbols` (which
 allows the passing of keyword arguments, such as
 `"commutative=false"`:
 
@@ -212,40 +212,31 @@ sqrt(x + 1) |> replace(x, 2) |> N	 # 1.73205080756888 as Sym object
 
 
 The `N` function takes an argument to control the number of
-digits. For example, we can do
+digits displayed. For example, we can do
 
 ```
-sympy.pi			# a PyObject with pi
-PI = Sym(sympy.pi)		# a Sym object
 N(PI, 60)			# 3.14159265358979323846264338327950288419716939937510582097494
 ```
 
-The above shows a somewhat awkward way to get `pi` into a symbolic expression. This also works
+(The value of `PI` is just `Sym(sympy.pi)`.)
+
+There can be a loss of precision when a floating point `Julia` object
+is converted into a symbolic object. For example, rational powers will
+not produce what is desired without some care:
 
 ```
-PI = Sym("pi")
+x^(1/3)             # x^0.333333333333333
+x^(1//3)            # x^(1/3)
 ```
 
-This can be useful, for example a substitution along the lines of
-
-```
-x = sym"x"
-x = subs(x, x, pi)
-N(x, 60)			# 3.14159265358979311599796346854418516159057617187500000000000
-```
-
-loses precision, as the value substituted is `julia`'s floating point
-representation of `pi`, not the symbolic value `Sym(sympy.pi)`, so it gets
-truncated after enough digits. The constant `PI` is provided as an alias for `Sym(sympy.pi)` (As well, constants `E`, `IM` are counterparts for `e` and `im`; and `oo` for infinity are provided by `SymPy`.)
-
-Other conversions can cause loss. For example, `convert(Sym, 1/3)`
-will not be the fraction `1/3` as the value will be parse as floating
-point before being converted. To get exact rational expressions,
-converting from `Julia`'s `Rational` class will work. That is, use expressions like:
-
-```
-x^(1//3)            # not x^(1/3), as that will first convert to floating point.
-```
+Rational expressions are converted exactly, whereas in the first
+example, the `1/3` is first parsed and evaluated as a floating point
+value in `julia` before being passed to the underlying `SymPy`
+function. For the math constants, such as `pi` and `e`, this
+conversion isn't supposed to happen, though to be sure the values
+of `PI` and `E` can be used. The value `oo` represents symbolic
+infinity (on the real line, the value `Sym(sympy.zoo)` is used for a
+complex infinity).
 
 ### Calculus
 
@@ -464,7 +455,7 @@ These are arrays of symbolic objects. Some functions are defined for such:
 
 ```
 det(A)				# determinant
-inverse(A)			# inverse is `inverse` -- not `inv`
+inv(A)			    # 
 exp(A)				# matrix exponential, many screenfuls
 trace(A)
 eigvals(A)

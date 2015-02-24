@@ -52,9 +52,14 @@ given.
 
 """
 
-Make an implicit plot of an expression. The expression may use logical
-values, but there are specifed with unicode operators: `\ll<tab>`,
-`\lt<tab>`, `\Equal<tab>`, `\gt<tab>`, and `\gg<tab>`.
+Make an implicit plot of an expression. 
+
+To create conditions on the variable, the functions `Lt`, `Le`, `Eq`,
+`Ge`, and `Gt` can be used. For infix notation, unicode operators can
+be used: `\ll<tab>`, `\le<tab>`, `\Equal<tab>`, `\ge<tab>`, and
+`\gg<tab>`.
+
+To combine terms, the unicode `\vee<tab>` (for "or"), `\wedge<tab>` (for "and") can be used
 
 Warning, if using in `IJulia`, must be used **after** loading `PyPlot`.
 
@@ -64,7 +69,9 @@ Examples:
 ```
 x,y = symbols("x,y", real=true)
 plot_implicit(sin(x+y) - cos(x^2 + y^2), (x, -5,5), (y, -5, 5))
-plot_implicit(x ≫ y)  # over default region of [-5,5[ x [-5,5]
+plot_implicit(x ≫ y)  # over default region of [-5,5] x [-5,5]
+f(x,y) = x^2 + y^2
+plot_implicit((f(x,y) ≪ 5) ∧ (f(x,y) ≥ 2), (x,-5,5), (y,-5,5))
 ```
 """
 plot_implicit(ex, args...; kwargs...) = sympy.plotting[:plot_implicit](ex.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)

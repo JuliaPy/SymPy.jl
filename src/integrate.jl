@@ -38,7 +38,7 @@ The `integrate` function has its limits specified with tuples of the type `(var,
 profides a simpler interface for one-dimensional integrals: `integrate(ex, var, a, b)`
 
 """ 
-integrate(s::Sym, x::Sym, from::Union(Real, Sym), to::Union(Real, Sym)) = integrate(s, (x, from, to))
+integrate(s::Sym, x::Sym, from::Union(Real, Sym), to::Union(Real, Sym)) = integrate(s, (x, convert(Sym,from), convert(Sym,to)))
 
 "Symbolically integrate a function"
 function integrate(f::Function)

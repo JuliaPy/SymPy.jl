@@ -75,6 +75,7 @@ det(A)
 det(a)
 
 ## we use inverse for A[:inv]()
+inv(A) # aliased to use inverse
 inverse(A)
 a[:inv]() |> u -> convert(Array{Sym}, u)
 a[:inv]("LU")                   # pass argument to function
@@ -240,10 +241,15 @@ q,r = polydiv(f1,g1, domain="QQ") # not div, as can't disambiguate div(Sym(7), 5
 
 ## piecewise
 x = sym"x"
-p = piecewise((x, x>0), (0, x < 0), (1, x==0))
+p = piecewise((x, Ge(x,0)), (0, Lt(x,0)), (1, Eq(x,0)))
+## using infix \ll<tab>, \gt<tab>, \Equal<tab>
+p = piecewise((x, x ≥ 0), (0, x ≪ 0), (1, x ⩵ 0))
 @assert int(subs(p,x,2)) == 2
 @assert int(subs(p,x,-1)) == 0
-@assert int(subs(p,x,0)) == 1
+@assert int(subs(p,x,0)) == 0
+
+## More logical expressions
+(x ≪ 0) ∧ (x*y ≤ 1) ∨ (x ⩵ y) ∧ (¬(x ≫ 3))
 
 ## mpmath functions
 x = sym"x"

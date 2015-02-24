@@ -283,7 +283,7 @@ Base.zero(::Type{Sym}) = Sym(0)
 Base.one(x::Sym) = Sym(1)
 Base.one(::Type{Sym}) = Sym(1)
 
-@doc """
+"""
 
 Solve an expression for any zeros or a system of expressions passed a vector.
 
@@ -327,7 +327,7 @@ Note: The individual components of the array display more nicely than the array.
 
 Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html#algebraic-equations)
 
-""" -> 
+"""  
 function solve(ex::Sym, args...; kwargs...)
     a = sympy.solve(project(ex), map(project, args)...; kwargs...)
 
@@ -408,7 +408,7 @@ end
 
 ## Numeric solutions
 
-@doc """
+"""
 Numerically solve for a zero of an expression.
 
 Examples: 
@@ -418,7 +418,7 @@ nsolve(x^5 - x - 1, 1)
 ```
 
 Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html#algebraic-equations)
-""" ->             
+"""              
 nsolve(ex::Sym, x::Sym, x0::Number) = sympy.nsolve(project(ex), project(x), x0) |> x -> convert(Float64, x)
 nsolve(ex::Sym, x0::Number) =  sympy.nsolve(project(ex), x0) |> x -> convert(Float64, x)
 function nsolve{T <: Number}(ex::Vector{Sym}, x::Vector{Sym}, x0::Vector{T}; kwargs...)
@@ -433,7 +433,7 @@ export nsolve
 SymFunction(nm::Union(Symbol, String)) = (args...) -> Sym(sympy.Function(nm)(project(args)...))
 
 
-@doc """
+"""
 
 Solve an odinary differential equation.
 
@@ -447,37 +447,51 @@ dsolve(diff(f(x), x, x) + f(x), f(x)) ## solve f''(x) + f(x) = 0
 ```
 
 References: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/ode.html#ode-docs)
-""" ->            
+"""             
 dsolve(ex::Sym, fx::Sym) = sympy_meth(:dsolve, ex, fx)
 
 
-@doc """
+"""
 
 Create a piecewise defined function.
 
-    Examples:
-    ```
-    p = piecewise((1, x < 1), (2, (1 <= x) ∨ (x <= 2)), (3, x > 2)) ## using ∨ and ∧ for & and or
-    subs(p, x, 2) ## 2
-    x,a = symbols("x,a")
-    p = piecewise((1, Lt(x, a)), (2, Ge(x,a)))  # same as piecewise((1,  x ≪ a), (2, x ≥ a))
-    subs(p, x, a - 1)
-    ```
-""" ->                
+To create conditions on the variable, the functions `Lt`, `Le`, `Eq`, `Ge`, and `Gt` can be used. For infix notation, 
+unicode operators can be used: `\ll<tab>`, `\le<tab>`, `\Equal<tab>`, `\ge<tab>`, and `\gg<tab>`.
+
+To combine terms, the unicode `\vee<tab>` (for "or"), `\wedge<tab>` (for "and") can be used
+
+
+Examples:
+```
+p = piecewise((1, x ≪ 1), (2, (1 ≤ x) ∨ (x ≤ 2)), (3, x ≫ 2)) ## using ∨ and ∧ for & and or
+subs(p, x, 2) ## 2
+x,a = symbols("x,a")
+p = piecewise((1, Lt(x, a)), (2, Ge(x,a)))  # same as piecewise((1,  x ≪ a), (2, x ≥ a))
+subs(p, x, a - 1)
+```
+"""                 
 function piecewise(args...)
     args = [map(project, x) for x in args]
     sympy.Piecewise(args...)
 end
 
 ## special numbers
-@doc "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors." ->
+"PI is a symbolic  π. Using `julia`'s `pi` will give round off errors." 
 const PI = Sym(sympy.pi)
 
-@doc "E is a symbolic  `e`. Using `julia`'s `e` will give round off errors." ->
+"E is a symbolic  `e`. Using `julia`'s `e` will give round off errors." 
 const E = Sym(sympy.exp(1))
 
-@doc "IM is a symbolic `im`" ->
+"IM is a symbolic `im`" 
 const IM = Sym(sympy.I)
 
-@doc "oo is a symbolic infinity. Example: `integrate(exp(-x), x, 0, oo)`." ->
+"oo is a symbolic infinity. Example: `integrate(exp(-x), x, 0, oo)`." 
 const oo = Sym(sympy.oo)
+
+
+## math constants
+convert(::Type{Sym}, x::MathConst{:π}) = PI
+convert(::Type{Sym}, x::MathConst{:e}) = E
+convert(::Type{Sym}, x::MathConst{:γ}) = Sym(sympy.EulerGamma)
+convert(::Type{Sym}, x::MathConst{:catalan}) =Sym(sympy.Catalan)
+convert(::Type{Sym}, x::MathConst{:φ}) = (1 + Sym(5)^(1//2))/2
