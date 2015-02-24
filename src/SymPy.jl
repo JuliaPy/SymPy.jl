@@ -84,14 +84,13 @@ export SymFunction, SymMatrix,
        limit, diff, 
        series, integrate, 
        summation,
-       I, oo,
        dsolve,
        poly,  nroots, real_roots,
        ∨, ∧, ¬
 export relation, piecewise
 export members, doc, _str
 
-export PI, E
+export PI, E, IM, oo
 
 include("types.jl")
 include("utils.jl")
