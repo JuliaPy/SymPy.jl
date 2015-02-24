@@ -53,7 +53,6 @@ end
 ## (x:Sym, ...) , export
 sympy_math_methods = (:Prod,
                       :Ylm, 
-                      :gamma, :beta, # need import
                       :assoc_legendre, 
                       :chebyshevt
                       )
@@ -63,7 +62,9 @@ for meth in sympy_math_methods
     eval(Expr(:export, meth))
 end
 
-
+## :gamma, :beta, # need import
+beta(x::Sym, y::Sym) = sympy.beta(project(x), project(y))
+gamma(x::Sym, y::Sym) = sympy.gamma(project(x), project(y))
 
 
 ## simple (x::Union(Sym, Number;...) signature, export
@@ -135,9 +136,9 @@ end
 abs(x::Sym) = sympy_meth(:Abs, x)
 abs(a::Array{Sym}) = map(abs, a)
 
-Base.isless(a::Real, b::Sym) = isless(a, float(b))
+Base.isless(a::Real, b::Sym) = isless(a, convert(Float64, b))
 Base.isless(a::Sym, b::Real) = isless(b, a)
-Base.isfinite(x::Sym) = isfinite(float(x))
+Base.isfinite(x::Sym) = isfinite(convert(Float64, x))
 
 ## Some sympy function interfaces
 
@@ -190,7 +191,7 @@ Base.replace(x::SymbolicObject, y) = ex -> subs(ex, x, y)
 
 function !={T <: Real}(x::Sym, y::T) 
     try 
-        x = float(x)
+        x = convert(Float64, x)
         x != y
     catch
         true
@@ -267,80 +268,14 @@ fraction(args...; kwargs...) = sympy.fraction(project(args)...; kwargs...) |> os
 ## solve(x^2 +x == x, x)
 ##==(x::Sym, y::Sym) = solve(x - y)
 
-## Logical operators for (Sym,Sym)
-## Experimental! Not sure these are such a good idea ...
-## but used with piecewise
-Base.&(x::Sym, y::Sym) = PyCall.pyeval("x & y", x=project(x), y=project(y))
-Base.|(x::Sym, y::Sym) = PyCall.pyeval("x | y", x=project(x), y=project(y))
-!(x::Sym)         =      PyCall.pyeval("~x",    x=project(x))
-
-## use ∨, ∧, ¬ for |,&,! (\vee<tab>, \wedge<tab>, \neg<tab>)
-∨(x::Sym, y::Sym) = x | y
-∧(x::Sym, y::Sym) = x & y
-¬(x::Sym) = !x
-
-
-"""
-
-In SymPy, symbolic equations are not represented by `=` or `==`,
-rather ther function `Eq` is used. Here we use the unicode
-`\Equal<tab>` for an infix operator. There are also unicode values to represent `<`, `<=`, `>=`. `>`. These are
-
-* `<` is `\ll<tab>`
-* `<=` is `\le<tab>
-* `==` is `\Equal<tab>`
-* `>=` is `\ge<tab>`
-* `>` is `\gg<tab>`
-
-"""
-
-## These are useful with pairwise and plot_implicit, but they cause  issues elsewhere with linear algebra functions
-#Base.isless(a::Sym, b::Sym) = Lt(a,b)
-#Base.isequal(a::Sym, b::Sym) = Eq(a,b)
-# ⩵(a::Sym, b::Sym) = isequal(a,b)
-#export ⩵
-## Instead we have:
-## We use unicode for visual appeal of infix operators, but the Lt, Le, Eq, Ge, Gt are the proper way:
-
-@doc "This is `\ll<tab>` mapped as an infix operator to `Lt`" ->
-(≪)(a::Sym, b::Sym) = Lt(a,b)  # \ll<tab>
-Base.(:≤)(a::Sym, b::Sym) = Le(a,b)  # \le<tab>
-
-@doc "For infix `Eq` one can use \Equal<tab> unicode operator" ->
-(⩵)(a::Sym, b::Sym) = Eq(a,b)  # \Equal<tab>
-
-@doc "use equality if a python level." ->
-==(x::Sym, y::Sym) = x.x == y.x
-
-Base.(:>=)(a::Sym, b::Sym) = Ge(a,b)
-(≫)(a::Sym, b::Sym) = Gt(a,b)
-
-
-
-export ≪,⩵,≫
-
-
-<(x::Sym,  y::Number) = PyCall.pyeval("x < y", x=project(x), y=project(y))
-<=(x::Sym, y::Number) = PyCall.pyeval("x <= y", x=project(x), y=project(y))
->=(x::Sym, y::Number) = PyCall.pyeval("x >= y", x=project(x), y=project(y))
->(x::Sym, y::Number)  = PyCall.pyeval("x > y", x=project(x), y=project(y))
-## hacky, but == is something else to SymPy
-==(x::Sym, y::Number) = (x <= y) & (x >= y)
-
-<(x::Number, y::Sym)  = y > x
-<=(x::Number, y::Sym) = y >= x
->=(x::Number, y::Sym) = y <= x
->(x::Number, y::Sym)  = y < x
-
-
 ## Handle ininf, and isnan by coercion to float
-Base.isinf(x::Sym) = try isinf(float(x)) catch e false end
-Base.isnan(x::Sym) = try isnan(float(x)) catch e false end
+Base.isinf(x::Sym) = try isinf(convert(Float64, x)) catch e false end
+Base.isnan(x::Sym) = try isnan(convert(Float64, x)) catch e false end
 
 
-Base.div(x::Sym, y) = convert(Sym, sympy.floor(project(x/convert(Sym,y))))
+Base.div(x::Sym, y::Union(Sym, Number)) = convert(Sym, sympy.floor(project(x/convert(Sym,y))))
 
-Base.rem(x::Sym, y) = x-Sym(y)*Sym(sympy.floor(project(x/y)))
+Base.rem(x::Sym, y::Union(Sym, Number)) = x-Sym(y)*Sym(sympy.floor(project(x/y)))
 
 Base.zero(x::Sym) = oftype(Sym, 0)
 Base.zero{T<:Sym}(::Type{T}) = oftype(T,0)
@@ -484,12 +419,12 @@ nsolve(x^5 - x - 1, 1)
 
 Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html#algebraic-equations)
 """ ->             
-nsolve(ex::Sym, x::Sym, x0::Number) = sympy.nsolve(project(ex), project(x), x0) |> float
-nsolve(ex::Sym, x0::Number) =  sympy.nsolve(project(ex), x0) |> float
+nsolve(ex::Sym, x::Sym, x0::Number) = sympy.nsolve(project(ex), project(x), x0) |> x -> convert(Float64, x)
+nsolve(ex::Sym, x0::Number) =  sympy.nsolve(project(ex), x0) |> x -> convert(Float64, x)
 function nsolve{T <: Number}(ex::Vector{Sym}, x::Vector{Sym}, x0::Vector{T}; kwargs...)
     ans = sympy.nsolve(tuple(map(project,ex)...), tuple(map(project,x)...), tuple(x0...); kwargs...)
     ## ans is matrix object -- convert
-    convert(Array{Sym}, sympy.Matrix(ans)) |> float
+    convert(Array{Sym}, sympy.Matrix(ans)) |> x -> convert(Float64, x)
 end
 export nsolve
 

@@ -96,8 +96,9 @@ export PI, E
 include("types.jl")
 include("utils.jl")
 include("mathops.jl")
-include("math.jl")
 include("core.jl")
+include("logical.jl")
+include("math.jl")
 include("simplify.jl")
 include("functions.jl")
 include("series.jl")
@@ -106,6 +107,7 @@ include("assumptions.jl")
 include("poly.jl")
 include("matrix.jl")
 include("ntheory.jl")
+include("display.jl")
 include("plot.jl")
 
 

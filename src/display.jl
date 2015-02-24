@@ -1,0 +1,74 @@
+## Display code
+
+
+
+## We add writemime methods for the REPL (text/plain) and IJulia (text/latex)
+
+## text/plain
+writemime(io::IO, ::MIME"text/plain", s::Array{Sym}) =  print(io, summary(s), "\n", sympy.pretty(project(convert(SymMatrix, s))))
+writemime(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy.pretty(project(s)))
+
+## text/latex -- for IJulia
+function latex(s::SymbolicObject, args...; kwargs...)
+    sympy.latex(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+end
+writemime(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
+function writemime(io::IO, ::MIME"text/latex", x::Array{Sym}) 
+    function toeqnarray(x::Vector{Sym})
+        a = join([latex(x[i]) for i in 1:length(x)], "\\\\")
+        "\\begin{bmatrix}$a\\end{bmatrix}"
+    end
+    function toeqnarray(x::Array{Sym,2})
+        sz = size(x)
+        a = join([join(map(latex, x[i,:]), "&") for i in 1:sz[1]], "\\\\")
+        "\\begin{bmatrix}$a\\end{bmatrix}"
+    end
+    print(io, toeqnarray(x))
+end
+
+## Pretty print dicts
+function writemime(io::IO, ::MIME"text/latex", d::Dict)    
+    Latex(x::Sym) = latex(x)
+    Latex(x) = string(x)
+
+    out = "\\begin{equation*}\\begin{cases}"
+    for (k,v) in d
+        out = out * Latex(k) * " & \\text{=>} &" * Latex(v) * "\\\\"
+    end
+    out = out * "\\end{cases}\\end{equation*}"
+    print(io, out)
+
+
+end
+
+
+## Add some of SymPy's displays
+## Some pretty printing
+doc(x::SymbolicObject) = print(x[:__doc__])
+
+"Map a symbolic object to a string"
+_str(s::SymbolicObject) = s[:__str__]()
+
+"Map an array of symbolic objects to a string"
+_str(a::Array{SymbolicObject}) = map(_str, a)
+
+"call SymPy's pretty print"
+pprint(s::SymbolicObject, args...; kwargs...) = sympy.pprint(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+
+"Call SymPy's `latex` function. Not exported. "
+latex(s::SymbolicObject, args...; kwargs...)  = sympy.latex(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+
+"create basic printed output"
+function jprint(x::SymbolicObject)
+  out = PyCall.pyeval("str(x)", x = x.x)
+
+  if ismatch(r"\*\*", out)
+    return replace(out, "**", "^")
+  else
+    return out
+  end
+end
+jprint(x::Array) = map(jprint, x)
+
+## Convert SymPy symbol to Julia expression
+convert(::Type{Expr}, x::SymbolicObject) = parse(jprint(x))

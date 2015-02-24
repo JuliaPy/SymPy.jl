@@ -1,5 +1,5 @@
-
-
+## Alternate constructors for symbolic objects
+##
 ## Many (too many) ways to create symbolobjects
 ## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y), @syms x y, symbols("x y")
 
@@ -84,6 +84,16 @@ project(x::Symbol) = project(Sym(x)) # can use :x instead of Sym(x)
 project(x::Tuple) = map(project, x)
 
 
+## Iterator for Sym
+Base.start(x::Sym) = 1
+Base.next(x::Sym, state) = (x.x, state-1)
+Base.done(x::Sym, state) = state <= 0
+
+
+
+
+
+
 """
 convert args so that we can use obj[:methname](x,...) without needing to project to
 python: obj.method(arg1, arg2, ...) -> julia: obj[:meth](args...) 
@@ -120,157 +130,6 @@ function getindex(x::SymbolicObject, i::Symbol)
         end
     else
         MethodError()
-    end
-end
-
-
-## Display
-
-## display
-## text/plain
-writemime(io::IO, ::MIME"text/plain", s::Array{Sym}) =  print(io, summary(s), "\n", sympy.pretty(project(convert(SymMatrix, s))))
-writemime(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy.pretty(project(s)))
-
-## text/latex -- for IJulia
-function latex(s::SymbolicObject, args...; kwargs...)
-    sympy.latex(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
-end
-writemime(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
-function writemime(io::IO, ::MIME"text/latex", x::Array{Sym}) 
-    function toeqnarray(x::Vector{Sym})
-        a = join([latex(x[i]) for i in 1:length(x)], "\\\\")
-        "\\begin{bmatrix}$a\\end{bmatrix}"
-    end
-    function toeqnarray(x::Array{Sym,2})
-        sz = size(x)
-        a = join([join(map(latex, x[i,:]), "&") for i in 1:sz[1]], "\\\\")
-        "\\begin{bmatrix}$a\\end{bmatrix}"
-    end
-    print(io, toeqnarray(x))
-end
-
-## Pretty print dicts
-function writemime(io::IO, ::MIME"text/latex", d::Dict)    
-    Latex(x::Sym) = latex(x)
-    Latex(x) = string(x)
-
-    out = "\\begin{equation*}\\begin{cases}"
-    for (k,v) in d
-        out = out * Latex(k) * " & \\text{=>} &" * Latex(v) * "\\\\"
-    end
-    out = out * "\\end{cases}\\end{equation*}"
-    print(io, out)
-
-
-end
-
-
-
-
-
-doc(x::SymbolicObject) = print(x[:__doc__])
-
-"Map a symbolic object to a string"
-_str(s::SymbolicObject) = s[:__str__]()
-
-"Map an array of symbolic objects to a string"
-_str(a::Array{SymbolicObject}) = map(_str, a)
-
-"call SymPy's pretty print"
-pprint(s::SymbolicObject, args...; kwargs...) = sympy.pprint(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
-
-"Call SymPy's `latex` function. Not exported. "
-latex(s::SymbolicObject, args...; kwargs...)  = sympy.latex(project(s), project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
-
-"create basic printed output"
-function jprint(x::SymbolicObject)
-  out = PyCall.pyeval("str(x)", x = x.x)
-
-  if ismatch(r"\*\*", out)
-    return replace(out, "**", "^")
-  else
-    return out
-  end
-end
-jprint(x::Array) = map(jprint, x)
-
-## Convert SymPy symbol to Julia expression
-convert(::Type{Expr}, x::SymbolicObject) = parse(jprint(x))
-
-## Number types
-## promotion and conversion
-promote_rule{T<:SymbolicObject, S<:Number}(::Type{T}, ::Type{S} ) = T
-#promote_rule{T <: Number}(::Type{SymbolicObject}, ::Type{T}) = Sym
-#promote_rule{T <: Number}(::Type{Sym}, ::Type{T}) = Sym
-convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
-
-convert{T<:SymbolicObject}(::Type{T}, x::Rational) = sympy.Rational(x.num, x.den)
-convert{S<:SymbolicObject, T <: Real}(::Type{S}, x::T) = sympy.sympify(x)
-convert(::Type{Sym}, x::Complex) = real(x) == 0 ? sympy.Symbol("$(imag(x))*I") : sympy.Symbol("$(real(x)) + $(imag(x))*I")
-
-convert(::Type{Complex}, x::Sym) = complex(map(float, x[:as_real_imag]())...)
-complex(x::Sym) = convert(Complex, x)
-complex(xs::Array{Sym}) = map(complex, xs)
-
-convert(::Type{SymMatrix}, o::PyCall.PyObject) = SymMatrix(o)
-convert(::Type{Sym}, o::SymMatrix) = Sym(o.x)
-convert(::Type{SymMatrix}, o::Sym) = SymMatrix(o.x)
-
-
-# convert(::Type{Sym}, x::Number)  = sympy.Symbol(string(x))
-# convert(::Type{SymbolicObject}, x::Number) = sympy.Symbol(string(x))
-# convert(::Type{Sym}, x::Rational) = sympy.Rational(x.num, x.den)
-# convert(::Type{SymbolicObject}, x::Rational) = sympy.Rational(x.num, x.den)
-# convert(::Type{Sym}, x::Complex) = real(x) == 0 ? sympy.Symbol("$(imag(x))*I") : sympy.Symbol("$(real(x)) + $(imag(x))*I")
-# convert(::Type{String},  x::Sym) = convert(String,  project(x))
-# convert(::Type{Rational}, s::Sym) = Rational(project(s)[:p], project(s)[:q])
-# convert(::Type{Complex}, x::Sym) = complex(map(float, x[:as_real_imag]())...)
-
-
-# complex(x::Sym) = convert(Complex, x)
-# complex(xs::Array{Sym}) = map(complex, xs)
-
-"get the free symbols in a more convenient form that as returned by `free_symbols`"
-function get_free_symbols(ex::Sym)
-    free = free_symbols(ex)
-    vars = [free[:pop]()]
-    for i in 1:free[:__len__]()
-        push!(vars, free[:pop]())
-    end
-    vars
-end
-
-## Conversion to function a bit hacky
-## we use free_symbols to get the free symbols, then create a function
-## with arguments in this order. No problem with only one variable, but
-## may be confusing when more than one in ex.
-## We now coerce output to float
-function convert(::Type{Function}, ex::Sym)
-    vars = get_free_symbols(ex)
-    len = length(vars)
-    local out
-    (args...) -> begin
-        out = ex
-        for i in 1:length(vars)
-            out = out[:subs](vars[i], args[i])
-        end
-        out
-    end
-end
-
-## For plotting we need to know if a function has 1, 2, or 3 free variables
-function as_nfunction(ex::Sym, nvars=1)
-    free = free_symbols(ex)
-    vars = [free[:pop]()]
-    for i in 1:free[:__len__]()
-        push!(vars, free[:pop]())
-    end
-    len = length(vars)
-
-    if len == nvars
-        convert(Function, ex)
-    else
-        throw(DimensionMismatch("Expecting $nvars free variables and found $len"))
     end
 end
 
@@ -319,39 +178,3 @@ function members(o::Union(PyObject, Sym))
     String[u[1] for u in out]
 end
 
-
-## add writemime support
-## how to pass "mode" to writemime
-
-import Base.writemime
-export writemime
-## various ways to write out mime equations
-writemime(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
-function writemime(io::IO, ::MIME"text/latex", x::Array{Sym}) 
-    function toeqnarray(x::Vector{Sym})
-        a = join([latex(x[i]) for i in 1:length(x)], "\\\\")
-        "\\begin{bmatrix}$a\\end{bmatrix}"
-    end
-    function toeqnarray(x::Array{Sym,2})
-        sz = size(x)
-        a = join([join(map(latex, x[i,:]), "&") for i in 1:sz[1]], "\\\\")
-        "\\begin{bmatrix}$a\\end{bmatrix}"
-    end
-    print(io, toeqnarray(x))
-end
- 
-## attempt to write out a dict. Likely not too robust, but simple cases look good.
-## Not sure this belongs here ...
-function writemime(io::IO, ::MIME"text/latex", d::Dict)    
-    Latex(x::Sym) = latex(x)
-    Latex(x) = string(x)
-
-    out = "\\begin{equation*}\\begin{cases}"
-    for (k,v) in d
-        out = out * Latex(k) * " & \\text{=>} &" * Latex(v) * "\\\\"
-    end
-    out = out * "\\end{cases}\\end{equation*}"
-    print(io, out)
-
-
-end

@@ -33,7 +33,7 @@ function prepare_parametric(exs, t0, t1)
     end
     
     ts = linspace(t0, t1, 250)
-    [Float64[float(convert(Function, exs[i])(t)) for t in ts] for i in 1:n] # [[xs...], [ys...], [zs...]]
+    [Float64[convert(Float64, convert(Function, exs[i])(t)) for t in ts] for i in 1:n] # [[xs...], [ys...], [zs...]]
 end
 
 
@@ -144,7 +144,7 @@ Requires.@require Winston begin
         vars = get_free_symbols(ex)
         if length(vars) == 1        
             f = convert(Function, ex)
-            plot(x -> float(f(x)), a, b, args...; kwargs...)
+            plot(x -> convert(Float64, f(x)), a, b, args...; kwargs...)
         elseif length(vars) == 2
             f = convert(Function, ex)
             error("Make contour plot")
@@ -154,7 +154,7 @@ Requires.@require Winston begin
         vars = get_free_symbols(ex)
         if length(vars) == 1        
             f = convert(Function, ex)
-            oplot(x -> float(f(x)), args...; kwargs...)
+            oplot(x -> convert(Float64, f(x)), args...; kwargs...)
         end
     end
     
@@ -176,7 +176,7 @@ Requires.@require Winston begin
         
         xs = linspace(sort([x1,x2])...)
         ys = linspace(sort([y1,y2])...)
-        zs = [float(f(x,y)) for x in xs, y in ys]
+        zs = [convert(Float64, f(x,y)) for x in xs, y in ys]
         ## Winston.contour???
         contour(xs, ys, zs, args...; kwargs...)
     end
@@ -185,7 +185,7 @@ Requires.@require Winston begin
 
     function add_arrow(p::Vector, v::Vector)
         n = length(p)
-        p,v = map(float, p), map(float, v)
+        p,v = map(x -> convert(Float64, x), p), map(x -> convert(Float64, x), v)
         n == 2 || error("Winston is only 2 dimensional")
         oplot([p[1], p[1] + v[1]], [p[2], p[2] + v[2]])
     end
@@ -201,7 +201,7 @@ Requires.@require PyPlot begin
         if length(vars) == 1        
             f = convert(Function, ex)
             xs = linspace(a,b, n)
-            ys = map(x->float(f(x)), xs)
+            ys = map(x->convert(Float64,f(x)), xs)
             plot(xs, ys, args...; kwargs...)
         elseif length(vars) == 2
             contour(ex, a, b, args...; kwargs...)
@@ -232,8 +232,8 @@ Requires.@require PyPlot begin
             nvars == 2 || throw(DimensionMismatch("Expression has $nvars, expecting 2 for a quiver plot"))
         end
 
-        f1 = (x,y) -> float(convert(Function, f[1])(x,y))
-        f2 = (x,y) -> float(convert(Function, f[2])(x,y))
+        f1 = (x,y) -> convert(Float64, convert(Function, f[1])(x,y))
+        f2 = (x,y) -> convert(Float64, convert(Function, f[2])(x,y))
 
         xs, ys = linspace(x1, x2, nx), linspace(y1, y2, ny)
 
@@ -247,7 +247,7 @@ Requires.@require PyPlot begin
          xs = linspace(sort([x1,x2])...)
          ys = linspace(sort([y1,y2])...)
          f = convert(Function, ex)
-         zs = [float(f(x,y)) for x in xs, y in ys]
+         zs = [convert(Float64, f(x,y)) for x in xs, y in ys]
          PyPlot.contour(xs, ys, zs, args...; kwargs...)
     end
     
@@ -255,7 +255,7 @@ Requires.@require PyPlot begin
          xs = linspace(sort([x1,x2])...)
          ys = linspace(sort([y1,y2])...)
          f = convert(Function, ex)
-         zs = [float(f(x,y)) for x in xs, y in ys]
+         zs = [convert(Float64, f(x,y)) for x in xs, y in ys]
          PyPlot.contour3D(xs, ys, zs, args...; kwargs...)
     end
 
@@ -265,7 +265,7 @@ Requires.@require PyPlot begin
         xs = linspace(sort([x1,x2])..., n)
         ys = linspace(sort([y1,y2])..., n)
         f = convert(Function, ex)
-        zs = [float(f(x,y)) for x in xs, y in ys]
+        zs = [convert(Float64, f(x,y)) for x in xs, y in ys]
         PyPlot.plot_surface(xs, ys, zs, args...; kwargs...)
     end
 
@@ -292,7 +292,7 @@ Requires.@require Gadfly begin
         vars = get_free_symbols(ex)
         if length(vars) == 1        
             f = convert(Function, ex)
-            plot(x -> float(f(x)), a, b, args...; kwargs...)
+            plot(x -> convert(Float64, f(x)), a, b, args...; kwargs...)
         elseif length(vars) == 2
             contour(ex, a, b, args...; kwargs...)
         end
@@ -312,6 +312,6 @@ Requires.@require Gadfly begin
 
     function contour(ex::Sym, x1::Real,x2::Real, y1::Real, y2::Real, args...; kwargs...)
         f = convert(Function, ex)
-        Gadfly.plot((x,y) -> float(f(x,y)), x1, x2, y1, y2, args...; kwargs...)
+        Gadfly.plot((x,y) -> convert(Float64, f(x,y)), x1, x2, y1, y2, args...; kwargs...)
     end
 end

@@ -1,5 +1,7 @@
-## Symbol class for controlling dispatch
+## Code for our Types and conversion methods
 
+
+## Symbol class for controlling dispatch
 abstract SymbolicObject <: Number
 
 ## Basic types defined here
@@ -13,8 +15,6 @@ immutable SymMatrix <: SymbolicObject
     x::PyCall.PyObject
 end
 
-convert(::Type{Sym}, o::String) = Sym(o)
-convert(::Type{Sym}, o::Number) = Sym(o)
 
 ## Automatic conversion of python types to Sym class.
 
@@ -35,48 +35,89 @@ end
 #mpctype = sympy.mpmath["ctx_mp_python"]
 #pytype_mapping(mpctype, Sym)
 
-## Iterator for Sym
-Base.start(x::Sym) = 1
-Base.next(x::Sym, state) = (x.x, state-1)
-Base.done(x::Sym, state) = state <= 0
+## promotion and conversion
+## promote up to symbolic so that math ops work
+promote_rule{T<:SymbolicObject, S<:Number}(::Type{T}, ::Type{S} ) = T
 
+## Conversion
+## String
 
-## Conversion methods
-convert(::Type{Sym}, o::String) = sympy.sympify(o)
 convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
 convert(::Type{PyObject}, s::Sym) = s.x
+
+
 function convert(::Type{Tuple}, o::PyCall.PyObject)
     ## check that o is a tuple?
     ## PyCall.pytypeof(o) 
     n = o[:__len__]()
     ntuple(n, i -> o[:__getitem__](i-1))
 end
-convert{T<:SymbolicObject}(::Type{T}, x::Rational) = sympy.Rational(x.num, x.den)
-convert{S<:SymbolicObject, T <: Real}(::Type{S}, x::T) = sympy.sympify(x)
-convert(::Type{Sym}, x::Complex) = real(x) == 0 ? sympy.Symbol("$(imag(x))*I") : sympy.Symbol("$(real(x)) + $(imag(x))*I")
 
-convert(::Type{Complex}, x::Sym) = complex(map(float, x[:as_real_imag]())...)
+## rational
+convert{T<:SymbolicObject}(::Type{T}, x::Rational) = sympy.Rational(x.num, x.den)
+
+## real
+convert{S<:SymbolicObject, T <: Real}(::Type{S}, x::T) = sympy.sympify(x)
+convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
+
+## complex
+convert(::Type{Sym}, x::Complex) = real(x) == 0 ? sympy.Symbol("$(imag(x))*I") : sympy.Symbol("$(real(x)) + $(imag(x))*I")
+convert(::Type{Complex}, x::Sym) = complex(map(x -> convert(Float64, x), x[:as_real_imag]())...)
 complex(x::Sym) = convert(Complex, x)
 complex(xs::Array{Sym}) = map(complex, xs)
 
+## matrices
 convert(::Type{SymMatrix}, o::PyCall.PyObject) = SymMatrix(o)
 convert(::Type{Sym}, o::SymMatrix) = Sym(o.x)
 convert(::Type{SymMatrix}, o::Sym) = SymMatrix(o.x)
 
+## string
+convert(::Type{Sym}, o::String) = sympy.sympify(o)
+convert(::Type{Sym}, o::Symbol) = sympy.sympify(string(o))
 
 
-# convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
-# convert(::Type{PyObject}, s::Sym) = s.x
+"get the free symbols in a more convenient form that as returned by `free_symbols`"
+function get_free_symbols(ex::Sym)
+    free = free_symbols(ex)
+    vars = [free[:pop]()]
+    for i in 1:free[:__len__]()
+        push!(vars, free[:pop]())
+    end
+    vars
+end
 
-# function convert(::Type{Tuple}, o::PyCall.PyObject)
-#     ## check that o is a tuple?
-#     ## PyCall.pytypeof(o) 
-#     n = o[:__len__]()
-#     ntuple(n, i -> o[:__getitem__](i-1))
-# end
+## Conversion to function a bit hacky
+## we use free_symbols to get the free symbols, then create a function
+## with arguments in this order. No problem with only one variable, but
+## may be confusing when more than one in ex.
+## We now coerce output to float
+## SymPy has `lamdify` for this task too.
+function convert(::Type{Function}, ex::Sym)
+    vars = get_free_symbols(ex)
+    len = length(vars)
+    local out
+    (args...) -> begin
+        out = ex
+        for i in 1:length(vars)
+            out = out[:subs](vars[i], args[i])
+        end
+        out
+    end
+end
 
+## For plotting we need to know if a function has 1, 2, or 3 free variables
+function as_nfunction(ex::Sym, nvars=1)
+    free = free_symbols(ex)
+    vars = [free[:pop]()]
+    for i in 1:free[:__len__]()
+        push!(vars, free[:pop]())
+    end
+    len = length(vars)
 
-## convert SymPy matrices to SymMatrix
-convert(::Type{SymMatrix}, o::PyCall.PyObject) = SymMatrix(o)
-convert(::Type{Sym}, o::SymMatrix) = Sym(o.x)
-convert(::Type{SymMatrix}, o::Sym) = SymMatrix(o.x)
+    if len == nvars
+        convert(Function, ex)
+    else
+        throw(DimensionMismatch("Expecting $nvars free variables and found $len"))
+    end
+end
+
