@@ -277,11 +277,11 @@ Base.div(x::Sym, y::Union(Sym, Number)) = convert(Sym, sympy.floor(project(x/con
 
 Base.rem(x::Sym, y::Union(Sym, Number)) = x-Sym(y)*Sym(sympy.floor(project(x/y)))
 
-Base.zero(x::Sym) = oftype(Sym, 0)
-Base.zero{T<:Sym}(::Type{T}) = oftype(T,0)
+Base.zero(x::Sym) = Sym(0)
+Base.zero(::Type{Sym}) = Sym(0)
 
-Base.one(x::Sym) = oftype(Sym, 1)
-Base.one{T<:Sym}(::Type{T}) = oftype(T, 1)
+Base.one(x::Sym) = Sym(1)
+Base.one(::Type{Sym}) = Sym(1)
 
 @doc """
 
