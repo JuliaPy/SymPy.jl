@@ -133,13 +133,19 @@ a .* s
 
 ## s / v  ## broadcasts s Depreacated
 s ./ v 
-v / s 
+v / s
+v .\ s
+s \ v
 ## s / rv ## broadcasts s Deprecated
 s ./ rv
-rv / s 
+rv / s
+rv .\ s
+s \ rv
 ## s / a ## broadcasts s Deprecated
 s ./ a 
 a / s
+a .\ s
+s \ a
 
 @test_throws MethodError  s ^ v ## error
 s .^ v  
@@ -169,8 +175,10 @@ v .* rv ## XXX ?? should be what? -- not 2 x 2
 rv .* v ## XXX ditto
 @test_throws MethodError  v / v ## error
 v ./ v ## ones()
+v .\ v
 @test_throws MethodError  v / rv ## error
 v ./ rv  ## ??
+rv .\ v
 @test_throws MethodError  v ^ v ## error
 v .^ v
 @test_throws MethodError  v ^ rv ## error
@@ -188,6 +196,7 @@ v .- a
 v .* a
 #@test_throws MethodError  v / a ## error
 v ./ a
+a .\ v
 @test_throws MethodError  v ^ a ## error
 v .^ a
 v
@@ -201,10 +210,12 @@ a * a
 a .* a
 a * b ## 2x2 * 2*3 -- 2x3
 @test_throws DIMERROR  a .* b ## error -- wrong size
-#@test_throws MethodError  a / a 
+#@test_throws MethodError  a / a
 a ./ a ## ones
+a .\ a
 @test_throws MethodError  a / b ## error
 @test_throws DIMERROR  a ./ b ## error
+@test_throws DIMERROR  b .\ a ## error
 @test_throws MethodError  a ^ a ## error
 a .^ a
 @test_throws MethodError  a ^ b ## error
