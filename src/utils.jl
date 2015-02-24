@@ -7,7 +7,8 @@
 Sym(s::Union(Symbol, String)) = sympy.symbols(string(s))
 
 "Create a symbolic number"
-Sym{T <: Number}(s::T) = convert(Sym, sympy.sympify(s))
+Sym(s::Rational) = convert(Sym, s)
+Sym{T <: Number}(s::T) = sympy.sympify(s)
 
 
 "vectorized version of `Sym`"

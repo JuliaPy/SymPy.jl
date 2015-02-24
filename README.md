@@ -139,15 +139,15 @@ julia> 1/x
 x
 
 julia> [1/x, 1/x^2]
-2-element Array{Sym,1}:
- 1
-─
-x      
- 1 
-──
- 2
-x 
-
+2-element Array{Sym,1}
+⎡1 ⎤
+⎢─ ⎥
+⎢x ⎥
+⎢  ⎥
+⎢1 ⎥
+⎢──⎥
+⎢ 2⎥
+⎣x ⎦
 julia> map(SymPy._str,[1/x, 1/x^2])
 2-element ASCIIString Array:
  "1/x"    
@@ -157,11 +157,12 @@ julia> map(SymPy._str,[1/x, 1/x^2])
 ### Plotting
 
 There are several plotting functions available when either `Gadfly`,
-`Winston`, or `PyPlot` is loaded. In
-addition to `plot(expr, a, b)` to plot an expression of a single
-variable, there are methods (as available in the underlying plotting
-package) to plot parametric plots, surface plots, contour plots, and
-vector fields. The `PyPlot` package has the most features implemented.
+`Winston`, or `PyPlot` is loaded. In addition to `plot(expr, a, b)` to
+plot an expression of a single variable, there are methods (as
+available in the underlying plotting package) to plot parametric
+plots, surface plots, contour plots, and vector fields. The `PyPlot`
+package has the most features implemented. For example, these commands
+will create a plot:
 
 ```
 using PyPlot
@@ -170,9 +171,7 @@ x = Sym(:x)
 plot(x^2 - 2x - 2, -3, 3)
 ```
 
-Will create a plot.
-
-SymPy provides a few plotting functions in addition to
+`SymPy` provides a few plotting functions in addition to
 `matplotlib`. The following are exported `plot_implicit`,
 `plot_parametric`, `plot3d`, `plot3d_parametric_line`,
 `plot3d_parametric_surface`. (When using `IJulia`, the `PyPlot`
@@ -236,12 +235,17 @@ N(x, 60)			# 3.14159265358979311599796346854418516159057617187500000000000
 ```
 
 loses precision, as the value substituted is `julia`'s floating point
-representation of `pi`, not the symbolic value `sympi.pi`, so it gets
-truncated after enough digits.
+representation of `pi`, not the symbolic value `Sym(sympy.pi)`, so it gets
+truncated after enough digits. The constant `PI` is provided as an alias for `Sym(sympy.pi)` (As well, constants `E`, `IM` are counterparts for `e` and `im`; and `oo` for infinity are provided by `SymPy`.)
 
-Similarly, substituting `1/3` will cause loss due to floating point
-conversion prior to substitution, but substituting `1//3` will not, as
-rational numbers are converted without loss.
+Other conversions can cause loss. For example, `convert(Sym, 1/3)`
+will not be the fraction `1/3` as the value will be parse as floating
+point before being converted. To get exact rational expressions,
+converting from `Julia`'s `Rational` class will work. That is, use expressions like:
+
+```
+x^(1//3)            # not x^(1/3), as that will first convert to floating point.
+```
 
 ### Calculus
 

@@ -5,3 +5,4 @@
 *(x::SymbolicObject, y::SymbolicObject) =  pyeval("x * y", x = project(x), y = project(y))
 /(x::SymbolicObject, y::SymbolicObject) =  pyeval("x / y", x = project(x), y = project(y))
 ^(x::SymbolicObject, y::SymbolicObject) =  pyeval("x ** y", x = project(x), y = project(y))
+^(x::SymbolicObject, y::Rational) = x^convert(Sym,y)
