@@ -63,7 +63,16 @@ convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 
 
 ## complex
-convert(::Type{Sym}, x::Complex) = real(x) == 0 ? sympy.Symbol("$(imag(x))*I") : sympy.Symbol("$(real(x)) + $(imag(x))*I")
+function convert(::Type{Sym}, x::Complex)
+    if isa(x, Complex{Bool})
+        return(Sym(sympy.I))
+    end
+    if real(x) == 0
+        Sym(sympy.Symbol("$(imag(x))*I"))
+    else
+        Sym(sympy.Symbol("$(real(x)) + $(imag(x))*I"))
+    end
+end
 convert(::Type{Complex}, x::Sym) = complex(map(x -> convert(Float64, x), x[:as_real_imag]())...)
 complex(x::Sym) = convert(Complex, x)
 complex(xs::Array{Sym}) = map(complex, xs)
