@@ -56,6 +56,9 @@ end
 ## rational
 convert{T<:SymbolicObject}(::Type{T}, x::Rational) = sympy.Rational(x.num, x.den)
 
+## big. Need mpmath installed separately -- not as a SymPy module as that is how it is called in PyCall
+convert{T<:SymbolicObject}(::Type{T}, x::BigFloat) = Sym(PyCall.PyObject(x))
+convert(::Type{Sym}, x::Complex{BigFloat}) = Sym(PyCall.PyObject(x))
 
 ## real
 convert{S<:SymbolicObject, T <: Real}(::Type{S}, x::T) = sympy.sympify(x)

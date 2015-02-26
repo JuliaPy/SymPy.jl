@@ -14,8 +14,6 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
            :factorial2,
            :airyai, :airybi
            )
-
-    
     meth = string(fn)
     @eval ($fn)(x::Sym;kwargs...) = getfield(sympy,symbol($meth))(project(x),[(k,project(v)) for (k,v) in kwargs]...)
     @eval ($fn)(a::Array{Sym}) = map($fn, a)

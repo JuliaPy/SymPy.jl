@@ -9,6 +9,22 @@ x = Sym(:x)
 x,y = Sym(:x, :y)
 x,y = @syms x y
 
+## number conversions
+Sym(2)
+Sym(2.0)
+Sym(big(2))
+Sym(big(2.0))
+Sym(2//1)
+Sym(im)
+Sym(2im)
+Sym(1 + 2im)
+Sym(pi)
+Sym(e)
+Sym(catalan)
+            
+      
+
+
 ## subs, |> (x == number)
 f(x) = x^2 - 2
 y = f(x)

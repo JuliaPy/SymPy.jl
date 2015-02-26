@@ -26,6 +26,7 @@ else
     macro document() nothing end    
 end
 @document
+#@docstrings
 
 import Base: show, writemime
 import Base: convert, promote_rule

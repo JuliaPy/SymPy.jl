@@ -7,13 +7,13 @@
 Sym(s::Union(Symbol, String)) = sympy.symbols(string(s))
 
 "Create a symbolic number"
-Sym(s::Rational) = convert(Sym, s)
-Sym(x::MathConst{:π}) = convert(Sym, x)
-Sym(x::MathConst{:e}) = convert(Sym, x)
-Sym(x::MathConst{:γ}) = convert(Sym, x)
-Sym(x::MathConst{:catalan}) = convert(Sym, x)
-Sym(x::MathConst{:φ}) = convert(Sym, x)
-Sym{T <: Number}(s::T) = sympy.sympify(s)
+# Sym(s::Rational) = convert(Sym, s)
+# Sym(x::MathConst{:π}) = convert(Sym, x)
+# Sym(x::MathConst{:e}) = convert(Sym, x)
+# Sym(x::MathConst{:γ}) = convert(Sym, x)
+# Sym(x::MathConst{:catalan}) = convert(Sym, x)
+# Sym(x::MathConst{:φ}) = convert(Sym, x)
+Sym{T <: Number}(x::T) = convert(Sym, x)
 
 
 
