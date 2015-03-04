@@ -15,7 +15,11 @@ module SymPy
 
 using PyCall
 @pyimport sympy
-@pyimport mpmath
+try 
+    @pyimport mpmath
+catch e
+    @pyimport sympy.mpmath as mpmath
+end
 
 using Requires ## for @require macro
 
