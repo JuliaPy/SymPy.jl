@@ -15,10 +15,11 @@ module SymPy
 
 using PyCall
 @pyimport sympy
-try 
-    @pyimport mpmath
-catch e
+## how to check if symbol in module more quickly?
+if :mpmath in names(sympy)
     @pyimport sympy.mpmath as mpmath
+else
+    @pyimport mpmath
 end
 
 using Requires ## for @require macro
