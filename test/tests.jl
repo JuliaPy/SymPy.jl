@@ -13,7 +13,7 @@ x,y = @syms x y
 Sym(2)
 Sym(2.0)
 Sym(big(2))
-Sym(big(2.0))
+Sym(big(2.0))                   # may need mpmath (e.g., conda install mpmath)
 Sym(2//1)
 Sym(im)
 Sym(2im)
