@@ -15,7 +15,7 @@ module SymPy
 
 using PyCall
 @pyimport sympy
-
+@pyimport mpmath
 
 using Requires ## for @require macro
 

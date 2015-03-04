@@ -81,6 +81,7 @@ for fn in (
 end
 
 ## in mpmath module
+
 for fn in (:hyp0f1, 
            :hyp1f1, :hyp1f2, 
            :hyp2f0, :hyp2f1, :hyp2f2, :hyp2f3,
@@ -109,7 +110,7 @@ for fn in (:hyp0f1,
            )
            meth = string(fn)
            @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) = 
-           Sym(sympy.mpmath[(symbol($meth))]([project(x) for x in xs]...,[(k,project(v)) for (k,v) in kwargs]...))
+           Sym(mpmath.((symbol($meth)))([project(x) for x in xs]...,[(k,project(v)) for (k,v) in kwargs]...))
     eval(Expr(:export, fn))
 end
            
