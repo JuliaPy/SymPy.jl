@@ -76,7 +76,7 @@ if VERSION < v"0.4.0-dev"
 end
 
 export sympy, sympy_meth, object_meth, call_matrix_meth
-export Sym, @sym_str, @syms, symbols
+export Sym, @syms, @vars, symbols # @sym_str,
 export pprint,  jprint
 export SymFunction, SymMatrix,
        n,  subs,

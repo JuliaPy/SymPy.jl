@@ -12,7 +12,7 @@
 ## Implementations
 #                                PyPlot     Gadfly    Winston
 # plot(::Sym)                     ✓           ✓          ✓
-# plot(::Vector{Sym})             .           .          .
+# plot(::Vector{Sym})             .           ✓          .
 # plot(::Tuple{Sym})              ✓           ✓(2D)      ✓(2D)
 # parametricplot                  ✓           ✓(2D)      ✓(2D)
 # contour(::Vector{Sym})          ✓           ✓          .
@@ -303,6 +303,11 @@ Requires.@require Gadfly begin
         elseif length(vars) == 2
             contour(ex, a, b, args...; kwargs...)
         end
+    end
+
+    function plot(exs::Array{Sym,1},a::Real,b::Real,args::Union(Gadfly.Element,DataType,Gadfly.Theme,Function)...; kwargs...)
+        fs = map(ex->convert(Function, ex), exs)
+        plot(fs, a, b, args...; kwargs...)
     end
     
     ## Parametric plots use notation plot((ex1,ex2, [ex3]), t0, t1, args..., kwargs...)

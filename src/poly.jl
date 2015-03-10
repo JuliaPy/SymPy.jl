@@ -65,8 +65,8 @@ polynomial_sympy_methods = (
                             :construct_domain,
                             :minimal_polynomial,
                             :minpoly, :primitive_element,
-                            :field_isomorphism, :to_number_field,
-                            :roots
+                            :field_isomorphism, :to_number_field
+#                            :roots ## conflict with Roots.roots and functionality provided by solve
                             )
                             
 

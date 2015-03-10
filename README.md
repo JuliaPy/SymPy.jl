@@ -54,7 +54,7 @@ This gets replaced by a more `julia`n syntax:
 
 ```
 using SymPy                     # some warnings need cleaning up
-x = sym"x"			            # or Sym("x"), Sym(:x), symbols("x"), or (x,) = @syms x
+x = Sym("x")		            # or  Sym(:x), symbols("x"), or (x,) = @syms x
 y = sin(pi*x)                    
 subs(y, x, 1) |> float
 ```
@@ -73,13 +73,12 @@ to call the method.
 ## Examples
 
 To make a symbolic object (of type `Sym`) we have the `Sym`
-constructor, the convenient `sym` macro, the `@syms` macro, and `symbols` (which
+constructor, the `@syms` macro, and `symbols` (which
 allows the passing of keyword arguments, such as
 `"commutative=false"`:
 
 ```
 h, y = Sym("h", :y)
-x = sym"x"
 a, b, c = @syms a b c
 A,B = symbols("A, B", commutative=false)
 ```

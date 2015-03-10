@@ -27,7 +27,7 @@ Sym(args...) = map(Sym, args)
 
 Macro to create many symbolic objects at once. (Written by `@vtjnash`.)
 
-Example: `a,b,c = @syms a b c`
+Example: ` @syms a b c`
 
 """
 macro syms(x...)
@@ -41,13 +41,35 @@ macro syms(x...)
         push!(q.args, Expr(:(=), s, Expr(:call, :Sym, Expr(:quote, s))))
            end 
     push!(q.args, Expr(:tuple, x...))
-    q   
+    q
 end
 
-"Macro to create a symbolic object: `sym\"x\"`"
-macro sym_str(x)
-    Sym(x)
+"""
+
+The `vars` macro is like `syms` except it assigns the variables into `Main`, so can be
+called as `@vars a b c`. This simplifies construction of variables, but pollutes the `Main` module.
+
+"""
+macro vars(x...)
+    q=Expr(:block)
+    if length(x) == 1 && isa(x[1],Expr)
+        @assert x[1].head === :tuple "@vars expected a list of symbols"
+        x = x[1].args
+    end 
+    for s in x
+        @assert isa(s,Symbol) "@vars expected a list of symbols"
+        push!(q.args, Expr(:(=), s, Expr(:call, :Sym, Expr(:quote, s))))
+    end
+    push!(q.args, Expr(:tuple, x...))
+    eval(Main, q)
 end
+
+
+"Macro to create a symbolic object: `sym\"x\"`"
+#macro sym_str(x)
+#    Sym(x)
+#end
+@deprecate sym_str(x)  symbols(x::String)
 
 ## define one or more symbols directly
 ## a,b,c = symbols("a,b,c", commutative=false)
@@ -57,7 +79,7 @@ Function to create one or more symbolic objects. These are specified with a stri
 with commas separating different variables.
 
 This function allows the passing of assumptions about the variables
-such as `positive=true`, `real=true` or `commutative=true`.
+such as `positive=true`, `real=true` or `commutative=true`. See [SymPy Docs](http://docs.sympy.org/dev/modules/core.html#module-sympy.core.assumptions) for a complete list.
 
 Example:
 
