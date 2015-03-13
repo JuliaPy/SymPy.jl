@@ -214,8 +214,8 @@ in `Julia`, whereas `evalf` leaves it as a symbolic number.
 
 
 ```
-sqrt(x + 1) |> replace(x, 2)       # pretty print sqrt(3)
-sqrt(x + 1) |> replace(x, 2) |> N	 # 1.73205080756888
+sqrt(x + 1) |> replace(x, 2)             # pretty print sqrt(3)
+sqrt(x + 1) |> replace(x, 2) |> N	     # 1.73205080756888
 sqrt(x + 1) |> replace(x, 2) |> evalf 	 # 1.73205080756888 as a Sym object
 ```
 
