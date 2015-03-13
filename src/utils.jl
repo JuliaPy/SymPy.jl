@@ -111,6 +111,13 @@ project(x::Any) = x
 project(x::SymbolicObject) = x.x
 project(x::Symbol) = project(Sym(x)) # can use :x instead of Sym(x)
 project(x::Tuple) = map(project, x)
+function project{T <: Any}(x::Dict{Sym,T})
+    D = Dict()
+    for (k,v) in x
+        D[project(k)] = v
+    end
+    D
+end
 project(x::MathConst{:π}) = project(convert(Sym, x))
 project(x::MathConst{:e}) = project(convert(Sym, x))
 project(x::MathConst{:γ}) = project(convert(Sym, x))
@@ -147,7 +154,7 @@ function getindex(x::SymbolicObject, i::Symbol)
         out = project(x)[i]
         if isa(out, Function) 
             function f(args...;kwargs...) 
-                out(project(args)...;kwargs...)
+                out(project(args)...; [(k,project(v)) for (k,v) in kwargs]...)
             end
             return f
         else
@@ -157,7 +164,7 @@ function getindex(x::SymbolicObject, i::Symbol)
         out = sympy.(i)
         if isa(out, Function) 
             function f(args...;kwargs...) 
-                out(project(x), project(args)...;kwargs...) 
+                out(project(x), project(args)...; [(k,project(v)) for (k,v) in kwargs]... )
             end
             return f
         else

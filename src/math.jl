@@ -205,10 +205,121 @@ function !={T <: Complex}(x::Sym, y::T)
     end
 end
 
-## evalf, n, N
+_is_rational(ex::Sym) = ex[:is_rational] && ex[:numer]()[:is_integer]
 
-for meth in (:n, :N,
-             :separate, :flatten, 
+## evalf, n, N
+## We want to convert to numeric:
+## evalf -> keep as sympy expression
+## N bring back into julia using convert
+## In SymPy N and evalf are the same, so this could be confusing!!!
+
+"""
+
+Convert a SymPy value to a numeric Julian value.
+
+The `N` function of SymPy is an alias for `evalf`. Within SymPy, either may be used to
+find numeric values from symbolic values.
+
+For example, symbolic roots can be computed numerically, even if not
+available symbolically, by calling `N` on the values.
+
+Using `SymPy` within `Julia` makes having two such functions useful:
+
+* one to do the equivalent of SymPy's `evalf` function 
+* one to *also* convert these expressions back into `Julia` objects.
+
+We use `N` to return a `Julia` object and `evalf` to return a symbolic
+object.
+
+Examples:
+```
+x = Sym("x")
+p = subs(x, x, pi)
+N(p)                            # float version of pi
+evalf(p, 60)                    # 60 digits of pi, as a symbolic value
+N(p, 60)                        # when a precision is given, "Big" values are returned
+r = subs(x,x,1.2)
+N(r)                            # float
+q = subs(x, x, 1//2)
+N(q)                            # 1//2
+z = solve(x^2 + 1)[1]           # -ⅈ
+N(z)                            # 0 - 1im
+evalf(z)
+```
+
+
+The `evalf` function is similar, though it leaves the expression as a symbolic object.
+This breaks the similarity of N and evalf for sympy users.
+
+Throws a `DomainError` if no conversion is possible, such as when the expression still has symbolic values.
+
+`N` is type unstable.
+
+"""
+function N(ex::Sym)
+    ## more work than I'd like
+    if ex[:is_integer]
+        for T in [Int, BigInt]
+            try (return(convert(T, ex))) catch e end
+        end
+    elseif _is_rational(ex)
+        try (return(convert(Rational, ex))) catch e end
+    elseif ex[:is_real]
+        for T in [MathConst, Float64] ## BigFloat???
+              try (return(convert(T, ex))) catch e end
+        end
+    elseif ex[:is_complex]
+        try
+            r, i = ex[:re](), ex[:im]()
+            r, i = promote(N(r), N(i))
+            return(Complex(r, i))
+        catch e
+        end
+    end
+    throw(DomainError())
+end
+
+"""
+`N` can take a precision argument. 
+
+When given as ain integer more than 16, we try to match the digits of accuracy using `BigFloat` precision
+
+"""
+function N(x::Sym, prec::Int)
+    iprec <= 16 && return(N(x))
+
+    ex = evalf(x, prec)
+    if x[:is_integer]
+        return(convert(BigInt, ex))
+    elseif _is_rational(x)
+        return(convert(Rational, ex))
+    elseif x[:is_real]
+        p = round(Int,log2(10)*prec)
+        
+        out = with_bigfloat_precision(p) do 
+            convert(BigFloat, ex)
+        end
+        return(out)
+    elseif x[:is_complex]
+        return(Complex(promote(N(x[:re](), prec), N(x[:im](), prec))))
+    end
+    throw(DomainError())
+end
+
+"""
+
+The `evalf` function has keyword possibilities, such as subs being given directly through a `Dict(Sym,Any)`.
+Unlike `N`, `evalf` returns an object of type `Sym`.
+
+Examples
+```
+x = Sym("x")
+evalf(x, subs=[x => 1/2])
+```
+"""
+evalf(x::Sym, args...; kwargs...) = x[:evalf](args...; kwargs...)
+
+for meth in (:separate, :flatten, 
              :igcd, :ilcm,
              :sqf,
              :together, 
@@ -219,6 +330,8 @@ for meth in (:n, :N,
     @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
     eval(Expr(:export, meth))
 end
+
+
 
 ## diff for matrix doesn't handle vectors well, so we vectorize here
 diff(exs::Array{Sym}, args...; kwargs...) = map(ex -> diff(ex, args...;kwargs...), exs)

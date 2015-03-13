@@ -73,13 +73,14 @@ to call the method.
 ## Examples
 
 To make a symbolic object (of type `Sym`) we have the `Sym`
-constructor, the `@syms` macro, and `symbols` (which
-allows the passing of keyword arguments, such as
-`"commutative=false"`:
+constructor, the `@syms` macro, the `@vars` macro (which assigns the
+variables into `Main`), and `symbols` (which allows the passing of
+keyword arguments, such as `"commutative=false"`:
 
 ```
 h, y = Sym("h", :y)
 a, b, c = @syms a b c
+@vars alpha beta gamma
 A,B = symbols("A, B", commutative=false)
 ```
 
@@ -179,11 +180,21 @@ package must be loaded prior to calling these functions.)
 ## Conversion
 
 The key to plotting working is forming a function object from the `Sym` object.
-Here is one pattern to do so where we need to be careful to match the
-variable we substitute with (`x`) with the expression.
+
+The following isn't quite what we need:
 
 ```
-u -> float(subs( exp(-x) * sin(x), x, u)) # anonymous function to evaluate expression
+asfunction(ex) =  u -> subs(ex, x, u)
+```
+
+as the value returned will be a symbolic number when `ex` depends only
+on the variable `x` and not a number. To convert to a number can be
+done through the `convert(T,x)` methods. However, for convenience, we
+make SymPy's `N` function do the conversion. So, assuming `x` is the
+lone variable in `ex`, we could have
+
+```
+asfunction(ex) = u -> N(subs(ex, x, u))
 ```
 
 This is basically what happens in the call: `convert(Function,
@@ -193,28 +204,27 @@ expressions with `julia`'s other plotting packages. (This can be
 somewhat slow, as each evaluation has to make the round trip from
 `julia` to `sympy` and back.)
 
-Basic conversions from `SymPy` numeric types to the corresponding
-`julia` objects may be done with the functions `integer`, `float`, and
-`complex`. Rational expressions can be converted through
-`convert(Rational, ex )`.
+In SymPy under `Python`, the `N` and `evalf` functions are basically
+the same, converting a symbolic expression into a symbolic numeric
+expression. In `SymPy`, the `N` function converts to a numeric object
+in `Julia`, whereas `evalf` leaves it as a symbolic number.
 
-
-The `sympy` function `N` can be used to form a numerical value from an
-expression, though the expression is still a `Sym` instance.
 
 ```
 sqrt(x + 1) |> replace(x, 2)       # pretty print sqrt(3)
-sqrt(x + 1) |> replace(x, 2) |> N	 # 1.73205080756888 as Sym object
+sqrt(x + 1) |> replace(x, 2) |> N	 # 1.73205080756888
+sqrt(x + 1) |> replace(x, 2) |> evalf 	 # 1.73205080756888 as a Sym object
 ```
 
 
 
 
-The `N` function takes an argument to control the number of
-digits displayed. For example, we can do
+The `N` function may take an argument to control the number of digits
+displayed. For example, we can do
 
 ```
-N(PI, 60)			# 3.14159265358979323846264338327950288419716939937510582097494
+N(PI, 60)			# BigFloat value of pi with about 60 digits of precisions
+evalf(PI, 60)       # 60 digits of pi as `Sym` object.
 ```
 
 (The value of `PI` is just `Sym(sympy.pi)`.)
@@ -228,6 +238,8 @@ x^(1/3)             # x^0.333333333333333
 x^(1//3)            # x^(1/3)
 ```
 
+
+
 Rational expressions are converted exactly, whereas in the first
 example, the `1/3` is first parsed and evaluated as a floating point
 value in `julia` before being passed to the underlying `SymPy`
@@ -236,6 +248,8 @@ conversion isn't supposed to happen, though to be sure the values
 of `PI` and `E` can be used. The value `oo` represents symbolic
 infinity (on the real line, the value `Sym(sympy.zoo)` is used for a
 complex infinity).
+
+Conversions may also be achieved through `Julia's` `convert(T,x)` mechanism.
 
 ### Calculus
 

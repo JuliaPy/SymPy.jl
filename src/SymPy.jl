@@ -79,7 +79,7 @@ export sympy, sympy_meth, object_meth, call_matrix_meth
 export Sym, @syms, @vars, symbols # @sym_str,
 export pprint,  jprint
 export SymFunction, SymMatrix,
-       n,  subs,
+       evalf, N,  subs,
        simplify, nsimplify, 
        expand, factor, trunc,
        collect, separate, 

@@ -37,6 +37,19 @@ z = x - 3 + y
 subs(z, y, 3)
 @assert (z |> replace(x, 2) |> replace(y, 3) |> float) == (2 - 3 + 3)
 
+## Conversion
+x = Sym("x")
+p = subs(x,x,pi)
+q = subs(x,x,1//2)
+r = subs(x,x,1.2)
+z = subs(x,x,1)
+@assert isa(N(p), Float64)
+@assert isa(N(p, 60), BigFloat)
+@assert isa(evalf(p), Sym)
+@assert isa(N(q), Rational)
+@assert isa(N(r), Float64)
+@assert isa(N(z), Int)
+
 ## algebra
 expand((x + 1)*(x+2))
 x1 = (x + 1)*(x+2)

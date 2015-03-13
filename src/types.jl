@@ -115,7 +115,7 @@ function convert(::Type{Function}, ex::Sym)
         for i in 1:length(vars)
             out = out[:subs](vars[i], args[i])
         end
-        out
+        N(out)
     end
 end
 
