@@ -287,7 +287,7 @@ When given as an integer greater than 16, we try to match the digits of accuracy
 
 """
 function N(x::Sym, prec::Int)
-    iprec <= 16 && return(N(x))
+    prec <= 16 && return(N(x))
 
     ex = evalf(x, prec)
     if x[:is_integer]
