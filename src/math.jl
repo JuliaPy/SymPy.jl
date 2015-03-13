@@ -205,6 +205,7 @@ function !={T <: Complex}(x::Sym, y::T)
     end
 end
 
+## helper, as :is_rational will find 1.2 rational...
 _is_rational(ex::Sym) = ex[:is_rational] && ex[:numer]()[:is_integer]
 
 ## evalf, n, N
@@ -215,7 +216,7 @@ _is_rational(ex::Sym) = ex[:is_rational] && ex[:numer]()[:is_integer]
 
 """
 
-Convert a SymPy value to a numeric Julian value.
+Convert a `Sym` value to a numeric Julian value.
 
 The `N` function of SymPy is an alias for `evalf`. Within SymPy, either may be used to
 find numeric values from symbolic values.
@@ -282,7 +283,7 @@ end
 """
 `N` can take a precision argument. 
 
-When given as ain integer more than 16, we try to match the digits of accuracy using `BigFloat` precision
+When given as an integer greater than 16, we try to match the digits of accuracy using `BigFloat` precision on conversions to floating point.
 
 """
 function N(x::Sym, prec::Int)
@@ -308,13 +309,13 @@ end
 
 """
 
-The `evalf` function has keyword possibilities, such as subs being given directly through a `Dict(Sym,Any)`.
+The `evalf` function has keyword possibilities, such as `subs` being given directly through a `Dict(Sym,Any)`.
 Unlike `N`, `evalf` returns an object of type `Sym`.
 
 Examples
 ```
 x = Sym("x")
-evalf(x, subs=[x => 1/2])
+evalf(x, subs=[x => 1/2])  # v0.3 syntax for anonymous dicts
 ```
 """
 evalf(x::Sym, args...; kwargs...) = x[:evalf](args...; kwargs...)

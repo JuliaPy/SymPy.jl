@@ -187,8 +187,17 @@ The following isn't quite what we need:
 asfunction(ex) =  u -> subs(ex, x, u)
 ```
 
-as the value returned will be a symbolic number when `ex` depends only
-on the variable `x` and not a number. To convert to a number can be
+
+This is basically what happens in the call: `convert(Function,
+exp(-x)*sin(x))`, though that call replaces a lone free variable, not
+necessarily one named `x`. This conversion is then used to plot
+expressions with `julia`'s other plotting packages. (This can be
+somewhat slow, as each evaluation has to make the round trip from
+`julia` to `sympy` and back.)
+
+
+However, the value returned will be a symbolic number when `ex` depends only
+on the variable `x` and not a number. Converting to a Julian number can be
 done through the `convert(T,x)` methods. However, for convenience, we
 make SymPy's `N` function do the conversion. So, assuming `x` is the
 lone variable in `ex`, we could have
@@ -197,12 +206,6 @@ lone variable in `ex`, we could have
 asfunction(ex) = u -> N(subs(ex, x, u))
 ```
 
-This is basically what happens in the call: `convert(Function,
-exp(-x)*sin(x))`, though that call replaces a lone free variable, not
-necessarily one named `x`. This conversion is then used to plot
-expressions with `julia`'s other plotting packages. (This can be
-somewhat slow, as each evaluation has to make the round trip from
-`julia` to `sympy` and back.)
 
 In SymPy under `Python`, the `N` and `evalf` functions are basically
 the same, converting a symbolic expression into a symbolic numeric
@@ -249,7 +252,6 @@ of `PI` and `E` can be used. The value `oo` represents symbolic
 infinity (on the real line, the value `Sym(sympy.zoo)` is used for a
 complex infinity).
 
-Conversions may also be achieved through `Julia's` `convert(T,x)` mechanism.
 
 ### Calculus
 

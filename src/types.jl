@@ -104,7 +104,7 @@ end
 ## we use free_symbols to get the free symbols, then create a function
 ## with arguments in this order. No problem with only one variable, but
 ## may be confusing when more than one in ex.
-## We now coerce output to float
+## Output is symbolic. Conversion is necessary to use output as Julia values.
 ## SymPy has `lamdify` for this task too.
 function convert(::Type{Function}, ex::Sym)
     vars = get_free_symbols(ex)
@@ -115,7 +115,7 @@ function convert(::Type{Function}, ex::Sym)
         for i in 1:length(vars)
             out = out[:subs](vars[i], args[i])
         end
-        N(out)
+        out
     end
 end
 
