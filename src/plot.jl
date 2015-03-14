@@ -205,7 +205,7 @@ Requires.@require PyPlot begin
     
     function plot(ex::Sym, a::Real, b::Real, n=250, args...; kwargs...)
         vars = get_free_symbols(ex)
-        if length(vars) == 1        
+        if length(vars) <= 1        
             f = convert(Function, ex)
             xs = linspace(a,b, n)
             ys = map(x->convert(Float64,f(x)), xs)
@@ -297,7 +297,7 @@ Requires.@require Gadfly begin
 
     function plot(ex::Sym, a::Real, b::Real, args...; kwargs...)
         vars = get_free_symbols(ex)
-        if length(vars) == 1        
+        if length(vars) <= 1        
             f = convert(Function, ex)
             plot(x -> convert(Float64, f(x)), a, b, args...; kwargs...)
         elseif length(vars) == 2

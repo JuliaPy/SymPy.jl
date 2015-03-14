@@ -93,9 +93,14 @@ convert(::Type{Sym}, o::Symbol) = sympy.sympify(string(o))
 "get the free symbols in a more convenient form that as returned by `free_symbols`"
 function get_free_symbols(ex::Sym)
     free = free_symbols(ex)
+    n = free[:__len__]()
+    n == 0 && return(Sym[])
+    
     vars = [free[:pop]()]
-    for i in 1:free[:__len__]()
-        push!(vars, free[:pop]())
+    if n > 1
+        for i in 1:(n-1)
+            push!(vars, free[:pop]())
+        end
     end
     vars
 end
@@ -109,10 +114,13 @@ end
 function convert(::Type{Function}, ex::Sym)
     vars = get_free_symbols(ex)
     len = length(vars)
+    if len == 0
+        return x -> ex
+    end
     local out
     (args...) -> begin
         out = ex
-        for i in 1:length(vars)
+        for i in 1:len
             out = out[:subs](vars[i], args[i])
         end
         out

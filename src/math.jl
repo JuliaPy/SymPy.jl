@@ -246,6 +246,9 @@ N(q)                            # 1//2
 z = solve(x^2 + 1)[1]           # -ⅈ
 N(z)                            # 0 - 1im
 evalf(z)
+
+rts = solve(x^5 - x + 1)
+[N(r) for r in rts]             # numeric solutions to quintic
 ```
 
 
@@ -259,6 +262,9 @@ Throws a `DomainError` if no conversion is possible, such as when the expression
 """
 function N(ex::Sym)
     ## more work than I'd like
+    if ex[:is_integer] == nothing
+        return(N(ex[:evalf]()))
+    end
     if ex[:is_integer]
         for T in [Int, BigInt]
             try (return(convert(T, ex))) catch e end
@@ -287,8 +293,13 @@ When given as an integer greater than 16, we try to match the digits of accuracy
 
 """
 function N(x::Sym, prec::Int)
+    ## check
     prec <= 16 && return(N(x))
-
+    if x[:is_integer] == nothing
+        out = x[:evalf](prec)
+        return( N(out, prec) )
+    end
+    
     ex = evalf(x, prec)
     if x[:is_integer]
         return(convert(BigInt, ex))
@@ -302,8 +313,11 @@ function N(x::Sym, prec::Int)
         end
         return(out)
     elseif x[:is_complex]
-        return(Complex(promote(N(x[:re](), prec), N(x[:im](), prec))))
+        r, i = ex[:re](), ex[:im]()
+        u, v = promote(N(r, prec), N(i, prec))
+        return(Complex(u, v))
     end
+    
     throw(DomainError())
 end
 
