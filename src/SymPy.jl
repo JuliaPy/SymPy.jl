@@ -120,6 +120,7 @@ include("plot.jl")
 
 for meth in union(core_sympy_methods,
                   simplify_sympy_meths,
+                  expand_sympy_meths,
                   functions_sympy_methods,
                   series_sympy_meths,
                   integrals_sympy_methods,
@@ -138,7 +139,8 @@ end
 for meth in union(core_object_methods,
                   integrals_instance_methods,
                   summations_instance_methods,
-                  polynomial_instance_methods)
+                  polynomial_instance_methods
+                  )
 
     meth_name = string(meth)
     @eval ($meth)(ex::Sym, args...; kwargs...) = object_meth(ex, symbol($meth_name), args...; kwargs...)

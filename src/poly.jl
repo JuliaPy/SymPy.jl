@@ -82,12 +82,34 @@ for meth in polynomial_sympy_methods_import
     @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
 end
 
+## SymPy Poly class
+
+"""
+
+Constructor for polynomials. This allows certain polynomial-specifec
+methods to be called, such as `coeffs`. There is also `poly` that does
+the same thing. (We keep `Poly`, as it is named like a constructor.)
+
+Examples:
+```
+p = Poly(x^2 + 2x + 1)  #  a poly in x over Z
+coeffs(p)  # [1, 2, 1]
+p = Poly(a*x^2 + b*x + c, x)  # must specify variable that polynomial is over.
+coeffs(p)  ## [a,b,c]
+```
+
+"""
+Poly(x::Sym) = sympy.Poly(project(x))
+Poly(x::Sym, args...; kwargs...) = sympy.Poly(project(x), project(args)...; [(k,project(v)) for (k,v) in kwargs]...)
+export Poly
+
 ## Poly class methods that aren't sympy methods
 ## e.g., must be called as obj.method(...), but not method(obj, ...)       
 ## not coeffs(x^2 -1), rather poly(x^2 - 1)  |> coeffs
+## or poly(a*x^2 + b*x + c, x) |> coeffs to specify a specific variable
 polynomial_instance_methods = (:EC, :ET, :LC, :LM, :LT, :TC, ## no .abs()
                               :add_ground, 
-                               :all_coeffs,
+                              :all_coeffs,
                               :all_monoms, :all_roots, :all_terms, 
                               :as_dict, :as_expr, :as_list,
                               :clear_denoms,
@@ -111,7 +133,6 @@ polynomial_instance_methods = (:EC, :ET, :LC, :LM, :LT, :TC, ## no .abs()
                               :to_exact, :to_field, :to_ring, :total_degree,
                               :unify
                               )
-
 
 
 polynomial_predicates = (

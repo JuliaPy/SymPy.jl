@@ -17,7 +17,7 @@ core_object_methods = (:args, :as_poly, :atoms,
                        :as_ordered_terms, :as_powers_dicts, :as_real_imag,
                        :as_terms, 
                        :coeff, :compute_leading_term, :could_extract_minus_sign,
-                       :count_ops, :equals, :expand, :extract_additively,
+                       :count_ops, :equals,  :extract_additively,
                        :extract_branch_factor, :extract_multiplicatively,
                        :getO, :getn,
                        ## :is_integer called as x[:is_intgeger]
@@ -27,7 +27,7 @@ core_object_methods = (:args, :as_poly, :atoms,
                        :primitive, 
                        :removeO,
                        :series,
-                       :expand
+                       :expand, :expand_trig
                        )
 
 

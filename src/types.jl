@@ -15,7 +15,6 @@ immutable SymMatrix <: SymbolicObject
     x::PyCall.PyObject
 end
 
-
 ## Automatic conversion of python types to Sym class.
 basictype = sympy.basic["Basic"]
 pytype_mapping(basictype, Sym)

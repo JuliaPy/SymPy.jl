@@ -10,6 +10,13 @@ simplify_sympy_meths = (:collect, :rcollect, :separatevars,
                         :posify, :powdenest, :sqrtdenest,
                         :logcombine, :hyperexpand)
 
+expand_sympy_meths = (:expand_trig,
+                      :expand_power_base, :expand_power_exp,
+                      :expand_log,
+                      :expand_func,
+                      :hyperexpand
+                      )
+
 
 
 ## didn't do traversal tools, EPath tools
