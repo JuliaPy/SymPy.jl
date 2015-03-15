@@ -285,7 +285,7 @@ function N(ex::Sym)
     end
     throw(DomainError())
 end
-
+N(x::Number) = x
 """
 `N` can take a precision argument. 
 
@@ -332,7 +332,10 @@ x = Sym("x")
 evalf(x, subs=[x => 1/2])  # v0.3 syntax for anonymous dicts
 ```
 """
-evalf(x::Sym, args...; kwargs...) = x[:evalf](args...; kwargs...)
+
+function evalf(x::Sym, args...; kwargs...)
+    x[:evalf](args...; kwargs...)
+end
 
 for meth in (:separate, :flatten, 
              :igcd, :ilcm,

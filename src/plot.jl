@@ -215,6 +215,14 @@ Requires.@require PyPlot begin
         end
     end
 
+    function plot(exs::Array{Sym,1},a::Real,b::Real,n=250, args...; kwargs...)
+        xs = linspace(a,b,n)
+        fs = map(ex->convert(Function, ex), exs)
+        for i in 1:length(fs)
+            plot(xs, map(x->N(fs[i](x)),xs))
+        end
+    end
+
     ## Parametric plots use notation plot((ex1,ex2, [ex3]), t0, t1, args..., kwargs...)
     function plot(exs::(Sym...), t0::Real, t1::Real, args...; kwargs...)
         out = prepare_parametric(exs, t0, t1)
