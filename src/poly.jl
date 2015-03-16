@@ -69,7 +69,15 @@ polynomial_sympy_methods = (
                             :numer, :denom
 #                            :roots ## conflict with Roots.roots and functionality provided by solve
                             )
-                            
+
+""" 
+
+We make `polyroots`, not `roots`, as this conflicts with the `Roots` package.
+
+"""
+
+polyroots(ex::Sym, args...; kwargs...) = ex[:roots](args...;kwargs...)
+
 
 
 

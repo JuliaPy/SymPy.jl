@@ -117,7 +117,7 @@ end
 
 
 ## in julia, not SymPy
-cbrt(x::Sym) = PyCall.pyeval("x ** (1/3)", x=project(x)) 
+cbrt(x::Sym) = x^(1//3)
 Base.ceil(x::Sym) = ceiling(x)
 
 ## degree functions   

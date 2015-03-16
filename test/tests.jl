@@ -54,8 +54,7 @@ z = subs(x,x,1)
 expand((x + 1)*(x+2))
 x1 = (x + 1)*(x+2)
 expand(x1)
-
-
+expand_trig(sin(2x))
 
 
 ## limits

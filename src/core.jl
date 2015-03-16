@@ -27,7 +27,7 @@ core_object_methods = (:args, :as_poly, :atoms,
                        :primitive, 
                        :removeO,
                        :series,
-                       :expand, :expand_trig
+                       :expand
                        )
 
 

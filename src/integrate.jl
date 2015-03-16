@@ -1,7 +1,7 @@
 ## http://docs.sympy.org/0.7.2/modules/integrals/integrals.html
 
 
-integrals_sympy_methods = (:integrate,
+integrals_sympy_methods = (:integrate, :Integral,
                            :mellin_transform,
                            :inverse_mellin_transform,
                            :lapace_transform,
