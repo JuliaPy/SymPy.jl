@@ -92,7 +92,8 @@ export SymFunction, SymMatrix,
        summation,
        dsolve,
        poly,  nroots, real_roots, polyroots,
-       ∨, ∧, ¬
+       ∨, ∧, ¬,
+       rhs, lhs, args
 export relation, piecewise
 export members, doc, _str
 

@@ -1,3 +1,4 @@
+## XXX This needs to be partitioned .... XXX
 
 
 ## Imported math functions
@@ -80,14 +81,40 @@ for fn in (
     eval(Expr(:export, fn))
 end
 
-## in mpmath module
 
+## in julia, not SymPy
+cbrt(x::Sym) = x^(1//3)
+Base.ceil(x::Sym) = ceiling(x)
+
+## degree functions   
+for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
+          :acosd, :acotd, :acscd, :asecd, :asind, :atand)
+
+    rad_fn = string(fn)[1:end-1]
+    @eval ($fn)(x::Sym) = getfield(sympy, symbol($rad_fn))(project(x * Sym(sympy.pi)/180))
+    @eval ($fn)(a::Array{Sym}) = map($fn, a)
+end
+                                           
+
+
+## add
+abs(x::Sym) = sympy_meth(:Abs, x)
+abs(a::Array{Sym}) = map(abs, a)
+
+Base.isless(a::Real, b::Sym) = isless(a, convert(Float64, b))
+Base.isless(a::Sym, b::Real) = isless(b, a)
+Base.isfinite(x::Sym) = isfinite(convert(Float64, x))
+
+## in mpmath module
+## These are not right!!!
+## see hyper and meijerg to indicate what needs to be done for these special function
+## they really need to be coordinated with `Julia`'s as well.
 for fn in (:hyp0f1, 
            :hyp1f1, :hyp1f2, 
            :hyp2f0, :hyp2f1, :hyp2f2, :hyp2f3,
            :hyp3f2,
-           :hyper, :hypercomb,
-           :meijerg,
+           :hypercomb,
+#           :meijerg,
            :bihyper,
            :hyper2d,
            :appellf1, :appellf2, :appellf3, :appellf4,
@@ -113,31 +140,28 @@ for fn in (:hyp0f1,
            Sym(mpmath.((symbol($meth)))([project(x) for x in xs]...,[(k,project(v)) for (k,v) in kwargs]...))
     eval(Expr(:export, fn))
 end
-           
 
+## Hyper and friends don't really have symbolic use...
+"""
 
-## in julia, not SymPy
-cbrt(x::Sym) = x^(1//3)
-Base.ceil(x::Sym) = ceiling(x)
+Evaluates the generalized hypergeometric function:
+[hyper](http://docs.sympy.org/dev/modules/mpmath/functions/hypergeometric.html#hyper)
 
-## degree functions   
-for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
-          :acosd, :acotd, :acscd, :asecd, :asind, :atand)
+"""
+hyper{T<:Number, S<:Number}(as::Vector{T}, bs::Vector{S}, z::Number) = SymPy.sympy.hyper(map(project,as), map(project,bs), project(z))
+export hyper
 
-    rad_fn = string(fn)[1:end-1]
-    @eval ($fn)(x::Sym) = getfield(sympy, symbol($rad_fn))(project(x * Sym(sympy.pi)/180))
-    @eval ($fn)(a::Array{Sym}) = map($fn, a)
+"""
+
+[docs](http://docs.sympy.org/dev/modules/mpmath/functions/hypergeometric.html#meijer-g-function)
+
+"""
+function meijerg{T<:Number, S<:Number}(a1s::Vector{T}, a2s::Vector{T}, b1s::Vector{S}, b2s::Vector{S}, z::Number, r=1;kwargs...)
+    as = [map(project,a1s), map(project,a2s)]
+    bs = [map(project,b1s), map(project,b2s)]
+    SymPy.sympy.meijerg(as, bs, project(z), r;  [(k,project(v)) for (k,v) in kwargs]...)
 end
-                                           
-
-
-## add
-abs(x::Sym) = sympy_meth(:Abs, x)
-abs(a::Array{Sym}) = map(abs, a)
-
-Base.isless(a::Real, b::Sym) = isless(a, convert(Float64, b))
-Base.isless(a::Sym, b::Real) = isless(b, a)
-Base.isfinite(x::Sym) = isfinite(convert(Float64, x))
+export meijerg
 
 ## Some sympy function interfaces
 
@@ -148,8 +172,8 @@ Base.isfinite(x::Sym) = isfinite(convert(Float64, x))
 
 
 """ 
-function subs{T <: SymbolicObject, S <: SymbolicObject}(ex::T, x::S, arg)
-    object_meth(ex, :subs, x, convert(Sym,arg))
+function subs{T <: SymbolicObject, S <: Union(String, Symbol, SymbolicObject)}(ex::T, x::S, arg)
+    object_meth(ex, :subs, Sym(x), convert(Sym,arg))
 end
 subs{T <: SymbolicObject, S <: SymbolicObject}(exs::Array{T}, x::S, arg) = map(ex->subs(ex, x, arg), exs)
 
@@ -393,10 +417,6 @@ fraction(args...; kwargs...) = sympy.fraction(project(args)...; kwargs...) |> os
 
 ## solve
 
-## DEPRECATED
-## Is this a good idea? I want to be able to solve equations with
-## solve(x^2 +x == x, x)
-##==(x::Sym, y::Sym) = solve(x - y)
 
 ## Handle ininf, and isnan by coercion to float
 Base.isinf(x::Sym) = try isinf(convert(Float64, x)) catch e false end
@@ -458,8 +478,8 @@ Note: The individual components of the array display more nicely than the array.
 Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html#algebraic-equations)
 
 """  
-function solve(ex::Sym, args...; kwargs...)
-    a = sympy.solve(project(ex), map(project, args)...; kwargs...)
+function solve(ex::Sym, args...;  kwargs...)
+    a = sympy.solve(project(ex), map(project, args)...;  kwargs...)
 
     ## Way too much work here to finesse into a nice enough output
     ## (Issue comes from solving without specifying variable when 2 or more variables in the expression
@@ -500,8 +520,8 @@ function solve(ex::Sym, args...; kwargs...)
 end
 
 
-function solve(exs::Vector{Sym}, args...; kwargs...)
-    ans = sympy.solve(map(project, exs),  args...; kwargs...) #  dictionary with keys, values as PyObjects
+function solve(exs::Vector{Sym}, args...; dict=true, kwargs...)
+    ans = sympy.solve(map(project, exs),  args...; dict=true, kwargs...) #  dictionary with keys, values as PyObjects
     tmp = map(get_free_symbols, exs)
     xs = shift!(tmp)
     for ss in tmp
@@ -515,8 +535,8 @@ function solve(exs::Vector{Sym}, args...; kwargs...)
     solve(exs, xs, args...; kwargs...)
 
 end
-function solve(exs::Vector{Sym}, xs::Vector{Sym}, args...; kwargs...)
-    ans = sympy.solve(map(project, exs), map(project, xs), args...; kwargs...) #  dictionary with keys, values as PyObjects
+function solve(exs::Vector{Sym}, xs::Vector{Sym}, args...; dict=true, kwargs...)
+    ans = sympy.solve(map(project, exs), map(project, xs), args...; dict=true, kwargs...) #  dictionary with keys, values as PyObjects
 
     function mapit(out) ## can be a tuple if m=n
         d = Dict{String, Sym}()

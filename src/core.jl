@@ -2,7 +2,7 @@
 
 
 
-core_object_methods = (:args, :as_poly, :atoms,
+core_object_methods = (:as_poly, :atoms,
                        :compare, :compare_pretty,
                        :count, :doit, :dummy_eq, 
                        :has, :match, ##:replace,
@@ -63,3 +63,14 @@ for meth in core_sympy_methods_base
     @eval ($meth)(ex::Sym, args...; kwargs...) = 
       sympy_meth(symbol($meth_name), ex, args...; kwargs...)
 end
+
+
+"""
+Extract left and right hand side of a relation, parts of an expression.
+
+[args](http://docs.sympy.org/dev/modules/core.html#sympy.core.basic.Basic.args)
+
+"""
+rhs(ex::Sym, args...; kwargs...) = ex[:rhs]
+lhs(ex::Sym, args...; kwargs...) = ex[:lhs]
+args(ex::Sym) = ex[:args]()
