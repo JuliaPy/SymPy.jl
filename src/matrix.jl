@@ -246,7 +246,7 @@ export jacobian
 ## f = x^2 - 2x*y
 ## hessian(f, [x,y])
 "Find Hessian of a symbolic expression"
-function hessian(f::Sym, x::Matrix{Sym})
+function hessian(f::Sym, x::Vector{Sym})
     out = sympy_meth(:hessian, f, x)
     convert(SymMatrix, out) |> u -> convert(Array{Sym}, u)
 end

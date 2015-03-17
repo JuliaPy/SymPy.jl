@@ -329,9 +329,12 @@ Requires.@require Gadfly begin
         end
     end
     parametricplot(f::Vector{Sym}, a::Real, b::Real, args...; kwargs...) = plot(tuple(f...), a, b, args...;kwargs...)
-
+    export parametricplot
+    
     function contour(ex::Sym, x1::Real,x2::Real, y1::Real, y2::Real, args...; kwargs...)
         f = convert(Function, ex)
         Gadfly.plot((x,y) -> convert(Float64, f(x,y)), x1, x2, y1, y2, args...; kwargs...)
     end
+
+    export parametricplot, contour
 end
