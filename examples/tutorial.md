@@ -4,7 +4,7 @@ This tutorial provides an introduction to using `SymPy` within `Julia`.
 It owes an enormous debt to the tutorial for using SymPy within Python which may be found
 [here](http://docs.sympy.org/dev/tutorial/index.html). The overall structure and many examples are taken from that work, with adjustments and additions to illustrate the differences due to using `SymPy` within `Julia`.
 
-This tutorial can be read as an `IJulia` notebook [here](http://nbviewer.ipython.org/github/jverzani/SymPy.jl/master/examples/tutorial.ipynb?create=1).
+This tutorial can be read as an `IJulia` notebook [here](http://nbviewer.ipython.org/github/jverzani/SymPy.jl/blob/master/examples/tutorial.ipynb).
 
 After installing `SymPy`, which is discussed in the packages `README` file, we must first load it into `Julia` with the standard command `using`:
 
@@ -1024,7 +1024,6 @@ limit(sn, n, oo)
 
 This would have also been possible through `Sum(1/i^2, (i, 1, oo))`.
 
-
 ### vector-valued functions
 
 Julia makes constructing a vector of symbolic objects easy:
@@ -1079,7 +1078,6 @@ parametricplot([cos(5x), sin(3x)], 0, 4pi)
 ```
 
 Surface plots of function $f(x,y) -> R$ can be rendered with `PyPlot`, through a call like `plot_surface(x^2 + y^2, -5, 5, -5, 5)`. 
-
 
 ## Matrices
 
