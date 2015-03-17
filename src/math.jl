@@ -520,8 +520,8 @@ function solve(ex::Sym, args...;  kwargs...)
 end
 
 
-function solve(exs::Vector{Sym}, args...; dict=true, kwargs...)
-    ans = sympy.solve(map(project, exs),  args...; dict=true, kwargs...) #  dictionary with keys, values as PyObjects
+function solve(exs::Vector{Sym}, args...; kwargs...)
+    ans = sympy.solve(map(project, exs),  args...; kwargs...) #  dictionary with keys, values as PyObjects
     tmp = map(get_free_symbols, exs)
     xs = shift!(tmp)
     for ss in tmp
@@ -535,8 +535,8 @@ function solve(exs::Vector{Sym}, args...; dict=true, kwargs...)
     solve(exs, xs, args...; kwargs...)
 
 end
-function solve(exs::Vector{Sym}, xs::Vector{Sym}, args...; dict=true, kwargs...)
-    ans = sympy.solve(map(project, exs), map(project, xs), args...; dict=true, kwargs...) #  dictionary with keys, values as PyObjects
+function solve(exs::Vector{Sym}, xs::Vector{Sym}, args...; kwargs...)
+    ans = sympy.solve(map(project, exs), map(project, xs), args...; kwargs...) #  dictionary with keys, values as PyObjects
 
     function mapit(out) ## can be a tuple if m=n
         d = Dict{String, Sym}()
