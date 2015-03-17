@@ -7,7 +7,11 @@ many features of `SymPy` from a `julia` session.
 
 This `SymPy` package provides a light interface for _some_ of the
 features of `SymPy` that makes working with `SymPy` objects a bit
-easier. The [tutorial](examples/tutorial.md) provides an overview.
+easier.
+
+The [tutorial](examples/tutorial.md) provides an overview. It is
+viewable as an `IJulia` notebook
+[here](http://nbviewer.ipython.org/github/jverzani/SymPy.jl/blob/master/examples/tutorial.ipynb).
 
 ### Installation
 

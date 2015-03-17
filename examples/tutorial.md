@@ -505,7 +505,10 @@ The `solve` function does not need to just solve `ex = 0`. There are other means
 solve(Eq(x, 1))
 ```
 
-Gives $1$, as expected from solving `x == 1`. In addition to `Eq`, there are `Lt`, `Le`, `Ge`, `Gt`. The Unicode operators are not aliased to these, but there are alternatives `\ll[tab]`, `\le[tab]`, `\Equal[tab]`, `\ge[tab]`, `\gg[tab]` and `\neg[tab]` to negate.
+Gives 1, as expected from solving `x == 1`. In addition to `Eq`, there
+are `Lt`, `Le`, `Ge`, `Gt`. The Unicode operators are not aliased to
+these, but there are alternatives `\ll[tab]`, `\le[tab]`,
+`\Equal[tab]`, `\ge[tab]`, `\gg[tab]` and `\neg[tab]` to negate.
 
 So, the above could have been written with the following nearly identical expression, though it is entered with `\Equal[tab]`. 
 
