@@ -15,12 +15,13 @@ viewable as an `IJulia` notebook
 
 ### Installation
 
-To use it, both `Python` and the `SymPy` package must be installed on
-your system. The `Anaconda` distribution is suggested, as it includes
-much more than `SymPy` that can be profitably accessed within `Julia`
-via `PyCall`. (Otherwise, install `Python` then download the `sympy`
-library from http://code.google.com/p/sympy/downloads/list and
-install.)
+To use this package, both `Python` and its `SymPy` library must be
+installed on your system. The `Anaconda` distribution is suggested, as
+it provides a single installation of `Python` that includes `SymPy`
+and many other scientifice libraries that can be profitably accessed
+within `Julia` via `PyCall`. (Otherwise, install `Python` then
+download the `sympy` library from
+http://code.google.com/p/sympy/downloads/list and install.)
 
 ## The `PyCall` interface to `SymPy`
 
@@ -60,9 +61,9 @@ This gets replaced by a more `julia`n syntax:
 
 ```
 using SymPy                     # some warnings need cleaning up
-x = Sym("x")		            # or  Sym(:x), symbols("x"), or (x,) = @syms x
+x = Sym("x")		            # or  Sym(:x), symbols("x"), (x,) = @syms x, or @vars x
 y = sin(pi*x)                    
-subs(y, x, 1) |> float
+N(subs(y, x, 1))
 ```
 
 The object `x` we create is of type `Sym`, a simple proxy for the

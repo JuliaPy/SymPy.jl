@@ -33,7 +33,7 @@ This creates a symbolic object `x`, which can be manipulated through further fun
 
 ### Assumptions
 
-With the `symbols` constructor, it is possible to pass assumptions for the variables. A list of possible ones is [here](http://docs.sympy.org/dev/modules/core.html#module-sympy.core.assumptions). Some examples are:
+With the `symbols` constructor, it is possible to pass assumptions onto the variables. A list of possible assumptions is [here](http://docs.sympy.org/dev/modules/core.html#module-sympy.core.assumptions). Some examples are:
 
 ```
 x = symbols("x", real=true)
@@ -57,7 +57,7 @@ solve(y1 + 1)    # -1 is not positive
 
 ### Special constants
 
-`Julia` has its math constants, like `pi` and `e`, `SymPy` as well. A few of these have `Julia` counterparts provided by `SymPy`. For example, these three constants are defined.
+`Julia` has its math constants, like `pi` and `e`, `SymPy` as well. A few of these have `Julia` counterparts provided by `SymPy`. For example, these three constants are defined (where `oo` is for infinity):
 
 ```
 PI, E, oo
@@ -110,7 +110,13 @@ ex |> replace(y, pi)
 
 ## Conversion from symbolic to numeric
 
-SymPy provides two identical means to convert a symbolic math expression to a number. One is `evalf`, the other `N`. Within `Julia` we decouple this, using `N` to convert to a `Julian` value and `evalf` to leave the conversion as a symbolic object.  The `N` function converts symbolic integers, rationals, irrationals, and complex values, while attempting to find an appropriate `Julia` type for the value.
+SymPy provides two identical means to convert a symbolic math
+expression to a number. One is `evalf`, the other `N`. Within `Julia`
+we decouple this, using `N` to also convert to a `Julian` value and
+`evalf` to leave the conversion as a symbolic object.  The `N`
+function converts symbolic integers, rationals, irrationals, and
+complex values, while attempting to find an appropriate `Julia` type
+for the value.
 
 To see the difference, we use both on `PI`:
 
@@ -130,7 +136,7 @@ Both allow for a precision argument to be passed through the second argument. Th
 N(PI, 30)
 ```
 
-This produces a `BigFloat` with a precision to match (basically) the specified number of digits. Where as
+Here `N` produces a `BigFloat` with a precision to match (basically) the specified number of digits. Whereas
 
 ```
 evalf(PI, 30)
@@ -145,7 +151,7 @@ leaves the value as a symbolic object with 30 digits of accuracy.
 
 ## algebraic expressions
 
-`SymPy` overloads many of `Julia`'s functions to work with symbolic objects, such as seen with `asin` above. The usual mathematical operations such as `+`, `*`, `-`, `/` etc. work through `Julia`'s promotion mechanism, where numbers are promoted to symbolic objects, others dispatch internally to related `SymPy` functions.
+`SymPy` overloads many of `Julia`'s functions to work with symbolic objects, such as seen above with `asin`. The usual mathematical operations such as `+`, `*`, `-`, `/` etc. work through `Julia`'s promotion mechanism, where numbers are promoted to symbolic objects, others dispatch internally to related `SymPy` functions.
 
 In most all  cases, thinking about this distinction between numbers and symbolic numbers is unnecessary, as numeric values passed to `SymPy` functions are typically promoted to symbolic expressions. This conversion will take math constants to their corresponding `SymPy` counterpart, rational expressions to rational expressions, and floating point values to floating point values. However there are edge cases. An expression like `1//2 * pi * x` will differ from the seemingly identical  `1//2 * (pi * x)`. The former will produce a floating point value from `1//2 * pi` before being promoted to a symbolic instance. Using the symbolic value `PI` makes this expression work either way.
 
@@ -217,7 +223,9 @@ expand((x + 1)*(x - 2) - (x - 1)*x)
 ```
 
 
-These methods are not restricted to polynomial expressions and will work with other. For example, `factor` identifies this as a factorable object in terms of the variable `exp(x)`:
+These methods are not restricted to polynomial expressions and will
+work with other expressions. For example, `factor` identifies the
+following as a factorable object in terms of the variable `exp(x)`:
 
 ```
 factor(exp(2x) + 3exp(x) + 2)
@@ -251,7 +259,7 @@ bottom = (x-1)*(x-4)
 top/bottom
 ```
 
-(This might make math faculty a bit upset but is in line with student thinking.)
+(This might make math faculty a bit upset, but it is in line with student thinking.)
 
 However, expanded terms are not factored, then canceled:
 
@@ -273,7 +281,7 @@ The SymPy [tutorial](http://docs.sympy.org/dev/tutorial/simplification.html#powe
 
 * $x^a y^a=(xy)^a$ is only true with assumptions, such as $x,y \geq 0$ and $a$ is real, but not in general. For example, $x=y=-1$ and $a=1/2$ has $x^a \cdot y^a = i \cdot i =  -1$, where as $(xy)^a = 1$.
 
-* $(x^a)^b = x^(ab)$ is only true with assumptions. For example $x=-1, a=2$, and $b=1/2$ gives $(x^a)^b = 1^{1/2} = 1$, whereas $x^(ab) = -1^1 = -1$.
+* $(x^a)^b = x^{ab}$ is only true with assumptions. For example $x=-1, a=2$, and $b=1/2$ gives $(x^a)^b = 1^{1/2} = 1$, whereas $x^{ab} = -1^1 = -1$.
 
 
 We see that with assumptions, the expression does simplify to $0$:
@@ -337,7 +345,7 @@ p = a*x^2 + b*x + c
 The `coeff(ex, monom)` function will return the corresponding coefficient of the monomial:
 
 ```
-coeff(p, x^2)
+coeff(p, x^2) # a 
 coeff(p, x)   # b
 ```
 
@@ -378,7 +386,7 @@ For a *univariate* polynomial expression (a single variable), the real roots, wh
 real_roots(x^2 - 2)
 ```
 
-Unlike `factor` -- which only factors over rational factors -- `real_roots` finds the two irrational roots here. It is well known (the [Abel-Ruffini theorem]()) that for degree 5 polynomials, or higher, it is not always possible to express the roots in terms of radicals. However, when the roots are rational `SymPy` can have success:
+Unlike `factor` -- which only factors over rational factors -- `real_roots` finds the two irrational roots here. It is well known (the [Abel-Ruffini theorem](http://en.wikipedia.org/wiki/Abel%E2%80%93Ruffini_theorem)) that for degree 5 polynomials, or higher, it is not always possible to express the roots in terms of radicals. However, when the roots are rational `SymPy` can have success:
 
 
 ```
@@ -386,13 +394,20 @@ p = (x-3)^2*(x-2)*(x-1)*x*(x+1)*(x^2 + x + 1)
 real_roots(p)
 ```
 
-In this example, the degree of `p` is 8, but there are only 5 real roots returned, the double root  of  $3$ not being accounted for nor the two complex roots of `x^2 + x+ 1`. The actual roots can be found with `solve`:
+In this example, the degree of `p` is 8, but there are only 6 real
+roots returned, the double root of $3$ is accounted for, but the two
+complex roots of `x^2 + x+ 1` are not. The actual roots can be found
+with `solve`:
 
 ```
 solve(p)
 ```
 
-This finds the complex roots, but does not account for the double roots. The `roots` function of SymPy does. This particular function is not exported (as it conflicts with the `roots` function from `Polynomials` and `Roots`) but we can still access it using indexing notation or its alias `polyroots`.
+This finds the complex roots, but does not account for the double
+root. The `roots` function of SymPy does. This particular function is
+not exported (as it conflicts with the `roots` function from
+`Polynomials` and `Roots`) but we can still access it using indexing
+notation or its alias `polyroots`.
 
 > Indexing with a symbol. When a symbolic expression is indexed by a symbol it returns a function which maps to a corresponding SymPy function. For example, `p[:roots](args...)` will call `roots(p, args...)` within SymPy. For methods of SymPy objects, the same is true, so if `roots` were a class method, then the call would resolve to `p.roots(args...)`.
 
@@ -632,7 +647,11 @@ limit(f, 0)
 
 #### numeric limits
 
-The `limit` function use the [Gruntz](http://docs.sympy.org/latest/modules/series.html#the-gruntz-algorithm) algorithm. It is far more reliable then simple numeric attempts at integration. An example of Gruntz is the limit at $0+$ of the function:
+The `limit` function uses the
+[Gruntz](http://docs.sympy.org/latest/modules/series.html#the-gruntz-algorithm)
+algorithm. It is far more reliable then simple numeric attempts at
+integration. An example of Gruntz is the right limit at $0$ of the
+function:
 
 ```
 f(x) = 1/x^(log(log(log(log(1/x)))) - 1)
@@ -646,7 +665,7 @@ ys = [f(h) for h in hs]
 [hs ys]
 ```
 
-With a limit seeming approaching $0$, but in fact it heads off to $\infty$:
+With a values appearing to approach $0$. However, in fact these values will ultimately head  off to $\infty$:
 
 ```
 limit(f(x), x, 0, dir="+")
@@ -692,7 +711,7 @@ diff(f(x), x) |> solve
 
 #### Operator version
 
-`SymPy` provides an "operator" version of `diff` for univariate functions for convenience (`diff(f,k=1)=diff(f(x),x,k)`):
+`SymPy` provides an "operator" version of `diff` for univariate functions for convenience (`diff(f::Function,k=1)=diff(f(x),x,k)`):
 
 ```
 f(x) = exp(x)*cos(x)
@@ -701,7 +720,7 @@ diff(f, 2)
 
 #### Partial derivatives
 
-Finding partial derivatives is easy. For example, this computes the mixed partials of an expression in `x` and `y`:
+The `diff` function makes finding partial derivatives as easy as specifying the variable to differentiate in. This  example computes the mixed partials of an expression in `x` and `y`:
 
 ```
 x,y = symbols("x,y")
@@ -727,7 +746,8 @@ doit(ex)
 
 #### Implicit derivatives
 
-SymPy can be used to find derivatives of implicitly defined functions. For example, the task of finding $dy/dx$ for the equations
+SymPy can be used to find derivatives of implicitly defined
+functions. For example, the task of finding $dy/dx$ for the equation:
 
 $$
 y^4 - x^4 -y^2 + 2x^2 = 0
@@ -785,7 +805,12 @@ Finally, we substitute back into the solution for $F(x)$:
 ex4 = subs(ex3, F(x), y)
 ```
 
-To visualize this, SymPy's `plot_implicit` function could be used. This requires `PyPlot` to be the graphing package, but we are using `Gadfly`. (The `PyPlot` call is just `plot_implicit(Eq(ex, 0))`). We use the `ImplicitEquations` package which provides a similar means to plot implicit equations within `Gadfly`, though we need to create functions from our symbolic expressions.
+To visualize this, SymPy's `plot_implicit` function could be
+used. This requires `PyPlot` to be the graphing package, but we are
+using `Gadfly`. (The `PyPlot` call is just `plot_implicit(Eq(ex,
+0))`). We use the `ImplicitEquations` package which provides a similar
+means to plot implicit equations within `Gadfly`, though we need to
+create functions and not use our symbolic expressions.
 
 
 ```
@@ -807,7 +832,10 @@ ImplicitEquations.ggraph((f==0) | (g==0))  # ugly default colors...
 
 ###### Example: A Norman Window
 
-A [Norman window](http://en.wiktionary.org/wiki/Norman_window) is in the shape of a rectangle with a half circle atop. Maximize the area if the perimeter is fixed to be $P$.
+A classic calculus problem is to maximize the area of a
+[Norman window](http://en.wiktionary.org/wiki/Norman_window) (in the
+shape of a rectangle with a half circle atop) when the perimeter is
+fixed to be $P \geq 0$.
 
 
 Label the rectangle as $w$ and $h$ and then the half circle has radius $r=w/2$. With this, we can see that the area is $wh+(1/2)\pi r^2$ and the perimeter is $w + 2h + \pi r$. This gives:
@@ -815,19 +843,25 @@ Label the rectangle as $w$ and $h$ and then the half circle has radius $r=w/2$. 
 ```
 w, h, P = symbols("w, h, P", nonnegative=true)
 r = w/2
-A = w*h + (1//2)* r^2 * pi
+A = w*h + 1//2 * (pi * r^2)
 p = w + 2h + pi*r
 ```
 
-(There is a subtlety above, as `(1//2)*pi*r^2` will not work as expected, as the products will be done left to right, and `(1//2)*pi` will be converted to floating point before multiplying `r^2`, as such we rewrite the terms. It would be easier to use `PI` instead of `pi`.)
+(There is a subtlety above, as `1//2*pi*r^2` will not work as
+expected, as the products will be done left to right, and `1//2*pi`
+will be converted to floating point before multiplying `r^2`, as such
+we rewrite the terms. It may be easier to use `PI` instead of `pi`.)
 
-We want to solve for `h` from when `p=P` (our fixed value) and substitute back into `A`. We solve `P-p`, as `solve` finds zeros:
+We want to solve for `h` from when `p=P` (our fixed value) and
+substitute back into `A`. We solve `P-p==0`:
 
 ```
 A1 = subs(A, h, solve(P-p, h)[1])
 ```
 
-Now we note this is a parabola in `w`, so any maximum will be an endpoint or the vertex, provided the leading term is negative. To see the leading term we could do this:
+Now we note this is a parabola in `w`, so any maximum will be an
+endpoint or the vertex, provided the leading term is negative. To see
+the leading term we could do this:
 
 ```
 coeffs(Poly(A1, w))
@@ -839,10 +873,10 @@ Or without using the `Poly` methods, we could do this:
 coeff(collect(expand(A1), w), w^2)
 ```
 
-Either way, we see the leading coefficient is negative, so the maximum can only happen at an endpoint or the vertex of the parabola. Now we check that when $w=0$ (the left endpoint) the area is $0$:
+Either way, we see the leading coefficient, $-1/2 - \pi/8$, is negative, so the maximum can only happen at an endpoint or the vertex of the parabola. Now we check that when $w=0$ (the left endpoint) the area is $0$:
 
 ```
-subs(A1, w, 0), subs(A1, w, P/10)
+subs(A1, w, 0)
 ```
 
 The other endpoint is when $h=0$, or
@@ -932,14 +966,14 @@ integrate(f(x), x)
 
 The `integrate` function uses a tuple, `(var, a, b)`, to specify the limits of a definite integral. This syntax lends itself readily to multiple integration.
 
-For example, this computes the integral of $xy$ over the unit square:
+For example, the following computes the integral of $xy$ over the unit square:
 
 ```
 x, y = symbols("x,y")
 integrate(x*y, (y, 0, 1), (x, 0, 1))
 ```
 
-The innermost terms can depend on outer ones. For example, this integrates $x^2y$ over the upper half of the unit circle:
+The innermost terms can depend on outer ones. For example, the following integrates $x^2y$ over the upper half of the unit circle:
 
 ```
 integrate(x^2*y, (y, 0, sqrt(1 - x^2)), (x, -1, 1))
@@ -1074,17 +1108,21 @@ hessian(ex)
 
 Some of the standard plots for working with vector-valued function or multivariate functions are available within `SymPy`. The support varies depending on the underlying plotting package, with `PyPlot` generally having more features.
 
-Parametric plots of vector expression is supported. With `PyPlot`, the output can be 2 or 3D, but with Gadfly, just 2D. Here we illustrate:
+Parametric plots of vector expressions are supported. With `PyPlot`, the output can be 2 or 3D, but with Gadfly, just 2D. Here we illustrate:
 
 ```
 parametricplot([cos(5x), sin(3x)], 0, 4pi)
 ```
 
-Surface plots of function $f(x,y) -> R$ can be rendered with `PyPlot`, through a call like `plot_surface(x^2 + y^2, -5, 5, -5, 5)`. 
+Surface plots of function $f(x,y) \rightarrow R$ can be rendered with `PyPlot`, through a call like `plot_surface(x^2 + y^2, -5, 5, -5, 5)`. 
 
 ## Matrices
 
-SymPy has a special class to work with matrices, as does `Julia`. With `SymPy`, matrices are just `Julia`n matrices with symbolic entries. The conversion to matrices that SymPy knows about is primarily handled in the background, though if need be `convert(SymMatrix, M)` can be used.
+SymPy has a special class to work with matrices, as does `Julia`. With
+`SymPy`, matrices are just `Julia`n matrices with symbolic
+entries. The conversion to matrices that SymPy knows about is
+primarily handled in the background, though, if need be,
+`convert(SymMatrix, M)` can be used.
 
 Constructing matrices then follows `Julia`'s conventions:
 
@@ -1141,7 +1179,7 @@ F = symbols("F", cls=SymFunction)
 With this, we can  construct a  differential equation. Following the SymPy tutorial, we solve $f''(x) - 2f'(x) + f(x) = \sin(x)$:
 
 ```
-diffeq = Eq(diff(F(x), x, 2) - 2*diff(F(x)) + F(x) , sin(x))
+diffeq = Eq(diff(F(x), x, 2) - 2*diff(F(x)) + F(x), sin(x))
 ```
 
 
