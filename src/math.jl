@@ -168,9 +168,19 @@ export meijerg
 ## subs
 """
 
-`subs` is used to subsitute a value in an expression with another value. The `replace` function is also overrided to do this task.
+`subs` is used to subsitute a value in an expression with another
+value. The `replace` function is also overrided to do this task.
 
-
+Examples:
+```
+x,y = symbols("x,y")
+ex = (x-y)*(x+2y)
+subs(ex, y, y^2)
+subs(ex, y, 3)
+subs(ex, :y, pi)
+ex |> subs(:x, e)
+subs(ex, (x,1), (y,2))
+```
 """ 
 function subs{T <: SymbolicObject, S <: Union(String, Symbol, SymbolicObject)}(ex::T, x::S, arg)
     object_meth(ex, :subs, Sym(x), convert(Sym,arg))
@@ -178,14 +188,14 @@ end
 subs{T <: SymbolicObject, S <: SymbolicObject}(exs::Array{T}, x::S, arg) = map(ex->subs(ex, x, arg), exs)
 
 ## curried version to use with |>
-subs(x::SymbolicObject, y) = ex -> subs(ex, x, y)
+subs(x::Union(String, Symbol, SymbolicObject), y) = ex -> subs(ex, x, y)
 
 """
 
 Substitute multiple values at once with `subs(ex, (var1, val1), (var2, val2), ...)`
 
 """
-function subs(ex::SymbolicObject, x::(SymbolicObject, Any), args...)
+function subs(ex::SymbolicObject, x::(Union(String, Symbol, SymbolicObject), Any), args...)
     ex = subs(ex, x[1], x[2])
     if length(args) > 0
         subs(ex, args...)

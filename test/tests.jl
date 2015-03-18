@@ -267,6 +267,13 @@ q,r = polydiv(f1,g1, domain="QQ") # not div, as can't disambiguate div(Sym(7), 5
 @test r == Sym(-2)
 @test simplify(q*g1 + r - f1) == Sym(0)
 
+## ODEs
+x, a = Sym("x, a")
+F = symbols("F", cls=SymFunction)
+ex = Eq(diff(F(x),x), a*F(x))
+ex1 = dsolve(ex, F(x))
+ex2 = rhs(ex1) |> subs(Sym(:C1), 1) |> subs(a, 2)
+@assert ex2 == exp(2x)
 
 ## piecewise
 x = Sym("x")
@@ -279,6 +286,14 @@ p = piecewise((x, x ≥ 0), (0, x ≪ 0), (1, x ⩵ 0))
 
 ## More logical expressions
 (x ≪ 0) ∧ (x*y ≤ 1) ∨ (x ⩵ y) ∧ (¬(x ≫ 3))
+
+
+## relations
+x,y=symbols("x, y")
+ex = Eq(x^2, x)
+@assert lhs(ex) == x^2
+@assert rhs(ex) == x
+@assert args(ex) == (x^2, x)
 
 ## mpmath functions
 x = Sym("x")

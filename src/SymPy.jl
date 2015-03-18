@@ -1,15 +1,24 @@
 module SymPy
 
-## SymPy package to interface with Python's [SymPy package](http://www.sympy.org) through `PyCall`
-##
-## The basic idea is that a new type `Sym` is made to hold symbolic objects.
-##
-## For this type, the basic operators and appropriate functions of `Julia` are overloaded for `Sym` objects.
-##
-## As well, many -- but not all -- of the SymPy functions are ported
-## to allow them to be called on `Sym` objects. For documentation, one
-## should refer to [SymPy's
-## website](http://docs.sympy.org/latest/index.html).
+
+"""
+SymPy package to interface with Python's [SymPy package](http://www.sympy.org) through `PyCall`.
+
+The basic idea is that a new type `Sym` is made to hold symbolic
+objects.  For this type, the basic operators and appropriate functions
+of `Julia` are overloaded for `Sym` objects so that the expressions
+are treated symbolically and not evaluated immediately.
+
+As well, many -- but not all -- of the SymPy functions are ported to
+allow them to be called on `Sym` objects. Mostly these are implemented
+through metaprogramming, so adding missing functions is not hard.
+
+For documentation on SymPy functions, one should refer to 
+SymPy's [website](http://docs.sympy.org/latest/index.html).
+
+The package tutorial provides many examples.
+"""
+SymPy
 
 
 
