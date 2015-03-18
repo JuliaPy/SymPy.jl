@@ -63,19 +63,26 @@ This gets replaced by a more `julia`n syntax:
 using SymPy                     # some warnings need cleaning up
 x = Sym("x")		            # or  Sym(:x), symbols("x"), (x,) = @syms x, or @vars x
 y = sin(pi*x)                    
-N(subs(y, x, 1))
+N(subs(y, x, 1))                # substitute for 1 then convert from symbolic to numeric value
 ```
 
 The object `x` we create is of type `Sym`, a simple proxy for the
 underlying `PyObject`. We then overload the familiar math functions so
-that working with symbolic expressions can use natural `julia` idioms.
+that working with symbolic expressions can use natural `julia`
+idioms. The `N` function is used to convert a symbolic numeric
+expression into a numeric value within `Julia`.
 
-However, the `PyCall` interface is needed for serious work, as only a
-small portion of the `SymPy` interface is exposed.  To dig the
-`PyObject` out of a `Sym` object, you access its property `x`, as in
-`y.x`. This is useful if passing a `Sym` object to a method call,
-though `getindex` is overridden for `Sym` objects and symbol indices
-to call the method.
+However, for some tasks the `PyCall` interface is still needed, as
+only a portion of the `SymPy` interface is exposed. To call an
+underlying SymPy method, the `getindex` method is overloaded for
+`symbol` indices so that `ex[:meth_name](...)` dispatches to either to
+SymPy's `ex.meth_name(...)` or `meth_name(ex, ...)`, as possible. Any
+`Sym` objects are projected down onto the underlying `PyObject` for
+use within `PyCall`. Otherwise, to dig the `PyObject` out of a `Sym`
+object, you access its property `x`, as in `y.x`. To find a SymPy
+method, a call like `sympy.meth_name(...)` is possible,
+e.g. `sympy.harmonic(10)`. Any `Sym`-type arguments must be projected
+into `PyObject`s or an error will be thrown.
 
 ## Notes
 
