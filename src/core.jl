@@ -20,7 +20,7 @@ core_object_methods = (:as_poly, :atoms,
                        :count_ops, :equals,  :extract_additively,
                        :extract_branch_factor, :extract_multiplicatively,
                        :getO, :getn,
-                       ## :is_integer called as x[:is_intgeger]
+                       ## :is_integer called as x[:is_integer]
                        :is_constant, :is_polynomial, :is_rational_function,
                        :integer_nthroot,
                        :leadterm, 
@@ -39,7 +39,7 @@ core_object_properties = (:assumptions0,
                           )
 
 
-
+## From relational
 core_sympy_methods = (:Wild, :Dummy,
                       :Mod, :Rel, 
                       :Eq, :Ne, :Lt, :Le, :Gt, :Ge, 
@@ -51,6 +51,36 @@ core_sympy_methods = (:Wild, :Dummy,
                       :igcd, :ilcm
                       )
 
+"""
+Extract left and right hand side of a relation, parts of a relation.
+
+
+(These are properties in SymPy, functions in SymPy.jl)
+
+Examples:
+```
+x = Sym("x")
+Eq(x, sin(x)) |> rhs  ## sin(x)
+```
+"""
+rhs(ex::Sym, args...; kwargs...) = ex[:rhs]
+lhs(ex::Sym, args...; kwargs...) = ex[:lhs]
+
+"""
+
+Returns a tuple of arguments 
+
+cf. [args](http://docs.sympy.org/latest/modules/core.html#sympy.core.basic.Basic.args)
+
+(args is a property in SymPy, a function call in SymPy.jl.)
+
+Examples
+```
+Eq(x, x^2) |> args ## (x, x^2)
+sin(x) |> args ## (x,)
+```
+"""
+args(ex::Sym) = ex[:args]
 
 
 ## need to import these
@@ -63,14 +93,3 @@ for meth in core_sympy_methods_base
     @eval ($meth)(ex::Sym, args...; kwargs...) = 
       sympy_meth(symbol($meth_name), ex, args...; kwargs...)
 end
-
-
-"""
-Extract left and right hand side of a relation, parts of an expression.
-
-[args](http://docs.sympy.org/dev/modules/core.html#sympy.core.basic.Basic.args)
-
-"""
-rhs(ex::Sym, args...; kwargs...) = ex[:rhs]
-lhs(ex::Sym, args...; kwargs...) = ex[:lhs]
-args(ex::Sym) = ex[:args]()
