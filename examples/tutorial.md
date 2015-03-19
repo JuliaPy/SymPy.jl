@@ -6,7 +6,9 @@ It owes an enormous debt to the tutorial for using SymPy within Python which may
 
 This tutorial can be read as an `IJulia` notebook [here](http://nbviewer.ipython.org/github/jverzani/SymPy.jl/blob/master/examples/tutorial.ipynb).
 
-After installing `SymPy`, which is discussed in the packages `README` file, we must first load it into `Julia` with the standard command `using`:
+After installing `SymPy`, which is discussed in the package's `README`
+file, we must first load it into `Julia` with the standard command
+`using`:
 
 
 ```
@@ -27,21 +29,31 @@ x = Sym("x")
 
 This creates a symbolic object `x`, which can be manipulated through further function calls.
 
-> The @vars macro. For the common case where we wish to create symbolic variables in the *main workspace*, the `@vars` macro is useful. It uses the minimal amount of typing to construct new variables. For example, the command `@vars a b c` creates three variables `a`, `b`, and `c`. The values need not be assigned (and shouldn't be), as the macro automatically does this. (If assigning into the main workspace is not desirable, the related `@syms` macro is available to reduce typing.)
 
+There are two macros that make creating multiple variables a bit less typing. The `@vars` macro will create variables in the *Main workspace*, so no assignment is necessary. The `@syms` macro will return newly defined symbolic variables. As these are macros, the arguments need not be separated by commas.
+
+```
+@vars a b c
+a,b,c = @syms a,b,c
+```
 
 
 ### Assumptions
 
-With the `symbols` constructor, it is possible to pass assumptions onto the variables. A list of possible assumptions is [here](http://docs.sympy.org/dev/modules/core.html#module-sympy.core.assumptions). Some examples are:
+Finally, there is the `symbols` constructor. With `symbols` it is
+possible to pass assumptions onto the variables. A list of possible
+assumptions is
+[here](http://docs.sympy.org/dev/modules/core.html#module-sympy.core.assumptions). Some
+examples are:
 
 ```
+u = symbols("u")
 x = symbols("x", real=true)
 y1, y2 = symbols("y1, y2", positive=true)
 alpha = symbols("alpha", integer=true, positive=true)
 ```
 
-As seen, the `symbols` function can be used to make one or more variables with one or more assumptions.
+As seen, the `symbols` function can be used to make one or more variables with zero, one or more assumptions.
 
 We jump ahead for a second to illustrate, but here we see that `solve` will respect these assumptions, by failing to find solutions to these equations:
 
@@ -64,10 +76,12 @@ PI, E, oo
 ```
 
 
-Numeric values themselves can be symbolic. This example shows the difference. The first dispatches to `Julia`'s `asin` function, the second to `SymPy`'s:
+Numeric values themselves can be symbolic. This example shows the
+difference. The first `asin` call dispatches to `Julia`'s `asin`
+function, the second to `SymPy`'s:
 
 ```
-asin(1) , asin(Sym(1))
+asin(1), asin(Sym(1))
 ```
 
 ## Substitution
@@ -144,10 +158,7 @@ evalf(PI, 30)
 
 leaves the value as a symbolic object with 30 digits of accuracy.
 
-
-
-
-
+Explicit conversion via `convert(T, ex)` can also be done.
 
 ## algebraic expressions
 
@@ -155,7 +166,14 @@ leaves the value as a symbolic object with 30 digits of accuracy.
 
 In most all  cases, thinking about this distinction between numbers and symbolic numbers is unnecessary, as numeric values passed to `SymPy` functions are typically promoted to symbolic expressions. This conversion will take math constants to their corresponding `SymPy` counterpart, rational expressions to rational expressions, and floating point values to floating point values. However there are edge cases. An expression like `1//2 * pi * x` will differ from the seemingly identical  `1//2 * (pi * x)`. The former will produce a floating point value from `1//2 * pi` before being promoted to a symbolic instance. Using the symbolic value `PI` makes this expression work either way.
 
-Most of `Julia`'s [mathematical](http://julia.readthedocs.org/en/latest/manual/mathematical-operations/#elementary-functions) functions are overloaded to work with symbolic expressions. `Julia`'s generic definitions are used, as possible. This also introduces some edge cases. For example, `x^(-2)` will balk due to the negative, integer exponent, but either `x^(-2//1)` or `x^Sym(-2)` will work as expected, as the former call first dispatches to a generic defintion, but the latter expressions two do not.
+Most of `Julia`'s
+[mathematical](http://julia.readthedocs.org/en/latest/manual/mathematical-operations/#elementary-functions)
+functions are overloaded to work with symbolic expressions. `Julia`'s
+generic definitions are used, as possible. This also introduces some
+edge cases. For example, `x^(-2)` will balk due to the negative,
+integer exponent, but either `x^(-2//1)` or `x^Sym(-2)` will work as
+expected, as the former call first dispatches to a generic defintion,
+but the two latter expressions do not.
 
 
 `SymPy` makes it very easy to work with polynomial and rational expressions. First we create some variables:
@@ -233,25 +251,27 @@ factor(exp(2x) + 3exp(x) + 2)
 
 ## Rational expressions: apart, together, cancel
 
-When working with rational expressions, SymPy does not do much simplification unless asked. For example:
+When working with rational expressions, SymPy does not do much
+simplification unless asked. For example this expression is not
+simplified:
 
 ```
 r = 1/x + 1/x^2
 ```
 
-is not simplified. To put over a common denominator, the `together` function is available:
+To put the terms of `r` over a common denominator, the `together` function is available:
 
 ```
 together(r)
 ```
 
-The `apart` function does the reverse, creating a partial fraction decomposition:
+The `apart` function does the reverse, creating a partial fraction decomposition from a ratio of polynomials:
 
 ```
 apart( (4x^3 + 21x^2 + 10x + 12) /  (x^4 + 5x^3 + 5x^2 + 4x))
 ```
 
-Some times factors are canceled, as here:
+Some times SymPy will cancel factors, as here:
 
 ```
 top = (x-1)*(x-2)*(x-3)
@@ -261,13 +281,15 @@ top/bottom
 
 (This might make math faculty a bit upset, but it is in line with student thinking.)
 
-However, expanded terms are not factored, then canceled:
+However, with expanded terms, the common factor of `(x-1)` is not cancelled:
 
 ```
 r = expand(top) / expand(bottom)
 ```
 
-The `cancel` function will do so. It takes rational functions and puts them in a canonical $p/q$ form with no common (rational) factors and leading terms which are integers:
+The `cancel` function instructs SymPy to perform cancellations. It
+takes rational functions and puts them in a canonical $p/q$ form with
+no common (rational) factors and leading terms which are integers:
 
 ```
 cancel(r)
@@ -284,7 +306,7 @@ The SymPy [tutorial](http://docs.sympy.org/dev/tutorial/simplification.html#powe
 * $(x^a)^b = x^{ab}$ is only true with assumptions. For example $x=-1, a=2$, and $b=1/2$ gives $(x^a)^b = 1^{1/2} = 1$, whereas $x^{ab} = -1^1 = -1$.
 
 
-We see that with assumptions, the expression does simplify to $0$:
+We see that with assumptions, the following expression does simplify to $0$:
 
 ```
 x,y = symbols("x,y", nonnegative=true)
@@ -299,7 +321,7 @@ x,y,a = symbols("x,y,a")
 simplify(x^a * y^a - (x*y)^a)
 ```
 
-The `simplify` function calls `powsimp` above. The `powsimp` function has the keyword argument `force=true` to force simplification even if assumptions are not specified:
+The `simplify` function calls `powsimp` to simplify powers, as above. The `powsimp` function has the keyword argument `force=true` to force simplification even if assumptions are not specified:
 
 ```
 powsimp(x^a * y^a - (x*y)^a, force=true)
@@ -320,7 +342,7 @@ Calling either `simplify` or `trigsimp` will apply the Pythagorean identity:
 simplify(p)
 ```
 
-The `trigsimp` formula is, of course, course aware of the double angle formulas:
+Students may forget, but the `trigsimp` function is, of course, course aware of the double angle formulas:
 
 ```
 simplify(sin(2theta) - 2sin(theta)*cos(theta))
@@ -378,15 +400,25 @@ coeffs(q)
 
 ## Polynomial roots: solve, real_roots, polyroots, nroots
 
-SymPy provides functions to find the roots of a polynomial. In general, a polynomial with real coefficients of degree $n$ will have $n$ roots when multiplicities and complex roots are accounted for. The number or real roots is consequently between $0$ and $n$.
+SymPy provides functions to find the roots of a polynomial. In
+general, a polynomial with real coefficients of degree $n$ will have
+$n$ roots when multiplicities and complex roots are accounted for. The
+number or real roots is consequently between $0$ and $n$.
 
-For a *univariate* polynomial expression (a single variable), the real roots, when available, are returned by `real_roots`. For example,
+For a *univariate* polynomial expression (a single variable), the real
+roots, when available, are returned by `real_roots`. For example,
 
 ```
 real_roots(x^2 - 2)
 ```
 
-Unlike `factor` -- which only factors over rational factors -- `real_roots` finds the two irrational roots here. It is well known (the [Abel-Ruffini theorem](http://en.wikipedia.org/wiki/Abel%E2%80%93Ruffini_theorem)) that for degree 5 polynomials, or higher, it is not always possible to express the roots in terms of radicals. However, when the roots are rational `SymPy` can have success:
+Unlike `factor` -- which only factors over rational factors --
+`real_roots` finds the two irrational roots here. It is well known
+(the
+[Abel-Ruffini theorem](http://en.wikipedia.org/wiki/Abel%E2%80%93Ruffini_theorem))
+that for degree 5 polynomials, or higher, it is not always possible to
+express the roots in terms of radicals. However, when the roots are
+rational `SymPy` can have success:
 
 
 ```
@@ -436,7 +468,9 @@ But in fact, `rts` contains lots of information. We can extract numeric values q
 [N(r) for r in rts]     # or map(N, rts)
 ```
 
-These are numeric approximations to irrational numbers. For such a task, the `nroots` function will also work, though with this the answers are still symbolic:
+These are numeric approximations to irrational values. For numeric
+approximations to polynomial roots, the `nroots` function is also
+provided, though with this call the answers are still symbolic:
 
 ```
 nroots(p)
@@ -462,7 +496,9 @@ solve(cos(x) - x)
 
 For such, a numeric method would be needed.
 
-Though it can't solve everything, the `solve` function can also solve equations of a more general type. For example, here it is used to derive the quadratic equation:
+Though it can't solve everything, the `solve` function can also solve
+equations of a more general type. For example, here it is used to
+derive the quadratic equation:
 
 ```
 a,b,c  = symbols("a,b,c", real=true)
@@ -470,13 +506,19 @@ p = a*x^2 + b*x + c
 solve(p, x)
 ```
 
-The extra argument `x` is passed to `solve` so that `solve` knows which variable to solve for. If not given, `solve` tries to find a solution with all the free variables, which in this case is not helpful:
+The extra argument `x` is passed to `solve` so that `solve` knows
+which variable to solve for. If not given, `solve` tries to find a
+solution with all the free variables, which in this case is not
+helpful:
 
 ```
 solve(p)
 ```
 
-Systems of equations can be solved as well. We specify them within a vector of expressions, `[ex1, ex2, ..., exn]` where a found solution is one where all the expressions are 0. For example, to solve this linear system: $2x + 3y = 6, 3x - 4y=12$, we have:
+Systems of equations can be solved as well. We specify them within a
+vector of expressions, `[ex1, ex2, ..., exn]` where a found solution
+is one where all the expressions are 0. For example, to solve this
+linear system: $2x + 3y = 6, 3x - 4y=12$, we have:
 
 ```
 x, y = symbols("x,y", real=true)
@@ -484,7 +526,10 @@ exs = [2x+3y-6, 3x-4y-12]
 d = solve(exs)
 ```
 
-Plugging the solutions into the equations to check is a bit cumbersome, as the keys of the dictionary that is returned are strings, but functions like `subs` prefer the variables. Here is one workaround:
+Plugging the solutions into the equations to check is a bit
+cumbersome, as the keys of the dictionary that is returned are
+strings, but functions like `subs` prefer the variables. Here is one
+workaround:
 
 ```
 vars = [x,y]
@@ -492,7 +537,10 @@ vals = [d[string(var)] for var in vars]
 [subs(ex, zip(vars, vals)...) for ex in exs]
 ```
 
-In the previous example, the system had two equations and two unknowns. When that is not the case, one can specify the variables to solve for as a vector. In this example, we find a quadratic polynomial that approximates $\cos(x)$ near $0$:
+In the previous example, the system had two equations and two
+unknowns. When that is not the case, one can specify the variables to
+solve for as a vector. In this example, we find a quadratic polynomial
+that approximates $\cos(x)$ near $0$:
 
 ```
 a,b,c,h = symbols("a,b,c,h", real=true)
@@ -502,7 +550,8 @@ exs = [fn(0*h)-subs(p,x,0), fn(h)-subs(p,x,h), fn(2h)-subs(p,x,2h)]
 d = solve(exs, [a,b,c])
 ```
 
-Again, a dictionary is returned. The polynomial itself can be found by substituting back in for `a`, `b`, and `c`:
+Again, a dictionary is returned. The polynomial itself can be found by
+substituting back in for `a`, `b`, and `c`:
 
 ```
 vars=[a,b,c]
@@ -511,6 +560,21 @@ quad_approx = subs(p, zip(vars, vals)...)
 ```
 
 (Taking the limit as $h$ goes to 0 produces the answer $1 - x^2/2$.)
+
+Finally, we show how to re-express the polynomial $a_2x^2 + a_1x + a_0$
+as $b_2(x-c)^2 + b_1(x-c) + b_0$ using `solve` (and not, say, an
+expansion theorem.)
+
+```
+n = 3
+x, c = symbols("x,c")
+as = Sym["a$i" for i in 0:(n-1)]
+bs = Sym["b$i" for i in 0:(n-1)]
+p = sum([as[i+1]*x^i for i in 0:(n-1)])
+q = sum([bs[i+1]*(x-c)^i for i in 0:(n-1)])
+solve(p-q, bs)
+```
+
 
 ### Solving using logical operators
 
@@ -559,11 +623,13 @@ plot([x, x^2, x^3, 0], -2,2)
 
 (The `0` is converted to a symbolic expression through `Julia`'s promotion rules.)
 
-Passing a tuple of two expressions, will produce a 2D, parametric plot:
+Passing a tuple of two expressions, will produce a 2D, parametric plot (as will `parametricplot`):
 
 ```
 plot((cos(2x), sin(3x)), 0, 2pi)
 ```
+
+(Pass `Gadfly`'s `Geom.line`  to connect the points. In general, the plotting functions in `SymPy` concentrate on setting up the data but leave the aesthetics to the underlying plotting package.)
 
 When  `PyPlot` is loaded, the `plot` method dispatches to `PyPlot`'s. (Only one of the plotting packages from `Gadfly`, `PyPlot`, or `Winston` should be loaded with `SymPy`.) In addition to plots as above, there is `plot_surface`, `contour`, `contour3D`, and `plot_implicit`.
 
@@ -571,7 +637,7 @@ When  `PyPlot` is loaded, the `plot` method dispatches to `PyPlot`'s. (Only one 
 
 ## Calculus
 
-`SymPy` has many of the basic operations of calculus provided through a handful of functions.
+`SymPy` has many of the basic operations of calculus provided through a relatively small handful of functions.
 
 ### limits
 
@@ -702,7 +768,16 @@ Or
 diff(exp(-x^2), x, 2)
 ```
 
-The output is a simple expression, so can be composed with other functions, such as `solve`. For example, here we find the critical points of a rational function:
+As an alternate to specifying the number of derivatives, multiple variables can be passed to `diff`:
+
+```
+diff(exp(-x^2), x, x, x)     # same as diff(..., x, 3)
+```
+
+This could include variables besides `x`.
+
+
+The output is a simple expression, so `diff` can be composed with other functions, such as `solve`. For example, here we find the critical points of a rational function:
 
 ```
 f(x) = (12x^2 - 1) / (x^3)
@@ -725,10 +800,10 @@ The `diff` function makes finding partial derivatives as easy as specifying the 
 ```
 x,y = symbols("x,y")
 ex = x^2*cos(y)
-Sym[diff(diff(ex,v1), v2) for v1 in [x,y], v2 in [x,y]]
+Sym[diff(ex,v1, v2) for v1 in [x,y], v2 in [x,y]]
 ```
 
-The key is the iterated use of `diff`. The extra `Sym`, of the form `T[]`, helps `Julia` resolve the type of the output.
+The extra `Sym`, of the form `T[]`, helps `Julia` resolve the type of the output.
 
 #### Unevaluated derivatives
 
@@ -838,7 +913,9 @@ shape of a rectangle with a half circle atop) when the perimeter is
 fixed to be $P \geq 0$.
 
 
-Label the rectangle as $w$ and $h$ and then the half circle has radius $r=w/2$. With this, we can see that the area is $wh+(1/2)\pi r^2$ and the perimeter is $w + 2h + \pi r$. This gives:
+Label the rectangle with $w$ and $h$ for width and height and then the
+half circle has radius $r=w/2$. With this, we can see that the area is
+$wh+(1/2)\pi r^2$ and the perimeter is $w + 2h + \pi r$. This gives:
 
 ```
 w, h, P = symbols("w, h, P", nonnegative=true)
@@ -860,8 +937,8 @@ A1 = subs(A, h, solve(P-p, h)[1])
 ```
 
 Now we note this is a parabola in `w`, so any maximum will be an
-endpoint or the vertex, provided the leading term is negative. To see
-the leading term we could do this:
+endpoint or the vertex, provided the leading term is negative. 
+The leading term can be found through:
 
 ```
 coeffs(Poly(A1, w))
@@ -873,7 +950,10 @@ Or without using the `Poly` methods, we could do this:
 coeff(collect(expand(A1), w), w^2)
 ```
 
-Either way, we see the leading coefficient, $-1/2 - \pi/8$, is negative, so the maximum can only happen at an endpoint or the vertex of the parabola. Now we check that when $w=0$ (the left endpoint) the area is $0$:
+Either way, the leading coefficient, $-1/2 - \pi/8$, is negative, so
+the maximum can only happen at an endpoint or the vertex of the
+parabola. Now we check that when $w=0$ (the left endpoint) the area is
+$0$:
 
 ```
 subs(A1, w, 0)
@@ -912,7 +992,7 @@ But after simplifying, we can see that this expression is positive if $P$ is:
 simplify(atc - atb)
 ```
 
-With this, we see that the maximum area happens at `c` with area `atc`.
+With this observation, we conclude the maximum area happens at `c` with area `atc`.
 
 ### integrals
 
@@ -1009,12 +1089,15 @@ integrate(sin, 0, pi)
 ### Taylor series
 
 The `series` function can compute series expansions around a point to a specified order. For example,
+the following command finds 4 terms of the series expansion os `exp(sin(x))` in `x` about $c=0$:
 
 ```
 s1 = series(exp(sin(x)), x, 0, 4)
 ```
 
-Finds 4 terms of the series expansion os `exp(sin(x))` in `x` about $c=0$. The coefficients are, of course, $a_i=f^{i}(c)/i!$. The [big "O"](http://en.wikipedia.org/wiki/Big_O_notation) term  indicates that any other power is no bigger than a constant times $x^4$.
+The coefficients are from the Taylor expansion ($a_i=f^{i}(c)/i!$). The
+[big "O"](http://en.wikipedia.org/wiki/Big_O_notation) term indicates
+that any other power is no bigger than a constant times $x^4$.
 
 
 Consider what happens when we multiply series of different orders:
@@ -1090,10 +1173,10 @@ ex = x^2*y - x*y^2
 Sym[diff(ex,var) for var in [x,y]]
 ```
 
-The mixed partials is similarly done, though a bit more involved:
+The mixed partials is similarly done by passing two variables to differentiate in to `diff`:
 
 ```
-Sym[diff(diff(ex, v1), v2) for v1 in [x,y], v2 in [x,y]]
+Sym[diff(ex, v1, v2) for v1 in [x,y], v2 in [x,y]]
 ```
 
 For this task, SymPy provides the `hessian` function:
@@ -1111,7 +1194,7 @@ Some of the standard plots for working with vector-valued function or multivaria
 Parametric plots of vector expressions are supported. With `PyPlot`, the output can be 2 or 3D, but with Gadfly, just 2D. Here we illustrate:
 
 ```
-parametricplot([cos(5x), sin(3x)], 0, 4pi)
+parametricplot([cos(5x), sin(3x)], 0, 4pi, Geom.line)
 ```
 
 Surface plots of function $f(x,y) \rightarrow R$ can be rendered with `PyPlot`, through a call like `plot_surface(x^2 + y^2, -5, 5, -5, 5)`. 
@@ -1157,7 +1240,13 @@ This example from the tutorial shows the `nullspace` function:
 
 ```
 M = [one(Sym) 2 3 0 0; 4 10 0 0 1]
-nullspace(M)
+vs = nullspace(M)
+```
+
+And this shows that they are indeed in the null space of `M`:
+
+```
+[M*vs[i] for i in 1:3]
 ```
 
 Symbolic expressions can be included in the matrices:
@@ -1165,6 +1254,7 @@ Symbolic expressions can be included in the matrices:
 ```
 M = [1 x; x 1]
 P, D = diagonalize(M)  # M = PDP^-1
+D
 ```
 
 
@@ -1191,7 +1281,7 @@ With this, we just need the `dsolve` function. This is called as `dsolve(eq, var
 ex = dsolve(diffeq, F(x))
 ```
 
-This solution has two constants, $C_1$ and $C_2$, that would be found from initial conditions. Say we know $F(0)=0$ and $F'(0)=1$, can we find the constants? To work with the returned expression, it is most convenient to get just the right hand side. The `rhs` function will return that:
+This solution has two constants, $C_1$ and $C_2$, that would be found from initial conditions. Say we know $F(0)=0$ and $F'(0)=1$, can we find the constants? To work with the returned expression, it is most convenient to get just the right hand side. The `rhs` function will return the right-hand side of a relation:
 
 ```
 ex1 = rhs(ex)
@@ -1199,7 +1289,7 @@ ex1 = rhs(ex)
 
 (The [args](http://docs.sympy.org/dev/modules/core.html#sympy.core.basic.Basic.args) function also can be used to break up the expression into parts.)
 
-With this, we can solve for `C1` from substituting in $0$ for $x$:
+With this, we can solve for `C1` through substituting in $0$ for $x$:
 
 ```
 solve(subs(ex1, x, 0), Sym("C1"))

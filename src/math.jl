@@ -493,6 +493,8 @@ function solve(ex::Sym, args...;  kwargs...)
 
     ## Way too much work here to finesse into a nice enough output
     ## (Issue comes from solving without specifying variable when 2 or more variables in the expression
+    isa(a, Dict) && return(a)
+    length(a) == 0 && return(a)
     if (length(a) > 0 && isa(a[1], Dict))
         d = Dict()
         for kv in a
@@ -501,29 +503,6 @@ function solve(ex::Sym, args...;  kwargs...)
             end
         end
         d
-
-        # d = Dict()
-        # for kv in a
-        #     for (k,v) in kv
-        #         cur = collect(keys(d))
-        #         i = findfirst(cur, k)
-        #         if i > 0
-        #             push!(d[cur[i]], v)
-        #         else
-        #             d[k] = [v]
-        #         end
-        #     end
-        # end
-        # for (k,v) in d
-        #     if length(v) == 1
-        #         d[k] = v[1]
-        #     end
-        # end
-        # if length(d) == 1
-        #     collect(values(d))[1]
-        # else
-        #     d
-        # end
     else
         Sym[v for v in a]
     end

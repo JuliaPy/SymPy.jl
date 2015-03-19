@@ -93,7 +93,11 @@ function symbols(x::String; kwargs...)
 end
 
 
-length(x::SymbolicObject) = *(size(x)...)
+function length(x::SymbolicObject)
+    sz = size(x)
+    length(sz) == 0 && return(0)
+    *(sz...)
+end
 function size(x::SymbolicObject)
     return ()
 end

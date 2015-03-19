@@ -56,6 +56,16 @@ x1 = (x + 1)*(x+2)
 expand(x1)
 expand_trig(sin(2x))
 
+## solve
+x,y,a = symbols("x,y,a", real=true)
+solve(x^2 - 2x)
+solve(x^2 - 2a, x)
+solve(x^2 - 2a, a)
+solve(Lt(x-2, 0))
+solve( x-2 ≪ 0)
+solve([x-y-a, x+y], [x,y])
+
+
 
 ## limits
 @assert limit(sin(x)/x, x, 0) |> float == 1
