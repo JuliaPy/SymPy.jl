@@ -1194,7 +1194,7 @@ Some of the standard plots for working with vector-valued function or multivaria
 Parametric plots of vector expressions are supported. With `PyPlot`, the output can be 2 or 3D, but with Gadfly, just 2D. Here we illustrate:
 
 ```
-parametricplot([cos(5x), sin(3x)], 0, 4pi, Geom.line)
+parametricplot([cos(5x), sin(3x)], 0, 4pi, Geom.line(preserve_order=true))
 ```
 
 Surface plots of function $f(x,y) \rightarrow R$ can be rendered with `PyPlot`, through a call like `plot_surface(x^2 + y^2, -5, 5, -5, 5)`. 
