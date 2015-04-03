@@ -432,7 +432,7 @@ fraction(args...; kwargs...) = sympy.fraction(project(args)...; kwargs...) |> os
 Base.isinf(x::Sym) = try isinf(convert(Float64, x)) catch e false end
 Base.isnan(x::Sym) = try isnan(convert(Float64, x)) catch e false end
 
-
+## we rename sympy.div -> polydiv
 Base.div(x::Sym, y::Union(Sym, Number)) = convert(Sym, sympy.floor(project(x/convert(Sym,y))))
 
 Base.rem(x::Sym, y::Union(Sym, Number)) = x-Sym(y)*Sym(sympy.floor(project(x/y)))

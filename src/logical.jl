@@ -70,6 +70,10 @@ export ≪,⩵,≫
 # ## we likely only need to define isequal, ==, isless and < for generic code, but there is
 # ## no way for < to return a boolean in general, save for (x < y -> float(x) < float(y)???)
 
+## Try this. It works with `sort`
+const SympyTRUE = sympy.Lt(0,1)
+Base.isless(x::Sym, y::Sym) = sympy.Lt(x.x, y.x) == SympyTRUE
+
 # <(x::Sym,  y::Sym) = Lt(x,y)
 # <(x::Sym, y::Number) = x < convert(Sym, y)
 # <=(x::Sym, y::Sym) = Le(x,y)

@@ -8,9 +8,18 @@
 const SymPoly = Sym
 
 ## rename these, their use is special to polynomials, so we prefix
+"""
+
+Renamed polynomial methods.
+
+The functions `div`, `rem, `divrem` had slightly different meaning in Julia than SymPy, where they are polynomial methods. Here we renames them by prefixing with "poly". We do the same for `roots`, so as to not conflict with the `roots` function from `Polynomials.jl`.
+
+"""
 polynomial_sympy_methods_renamed = ((:div, :polydiv),
-                                   (:rem, :polyrem),
-                                   (:divrem, :polydivrem))
+                                    (:rem, :polyrem),
+                                    (:divrem, :polydivrem),
+                                    (:roots, :polyroots)
+                                    )
 
                        
 for (meth, newmeth) in polynomial_sympy_methods_renamed
@@ -69,15 +78,6 @@ polynomial_sympy_methods = (
                             :numer, :denom
 #                            :roots ## conflict with Roots.roots and functionality provided by solve
                             )
-
-""" 
-
-We make `polyroots`, not `roots`, as this conflicts with the `Roots` package.
-
-"""
-
-polyroots(ex::Sym, args...; kwargs...) = ex[:roots](args...;kwargs...)
-
 
 
 

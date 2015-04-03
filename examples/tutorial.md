@@ -897,7 +897,7 @@ x0, y0 = (0,1)
 m = N(subs(ex3, (x,x0), (y,y0)))
 g(x,y) = y - (y0 + m*(x-x0))
 
-ImplicitEquations.ggraph((f==0) | (g==0))  # ugly default colors...
+ImplicitEquations.ggraph((f==0) | (g==0))  
 ```
 
 
