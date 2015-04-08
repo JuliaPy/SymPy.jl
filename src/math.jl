@@ -180,6 +180,7 @@ subs(ex, y, 3)
 subs(ex, :y, pi)
 ex |> subs(:x, e)
 subs(ex, (x,1), (y,2))
+subs(ex, x=1, y=2)
 ```
 """ 
 function subs{T <: SymbolicObject, S <: Union(String, Symbol, SymbolicObject)}(ex::T, x::S, arg)
@@ -214,11 +215,21 @@ subs{T <: Any}(ex::SymbolicObject, xs::Vector{(Sym,T)}) = subs(ex, xs...)
 ## convenience method to use symbol
 subs{T <:SymbolicObject}(ex::T, x::Symbol, arg) = subs(ex, Sym(x), arg)
 
+
+## Convenience method for keyword arguments
+function  subs{T <: SymbolicObject}(ex::T; kwargs...)
+    ts = [(Sym(k),v) for (k,v) in kwargs]
+    subs(ex, ts...)
+end
+
+
+
+
 Base.replace(ex::SymbolicObject, x::SymbolicObject, y) = subs(ex, x, y)
 ## curried version to use through |> as in
 ## ex |> replace(x, 2)
 Base.replace(x::SymbolicObject, y) = ex -> subs(ex, x, y)
-
+Base.replace(ex::SymbolicObject; kwargs...) = subs(ex, kwargs...)
 
 
 
