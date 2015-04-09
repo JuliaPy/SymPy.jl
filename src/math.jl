@@ -95,7 +95,12 @@ for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
                                            
-
+for fn in (:cospi, :sinpi)
+    rad_fn = string(fn)[1:end-2]
+    @eval ($fn)(x::Sym) = getfield(sympy, symbol($rad_fn))(project(x * Sym(sympy.pi)))
+    @eval ($fn)(a::Array{Sym}) = map($fn, a)
+end
+ 
 
 ## add
 abs(x::Sym) = sympy_meth(:Abs, x)
