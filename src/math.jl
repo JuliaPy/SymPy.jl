@@ -409,21 +409,13 @@ diff(exs::Array{Sym}, args...; kwargs...) = map(ex -> diff(ex, args...;kwargs...
 ## limit(f, c) or limit(f,c,dir="-") or limit(f, c, dir="-")
 function limit(f::Function, c::Number=0; kwargs...)
     x = Sym("x")
-    ## catch some values...
-    if abs(c) == Inf
-        c = sign(c) * oo
-    elseif c == Base.pi
-        c = Sym(sympy.pi)
-    elseif c == Base.e
-        c = Sym(sympy.exp(1))
-    end
     limit(f(x), x, c; kwargs...)
 end
 
 ## find symbolic derivatives from a function
-function diff(f::Function, k::Int=1)
+function diff(f::Function, k::Int=1; kwargs...)
     x = Sym("x")
-    diff(f(x), x, k)
+    diff(f(x), x, k; kwargs...)
 end
     
 
