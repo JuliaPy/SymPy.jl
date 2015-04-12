@@ -918,6 +918,10 @@ g(x,y) = y - (y0 + m*(x-x0))
 plot((f==0) | (g==0))  
 ```
 
+(If `PyPlot` were loaded, this could have been written:
+`plot_implicit((f(x,y) ⩵ 0) ∨ (y ⩵ y0 + m * (x-x0)))` using the
+Unicode infix operators `\Equal[tab]` and `\vee[tab]` used as aliases
+for `Eq` and `Or`.)
 
 
 
@@ -1293,13 +1297,6 @@ With this, we can  construct a  differential equation. Following the SymPy tutor
 diffeq = Eq(diff(F(x), x, 2) - 2*diff(F(x)) + F(x), sin(x))
 ```
 
-
-(We could overload `ctranspos` and  use the Unicode `\Equal[tab]` to make this look even closer to the math equation, though why we have `(x)` with some functions and not the derivatives is odd:)
-
-```
-Base.ctranspose(f::Function) = diff(f)
-diffeq = F'' - 2F' + F(x) ⩵ sin(x)
-```
 
 With this, we just need the `dsolve` function. This is called as `dsolve(eq, variable)`:
 
