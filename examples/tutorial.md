@@ -17,7 +17,7 @@ using SymPy
 
 The start up time is a bit lengthy.
 
-## symbols
+## Symbols
 
 At the core of `SymPy` is the introduction of symbolic variables that differ quite a bit from `Julia`'s variables. Symbolic variables do not immediately evaluate to a value, rather the "symbolicness" propagates when interacted with. To keep things manageable, SymPy does some simplifications along the way.
 
@@ -107,7 +107,13 @@ Expressions with more than one variable can have multiple substitutions, where e
 ```
 x,y,z = symbols("x,y,z")
 ex = x + y + z
-subs(ex, (x,1), (y,pi))
+subs(ex, (x,1), (y,pi))      
+```
+
+Or keyword arguments can be used to refer to the variable to substitute:
+
+```
+subs(ex, x=1, y=pi)
 ```
 
 When used with the pipeline operator, `|>`, there is a curried form that allows the expression to be implicit:
@@ -158,9 +164,10 @@ evalf(PI, 30)
 
 leaves the value as a symbolic object with 30 digits of accuracy.
 
-Explicit conversion via `convert(T, ex)` can also be done.
+Explicit conversion via `convert(T, ex)` can also be done, and is
+necessary at times if `N` does not give the desired type.
 
-## algebraic expressions
+## Algebraic expressions
 
 `SymPy` overloads many of `Julia`'s functions to work with symbolic objects, such as seen above with `asin`. The usual mathematical operations such as `+`, `*`, `-`, `/` etc. work through `Julia`'s promotion mechanism, where numbers are promoted to symbolic objects, others dispatch internally to related `SymPy` functions.
 
@@ -182,7 +189,7 @@ but the two latter expressions do not.
 x,y,z = symbols("x, y, z")
 ```
 
-### expand, factor, collect, simplify
+### The expand, factor, collect, and simplify functions
 
 A typical polynomial expression in a single variable can be written in two common ways, expanded or factored form. Using `factor` and `expand` can move between the two.
 
@@ -426,22 +433,28 @@ p = (x-3)^2*(x-2)*(x-1)*x*(x+1)*(x^2 + x + 1)
 real_roots(p)
 ```
 
-In this example, the degree of `p` is 8, but there are only 6 real
-roots returned, the double root of $3$ is accounted for, but the two
-complex roots of `x^2 + x+ 1` are not. The actual roots can be found
-with `solve`:
+In this example, the degree of `p` is 8, but only the 6 real roots
+returned, the double root of $3$ is accounted for. The two complex
+roots of `x^2 + x+ 1` are not considered by this function. The complete set 
+of distinct roots can be found with `solve`:
 
 ```
 solve(p)
 ```
 
 This finds the complex roots, but does not account for the double
-root. The `roots` function of SymPy does. This particular function is
-not exported (as it conflicts with the `roots` function from
-`Polynomials` and `Roots`) but we can still access it using indexing
-notation or its alias `polyroots`.
+root. The `roots` function of SymPy does.
 
-> Indexing with a symbol. When a symbolic expression is indexed by a symbol it returns a function which maps to a corresponding SymPy function. For example, `p[:roots](args...)` will call `roots(p, args...)` within SymPy. For methods of SymPy objects, the same is true, so if `roots` were a class method, then the call would resolve to `p.roots(args...)`.
+This particular function is not exported (as it conflicts with the
+`roots` function from `Polynomials` and `Roots`) but we can still
+access it using indexing notation or its alias `polyroots`.
+
+> Indexing with a symbol. When a symbolic expression is indexed by a
+> symbol it returns a function which maps to a corresponding SymPy
+> function. For example, `p[:roots](args...)` will call `roots(p,
+> args...)` within SymPy. For methods of SymPy objects, the same is
+> true, so if `roots` were a class method, then the call would resolve
+> to `p.roots(args...)`.
 
 The output of calling `roots` will be a dictionary whose keys are the roots and values the multiplicity.
 
@@ -476,7 +489,7 @@ provided, though with this call the answers are still symbolic:
 nroots(p)
 ```
 
-## solve
+## The solve function
 
 The `solve` function is more general purpose than just finding roots of univariate polynomials. The function tries to solve for when an expression is 0, or a set of expressions are all 0.
 
@@ -561,7 +574,7 @@ quad_approx = subs(p, zip(vars, vals)...)
 
 (Taking the limit as $h$ goes to 0 produces the answer $1 - x^2/2$.)
 
-Finally, we show how to re-express the polynomial $a_2x^2 + a_1x + a_0$
+Finally for `solve`, we show one way to re-express the polynomial $a_2x^2 + a_1x + a_0$
 as $b_2(x-c)^2 + b_1(x-c) + b_0$ using `solve` (and not, say, an
 expansion theorem.)
 
@@ -603,7 +616,7 @@ exs = [2x+3y ⩵ 6, 3x-4y ⩵ 12]    ## Using \Equal[tab]
 d = solve(exs)
 ```
 
-## plotting
+## Plotting
 
 Within Python, SymPy has several plotting features that work with Matplotlib. Many of these are available from within `Julia` using `PyPlot`. However, as `Julia` has several plotting options, there is also support for other packages, for example `Gadfly`.
 
@@ -639,7 +652,7 @@ When  `PyPlot` is loaded, the `plot` method dispatches to `PyPlot`'s. (Only one 
 
 `SymPy` has many of the basic operations of calculus provided through a relatively small handful of functions.
 
-### limits
+### Limits
 
 Limits are computed by the `limit` function which takes an expression, a variable and a value, and optionally a direction specified by either `dir="+"` or `dir="-"`.
 
@@ -687,7 +700,7 @@ In a previous example, we defined `quad_approx`. The limit as `h` goes to $0$ gi
 limit(quad_approx, h, 0)
 ```
 
-#### left and right limits
+#### Left and right limits
 
 The limit is defined when both the left and right limits exist and are equal. But left and right limits can exist and not be equal. The `sign` function is $1$ for positive $x$, $-1$ for negative $x$ and $0$ when $x$ is 0. It should not have a limit at $0$:
 
@@ -701,7 +714,11 @@ Oops. Well, the left and right limits are different anyways:
 limit(sign(x), x, 0, dir="-"), limit(sign(x), x, 0, dir="+")
 ```
 
-#### operator interface
+(The `limit` function finds the *right* limit by default. To be
+careful, either plot or check that both the left and right limit exist
+and are equal.)
+
+#### Operator interface
 
 
 For univariate functions there is an "operator" interface, where we pass a function object as the first argument and the value for `c` as the second (the variable is implicit, as `f` has only one).
@@ -711,7 +728,7 @@ f(x) = sin(5x)/x
 limit(f, 0)
 ```
 
-#### numeric limits
+#### Numeric limits
 
 The `limit` function uses the
 [Gruntz](http://docs.sympy.org/latest/modules/series.html#the-gruntz-algorithm)
@@ -738,7 +755,7 @@ limit(f(x), x, 0, dir="+")
 ```
 
 
-### derivatives
+### Derivatives
 
 One *could* use limits to implement the definition of a derivative:
 
@@ -885,7 +902,8 @@ used. This requires `PyPlot` to be the graphing package, but we are
 using `Gadfly`. (The `PyPlot` call is just `plot_implicit(Eq(ex,
 0))`). We use the `ImplicitEquations` package which provides a similar
 means to plot implicit equations within `Gadfly`, though we need to
-create functions and not use our symbolic expressions.
+create functions and not use our symbolic expressions (which don't
+play nicely with the underlying `ValidatedNumerics` package):
 
 
 ```
@@ -897,7 +915,7 @@ x0, y0 = (0,1)
 m = N(subs(ex3, (x,x0), (y,y0)))
 g(x,y) = y - (y0 + m*(x-x0))
 
-ImplicitEquations.ggraph((f==0) | (g==0))  
+plot((f==0) | (g==0))  
 ```
 
 
@@ -924,16 +942,18 @@ A = w*h + 1//2 * (pi * r^2)
 p = w + 2h + pi*r
 ```
 
-(There is a subtlety above, as `1//2*pi*r^2` will not work as
-expected, as the products will be done left to right, and `1//2*pi`
-will be converted to floating point before multiplying `r^2`, as such
-we rewrite the terms. It may be easier to use `PI` instead of `pi`.)
+(There is a subtlety above, as m `1//2*pi*r^2` will lose exactness, as
+the products will be done left to right, and `1//2*pi` will be
+converted to an approximate floating point value before multiplying
+`r^2`, as such we rewrite the terms. It may be easier to use `PI`
+instead of `pi`.)
 
 We want to solve for `h` from when `p=P` (our fixed value) and
 substitute back into `A`. We solve `P-p==0`:
 
 ```
-A1 = subs(A, h, solve(P-p, h)[1])
+h0 =  solve(P-p, h)[1]
+A1 = subs(A, h, h0)
 ```
 
 Now we note this is a parabola in `w`, so any maximum will be an
@@ -994,7 +1014,7 @@ simplify(atc - atb)
 
 With this observation, we conclude the maximum area happens at `c` with area `atc`.
 
-### integrals
+### Integrals
 
 Integration is implemented in SymPy through the `integrate` function. There are two basic calls: 
 `integrate(f(x), x)` will find the indefinite integral ($\int f(x) dx$) and when endpoints are specified through `integrate(f(x), (x, a, b))` the definite integral will be found ($\int_a^b f(x) dx$). The special form `integrate(ex, x, a, b)` can be used for single integrals, but the specification through a tuple is needed for multiple integrals.
@@ -1072,7 +1092,7 @@ integ = Integral(sin(x^2), x)
 doit(integ)
 ```
 
-#### operator version
+#### Operator version
 For convenience, for univariate functions there is a convenience wrapper so that the operator styles -- `integrate(f)` and `integrate(f, a, b)` -- will perform the integrations.
 
 ```
@@ -1120,31 +1140,32 @@ removeO(s1)
 
 ### Sums
 
-`SymPy` can do sums, including some infinite ones. The `Sum` function performs this task. For example, we have
+`SymPy` can do sums, including some infinite ones. The `summation` function performs this task. For example, we have
 
 ```
 i, n = symbols("i, n")
-Sum(i^2, (i, 1, n)) |> doit
+summation(i^2, (i, 1, n))
 ```
 
-Like `Integrate` and `Derivative` the `doit` function is called to initiate the sum.
+Like `Integrate` and `Derivative`, there is also a `Sum` function to stage the task until the `doit` function is called to initiate the sum.
 
 
 Some famous sums can be computed:
 
 ```
-sn = doit(Sum(1/i^2, (i, 1, n)))
+sn = Sum(1/i^2, (i, 1, n))
+doit(sn)
 ```
 
 And from this a limit is available:
 
 ```
-limit(sn, n, oo)
+limit(doit(sn), n, oo)
 ```
 
-This would have also been possible through `Sum(1/i^2, (i, 1, oo))`.
+This would have also been possible through `summation(1/i^2, (i, 1, oo))`.
 
-### vector-valued functions
+### Vector-valued functions
 
 Julia makes constructing a vector of symbolic objects easy:
 
@@ -1187,9 +1208,9 @@ hessian(ex)
 
 (When there are symbolic parameters, the free variables are specified as a vector, as in `hessian(ex, vars)`.)
 
-#### plots
+#### Plots
 
-Some of the standard plots for working with vector-valued function or multivariate functions are available within `SymPy`. The support varies depending on the underlying plotting package, with `PyPlot` generally having more features.
+Some of the standard plots for working with vector-valued functions or multivariate functions are available within `SymPy`. The support varies depending on the underlying plotting package, with `PyPlot` generally having more features.
 
 Parametric plots of vector expressions are supported. With `PyPlot`, the output can be 2 or 3D, but with Gadfly, just 2D. Here we illustrate:
 
@@ -1258,9 +1279,9 @@ D
 ```
 
 
-## differential equations
+## Differential equations
 
-SymPy has facilities for solving ordinary differential [equations](http://docs.sympy.org/latest/modules/solvers/ode.html). The key is to create a symbolic function expression using the `SymFunction` class. Again, this is done through:
+SymPy has facilities for solving ordinary differential [equations](http://docs.sympy.org/latest/modules/solvers/ode.html). The key is to create a symbolic function expression using the `SymFunction` class. Again, this may be done through:
 
 ```
 F = symbols("F", cls=SymFunction)
@@ -1273,7 +1294,12 @@ diffeq = Eq(diff(F(x), x, 2) - 2*diff(F(x)) + F(x), sin(x))
 ```
 
 
-(We could have used the Unicode `\Equal[tab]` to make this look even closer to the math equation.)
+(We could overload `ctranspos` and  use the Unicode `\Equal[tab]` to make this look even closer to the math equation, though why we have `(x)` with some functions and not the derivatives is odd:)
+
+```
+Base.ctranspose(f::Function) = diff(f)
+diffeq = F'' - 2F' + F(x) ⩵ sin(x)
+```
 
 With this, we just need the `dsolve` function. This is called as `dsolve(eq, variable)`:
 
