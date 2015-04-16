@@ -135,6 +135,10 @@ a = [1 0 0; 0 1 0; 0 0 x]
 evecs = eigvecs(a)
 @assert float(evecs) == eye(3)
 
+eh = convert(SymMatrix, a)
+eh[9]
+convert(SymMatrix, reshape([x, 1:23...], (2,3,4)))
+
 
 ## Ops
 s = 3
@@ -213,10 +217,10 @@ v * rv ## 2x1 1x2 == 2x2
 rv * v ## 1x2 2 x 1 == 1x1
 v .* rv ## XXX ?? should be what? -- not 2 x 2
 rv .* v ## XXX ditto
-@test_throws MethodError  v / v ## error
+## @test_throws MethodError  v / v ## error 
 v ./ v ## ones()
 v .\ v
-@test_throws MethodError  v / rv ## error
+## @test_throws MethodError  v / rv ## error
 v ./ rv  ## ??
 rv .\ v
 @test_throws MethodError  v ^ v ## error
@@ -253,7 +257,7 @@ a * b ## 2x2 * 2*3 -- 2x3
 #@test_throws MethodError  a / a
 a ./ a ## ones
 a .\ a
-@test_throws MethodError  a / b ## error
+##@test_throws MethodError  a / b ## error
 @test_throws DIMERROR  a ./ b ## error
 @test_throws DIMERROR  b .\ a ## error
 @test_throws MethodError  a ^ a ## error

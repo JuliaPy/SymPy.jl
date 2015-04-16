@@ -105,6 +105,8 @@ end
 ## add
 abs(x::Sym) = sympy_meth(:Abs, x)
 abs(a::Array{Sym}) = map(abs, a)
+Base.abs2(x::Sym) = re(x*conj(x))
+Base.copysign(x::Sym, y::Sym) = abs(x)*sign(y)
 
 Base.isless(a::Real, b::Sym) = isless(a, convert(Float64, b))
 Base.isless(a::Sym, b::Real) = isless(b, a)
@@ -195,6 +197,7 @@ subs{T <: SymbolicObject, S <: SymbolicObject}(exs::Array{T}, x::S, arg) = map(e
 
 ## curried version to use with |>
 subs(x::Union(String, Symbol, SymbolicObject), y) = ex -> subs(ex, x, y)
+subs(;kwargs...) = ex -> subs(ex; kwargs...)
 
 """
 
@@ -256,7 +259,10 @@ function !={T <: Complex}(x::Sym, y::T)
 end
 
 ## helper, as :is_rational will find 1.2 rational...
-_is_rational(ex::Sym) = ex[:is_rational] && ex[:numer]()[:is_integer]
+function _is_rational(ex::Sym)
+    ex[:is_rational] == nothing && return false
+    ex[:is_rational] && ex[:numer]()[:is_integer]
+end
 
 ## evalf, n, N
 ## We want to convert to numeric:

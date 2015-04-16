@@ -79,6 +79,7 @@ import Base: div
 import Base: trunc
 import Base: isinf, isnan
 import Base: real, imag
+import Base: expm
 
 ## conditional imports
 if VERSION < v"0.4.0-dev"

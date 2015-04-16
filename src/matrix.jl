@@ -3,27 +3,17 @@
 ## requires conversion from SymMatrix -> Array{Sym} in outputs, as appropriate
 
 ## covert back to Array{Sym}
-subs(ex::SymMatrix, x::SymbolicObject, y) = convert(Array{Sym}, subs(convert(Sym, ex), x, y))
-
-
-## map for linear indexing. Should be a function in base, but don't know it
-function find_ijk(i, s)
-    out = Integer[]
-    while length(s) > 1
-        p = prod(s[1:end-1])
-        push!(out, iceil(i/p))
-        i = (i-1) % prod(s[1:end-1]) +1
-        s = s[1:end-1]
-    end
-        
-    push!(out, i)
-    tuple((reverse!(out) .- 1)...)
+function subs(ex::Array{Sym}, args...; kwargs...)
+    u = convert(SymMatrix, ex)
+    convert(Array{Sym}, subs(u, args...; kwargs...))
 end
 
 
-## no linear indexing of matrices allowed here
+
 getindex(s::SymMatrix, i::Integer...) = pyeval("x[i]", x=s.x, i= tuple(([i...].-1)...))
+getindex(s::SymMatrix, i::Integer) = pyeval("x[i]", x=project(s), i=map(x->x-1, ind2sub(size(s), i)))
 getindex(s::SymMatrix, i::Symbol) = project(s)[i] # is_nilpotent, ... many such predicates
+
 getindex(s::Array{Sym}, i::Symbol) = project(s)[i] # digaonalize..
 
 ## size
@@ -56,12 +46,12 @@ function convert(::Type{Array{Sym}}, a::SymMatrix)
         Sym[a[i,j] for i in 1:size(a)[1], j in 1:size(a)[2]]
     else
         ## need something else for arrays... XXX -- can't linear index a
-        b = Sym[a[find_ijk(i, sz)] for i in 1:length(a)]
+        b = Sym[a[i] for i in 1:length(a)]
         reshape(b, sz)
     end
 end
   
-## when projecting, we convert to a symbolic matrix thne project  
+## when projecting, we convert to a symbolic matrix then project  
 project(x::Array{Sym}) = convert(SymMatrix, x) |> project
 
 
@@ -105,6 +95,9 @@ if VERSION < v"0.4.0-dev"
     inv(x::Matrix{Sym}) = inverse(x)
 end
 
+## But
+## is_symmetric <-> issym
+## istriu, istril, 
 for meth in  (:is_anti_symmetric, :is_diagonal, :is_diagonalizable,:is_nilpotent, 
                 :is_symbolic, :is_symmetric)
     
@@ -116,6 +109,9 @@ end
 
 
 ## methods called as properties
+
+## is_upper <-> itriu
+## is_lower <-> istril
 matrix_operators = (:H, :C,  
                     :is_lower, :is_lower_hessenberg, :is_square, :is_upper,  :is_upper_hessenberg, :is_zero
 )
@@ -130,6 +126,10 @@ end
 
 
 ## These take a matrix, return a container of symmatrices. Here we convert these to arrays of sym
+## Could use
+## - qr generically instead of QRdecomposition
+## - lu instead of
+## - chol will call cholesky
 map_matrix_methods = (:LDLsolve,
                       :LDLdecomposition, :LDLdecompositionFF,
                       :LUdecomposition_Simple,
@@ -150,7 +150,7 @@ map_matrix_methods = (:LDLsolve,
                       :print_nonzero,
                       :singular_values,
                       :upper_triangular_solve,
-                      :vec, :vech
+                      :vech
                       )
 
 for meth in map_matrix_methods
@@ -162,9 +162,10 @@ end
 
 
 ### Some special functions
-exp(ex::Matrix{Sym}) = convert(Array{Sym}, object_meth(convert(SymMatrix, ex), :exp))
-exp(a::SymMatrix) = a[:exp]()
+Base.chol(a::Matrix{Sym}) = cholesky(a)
 
+expm(ex::Matrix{Sym}) = convert(Array{Sym}, object_meth(convert(SymMatrix, ex), :exp))
+expm(a::SymMatrix) = a[:exp]()
 
 Base.conj(a::SymMatrix) = conjugate(a)
 Base.conj(a::Sym) = conjugate(a)
