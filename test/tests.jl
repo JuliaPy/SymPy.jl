@@ -88,7 +88,9 @@ u = r1(t)
 kappa = norm(diff(u) × diff(u,t,2)) / norm(diff(u))^3 |> simplify
 @assert convert(Rational,kappa) == 1//2
 
-
+u = symbols("u", cls=SymFunction)
+eqn = Eq(x^2 + u(x)^2, x^3 - u(x))
+diff(eqn, x)
 
 ## integrate
 integrate(sin(x))
