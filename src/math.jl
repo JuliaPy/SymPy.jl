@@ -398,12 +398,21 @@ for meth in (:separate, :flatten,
              :sqf,
              :together, 
              :limit, 
-             :diff, :Derivative
+             :Derivative
              )
     meth_name = string(meth)
     @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
     eval(Expr(:export, meth))
 end
+
+function Base.diff(ex::Sym, args...; kwargs...)
+    if ex[:is_Equality]
+        Eq(diff(lhs(ex), args...; kwargs...), diff(rhs(ex), args...; kwargs...))
+    else
+        sympy_meth(:diff, ex, args...; kwargs...)
+    end
+end
+    
 
 
 

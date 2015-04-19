@@ -63,6 +63,7 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        airyai, airybi,
        zero, one
 import Base: transpose
+import Base: diff       
 import Base: factorial, gcd, lcm, isqrt
 import Base: gamma, beta
 import Base: length,  size
@@ -98,7 +99,7 @@ export SymFunction, SymMatrix,
        primitive, sqf, resultant, cancel,
        together, square,
        solve,
-       limit, diff, 
+       limit,
        series, integrate, 
        summation,
        dsolve,
