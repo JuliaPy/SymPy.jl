@@ -128,6 +128,23 @@ As `subs` is very similar in spirit to `Julia`'s `replace` function, an alias is
 ex |> replace(y, pi)
 ```
 
+### Using function notation to substitute
+
+For `julia` version 0.4 and onward, changes to the language allow for `subs` to be replaced by a function-like notation:
+
+```
+if VERSION >= v"0.4.0-dev"
+  x(100)
+  ex(y=pi)
+  ex(x=1, y=pi)
+end
+```
+
+The first example above uses the internal `get_free_symbols` function
+to order the symbols found in the expression. These may not be as
+expected. This style should really only be used when there is just one
+free symbol in the expression.
+
 ## Conversion from symbolic to numeric
 
 SymPy provides two identical means to convert a symbolic math

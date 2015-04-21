@@ -21,6 +21,7 @@ The package tutorial provides many examples.
 SymPy
 
 
+using Compat
 
 using PyCall
 @pyimport sympy

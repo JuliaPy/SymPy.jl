@@ -204,7 +204,8 @@ subs(;kwargs...) = ex -> subs(ex; kwargs...)
 Substitute multiple values at once with `subs(ex, (var1, val1), (var2, val2), ...)`
 
 """
-function subs(ex::SymbolicObject, x::(Union(String, Symbol, SymbolicObject), Any), args...)
+typealias SymbolicTypes  @compat Union(String, Symbol, SymbolicObject)
+function subs(ex::SymbolicObject, x::@compat(Tuple{SymbolicTypes, Any}), args...)
     ex = subs(ex, x[1], x[2])
     if length(args) > 0
         subs(ex, args...)
@@ -218,7 +219,7 @@ end
 substitute multiple values stored in array
 
 """
-subs{T <: Any}(ex::SymbolicObject, xs::Vector{(Sym,T)}) = subs(ex, xs...)
+subs{T <: Any}(ex::SymbolicObject, xs::Vector{Union(Sym,T)}) = subs(ex, xs...)
 
 ## convenience method to use symbol
 subs{T <:SymbolicObject}(ex::T, x::Symbol, arg) = subs(ex, Sym(x), arg)
@@ -239,6 +240,22 @@ Base.replace(ex::SymbolicObject, x::SymbolicObject, y) = subs(ex, x, y)
 Base.replace(x::SymbolicObject, y) = ex -> subs(ex, x, y)
 Base.replace(ex::SymbolicObject; kwargs...) = subs(ex, kwargs...)
 
+
+## Make callable expression, so that function notation is more natural
+"""
+
+```
+`ex(1,2)`  ## uses order of get_free_symbols
+`ex(x=1, y=2)`
+```
+"""
+if VERSION >= v"0.4.0-dev"
+    Base.call(ex::SymbolicObject; kwargs...) = subs(ex, kwargs...)
+    function Base.call(ex::SymbolicObject, args...)
+        xs = get_free_symbols(ex)
+        subs(ex, collect(zip(xs, args))...)
+    end
+end 
 
 
 function !={T <: Real}(x::Sym, y::T) 
