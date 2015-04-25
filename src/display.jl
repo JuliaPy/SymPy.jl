@@ -58,18 +58,16 @@ function writemime(io::IO, ::MIME"text/latex", x::Array{Sym})
 end
 
 ## Pretty print dicts
-function writemime(io::IO, ::MIME"text/latex", d::Dict)    
+function writemime{T<:Any, S<:Any}(io::IO, ::MIME"text/latex", d::Dict{T,S})    
     Latex(x::Sym) = latex(x)
-    Latex(x) = string(x)
-
+    Latex(x) = sprint(Base.showlimited, x)
+    
     out = "\\begin{equation*}\\begin{cases}"
     for (k,v) in d
         out = out * Latex(k) * " & \\text{=>} &" * Latex(v) * "\\\\"
     end
     out = out * "\\end{cases}\\end{equation*}"
     print(io, out)
-
-
 end
 
 

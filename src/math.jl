@@ -182,47 +182,27 @@ Examples:
 ```
 x,y = symbols("x,y")
 ex = (x-y)*(x+2y)
-subs(ex, y, y^2)
-subs(ex, y, 3)
-subs(ex, :y, pi)
-ex |> subs(:x, e)
+subs(ex, (y, y^2))
 subs(ex, (x,1), (y,2))
-subs(ex, x=1, y=2)
+subs(ex, (x,y^3), (y,2))
+subs(ex, y, 3)
+subs(ex, :y, pi)    ## will only work if Sym(:y) == y, which isn't case, say when y=symbols("y", real=true)
+subs(ex, x=1, y=pi) ## will only work if Sym(:y) == y, which isn't case, say when y=symbols("y", real=true)
+ex |> subs(:x, e)   ## will only work if Sym(:y) == y, which isn't case, say when y=symbols("y", real=true)
+ex |> subs(x=e)     ## will only work if Sym(:y) == y, which isn't case, say when y=symbols("y", real=true)
+## julia v"0.4" only:
+## ex(x=2, y=3)     ## will only work if Sym(:y) == y, which isn't case, say when y=symbols("y", real=true)
 ```
-""" 
-function subs{T <: SymbolicObject, S <: Union(String, Symbol, SymbolicObject)}(ex::T, x::S, arg)
-    object_meth(ex, :subs, Sym(x), convert(Sym,arg))
-end
-subs{T <: SymbolicObject, S <: SymbolicObject}(exs::Array{T}, x::S, arg) = map(ex->subs(ex, x, arg), exs)
-
-## curried version to use with |>
-subs(x::Union(String, Symbol, SymbolicObject), y) = ex -> subs(ex, x, y)
-subs(;kwargs...) = ex -> subs(ex; kwargs...)
-
-"""
-
-Substitute multiple values at once with `subs(ex, (var1, val1), (var2, val2), ...)`
-
 """
 typealias SymbolicTypes  @compat Union(String, Symbol, SymbolicObject)
-function subs(ex::SymbolicObject, x::@compat(Tuple{SymbolicTypes, Any}), args...)
-    ex = subs(ex, x[1], x[2])
-    if length(args) > 0
-        subs(ex, args...)
-    else
-        ex
-    end
-end
+subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any})) =
+    object_meth(ex, :subs, Sym(y[1]), convert(Sym,y[2]))
+subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any}), args...) = subs(subs(ex, y), args...)
+subs{T <: SymbolicObject, S <: SymbolicTypes}(ex::T, y::S, val) = subs(ex, (y,val))
 
-"""
-
-substitute multiple values stored in array
-
-"""
-subs{T <: Any}(ex::SymbolicObject, xs::Vector{Union(Sym,T)}) = subs(ex, xs...)
-
-## convenience method to use symbol
-subs{T <:SymbolicObject}(ex::T, x::Symbol, arg) = subs(ex, Sym(x), arg)
+## curried version to use with |>
+subs(x::SymbolicTypes, y) = ex -> subs(ex, x, y)
+subs(;kwargs...) = ex -> subs(ex; kwargs...)
 
 
 ## Convenience method for keyword arguments
@@ -231,6 +211,14 @@ function  subs{T <: SymbolicObject}(ex::T; kwargs...)
     subs(ex, ts...)
 end
 
+
+"""
+
+substitute multiple values stored in array
+
+"""
+# @deprecate
+#subs{T <: Any}(ex::SymbolicObject, xs::Vector{Union(Sym,T)}) = subs(ex, xs...)
 
 
 
@@ -255,7 +243,9 @@ if VERSION >= v"0.4.0-dev"
         xs = get_free_symbols(ex)
         subs(ex, collect(zip(xs, args))...)
     end
-end 
+end
+
+#####
 
 
 function !={T <: Real}(x::Sym, y::T) 
