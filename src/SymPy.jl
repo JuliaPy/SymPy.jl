@@ -29,7 +29,16 @@ using PyCall
 if :mpmath in names(sympy)
     @pyimport sympy.mpmath as mpmath
 else
-    @pyimport mpmath
+    isthere = true
+    try
+        @pyimport mpmath
+    catch err
+        isthere = false
+        warn("Couldn't import the mpath Python module. This needs to be installed for tests to pass: `mpmath.org`.")
+    end
+    if isthere
+        @pyimport mpmath
+    end
 end
 
 using Requires ## for @require macro

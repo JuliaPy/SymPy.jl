@@ -1,8 +1,13 @@
 ## Assumptions
 ## http://docs.sympy.org/0.7.2/modules/assumptions/index.html
 
-## This is a bit messed up, as we use Qeven in place of Q.even, ...
+"""
+refine: http://docs.sympy.org/dev/modules/assumptions/refine.html
+"""
+refine(ex, assumpts...) = sympy_meth(:refine, ex, assumpts...)
+export refine
 
+## This is a bit messed up, as we use Qeven in place of Q.even, ...
 Q_predicates = (:even, :odd, :prime, :nonzero,
                 :complex, :extended_real, :imaginary, :infinitesimal, 
                 :integer, :irrational, :real,

@@ -116,6 +116,7 @@ Base.isfinite(x::Sym) = isfinite(convert(Float64, x))
 ## These are not right!!!
 ## see hyper and meijerg to indicate what needs to be done for these special function
 ## they really need to be coordinated with `Julia`'s as well.
+if isdefined(:mpmath)
 for fn in (:hyp0f1, 
            :hyp1f1, :hyp1f2, 
            :hyp2f0, :hyp2f1, :hyp2f2, :hyp2f3,
@@ -146,6 +147,9 @@ for fn in (:hyp0f1,
            @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) = 
            Sym(mpmath.((symbol($meth)))([project(x) for x in xs]...,[(k,project(v)) for (k,v) in kwargs]...))
     eval(Expr(:export, fn))
+end
+else
+    println("mpmath not defined???")
 end
 
 ## Hyper and friends don't really have symbolic use...
