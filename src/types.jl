@@ -48,7 +48,11 @@ function convert(::Type{Tuple}, o::PyCall.PyObject)
     ## check that o is a tuple?
     ## PyCall.pytypeof(o) 
     n = o[:__len__]()
-    ntuple(n, i -> o[:__getitem__](i-1))
+    if VERSION >= v"0.4.0-dev"
+        ntuple(i -> o[:__getitem__](i-1), n)
+    else
+        ntuple(n, i -> o[:__getitem__](i-1))
+    end
 end
 
 ## rational

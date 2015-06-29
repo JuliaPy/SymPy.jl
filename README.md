@@ -1,8 +1,13 @@
-# Package to bring `sympy` functionality into `julia` via `PyCall`
-
-[![Build Status](https://travis-ci.org/jverzani/SymPy.jl.svg?branch=master)](https://travis-ci.org/jverzani/SymPy.jl)
-[![Coverage Status](https://coveralls.io/repos/jverzani/SymPy.jl/badge.png)](https://coveralls.io/r/jverzani/SymPy.jl)
 [![SymPy](http://pkg.julialang.org/badges/SymPy_release.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=release)
+[![SymPy](http://pkg.julialang.org/badges/SymPy_nightly.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=nightly)
+&nbsp;
+Linux: [![Build Status](https://travis-ci.org/jverzani/SymPy.jl.svg?branch=master)](https://travis-ci.org/jverzani/SymPy.jl)
+&nbsp;
+Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/jverzani/SymPy.jl?branch=master&svg=true)](https://ci.appveyor.com/project/tkelman/example-jl/branch/master)
+
+
+# SymPy Package to bring Python's `Sympy` functionality into `Julia` via `PyCall`
+
 
 
 The `SymPy` package  (`http://sympy.org/`)  is a Python library for symbolic mathematics. 

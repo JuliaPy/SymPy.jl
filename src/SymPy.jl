@@ -63,7 +63,7 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        sinc, cosc, cosd, cotd, cscd, secd, sind, tand,
        acosd, acotd, acscd, asecd, asind, atand, atan2,
        sinpi, cospi,
-       radians2degrees, degrees2radians, log, log2,
+       log, log2,
        log10, log1p, exponent, exp, exp2, expm1, cbrt, sqrt,
        erf, erfc, erfcx, erfi, dawson, ceil, floor,
        trunc, round, significand,
@@ -95,7 +95,11 @@ import Base: expm
 ## conditional imports
 if VERSION < v"0.4.0-dev"
     import Base: rref, det
+    import Base: radians2degrees, degrees2radians
 end
+
+
+
 
 export sympy, sympy_meth, object_meth, call_matrix_meth
 export Sym, @syms, @vars, symbols # @sym_str,

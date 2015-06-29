@@ -20,6 +20,12 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
+if VERSION >= v"0.4.0-dev"
+    Base.rad2deg(x::Sym) = radians2degrees(x)
+    Base.deg2rad(x::Sym) = degrees2radians(x)
+end
+
+
 ## Handle arguments differently
 log(x::Sym) = sympy.log(project(x))
 log(b::Sym, x::Sym) = sympy.log(project(x), project(b))
@@ -116,8 +122,7 @@ Base.isfinite(x::Sym) = isfinite(convert(Float64, x))
 ## These are not right!!!
 ## see hyper and meijerg to indicate what needs to be done for these special function
 ## they really need to be coordinated with `Julia`'s as well.
-if isdefined(:mpmath)
-for fn in (:hyp0f1, 
+mpmath_fns = (:hyp0f1, 
            :hyp1f1, :hyp1f2, 
            :hyp2f0, :hyp2f1, :hyp2f2, :hyp2f3,
            :hyp3f2,
@@ -143,13 +148,15 @@ for fn in (:hyp0f1,
            :airyaizero, :airybizero, 
            :besseljzero, :besselyzero
            )
+if isdefined(:mpmath)
+for fn in mpmath_fns
            meth = string(fn)
            @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) = 
            Sym(mpmath.((symbol($meth)))([project(x) for x in xs]...,[(k,project(v)) for (k,v) in kwargs]...))
     eval(Expr(:export, fn))
 end
 else
-    println("mpmath not defined???")
+    warn("The mpmath module of Python is not installed so some functions -- $(join(map(string, mpmath_fns), ", ")) -- will not be available.")
 end
 
 ## Hyper and friends don't really have symbolic use...

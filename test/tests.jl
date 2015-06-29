@@ -312,8 +312,10 @@ ex = Eq(x^2, x)
 @assert args(ex) == (x^2, x)
 
 ## mpmath functions
-x = Sym("x")
-@assert limit(besselj(1,1/x), x, 0) == Sym(0)
-complex(hankel2(2, pi))
-bei(2, 3.5)
-bei(1+im, 2+3im)
+if isdefined(:mpmath)
+    x = Sym("x")
+    @assert limit(besselj(1,1/x), x, 0) == Sym(0)
+    complex(hankel2(2, pi))
+    bei(2, 3.5)
+    bei(1+im, 2+3im)
+end
