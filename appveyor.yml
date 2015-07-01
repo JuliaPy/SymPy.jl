@@ -1,4 +1,11 @@
 environment:
+  global:
+    # Borrowing setup from https://github.com/brian-team/brian2/blob/master/appveyor.yml
+    # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
+    # /E:ON and /V:ON options are not enabled in the batch script intepreter
+    # See: http://stackoverflow.com/a/13751649/163740
+    CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\dev\\appveyor\\run_with_env.cmd"
+
   matrix:
   - JULIAVERSION: "julialang/bin/winnt/x86/0.3/julia-0.3-latest-win32.exe"
   - JULIAVERSION: "julialang/bin/winnt/x64/0.3/julia-0.3-latest-win64.exe"
