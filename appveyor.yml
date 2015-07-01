@@ -12,6 +12,15 @@ environment:
   - JULIAVERSION: "julianightlies/bin/winnt/x86/julia-latest-win32.exe"
   - JULIAVERSION: "julianightlies/bin/winnt/x64/julia-latest-win64.exe"
 
+  - PYTHON: 2.7
+    PYCOSAT: 0.6.0
+  - PYTHON: 2.7
+    PYCOSAT:
+  - PYTHON: 3.4
+    PYCOSAT: 0.6.0
+  - PYTHON: 3.4
+    PYCOSAT:
+
 branches:
   only:
     - master
@@ -23,6 +32,26 @@ notifications:
     on_build_failure: false
     on_build_status_changed: false
 
+init:
+  - "ECHO %PYTHON%"
+  - "ECHO %PYCOSAT%"
+  - ps: if($env:PYTHON -eq "2.7" -and $env:Platform -eq "x64" -and $env:PYCOSAT -ne "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda-3.5.5-Windows-x86_64.exe' C:\Miniconda.exe; echo "Done"}
+  - ps: if($env:PYTHON -eq "2.7" -and $env:Platform -eq "x64" -and $env:PYCOSAT -eq "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda-3.4.2-Windows-x86_64.exe' C:\Miniconda.exe; echo "Done"}
+  - ps: if($env:PYTHON -eq "2.7" -and $env:Platform -eq "x86" -and $env:PYCOSAT -ne "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda-3.5.5-Windows-x86.exe' C:\Miniconda.exe; echo "Done"}
+  - ps: if($env:PYTHON -eq "2.7" -and $env:Platform -eq "x86" -and $env:PYCOSAT -eq "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda-3.4.2-Windows-x86.exe' C:\Miniconda.exe; echo "Done"}
+  - ps: if($env:PYTHON -eq "3.4" -and $env:Platform -eq "x64" -and $env:PYCOSAT -ne "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-3.5.5-Windows-x86_64.exe' C:\Miniconda.exe; echo "Done"}
+  - ps: if($env:PYTHON -eq "3.4" -and $env:Platform -eq "x64" -and $env:PYCOSAT -eq "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-3.4.2-Windows-x86_64.exe' C:\Miniconda.exe; echo "Done"}
+  - ps: if($env:PYTHON -eq "3.4" -and $env:Platform -eq "x86" -and $env:PYCOSAT -ne "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-3.5.5-Windows-x86.exe' C:\Miniconda.exe; echo "Done"}
+  - ps: if($env:PYTHON -eq "3.4" -and $env:Platform -eq "x86" -and $env:PYCOSAT -eq "0.6.0"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-3.4.2-Windows-x86.exe' C:\Miniconda.exe; echo "Done"}
+  - cmd: C:\Miniconda.exe /S /D=C:\Miniconda
+  - ps: ls C:\Miniconda/Scripts
+  - C:\Miniconda\Scripts\conda config --set always_yes yes
+  # We need to do this first as other commands may not work with older versions of conda.
+  - C:\Miniconda\Scripts\conda update conda
+  - C:\Miniconda\Scripts\conda install -c conda pytest requests conda-env --quiet
+  - ps: if($env:PYTHON -eq "2.7"){C:\Miniconda\Scripts\conda install ndg-httpsclient}
+
+
 install:
 # Download most recent Julia Windows binary
   - ps: (new-object net.webclient).DownloadFile(
@@ -30,9 +59,9 @@ install:
         "C:\projects\julia-binary.exe")
 # Run installer silently, output to C:\projects\julia
   - C:\projects\julia-binary.exe /S /D=C:\projects\julia
-# Install Python and miniconda
-  - "powershell .\\dev\\appveyor\\install_python.ps1"
 
+
+# Install Python and miniconda
   # Prepend newly installed Python to the PATH of this build (this cannot be
   # done from inside the powershell script as it would require to restart
   # the parent CMD process).
@@ -43,7 +72,8 @@ install:
   - "python -c \"import struct; print(struct.calcsize('P') * 8)\""
 
   # Install the build dependencies of the project via conda
-  - "conda install --yes --quiet numpy scipy sympy mpmath"
+  - C:\Miniconda\python.exe setup.py install
+  - C:\Miniconda\Scripts\conda install --yes --quiet numpy scipy sympy mpmath
   
 build_script:
 # Need to convert from shallow to complete for Pkg.clone to work
