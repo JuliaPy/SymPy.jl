@@ -629,7 +629,10 @@ dsolve(diff(f(x), x, x) + f(x), f(x)) ## solve f''(x) + f(x) = 0
 
 References: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/ode.html#ode-docs)
 """             
-dsolve(ex::Sym, fx::Sym) = sympy_meth(:dsolve, ex, fx)
+dsolve(ex::Sym, fx::Sym;kwargs...) = sympy_meth(:dsolve, ex, fx; kwargs...)
+dsolve(ex::Sym;kwargs...) = sympy_meth(:dsolve, ex; kwargs...)
+dsolve(exs::Vector{Sym};kwargs...) = sympy_meth(:dsolve, exs; kwargs...)
+dsolve(exs::Vector{Sym}, fx::Sym; kwargs...) = sympy_meth(:dsolve, exs, fx; kwargs...)
 
 
 """
