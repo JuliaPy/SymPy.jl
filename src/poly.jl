@@ -21,7 +21,7 @@ polynomial_sympy_methods_renamed = ((:div, :polydiv),
                                     (:roots, :polyroots)
                                     )
 
-                       
+
 for (meth, newmeth) in polynomial_sympy_methods_renamed
     meth_name = string(meth)
     @eval ($newmeth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
@@ -41,7 +41,7 @@ polynomial_sympy_methods = (
                             :poly_from_expr,
                             :degree, :degree_list,
                             :LC, :LM, :LT,
-                            :pdiv, :prem, :pquo, :pexquo, 
+                            :pdiv, :prem, :pquo, :pexquo,
                             :quo, :exquo,
                             :half_gcdex, :gcdex,
                             :invert,
@@ -85,7 +85,7 @@ polynomial_sympy_methods_import = (:expand,
                                    :factor #,
                                    #:trunc
                                    )
-                            
+
 for meth in polynomial_sympy_methods_import
     meth_name = string(meth)
     @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
@@ -113,13 +113,13 @@ Poly(x::Sym, args...; kwargs...) = sympy.Poly(project(x), project(args)...; [(k,
 export Poly
 
 ## Poly class methods that aren't sympy methods
-## e.g., must be called as obj.method(...), but not method(obj, ...)       
+## e.g., must be called as obj.method(...), but not method(obj, ...)
 ## not coeffs(x^2 -1), rather poly(x^2 - 1)  |> coeffs
 ## or poly(a*x^2 + b*x + c, x) |> coeffs to specify a specific variable
 polynomial_instance_methods = (:EC, :ET, :LC, :LM, :LT, :TC, ## no .abs()
-                              :add_ground, 
+                              :add_ground,
                               :all_coeffs,
-                              :all_monoms, :all_roots, :all_terms, 
+                              :all_monoms, :all_roots, :all_terms,
                               :as_dict, :as_expr, :as_list,
                               :clear_denoms,
                               :coeffs,

@@ -9,7 +9,7 @@ export refine
 
 ## This is a bit messed up, as we use Qeven in place of Q.even, ...
 Q_predicates = (:even, :odd, :prime, :nonzero,
-                :complex, :extended_real, :imaginary, :infinitesimal, 
+                :complex, :extended_real, :imaginary, :infinitesimal,
                 :integer, :irrational, :real,
                 :positive, :negative,
                 :bounded, :commutative)
@@ -30,7 +30,7 @@ end
 
 ## simple methods (x, args) -> y (y coercion happens via PyCall)
 logic_sympy_methods = (
-                     :And, :Or, :Not, 
+                     :And, :Or, :Not,
                      :Xor, :Nand, :Nor, :Implies,
                      :Equivalent,
                      :satisfiable

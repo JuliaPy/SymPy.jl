@@ -4,9 +4,9 @@
 
 core_object_methods = (:as_poly, :atoms,
                        :compare, :compare_pretty,
-                       :count, :doit, :dummy_eq, 
+                       :count, :doit, :dummy_eq,
                        :has, :match, ##:replace,
-                       :rewrite, :sort_key, 
+                       :rewrite, :sort_key,
                        :xreplace,
                        :args_cnc,
                        :as_coeff_Add, :as_coeff_Mul, :as_coeff_add,
@@ -15,7 +15,7 @@ core_object_methods = (:as_poly, :atoms,
                        :as_content_primitive, :as_expr, :as_independent,
                        :as_leading_term, :as_numer_denom, :as_ordered_factors,
                        :as_ordered_terms, :as_powers_dicts, :as_real_imag,
-                       :as_terms, 
+                       :as_terms,
                        :coeff, :compute_leading_term, :could_extract_minus_sign,
                        :count_ops, :equals,  :extract_additively,
                        :extract_branch_factor, :extract_multiplicatively,
@@ -23,8 +23,8 @@ core_object_methods = (:as_poly, :atoms,
                        ## :is_integer called as x[:is_integer]
                        :is_constant, :is_polynomial, :is_rational_function,
                        :integer_nthroot,
-                       :leadterm, 
-                       :primitive, 
+                       :leadterm,
+                       :primitive,
                        :removeO,
                        :series,
                        :expand
@@ -34,16 +34,16 @@ core_object_methods = (:as_poly, :atoms,
 core_object_properties = (:assumptions0,
                           :is_even, :is_odd,
                           :is_number, :is_integer, :is_real, :is_complex, :is_rational,
-                          :is_commutative, 
+                          :is_commutative,
                           :free_symbols # a bit funny, returns a set
                           )
 
 
 ## From relational
 core_sympy_methods = (:Wild, :Dummy,
-                      :Mod, :Rel, 
-                      :Eq, :Ne, :Lt, :Le, :Gt, :Ge, 
-                      :Equality, :Unequality, 
+                      :Mod, :Rel,
+                      :Eq, :Ne, :Lt, :Le, :Gt, :Ge,
+                      :Equality, :Unequality,
                       :GreaterThan, :LessThan, :StrictGreaterThan, :StrictLessThan,
                       :PoleError,
                       :count_ops,
@@ -68,7 +68,7 @@ lhs(ex::Sym, args...; kwargs...) = ex[:lhs]
 
 """
 
-Returns a tuple of arguments 
+Returns a tuple of arguments
 
 cf. [args](http://docs.sympy.org/latest/modules/core.html#sympy.core.basic.Basic.args)
 
@@ -90,6 +90,6 @@ core_sympy_methods_base = (:factorial,
                            )
 for meth in core_sympy_methods_base
     meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = 
+    @eval ($meth)(ex::Sym, args...; kwargs...) =
       sympy_meth(symbol($meth_name), ex, args...; kwargs...)
 end

@@ -23,8 +23,8 @@ Sym(1 + 2im)
 Sym(pi)
 Sym(e)
 Sym(catalan)
-            
-      
+
+
 
 
 ## subs, |> (x == number)
@@ -168,18 +168,18 @@ rv - s
 s - a
 a - s
 
-2v   
-2rv  
-2a   
+2v
+2rv
+2a
 s .* v
 v .* s
 s .* rv
 rv .* s
-s .* a 
-a .* s 
+s .* a
+a .* s
 
 ## s / v  ## broadcasts s Depreacated
-s ./ v 
+s ./ v
 v / s
 v .\ s
 s \ v
@@ -189,23 +189,23 @@ rv / s
 rv .\ s
 s \ rv
 ## s / a ## broadcasts s Deprecated
-s ./ a 
+s ./ a
 a / s
 a .\ s
 s \ a
 
 @test_throws MethodError  s ^ v ## error
-s .^ v  
+s .^ v
 @test_throws MethodError  v ^ s ## error
-v .^ s 
+v .^ s
 @test_throws MethodError  s ^ rv ## error
 s .^ rv
 @test_throws DimensionMismatch  rv ^ s ## error
-rv .^ s 
+rv .^ s
 @test_throws MethodError  s ^ a ## error
 s .^ a
 a ^ s
-a .^ s 
+a .^ s
 
 
 ## vector vector
@@ -220,7 +220,7 @@ v * rv ## 2x1 1x2 == 2x2
 rv * v ## 1x2 2 x 1 == 1x1
 v .* rv ## XXX ?? should be what? -- not 2 x 2
 rv .* v ## XXX ditto
-## @test_throws MethodError  v / v ## error 
+## @test_throws MethodError  v / v ## error
 v ./ v ## ones()
 v .\ v
 ## @test_throws MethodError  v / rv ## error

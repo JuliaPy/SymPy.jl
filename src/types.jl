@@ -46,7 +46,7 @@ convert(::Type{PyObject}, s::Sym) = s.x
 
 function convert(::Type{Tuple}, o::PyCall.PyObject)
     ## check that o is a tuple?
-    ## PyCall.pytypeof(o) 
+    ## PyCall.pytypeof(o)
     n = o[:__len__]()
     if VERSION >= v"0.4.0-dev"
         ntuple(i -> o[:__getitem__](i-1), n)
@@ -98,7 +98,7 @@ function get_free_symbols(ex::Sym)
     free = free_symbols(ex)
     n = free[:__len__]()
     n == 0 && return(Sym[])
-    
+
     vars = [free[:pop]()]
     if n > 1
         for i in 1:(n-1)

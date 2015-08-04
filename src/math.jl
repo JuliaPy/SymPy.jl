@@ -4,9 +4,9 @@
 ## Imported math functions
 ## make vectorized version while we are at it
 for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
-           :asinh, :acosh, :atanh, :sec, :csc, :cot, :asec, :acsc, :acot, 
-           :sech, :csch, 
-           :coth, :acoth, 
+           :asinh, :acosh, :atanh, :sec, :csc, :cot, :asec, :acsc, :acot,
+           :sech, :csch,
+           :coth, :acoth,
            :atan2,
            :radians2degrees, :degrees2radians,
            :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
@@ -30,7 +30,7 @@ end
 log(x::Sym) = sympy.log(project(x))
 log(b::Sym, x::Sym) = sympy.log(project(x), project(b))
 
-## :asech, :acsch, :sinc, :cosc, 
+## :asech, :acsch, :sinc, :cosc,
 ## These fail, so define from definitions
 ## http://mathworld.wolfram.com/InverseHyperbolicSecant.html
 asech(z::Sym) = log(sqrt(1/z-1)*sqrt(1/z+1) + 1/z)
@@ -57,11 +57,11 @@ end
 
 ## (x:Sym, ...) , export
 sympy_math_methods = (:Prod,
-                      :Ylm, 
-                      :assoc_legendre, 
+                      :Ylm,
+                      :assoc_legendre,
                       :chebyshevt
                       )
-for meth in sympy_math_methods 
+for meth in sympy_math_methods
     meth_name = string(meth)
     @eval ($meth)(ex::Sym, args...) = Sym(getfield(sympy,symbol($meth_name))(project(ex), project(args)...))
     eval(Expr(:export, meth))
@@ -76,13 +76,13 @@ gamma(x::Sym, y::Sym) = sympy.gamma(project(x), project(y))
 for fn in (
            :hankel1, :hankel2,             # hankel function of second kind H_n^2(x) = J_n(x) - iY_n(x)
            :legendre,
-           :jacobi, 
+           :jacobi,
            :gegenbauer,
            :hermite,
            :laguerre
            )
     meth = string(fn)
-    @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) = 
+    @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) =
     getfield(sympy,symbol($meth))([project(x) for x in xs]...,[(k,project(v)) for (k,v) in kwargs]...)
     eval(Expr(:export, fn))
 end
@@ -92,7 +92,7 @@ end
 cbrt(x::Sym) = x^(1//3)
 Base.ceil(x::Sym) = ceiling(x)
 
-## degree functions   
+## degree functions
 for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
           :acosd, :acotd, :acscd, :asecd, :asind, :atand)
 
@@ -100,13 +100,13 @@ for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
     @eval ($fn)(x::Sym) = getfield(sympy, symbol($rad_fn))(project(x * Sym(sympy.pi)/180))
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
-                                           
+
 for fn in (:cospi, :sinpi)
     rad_fn = string(fn)[1:end-2]
     @eval ($fn)(x::Sym) = getfield(sympy, symbol($rad_fn))(project(x * Sym(sympy.pi)))
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
- 
+
 
 ## add
 abs(x::Sym) = sympy_meth(:Abs, x)
@@ -122,8 +122,8 @@ Base.isfinite(x::Sym) = isfinite(convert(Float64, x))
 ## These are not right!!!
 ## see hyper and meijerg to indicate what needs to be done for these special function
 ## they really need to be coordinated with `Julia`'s as well.
-mpmath_fns = (:hyp0f1, 
-           :hyp1f1, :hyp1f2, 
+mpmath_fns = (:hyp0f1,
+           :hyp1f1, :hyp1f2,
            :hyp2f0, :hyp2f1, :hyp2f2, :hyp2f3,
            :hyp3f2,
            :hypercomb,
@@ -137,7 +137,7 @@ mpmath_fns = (:hyp0f1,
            :webere,
            :coulombc,
            :legenp, :legenq,
-           :chebyt, :chebyu, 
+           :chebyt, :chebyu,
            :pcfd, :pcfu, :pcfv, :pcfw,
            :lommels1, :lommels2,
            :coulombf, :coulombg,
@@ -145,13 +145,13 @@ mpmath_fns = (:hyp0f1,
            :whitm, :whitw,
            :scorergi, :scorerhi,
            :spherharm,
-           :airyaizero, :airybizero, 
+           :airyaizero, :airybizero,
            :besseljzero, :besselyzero
            )
 if isdefined(:mpmath)
 for fn in mpmath_fns
            meth = string(fn)
-           @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) = 
+           @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) =
            Sym(mpmath.((symbol($meth)))([project(x) for x in xs]...,[(k,project(v)) for (k,v) in kwargs]...))
     eval(Expr(:export, fn))
 end
@@ -259,16 +259,16 @@ end
 #####
 
 
-function !={T <: Real}(x::Sym, y::T) 
-    try 
+function !={T <: Real}(x::Sym, y::T)
+    try
         x = convert(Float64, x)
         x != y
     catch
         true
     end
 end
-function !={T <: Complex}(x::Sym, y::T) 
-    try 
+function !={T <: Complex}(x::Sym, y::T)
+    try
         x = complex(x)
         x != y
     catch
@@ -300,7 +300,7 @@ available symbolically, by calling `N` on the values.
 
 Using `SymPy` within `Julia` makes having two such functions useful:
 
-* one to do the equivalent of SymPy's `evalf` function 
+* one to do the equivalent of SymPy's `evalf` function
 * one to *also* convert these expressions back into `Julia` objects.
 
 We use `N` to return a `Julia` object and `evalf` to return a symbolic
@@ -361,7 +361,7 @@ function N(ex::Sym)
 end
 N(x::Number) = x
 """
-`N` can take a precision argument. 
+`N` can take a precision argument.
 
 When given as an integer greater than 16, we try to match the digits of accuracy using `BigFloat` precision on conversions to floating point.
 
@@ -373,7 +373,7 @@ function N(x::Sym, prec::Int)
         out = x[:evalf](prec)
         return( N(out, prec) )
     end
-    
+
     ex = evalf(x, prec)
     if x[:is_integer]
         return(convert(BigInt, ex))
@@ -381,8 +381,8 @@ function N(x::Sym, prec::Int)
         return(convert(Rational, ex))
     elseif x[:is_real]
         p = round(Int,log2(10)*prec)
-        
-        out = with_bigfloat_precision(p) do 
+
+        out = with_bigfloat_precision(p) do
             convert(BigFloat, ex)
         end
         return(out)
@@ -391,7 +391,7 @@ function N(x::Sym, prec::Int)
         u, v = promote(N(r, prec), N(i, prec))
         return(Complex(u, v))
     end
-    
+
     throw(DomainError())
 end
 
@@ -411,11 +411,11 @@ function evalf(x::Sym, args...; kwargs...)
     x[:evalf](args...; kwargs...)
 end
 
-for meth in (:separate, :flatten, 
+for meth in (:separate, :flatten,
              :igcd, :ilcm,
              :sqf,
-             :together, 
-             :limit, 
+             :together,
+             :limit,
              :Derivative
              )
     meth_name = string(meth)
@@ -430,7 +430,7 @@ function Base.diff(ex::Sym, args...; kwargs...)
         sympy_meth(:diff, ex, args...; kwargs...)
     end
 end
-    
+
 
 
 
@@ -450,7 +450,7 @@ function diff(f::Function, k::Int=1; kwargs...)
     x = Sym("x")
     diff(f(x), x, k; kwargs...)
 end
-    
+
 
 
 ## different conversions
@@ -488,7 +488,7 @@ Base.one(::Type{Sym}) = Sym(1)
 
 Solve an expression for any zeros or a system of expressions passed a vector.
 
-Examples: 
+Examples:
 
 ```
 x,y, a,b,c = symbols("x, y, a, b, c", real=true)
@@ -514,12 +514,12 @@ The `SymPy` docs say this about `solve`:
 > cannot be represented symbolically. For example, the equation
 > `x=cos(x)` has a solution, but it cannot be represented
 > symbolically using standard functions.
-> 
+>
 > In fact, solve makes no guarantees whatsoever about the completeness
 > of the solutions it finds. Much of solve is heuristics, which may find
 > some solutions to an equation or system of equations, but not all of
 > them.
-        
+
 
 If succesful, returns an array of possible answers, a dictionary, or an array of dictionaries. The dictionaries are
 of the form `string => Sym`, so to access the values, use `d[string(x)]` or `d["x"]`, but not `d[x]`, where `x` is symbolic.
@@ -528,7 +528,7 @@ Note: The individual components of the array display more nicely than the array.
 
 Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html#algebraic-equations)
 
-"""  
+"""
 function solve(ex::Sym, args...;  kwargs...)
     a = sympy.solve(project(ex), map(project, args)...;  kwargs...)
 
@@ -591,14 +591,14 @@ end
 """
 Numerically solve for a zero of an expression.
 
-Examples: 
+Examples:
 ```
 solve(x^5 - x -1) # inconclusive
 nsolve(x^5 - x - 1, 1)
 ```
 
 Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html#algebraic-equations)
-"""              
+"""
 nsolve(ex::Sym, x::Sym, x0::Number) = sympy.nsolve(project(ex), project(x), x0) |> x -> convert(Float64, x)
 nsolve(ex::Sym, x0::Number) =  sympy.nsolve(project(ex), x0) |> x -> convert(Float64, x)
 function nsolve{T <: Number}(ex::Vector{Sym}, x::Vector{Sym}, x0::Vector{T}; kwargs...)
@@ -628,7 +628,7 @@ dsolve(diff(f(x), x, x) + f(x), f(x)) ## solve f''(x) + f(x) = 0
 ```
 
 References: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/ode.html#ode-docs)
-"""             
+"""
 dsolve(ex::Sym, fx::Sym;kwargs...) = sympy_meth(:dsolve, ex, fx; kwargs...)
 dsolve(ex::Sym;kwargs...) = sympy_meth(:dsolve, ex; kwargs...)
 dsolve(exs::Vector{Sym};kwargs...) = sympy_meth(:dsolve, exs; kwargs...)
@@ -639,7 +639,7 @@ dsolve(exs::Vector{Sym}, fx::Sym; kwargs...) = sympy_meth(:dsolve, exs, fx; kwar
 
 Create a piecewise defined function.
 
-To create conditions on the variable, the functions `Lt`, `Le`, `Eq`, `Ge`, and `Gt` can be used. For infix notation, 
+To create conditions on the variable, the functions `Lt`, `Le`, `Eq`, `Ge`, and `Gt` can be used. For infix notation,
 unicode operators can be used: `\ll<tab>`, `\le<tab>`, `\Equal<tab>`, `\ge<tab>`, and `\gg<tab>`.
 
 To combine terms, the unicode `\vee<tab>` (for "or"), `\wedge<tab>` (for "and") can be used
@@ -653,23 +653,23 @@ x,a = symbols("x,a")
 p = piecewise((1, Lt(x, a)), (2, Ge(x,a)))  # same as piecewise((1,  x ≪ a), (2, x ≥ a))
 subs(p, x, a - 1)
 ```
-"""                 
+"""
 function piecewise(args...)
     args = [map(project, x) for x in args]
     sympy.Piecewise(args...)
 end
 
 ## special numbers
-"PI is a symbolic  π. Using `julia`'s `pi` will give round off errors." 
+"PI is a symbolic  π. Using `julia`'s `pi` will give round off errors."
 const PI = Sym(sympy.pi)
 
-"E is a symbolic  `e`. Using `julia`'s `e` will give round off errors." 
+"E is a symbolic  `e`. Using `julia`'s `e` will give round off errors."
 const E = Sym(sympy.exp(1))
 
-"IM is a symbolic `im`" 
+"IM is a symbolic `im`"
 const IM = Sym(sympy.I)
 
-"oo is a symbolic infinity. Example: `integrate(exp(-x), x, 0, oo)`." 
+"oo is a symbolic infinity. Example: `integrate(exp(-x), x, 0, oo)`."
 const oo = Sym(sympy.oo)
 
 
