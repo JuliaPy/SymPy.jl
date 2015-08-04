@@ -65,10 +65,10 @@ macro vars(x...)
 end
 
 
-"Macro to create a symbolic object: `sym\"x\"`"
 #macro sym_str(x)
 #    Sym(x)
 #end
+# "Macro to create a symbolic object: `sym\"x\"`"
 @deprecate sym_str(x)  symbols(x::String)
 
 ## define one or more symbols directly
