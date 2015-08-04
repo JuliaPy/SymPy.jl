@@ -1,5 +1,6 @@
 using SymPy
 using Base.Test
+using Compat
 
 ## syms
 x = Sym("x")
@@ -104,8 +105,8 @@ integrate(sin(x), (x, a, b)) |> replace(a, 0) |> replace(b, pi)
 summation(1/x^2, (x, 1, 10))
 out = summation(1/x^2, (x, 1, 10))
 out1 = sum([1//x^2 for  x in 1:10])
-@assert out[:p] |> integer == out1.num
-@assert out[:q] |> integer == out1.den
+@assert @compat round(Integer, out[:p]) == out1.num
+@assert @compat round(Integer, out[:q]) == out1.den
 
 ## matrices
 (x,) = @syms x
@@ -271,7 +272,7 @@ a .^ a
 ## Number theory
 @test isprime(100) == isprime(Sym(100))
 @test prime(Sym(100)) == 541
-@test int(collect(primerange(Sym(2),10))) == primes(10)
+@test @compat round(Int, collect(primerange(Sym(2),10))) == primes(10)
 @test multiplicity(Sym(10), 100) == 2
 @test factorint(Sym(100)) == factor(100)
 
@@ -301,9 +302,9 @@ x = Sym("x")
 p = piecewise((x, Ge(x,0)), (0, Lt(x,0)), (1, Eq(x,0)))
 ## using infix \ll<tab>, \gt<tab>, \Equal<tab>
 p = piecewise((x, x ≥ 0), (0, x ≪ 0), (1, x ⩵ 0))
-@assert int(subs(p,x,2)) == 2
-@assert int(subs(p,x,-1)) == 0
-@assert int(subs(p,x,0)) == 0
+@assert @compat Int(subs(p,x,2)) == 2
+@assert @compat Int(subs(p,x,-1)) == 0
+@assert @compat Int(subs(p,x,0)) == 0
 
 ## More logical expressions
 (x ≪ 0) ∧ (x*y ≤ 1) ∨ (x ⩵ y) ∧ (¬(x ≫ 3))
