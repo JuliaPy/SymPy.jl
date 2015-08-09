@@ -1,3 +1,5 @@
+VERSION >= v"0.4.0-dev+6521" && __precompile__()
+
 module SymPy
 
 
@@ -24,22 +26,6 @@ SymPy
 using Compat
 
 using PyCall
-@pyimport sympy
-## how to check if symbol in module more quickly?
-if :mpmath in names(sympy)
-    @pyimport sympy.mpmath as mpmath
-else
-    isthere = true
-    try
-        @pyimport mpmath
-    catch err
-        isthere = false
-        warn("Couldn't import the mpath Python module. This needs to be installed for tests to pass: `mpmath.org`.")
-    end
-    if isthere
-        @pyimport mpmath
-    end
-end
 
 using Requires ## for @require macro
 
@@ -83,6 +69,7 @@ import Base:  inv, conj,
               cross, eigvals, eigvecs, trace, norm
 import Base: promote_rule
 import Base: match, replace, round
+import Base: +,-,*,/,\
 import Base: ^, .^
 import Base: &, |, !, >, >=, ==, <=, <
 ## poly.jl
@@ -131,6 +118,10 @@ include("mathops.jl")
 include("core.jl")
 include("logical.jl")
 include("math.jl")
+include("mpmath.jl")
+include("specialfuns.jl")
+include("solve.jl")
+include("subs.jl")
 include("simplify.jl")
 include("functions.jl")
 include("series.jl")
@@ -185,5 +176,59 @@ for prop in union(core_object_properties,
     eval(Expr(:export, prop))
 end
 
+
+## For precompilation we must put PyCall instances in __init__:
+function __init__()
+    
+    ## Define sympy, mpmath, ...
+    global const sympy = pyimport("sympy")
+
+    ## mappings from PyObjects to types.
+    basictype = sympy[:basic]["Basic"]
+    pytype_mapping(basictype, Sym)
+
+    polytype = sympy[:polys]["polytools"]["Poly"]
+    pytype_mapping(polytype, Sym)
+
+    try
+        matrixtype = sympy[:matrices]["MatrixBase"]
+        pytype_mapping(matrixtype, SymMatrix)
+    catch e
+    end
+
+
+    ## Makes it possible to call in a sympy method, witout worrying about Sym objects
+    global call_sympy_fun(fn::Function, args...; kwargs...) = fn(map(project, args)...; [(k,project(v)) for (k,v) in kwargs]...)
+
+    ## Main interface to methods in sympy
+    ## sympy_meth(:name, ars, kwars...)
+    global sympy_meth(meth::Symbol, args...; kwargs...) = begin
+        ans = call_sympy_fun(sympy[meth], args...; kwargs...)
+        ## make nicer...
+        if isa(ans, Vector)
+            ans = Sym[i for i in ans]
+        end
+        ans
+    end
+    global object_meth(object::SymbolicObject, meth::Symbol, args...; kwargs...)  =  begin
+        call_sympy_fun(project(object)[meth],  args...; kwargs...)
+    end
+    global call_matrix_meth(object::SymbolicObject, meth::Symbol, args...; kwargs...) = begin
+        out = object_meth(object, meth, args...; kwargs...)
+        if isa(out, SymMatrix) 
+            convert(Array{Sym}, out)
+        elseif  length(out) == 1
+            out 
+        else
+            map(u -> isa(u, SymMatrix) ? convert(Array{Sym}, u) : u, out)
+        end
+    end
+
+    ##
+    init_logical()
+    init_math()
+    init_mpmath()
+
+end
 
 end

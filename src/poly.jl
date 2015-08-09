@@ -108,8 +108,8 @@ coeffs(p)  ## [a,b,c]
 ```
 
 """
-Poly(x::Sym) = sympy.Poly(project(x))
-Poly(x::Sym, args...; kwargs...) = sympy.Poly(project(x), project(args)...; [(k,project(v)) for (k,v) in kwargs]...)
+Poly(x::Sym) = sympy[:Poly](x)
+Poly(x::Sym, args...; kwargs...) = sympy_meth(:Poly, x, args...; kwargs...)
 export Poly
 
 ## Poly class methods that aren't sympy methods

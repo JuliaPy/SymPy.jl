@@ -15,19 +15,6 @@ immutable SymMatrix <: SymbolicObject
     x::PyCall.PyObject
 end
 
-## Automatic conversion of python types to Sym class.
-basictype = sympy.basic["Basic"]
-pytype_mapping(basictype, Sym)
-
-polytype = sympy.polys["polytools"]["Poly"]
-pytype_mapping(polytype, Sym)
-
-try
-    matrixtype = sympy.matrices["MatrixBase"]
-    pytype_mapping(matrixtype, SymMatrix)
-catch e
-end
-
 ## complex float
 ## this cause issue with printing on non-complex objects
 #mpctype = sympy.mpmath["ctx_mp_python"]
@@ -56,14 +43,14 @@ function convert(::Type{Tuple}, o::PyCall.PyObject)
 end
 
 ## rational
-convert{T<:SymbolicObject}(::Type{T}, x::Rational) = sympy.Rational(x.num, x.den)
+convert{T<:SymbolicObject}(::Type{T}, x::Rational) = sympy_meth(:Rational, x.num, x.den)
 
 ## big. Need mpmath installed separately -- not as a SymPy module as that is how it is called in PyCall
 convert{T<:SymbolicObject}(::Type{T}, x::BigFloat) = Sym(PyCall.PyObject(x))
 convert(::Type{Sym}, x::Complex{BigFloat}) = Sym(PyCall.PyObject(x))
 
 ## real
-convert{S<:SymbolicObject, T <: Real}(::Type{S}, x::T) = sympy.sympify(x)
+convert{S<:SymbolicObject, T <: Real}(::Type{S}, x::T) = sympy_meth(:sympify, x)
 convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 
 
@@ -71,12 +58,12 @@ convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 ## Sym(PyCall.PyObject(im)) gives 1j, not i (One is python, the other SymPy)
 function convert(::Type{Sym}, x::Complex)
     if isa(x, Complex{Bool})
-        return(Sym(sympy.I))
+        return(Sym(sympy[:I]))
     end
     if real(x) == 0
-        Sym(sympy.Symbol("$(imag(x))*I"))
+        Sym(sympy[:Symbol]("$(imag(x))*I"))
     else
-        Sym(sympy.Symbol("$(real(x)) + $(imag(x))*I"))
+        Sym(sympy[:Symbol]("$(real(x)) + $(imag(x))*I"))
     end
 end
 convert(::Type{Complex}, x::Sym) = complex(map(x -> convert(Float64, x), x[:as_real_imag]())...)
@@ -89,8 +76,8 @@ convert(::Type{Sym}, o::SymMatrix) = Sym(o.x)
 convert(::Type{SymMatrix}, o::Sym) = SymMatrix(o.x)
 
 ## string
-convert(::Type{Sym}, o::String) = sympy.sympify(o)
-convert(::Type{Sym}, o::Symbol) = sympy.sympify(string(o))
+convert(::Type{Sym}, o::String) = sympy_meth(:sympify, o)
+convert(::Type{Sym}, o::Symbol) = sympy_meth(:sympify, string(o))
 
 
 "get the free symbols in a more convenient form that as returned by `free_symbols`"

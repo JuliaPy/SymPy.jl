@@ -74,7 +74,7 @@ f(x,y) = x^2 + y^2
 plot_implicit((f(x,y) ≪ 5) ∧ (f(x,y) ≥ 2), (x,-5,5), (y,-5,5))
 ```
 """
-plot_implicit(ex, args...; kwargs...) = sympy.plotting[:plot_implicit](ex.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+plot_implicit(ex, args...; kwargs...) = sympy[:plotting][:plot_implicit](ex.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
     
 
 """
@@ -90,7 +90,7 @@ t = symbols("t", real=true)
 plot_parametric(sin(t), cos(t), (t, 0, 2pi))
 ```
 """
-plot_parametric(ex1, ex2, args...; kwargs...) = sympy.plotting[:plot_parametric](ex1.x, ex2.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+plot_parametric(ex1, ex2, args...; kwargs...) = sympy[:plotting][:plot_parametric](ex1.x, ex2.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
 
 
 """
@@ -108,7 +108,7 @@ x,y = symbols("x,y", real=true)
 plot3d(x^2 - 2x*y, (x, -5,5), (y, -5,5))
 ```
 """    
-plot3d(ex, args...; kwargs...) = sympy.plotting[:plot3d](ex.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+plot3d(ex, args...; kwargs...) = sympy[:plotting][:plot3d](ex.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
 
 
 """
@@ -120,7 +120,7 @@ t = sym"t"
 plot(cos(t), sin(t), t, (t, 0, 4PI))
 ```
 """    
-plot3d_parametric_line(ex1, ex2, ex3, args...; kwargs...) = sympy.plotting[:plot3d_parametric_line](ex1.x, ex2.x, ex3.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+plot3d_parametric_line(ex1, ex2, ex3, args...; kwargs...) = sympy[:plotting][:plot3d_parametric_line](ex1.x, ex2.x, ex3.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
 
 """
 
@@ -133,7 +133,7 @@ u,v = symbols("u, v", real=true)
 plot3d_parametric_surface(cos(u + v), sin(u - v), u-v, (u, -5, 5), (v, -5,5))
 ```
 """
-plot3d_parametric_surface(ex1, ex2, ex3, args...; kwargs...) = sympy.plotting[:plot3d_parametric_surface](ex1.x, ex2.x, ex3.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
+plot3d_parametric_surface(ex1, ex2, ex3, args...; kwargs...) = sympy[:plotting][:plot3d_parametric_surface](ex1.x, ex2.x, ex3.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
 
 
 export plot_implicit, plot_parametric, plot3d, plot3d_parametric_line, plot3d_parametric_surface

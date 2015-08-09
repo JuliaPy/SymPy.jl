@@ -17,7 +17,7 @@ Q_nms = [symbol("Q" * string(i)) for i in Q_predicates]
 
 for (fn, meth) in zip(Q_nms, Q_predicates)
     nm = string(meth)
-    @eval ($fn)(x) = PyCall.pyeval("f(x)", f=sympy.Q[($nm)], x=project(x))
+    @eval ($fn)(x) = PyCall.pyeval("f(x)", f=sympy[:Q][($nm)], x=project(x))
     eval(Expr(:export, fn))
 end
 
@@ -42,5 +42,5 @@ logic_sympy_methods = (
 ## ask(Qinteger(x*y), And(Qinteger(x), Qinteger(y)))
 ## ## really slow isprime:
 ## filter(x -> ask(Qprime(x)), [1:1000])
-ask(x::Sym, args...) = sympy.ask(x.x, map(project, args)...)
+ask(x::Sym, args...) = sympy_meth(:ask, x, args...)
 export ask

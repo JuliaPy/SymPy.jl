@@ -13,5 +13,5 @@ minimum(ex::Sym, args...; kwargs...) = sympy_meth(:Min, ex, args...; kwargs...)
 #maximum(ex::Sym,x::NAtype) = x
 maximum(ex::Sym, args...; kwargs...) = sympy_meth(:Max, ex, args...; kwargs...)
 
-Base.real(x::Sym) = sympy.re(project(x))
-Base.imag(x::Sym) = sympy.im(project(x))
+Base.real(x::Sym) = sympy_meth(:re, x)
+Base.imag(x::Sym) = sympy_meth(:im, x)

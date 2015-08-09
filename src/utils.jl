@@ -4,7 +4,7 @@
 ## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y), @syms x y, symbols("x y")
 
 "Create a symbolic object from a symbol or string"
-Sym(s::Union(Symbol, String)) = sympy.symbols(string(s))
+Sym(s::Union(Symbol, String)) = sympy_meth(:symbols, string(s))
 
 "Create a symbolic number"
 # Sym(s::Rational) = convert(Sym, s)
@@ -69,7 +69,7 @@ end
 #macro sym_str(x)
 #    Sym(x)
 #end
-@deprecate sym_str(x)  symbols(x::String)
+##@deprecate sym_str(x)  symbols(x::String)
 
 ## define one or more symbols directly
 ## a,b,c = symbols("a,b,c", commutative=false)
@@ -89,7 +89,7 @@ x,y,z = symbols("x, y, z", real=true)
 
 """
 function symbols(x::String; kwargs...) 
-    out = sympy.symbols(x; kwargs...)
+    out = sympy_meth(:symbols, x; kwargs...)
 end
 
 
@@ -164,8 +164,8 @@ function getindex(x::SymbolicObject, i::Symbol)
         else
             return out
         end
-    elseif i in names(sympy)
-        out = sympy.(i)
+    elseif haskey(sympy, i)
+        out = sympy[i]
         if isa(out, Function) 
             function f(args...;kwargs...) 
                 out(project(x), project(args)...; [(k,project(v)) for (k,v) in kwargs]... )
@@ -187,33 +187,33 @@ end
 ## or we may have object.method
 
 ## Makes it possible to call in a sympy method, witout worrying about Sym objects
-call_sympy_fun(fn::Function, args...; kwargs...) = fn(map(project, args)...; [(k,project(v)) for (k,v) in kwargs]...)
-function sympy_meth(meth::Symbol, args...; kwargs...) 
-    ans = call_sympy_fun(getfield(sympy,meth), args...; kwargs...)
-    ## make nicer...
-    if isa(ans, Vector)
-        ans = Sym[i for i in ans]
-    end
-    ans
-end
+# call_sympy_fun(fn::Function, args...; kwargs...) = fn(map(project, args)...; [(k,project(v)) for (k,v) in kwargs]...)
+# function sympy_meth(meth::Symbol, args...; kwargs...) 
+#     ans = call_sympy_fun(getfield(sympy,meth), args...; kwargs...)
+#     ## make nicer...
+#     if isa(ans, Vector)
+#         ans = Sym[i for i in ans]
+#     end
+#     ans
+# end
         
 
-## meth of object, convert arguments
-object_meth(object::SymbolicObject, meth::Symbol, args...; kwargs...) =  
-  call_sympy_fun(project(object)[meth],  args...; kwargs...)
+# ## meth of object, convert arguments
+# object_meth(object::SymbolicObject, meth::Symbol, args...; kwargs...) =  
+#   call_sympy_fun(project(object)[meth],  args...; kwargs...)
 
 
-## meth of object, convert arguments, output to SymMatrix 
-function call_matrix_meth(object::SymbolicObject, meth::Symbol, args...; kwargs...) 
-    out = object_meth(object, meth, args...; kwargs...)
-    if isa(out, SymMatrix) 
-        convert(Array{Sym}, out)
-    elseif  length(out) == 1
-        out 
-    else
-        map(u -> isa(u, SymMatrix) ? convert(Array{Sym}, u) : u, out)
-    end
-end
+# ## meth of object, convert arguments, output to SymMatrix 
+# function call_matrix_meth(object::SymbolicObject, meth::Symbol, args...; kwargs...) 
+#     out = object_meth(object, meth, args...; kwargs...)
+#     if isa(out, SymMatrix) 
+#         convert(Array{Sym}, out)
+#     elseif  length(out) == 1
+#         out 
+#     else
+#         map(u -> isa(u, SymMatrix) ? convert(Array{Sym}, u) : u, out)
+#     end
+# end
 
 
 
