@@ -1,5 +1,5 @@
 ## matrix class stuff
-## XXX work with Array{Sym}, not python array objects
+## Work with Array{Sym}, not python array objects
 ## requires conversion from SymMatrix -> Array{Sym} in outputs, as appropriate
 
 ## covert back to Array{Sym}
@@ -229,32 +229,50 @@ end
 # end
     
 
+### Higher dimensional derivatives
 
-# Jacobian
-# example:
-# rho, phi = @syms rho phi
-# M = [rho*cos(phi), rho*sin(phi), rho^2]
-# Y = [rho, phi]
-# jacobian(M, Y)
-function jacobian(x::Matrix{Sym}, y::Matrix{Sym})
+## For gradient we have [diff(ex,var) for var in get_free_symbols(ex)]... but order is of importance...
+
+
+"""
+
+Jacobian of a symbolic matrix
+
+Example:
+
+```
+rho, phi = symbols("rho, phi")
+M = [rho*cos(phi), rho*sin(phi), rho^2]
+Y = [rho, phi]
+jacobian(M, Y)
+```
+"""
+function jacobian(x::Array{Sym}, y::Array{Sym})
     X = convert(SymMatrix, x)
     Y = convert(SymMatrix, y)
     call_matrix_meth(X, :jacobian, Y)
 end
-export jacobian
 
-## x, y = symbols("x y")
-## f = x^2 - 2x*y
-## hessian(f, [x,y])
-"Find Hessian of a symbolic expression"
+
+
+"""
+
+Find Hessian of a symbolic expression
+
+Example:
+```
+x, y = symbols("x y")
+f = x^2 - 2x*y
+hessian(f, [x,y])
+```
+"""
 function hessian(f::Sym, x::Vector{Sym})
     out = sympy_meth(:hessian, f, x)
     convert(SymMatrix, out) |> u -> convert(Array{Sym}, u)
 end
 hessian(ex::Sym) = hessian(ex, get_free_symbols(ex))
-export hessian
 
-## For gradient we have [diff(ex,var) for var in get_free_symbols(ex)]... but order is of importance...
+
 
 
     

@@ -1,5 +1,9 @@
 VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
+## TODO:
+## * tidy up code
+## * check on sympy_meth uses...
+
 module SymPy
 
 
@@ -36,7 +40,7 @@ else
     macro document() nothing end    
 end
 @document
-#@docstrings
+
 
 import Base: show, writemime
 import Base: convert, promote_rule
@@ -106,7 +110,8 @@ export SymFunction, SymMatrix,
        dsolve,
        poly,  nroots, real_roots, polyroots,
        ∨, ∧, ¬,
-       rhs, lhs, args
+       rhs, lhs, args,
+       jacobian, hessian
 export relation, piecewise
 export members, doc, _str
 
@@ -123,7 +128,6 @@ include("specialfuns.jl")
 include("solve.jl")
 include("subs.jl")
 include("simplify.jl")
-include("functions.jl")
 include("series.jl")
 include("integrate.jl")
 include("assumptions.jl")

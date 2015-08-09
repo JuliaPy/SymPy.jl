@@ -1,3 +1,5 @@
+## Substitutions and numeric conversions
+
 
 ## subs
 """
@@ -6,6 +8,7 @@
 value. The `replace` function is also overrided to do this task.
 
 Examples:
+
 ```
 x,y = symbols("x,y")
 ex = (x-y)*(x+2y)
@@ -13,10 +16,17 @@ subs(ex, (y, y^2))
 subs(ex, (x,1), (y,2))
 subs(ex, (x,y^3), (y,2))
 subs(ex, y, 3)
-subs(ex, :y, pi)    ## will only work if Sym(:y) == y, which isn't case, say when y=symbols("y", real=true)
-subs(ex, x=1, y=pi) ## will only work if Sym(:y) == y, which isn't case, say when y=symbols("y", real=true)
-ex |> subs(:x, e)   ## will only work if Sym(:y) == y, which isn't case, say when y=symbols("y", real=true)
-ex |> subs(x=e)     ## will only work if Sym(:y) == y, which isn't case, say when y=symbols("y", real=true)
+```
+
+The following forms are *convenient*, but they will only work when the
+symbols satisfy `Sym(:y) == y`, which isn't the case, for example, for
+`y` defined through `y=symbols("y", real=true)`.
+
+```
+subs(ex, :y, pi)    
+subs(ex, x=1, y=pi) 
+ex |> subs(:x, e)   
+ex |> subs(x=e)     
 ## julia v"0.4" only:
 ## ex(x=2, y=3)     ## will only work if Sym(:y) == y, which isn't case, say when y=symbols("y", real=true)
 ```
@@ -33,22 +43,13 @@ subs(;kwargs...) = ex -> subs(ex; kwargs...)
 
 
 ## Convenience method for keyword arguments
-function  subs{T <: SymbolicObject}(ex::T; kwargs...)
+function subs{T <: SymbolicObject}(ex::T; kwargs...)
     ts = [(Sym(k),v) for (k,v) in kwargs]
     subs(ex, ts...)
 end
 
 
-"""
-
-substitute multiple values stored in array
-
-"""
-# @deprecate
-#subs{T <: Any}(ex::SymbolicObject, xs::Vector{Union(Sym,T)}) = subs(ex, xs...)
-
-
-
+## replace alias for subs
 Base.replace(ex::SymbolicObject, x::SymbolicObject, y) = subs(ex, x, y)
 ## curried version to use through |> as in
 ## ex |> replace(x, 2)
@@ -57,6 +58,8 @@ Base.replace(ex::SymbolicObject; kwargs...) = subs(ex, kwargs...)
 
 
 ## Make callable expression, so that function notation is more natural
+## **Problematic** as x=Sym("x") will work -- but **not** x= symbols("x", real=true), say.
+
 """
 
 ```
@@ -73,6 +76,9 @@ if VERSION >= v"0.4.0-dev"
 end
 
 #####
+
+
+## different conversions
 
 
 ## helper, as :is_rational will find 1.2 rational...
@@ -202,7 +208,7 @@ Unlike `N`, `evalf` returns an object of type `Sym`.
 Examples
 ```
 x = Sym("x")
-evalf(x, subs=[x => 1/2])  # v0.3 syntax for anonymous dicts
+evalf(x, subs=Dict([(x,1/2)])) 
 ```
 """
 

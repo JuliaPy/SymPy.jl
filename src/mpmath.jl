@@ -34,7 +34,10 @@ for fn in mpmath_fns
     eval(Expr(:export, fn))
 end
 
-
+## Initialize mpmath
+## includes trying to find the module!
+## automatic mappings may throw warning about strings, though it is expected these
+## will be addressed by PyCall
 function init_mpmath()
     PyCall.mpmath_init()
     ## try to load mpmath module
@@ -55,6 +58,7 @@ function init_mpmath()
         pytype_mapping(mpctype, Complex{BigFloat})
     end
 
+    ## Call a function in the mpmath module, giving warning and returning NaN if module is not found 
     global mpmath_meth(meth::Symbol, args...; kwargs...) = begin
         if isa(mpmath, Nothing)
             warn("The mpmath module of Python is not installed. http://docs.sympy.org/dev/modules/mpmath/setup.html#download-and-installation")

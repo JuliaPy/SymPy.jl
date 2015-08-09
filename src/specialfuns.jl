@@ -1,3 +1,32 @@
+## simple (x::Union(Sym, Number;...) signature, export
+for fn in (
+           :hankel1, :hankel2,             # hankel function of second kind H_n^2(x) = J_n(x) - iY_n(x)
+           :legendre,
+           :jacobi, 
+           :gegenbauer,
+           :hermite,
+           :laguerre
+           )
+    meth = string(fn)
+    @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) = sympy_meth(symbol($meth), xs...; kwargs...)
+    eval(Expr(:export, fn))
+end
+
+
+
+## these have (parameter, x) signature. Use symbolic x to call sympy version, othewise
+## should dispatch to julia version.
+for fn in (:besselj, :bessely, :besseli, :besselk)
+    meth = string(fn)
+    @eval ($fn)(nu::Union(Sym, Number), x::Sym;kwargs...) = sympy_meth(symbol($meth), x; kwargs...)
+    @eval ($fn)(nu::Union(Sym, Number), a::Array{Sym}) = map(x ->$fn(nu, x), a)
+end
+
+
+## :gamma, :beta, # need import
+beta(x::Sym, y::Sym) = sympy_meth(:beta, x, y)
+gamma(x::Sym, y::Sym) = sympy_meth(:gamma, x, y)
+
 
 ## Hyper and friends don't really have symbolic use...
 """

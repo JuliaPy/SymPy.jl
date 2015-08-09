@@ -1,6 +1,6 @@
 ## Logical operators for (Sym,Sym)
 
-## Experimental! Not sure these are such a good idea ...
+## XXX Experimental! Not sure these are such a good idea ...
 ## but used with piecewise
 Base.&(x::Sym, y::Sym) = PyCall.pyeval("x & y", x=project(x), y=project(y))
 Base.|(x::Sym, y::Sym) = PyCall.pyeval("x | y", x=project(x), y=project(y))
@@ -86,6 +86,24 @@ export ≪,⩵,≫
 # <=(x::Number, y::Sym) = y >= x
 # >=(x::Number, y::Sym) = y <= x
 # >(x::Number, y::Sym)  = y < x
+
+
+function !={T <: Real}(x::Sym, y::T) 
+    try 
+        x = convert(Float64, x)
+        x != y
+    catch
+        true
+    end
+end
+function !={T <: Complex}(x::Sym, y::T) 
+    try 
+        x = complex(x)
+        x != y
+    catch
+        true
+    end
+end
 
 function init_logical()
     ## Try this. It works with `sort`

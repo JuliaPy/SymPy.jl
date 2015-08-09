@@ -1,6 +1,3 @@
-## XXX This needs to be partitioned .... XXX
-
-
 ## Imported math functions
 ## make vectorized version while we are at it
 for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
@@ -20,76 +17,17 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
+
+## Log function handles arguments differently
+log(x::Sym) = sympy_meth(:log, x)
+log(b::Sym, x::Sym) = sympy_meth(:log(x,b))
+
+### Trigonometry
+
 if VERSION >= v"0.4.0-dev"
     Base.rad2deg(x::Sym) = radians2degrees(x)
     Base.deg2rad(x::Sym) = degrees2radians(x)
 end
-
-
-## Handle arguments differently
-log(x::Sym) = sympy_meth(:log,x)
-log(b::Sym, x::Sym) = sympy_meth(:log(x,b))
-
-## :asech, :acsch, :sinc, :cosc, 
-## These fail, so define from definitions
-## http://mathworld.wolfram.com/InverseHyperbolicSecant.html
-asech(z::Sym) = log(sqrt(1/z-1)*sqrt(1/z+1) + 1/z)
-asech(as::Array{Sym}) = map(asech, as)
-## http://mathworld.wolfram.com/InverseHyperbolicCosecant.html
-acsch(z::Sym) = log(sqrt(1+1/z^2) + 1/z)
-acsch(as::Array{Sym}) = map(acsch, as)
-sinc(x::Sym) = sin(Sym(PI*x))/(PI*x)
-sinc(as::Array{Sym}) = map(sinc, as)
-cosc(x::Sym) = diff(sinc(x))
-cosc(as::Array{Sym}) = map(cosc, as)
-
-
-
-## these have (parameter, x) signature. Use symbolic x to call sympy version, othewise
-## should dispatch to julia version.
-for fn in (:besselj, :bessely, :besseli, :besselk)
-    meth = string(fn)
-    @eval ($fn)(nu::Union(Sym, Number), x::Sym;kwargs...) = sympy_meth(symbol($meth), x; kwargs...)
-    @eval ($fn)(nu::Union(Sym, Number), a::Array{Sym}) = map(x ->$fn(nu, x), a)
-end
-
-## export these sympy functions ...
-
-## (x:Sym, ...) , export
-sympy_math_methods = (:Prod,
-                      :Ylm, 
-                      :assoc_legendre, 
-                      :chebyshevt
-                      )
-for meth in sympy_math_methods 
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
-    eval(Expr(:export, meth))
-end
-
-## :gamma, :beta, # need import
-beta(x::Sym, y::Sym) = sympy_meth(:beta, x, y)
-gamma(x::Sym, y::Sym) = sympy_meth(:gamma, x, y)
-
-
-## simple (x::Union(Sym, Number;...) signature, export
-for fn in (
-           :hankel1, :hankel2,             # hankel function of second kind H_n^2(x) = J_n(x) - iY_n(x)
-           :legendre,
-           :jacobi, 
-           :gegenbauer,
-           :hermite,
-           :laguerre
-           )
-    meth = string(fn)
-    @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) = sympy_meth(symbol($meth), xs...; kwargs...)
-    eval(Expr(:export, fn))
-end
-
-
-## in julia, not SymPy
-cbrt(x::Sym) = x^(1//3)
-Base.ceil(x::Sym) = ceiling(x)
 
 ## degree functions   
 for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
@@ -105,36 +43,65 @@ for fn in (:cospi, :sinpi)
     @eval ($fn)(x::Sym) = sympy[symbol($rad_fn)](project(x * Sym(sympy[:pi])))
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
- 
 
-## add
+## :asech, :acsch, :sinc, :cosc, 
+## These fail, so define from definitions
+## http://mathworld.wolfram.com/InverseHyperbolicSecant.html
+asech(z::Sym) = log(sqrt(1/z-1)*sqrt(1/z+1) + 1/z)
+asech(as::Array{Sym}) = map(asech, as)
+## http://mathworld.wolfram.com/InverseHyperbolicCosecant.html
+acsch(z::Sym) = log(sqrt(1+1/z^2) + 1/z)
+acsch(as::Array{Sym}) = map(acsch, as)
+sinc(x::Sym) = sin(Sym(PI*x))/(PI*x)
+sinc(as::Array{Sym}) = map(sinc, as)
+cosc(x::Sym) = diff(sinc(x))
+cosc(as::Array{Sym}) = map(cosc, as)
+
+
+## (x:Sym, ...) , export
+sympy_math_methods = (:Prod,
+                      :Ylm, 
+                      :assoc_legendre, 
+                      :chebyshevt
+                      )
+for meth in sympy_math_methods 
+    meth_name = string(meth)
+    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+    eval(Expr(:export, meth))
+end
+
+
+
+## in julia, not SymPy
+cbrt(x::Sym) = x^(1//3)
+Base.ceil(x::Sym) = ceiling(x)
+ 
+functions_sympy_methods = (
+                           :arg,
+                           :conjugate,
+                           :re,
+                           :sign
+                           )
+
+
+## map Abs->abs, Max->max, Min->min
+abs(ex::Sym, args...; kwargs...) = sympy_meth(:Abs, ex, args...; kwargs...)
+Base.real(x::Sym) = sympy_meth(:re, x)
+Base.imag(x::Sym) = sympy_meth(:im, x)
+
+## sign-related functions
 abs(x::Sym) = sympy_meth(:Abs, x)
 abs(a::Array{Sym}) = map(abs, a)
 Base.abs2(x::Sym) = re(x*conj(x))
 Base.copysign(x::Sym, y::Sym) = abs(x)*sign(y)
 
-Base.isless(a::Real, b::Sym) = isless(a, convert(Float64, b))
-Base.isless(a::Sym, b::Real) = isless(b, a)
-Base.isfinite(x::Sym) = isfinite(convert(Float64, x))
+#minimum(ex::Sym,x::NAtype) = x
+minimum(ex::Sym, args...; kwargs...) = sympy_meth(:Min, ex, args...; kwargs...)
+#maximum(ex::Sym,x::NAtype) = x
+maximum(ex::Sym, args...; kwargs...) = sympy_meth(:Max, ex, args...; kwargs...)
 
-## Some sympy function interfaces
 
-function !={T <: Real}(x::Sym, y::T) 
-    try 
-        x = convert(Float64, x)
-        x != y
-    catch
-        true
-    end
-end
-function !={T <: Complex}(x::Sym, y::T) 
-    try 
-        x = complex(x)
-        x != y
-    catch
-        true
-    end
-end
+
 for meth in (:separate, :flatten, 
              :igcd, :ilcm,
              :sqf,
@@ -178,20 +145,12 @@ end
     
 
 
-## different conversions
-fraction(args...; kwargs...) = sympy_meth(:fraction, project(args)...; kwargs...) |> os -> map(u -> convert(Sym, u), os)
 
+## Comparisons Real, Sym
+Base.isless(a::Real, b::Sym) = isless(a, convert(Float64, b))
+Base.isless(a::Sym, b::Real) = isless(b, a)
+Base.isfinite(x::Sym) = isfinite(convert(Float64, x))
 
-
-
-
-## Special functions
-## Spherical harmonic
-
-
-
-
-## solve
 
 
 ## Handle ininf, and isnan by coercion to float
@@ -200,15 +159,17 @@ Base.isnan(x::Sym) = try isnan(convert(Float64, x)) catch e false end
 
 ## we rename sympy.div -> polydiv
 Base.div(x::Sym, y::Union(Sym, Number)) = convert(Sym, sympy[:floor](project(x/convert(Sym,y))))
-
 Base.rem(x::Sym, y::Union(Sym, Number)) = x-Sym(y)*Sym(sympy[:floor](project(x/y)))
 
+## zero and one (zeros?)
 Base.zero(x::Sym) = Sym(0)
 Base.zero(::Type{Sym}) = Sym(0)
 
 Base.one(x::Sym) = Sym(1)
 Base.one(::Type{Sym}) = Sym(1)
 
+
+#### Piecewise functions
 
 """
 
@@ -222,9 +183,9 @@ To combine terms, the unicode `\vee<tab>` (for "or"), `\wedge<tab>` (for "and") 
 
 Examples:
 ```
+x,a = symbols("x,a")
 p = piecewise((1, x ≪ 1), (2, (1 ≤ x) ∨ (x ≤ 2)), (3, x ≫ 2)) ## using ∨ and ∧ for & and or
 subs(p, x, 2) ## 2
-x,a = symbols("x,a")
 p = piecewise((1, Lt(x, a)), (2, Ge(x,a)))  # same as piecewise((1,  x ≪ a), (2, x ≥ a))
 subs(p, x, a - 1)
 ```
@@ -234,7 +195,10 @@ function piecewise(args...)
     sympy_meth(:Piecewise, args...)
 end
 
-# ## special numbers
+
+
+
+## special numbers are initialized after compilation
 function init_math()
     "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors." 
     global const PI = sympy[:pi]

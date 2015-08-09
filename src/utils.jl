@@ -7,15 +7,9 @@
 Sym(s::Union(Symbol, String)) = sympy_meth(:symbols, string(s))
 
 "Create a symbolic number"
-# Sym(s::Rational) = convert(Sym, s)
-# Sym(x::MathConst{:π}) = convert(Sym, x)
-# Sym(x::MathConst{:e}) = convert(Sym, x)
-# Sym(x::MathConst{:γ}) = convert(Sym, x)
-# Sym(x::MathConst{:catalan}) = convert(Sym, x)
-# Sym(x::MathConst{:φ}) = convert(Sym, x)
 Sym{T <: Number}(x::T) = convert(Sym, x)
 
-
+## math constants in math.jl and done in __init__ stage
 
 "vectorized version of `Sym`"
 Sym(args...) = map(Sym, args)
@@ -93,23 +87,6 @@ function symbols(x::String; kwargs...)
 end
 
 
-function length(x::SymbolicObject)
-    sz = size(x)
-    length(sz) == 0 && return(0)
-    *(sz...)
-end
-function size(x::SymbolicObject)
-    return ()
-end
-function size(x::SymbolicObject, dim::Integer)
-    if dim <= 0
-        error("dimension out of range")
-   
-    else
-        return 1
-    end
-end
-
 ## pull out x property of Sym objects or leave alone
 project(x::Any) = x
 project(x::SymbolicObject) = x.x
@@ -128,6 +105,23 @@ project(x::MathConst{:γ}) = project(convert(Sym, x))
 project(x::MathConst{:catalan}) = project(convert(Sym, x))
 project(x::MathConst{:φ}) = project(convert(Sym, x))
 
+## for size of containers
+function length(x::SymbolicObject)
+    sz = size(x)
+    length(sz) == 0 && return(0)
+    *(sz...)
+end
+function size(x::SymbolicObject)
+    return ()
+end
+function size(x::SymbolicObject, dim::Integer)
+    if dim <= 0
+        error("dimension out of range")
+   
+    else
+        return 1
+    end
+end
 
 
 ## Iterator for Sym
@@ -180,44 +174,8 @@ function getindex(x::SymbolicObject, i::Symbol)
 end
 
 
-## Various means to call sympy or object methods. All convert input,
-## not all convert output.
-##
-## we may have sympy.method
-## or we may have object.method
 
-## Makes it possible to call in a sympy method, witout worrying about Sym objects
-# call_sympy_fun(fn::Function, args...; kwargs...) = fn(map(project, args)...; [(k,project(v)) for (k,v) in kwargs]...)
-# function sympy_meth(meth::Symbol, args...; kwargs...) 
-#     ans = call_sympy_fun(getfield(sympy,meth), args...; kwargs...)
-#     ## make nicer...
-#     if isa(ans, Vector)
-#         ans = Sym[i for i in ans]
-#     end
-#     ans
-# end
-        
-
-# ## meth of object, convert arguments
-# object_meth(object::SymbolicObject, meth::Symbol, args...; kwargs...) =  
-#   call_sympy_fun(project(object)[meth],  args...; kwargs...)
-
-
-# ## meth of object, convert arguments, output to SymMatrix 
-# function call_matrix_meth(object::SymbolicObject, meth::Symbol, args...; kwargs...) 
-#     out = object_meth(object, meth, args...; kwargs...)
-#     if isa(out, SymMatrix) 
-#         convert(Array{Sym}, out)
-#     elseif  length(out) == 1
-#         out 
-#     else
-#         map(u -> isa(u, SymMatrix) ? convert(Array{Sym}, u) : u, out)
-#     end
-# end
-
-
-
-## From PyCall.pywrap:
+## Helper function from PyCall.pywrap:
 function members(o::Union(PyObject, Sym))
     out = convert(Vector{(String,PyObject)}, 
                   pycall(PyCall.inspect["getmembers"], PyObject, project(o)))

@@ -20,13 +20,13 @@ end
 #mpctype = sympy.mpmath["ctx_mp_python"]
 #pytype_mapping(mpctype, Sym)
 
-## promotion and conversion
+## Promotion 
 ## promote up to symbolic so that math ops work
 promote_rule{T<:SymbolicObject, S<:Number}(::Type{T}, ::Type{S} ) = T
 
-## Conversion
-## String
 
+
+## Conversion
 convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
 convert(::Type{PyObject}, s::Sym) = s.x
 
