@@ -96,11 +96,13 @@ Base.abs2(x::Sym) = re(x*conj(x))
 Base.copysign(x::Sym, y::Sym) = abs(x)*sign(y)
 
 #minimum(ex::Sym,x::NAtype) = x
-minimum(ex::Sym, args...; kwargs...) = sympy_meth(:Min, ex, args...; kwargs...)
+#minimum(ex::Sym, args...; kwargs...) = sympy_meth(:Min, ex, args...; kwargs...)
 #maximum(ex::Sym,x::NAtype) = x
-maximum(ex::Sym, args...; kwargs...) = sympy_meth(:Max, ex, args...; kwargs...)
+#maximum(ex::Sym, args...; kwargs...) = sympy_meth(:Max, ex, args...; kwargs...)
 
-
+## use SymPy Names here...
+Min(ex::Sym, ex1::Sym) = sympy_meth(:Min, ex, ex1)
+Max(ex::Sym, ex1::Sym) = sympy_meth(:Max, ex, ex1)
 
 for meth in (:separate, :flatten, 
              :igcd, :ilcm,

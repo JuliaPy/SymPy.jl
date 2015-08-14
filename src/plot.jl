@@ -1,5 +1,12 @@
 ## add plotting commands for various packages (Winston, PyPlot, Gadfly)
 
+export plot_implicit, plot_parametric, plot3d,
+       plot3d_parametric_line, plot3d_parametric_surface
+       ## also
+       ## parametricplot, vectorplot, add_arror (PyPlot)
+       ## parametricplot, contour (Gadfly)
+       ## paramtericplot (Winston)
+
 # plot(ex::Sym, a, b, args; kwargs...)  function plot
 # plot([ex1, ex2, ...], a,b, args...; kwargs...) layer functions
 # parametricplot([x,y,z], a, b, args...;kwargs)
@@ -136,18 +143,19 @@ plot3d_parametric_surface(cos(u + v), sin(u - v), u-v, (u, -5, 5), (v, -5,5))
 plot3d_parametric_surface(ex1, ex2, ex3, args...; kwargs...) = sympy[:plotting][:plot3d_parametric_surface](ex1.x, ex2.x, ex3.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
 
 
-export plot_implicit, plot_parametric, plot3d, plot3d_parametric_line, plot3d_parametric_surface
-    
 
+    
+## Must put Requires.require outside of compilation
+function init_plot()
 
 ## Try to support Winston, PyPlot, and Gadfly to varying degrees
 ## Basically our goal here is to massage the data and let args... and kwargs.. be from the
 ## plotting packages.
 
 Requires.@require Winston begin
-    import Winston: plot, oplot
+    # import Winston: plot, oplot
     
-    function plot(ex::Sym, a, b, args...; kwargs...)
+    function Winston.plot(ex::Sym, a, b, args...; kwargs...)
         vars = get_free_symbols(ex)
         if length(vars) == 1        
             f = convert(Function, ex)
@@ -157,7 +165,7 @@ Requires.@require Winston begin
             error("Make contour plot")
         end
     end
-    function oplot(ex::Sym, args...; kwargs...)
+    function Winston.oplot(ex::Sym, args...; kwargs...)
         vars = get_free_symbols(ex)
         if length(vars) == 1        
             f = convert(Function, ex)
@@ -166,7 +174,7 @@ Requires.@require Winston begin
     end
     
     ## Parametric plot
-    function plot(exs::(Sym...), t0::Real, t1::Real, args...; kwargs...)
+    function Winston.plot(exs::(Sym...), t0::Real, t1::Real, args...; kwargs...)
         out = prepare_parametric(exs, t0, t1)
         n = length(exs)
         if n == 2
@@ -188,22 +196,24 @@ Requires.@require Winston begin
         contour(xs, ys, zs, args...; kwargs...)
     end
     
-    parametricplot(f::Vector{Sym}, a::Real, b::Real, args...; kwargs...) = plot(tuple(f...), a, b, args...;kwargs...)
+    global parametricplot(f::Vector{Sym}, a::Real, b::Real, args...; kwargs...) = plot(tuple(f...), a, b, args...;kwargs...)
 
-    function add_arrow(p::Vector, v::Vector)
+    global add_arrow(p::Vector, v::Vector) = begin
         n = length(p)
         p,v = map(x -> convert(Float64, x), p), map(x -> convert(Float64, x), v)
         n == 2 || error("Winston is only 2 dimensional")
         oplot([p[1], p[1] + v[1]], [p[2], p[2] + v[2]])
     end
     
-    export parametricplot, contour
+    eval(Expr(:export, :parametricplot))
+    eval(Expr(:export, :contour))
 end
 
+
 Requires.@require PyPlot begin
-    import PyPlot: plot, plot3D, contour, contour3D, plot_surface
-    
-    function plot(ex::Sym, a::Real, b::Real, n=250, args...; kwargs...)
+    #import PyPlot: plot, plot3D, contour, contour3D, plot_surface
+    println("pyplot....")
+    function PyPlot.plot(ex::Sym, a::Real, b::Real, n=250, args...; kwargs...)
         vars = get_free_symbols(ex)
         if length(vars) <= 1        
             f = convert(Function, ex)
@@ -215,7 +225,7 @@ Requires.@require PyPlot begin
         end
     end
 
-    function plot(exs::Array{Sym,1},a::Real,b::Real,n=250, args...; kwargs...)
+    function PyPlot.plot(exs::Array{Sym,1},a::Real,b::Real,n=250, args...; kwargs...)
         xs = linspace(a,b,n)
         fs = map(ex->convert(Function, ex), exs)
         for i in 1:length(fs)
@@ -224,7 +234,7 @@ Requires.@require PyPlot begin
     end
 
     ## Parametric plots use notation plot((ex1,ex2, [ex3]), t0, t1, args..., kwargs...)
-    function plot(exs::(Sym...), t0::Real, t1::Real, args...; kwargs...)
+    function PyPlot.plot(exs::(Sym...), t0::Real, t1::Real, args...; kwargs...)
         out = prepare_parametric(exs, t0, t1)
         n = length(exs)
         if n == 2
@@ -233,13 +243,13 @@ Requires.@require PyPlot begin
             plot3D(out..., args...; kwargs...)
         end
     end
-    parametricplot(f::Vector{Sym}, a::Real, b::Real, args...; kwargs...) = plot(tuple(f...), a, b, args...;kwargs...)
+    global parametricplot(f::Vector{Sym}, a::Real, b::Real, args...; kwargs...) = plot(tuple(f...), a, b, args...;kwargs...)
                                                           
     ## quiver ,,,http://matplotlib.org/examples/pylab_examples/quiver_demo.html
-    function vectorplot(f::Vector{Sym},
+    global  vectorplot(f::Vector{Sym}, 
                     x1::Real=-5.0, x2::Real=5.0,
                     y1::Real=-5.0, y2::Real=5.0,
-                    nx::Int=25, ny::Int=25, args...; kwargs...)
+                    nx::Int=25, ny::Int=25, args...; kwargs...) = begin
 
         length(f) == 2 || throw(DimensionMismatch("vector of symbolic objects must have length 2"))
         for ex in f
@@ -258,7 +268,7 @@ Requires.@require PyPlot begin
         quiver(xs, ys, us, vs, args...; kwargs...)
     end
         
-    function contour(ex::Sym, x1,x2, y1, y2, args...; kwargs...)
+    function PyPlot.contour(ex::Sym, x1,x2, y1, y2, args...; kwargs...)
          xs = linspace(sort([x1,x2])...)
          ys = linspace(sort([y1,y2])...)
          f = convert(Function, ex)
@@ -266,7 +276,7 @@ Requires.@require PyPlot begin
          PyPlot.contour(xs, ys, zs, args...; kwargs...)
     end
     
-    function contour3D(ex::Sym, x1,x2, y1, y2, args...; kwargs...)
+    function PyPlot.contour3D(ex::Sym, x1,x2, y1, y2, args...; kwargs...)
          xs = linspace(sort([x1,x2])...)
          ys = linspace(sort([y1,y2])...)
          f = convert(Function, ex)
@@ -284,7 +294,7 @@ Requires.@require PyPlot begin
         PyPlot.plot_surface(xs, ys, zs, args...; kwargs...)
     end
 
-    function add_arrow(p::Vector, v::Vector, args...; kwargs...)
+    global add_arrow(p::Vector, v::Vector, args...; kwargs...) = begin
        n = length(p)
        if n == 2
          arrow(p..., v...; kwargs...)
@@ -294,16 +304,17 @@ Requires.@require PyPlot begin
        end
      end
 
+        eval(Expr(:export, :parametricplot))
+        eval(Expr(:export, :vectorplot))
+        eval(Expr(:export, :add_arrow))
     
-    export parametricplot, vectorplot, add_arrow
-    
-end
+    end
 
 
-Requires.@require Gadfly begin
-    import Gadfly: plot
+    Requires.@require Gadfly begin
+        ## import Gadfly: plot
 
-    function plot(ex::Sym, a::Real, b::Real, args...; kwargs...)
+    function Gadfly.plot(ex::Sym, a::Real, b::Real, args...; kwargs...)
         vars = get_free_symbols(ex)
         if length(vars) <= 1        
             f = convert(Function, ex)
@@ -313,13 +324,13 @@ Requires.@require Gadfly begin
         end
     end
 
-    function plot(exs::Array{Sym,1},a::Real,b::Real,args::Union(Gadfly.Element,DataType,Gadfly.Theme,Function)...; kwargs...)
+    function Gadfly.plot(exs::Array{Sym,1},a::Real,b::Real,args::Union(Gadfly.Element,DataType,Gadfly.Theme,Function)...; kwargs...)
         fs = map(ex->convert(Function, ex), exs)
         plot(fs, a, b, args...; kwargs...)
     end
     
     ## Parametric plots use notation plot((ex1,ex2, [ex3]), t0, t1, args..., kwargs...)
-    function plot(exs::(Sym...), t0::Real, t1::Real, args...; kwargs...)
+    function Gadfly.plot(exs::(Sym...), t0::Real, t1::Real, args...; kwargs...)
         out = prepare_parametric(exs, t0, t1)
         n = length(exs)
         if n == 2
@@ -328,13 +339,13 @@ Requires.@require Gadfly begin
             error("No 3D plotting in Gadfly")
         end
     end
-    parametricplot(f::Vector{Sym}, a::Real, b::Real, args...; kwargs...) = plot(tuple(f...), a, b, args...;kwargs...)
-    export parametricplot
+    global parametricplot(f::Vector{Sym}, a::Real, b::Real, args...; kwargs...) = plot(tuple(f...), a, b, args...;kwargs...)
     
-    function contour(ex::Sym, x1::Real,x2::Real, y1::Real, y2::Real, args...; kwargs...)
+    function Gadfly.contour(ex::Sym, x1::Real,x2::Real, y1::Real, y2::Real, args...; kwargs...)
         f = convert(Function, ex)
         Gadfly.plot((x,y) -> convert(Float64, f(x,y)), x1, x2, y1, y2, args...; kwargs...)
     end
 
-    export parametricplot, contour
+        eval(Expr(:export, :parametricplot))
+    end
 end

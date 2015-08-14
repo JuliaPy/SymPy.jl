@@ -1,4 +1,4 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__()
+VERSION >= v"0.4.0-dev+6521" && __precompile__() ## won't work with Requires, Macrotools so plotting an issue
 
 ## TODO:
 ## * tidy up code
@@ -111,11 +111,12 @@ export SymFunction, SymMatrix,
        poly,  nroots, real_roots, polyroots,
        ∨, ∧, ¬,
        rhs, lhs, args,
-       jacobian, hessian
+       jacobian, hessian,
+       Max, Min
+export PI, E, IM, oo
 export relation, piecewise
 export members, doc, _str
 
-export PI, E, IM, oo
 
 include("types.jl")
 include("utils.jl")
@@ -232,7 +233,7 @@ function __init__()
     init_logical()
     init_math()
     init_mpmath()
-
+    init_plot()
 end
 
 end
