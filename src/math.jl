@@ -7,7 +7,7 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
            :atan2,
            :radians2degrees, :degrees2radians,
            :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
-           :sqrt, :square, :erf, :erfc, :erfcx, :erfi, :dawson,
+           :sqrt, :square, :erf, :erfc, :erfcx, :erfi, :erfcinv, :dawson,
            :ceiling, :floor, :trunc, :round, :significand,
            :factorial2,
            :airyai, :airybi
