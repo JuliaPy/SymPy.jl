@@ -1,8 +1,9 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__() ## won't work with Requires, Macrotools so plotting an issue
+VERSION >= v"0.4.0-dev+6521" && __precompile__(false) ## won't work until updated Requires, Macrotools can be compiled
 
 ## TODO:
+## * make tests work under travis
 ## * tidy up code
-## * check on sympy_meth uses...
+## * wait out precompile
 
 module SymPy
 
