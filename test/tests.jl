@@ -266,8 +266,6 @@ p = piecewise((x, x ≥ 0), (0, x ≪ 0), (1, x ⩵ 0))
 @assert int(subs(p,x,-1)) == 0
 @assert int(subs(p,x,0)) == 0
 
-## More logical expressions
-(x ≪ 0) ∧ (x*y ≤ 1) ∨ (x ⩵ y) ∧ (¬(x ≫ 3))
 
 
 ## relations
