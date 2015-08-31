@@ -20,7 +20,7 @@ As well, many -- but not all -- of the SymPy functions are ported to
 allow them to be called on `Sym` objects. Mostly these are implemented
 through metaprogramming, so adding missing functions is not hard.
 
-For documentation on SymPy functions, one should refer to 
+For documentation on SymPy functions, one should refer to
 SymPy's [website](http://docs.sympy.org/latest/index.html).
 
 The package tutorial provides many examples.
@@ -38,7 +38,7 @@ using Requires ## for @require macro
 if VERSION < v"0.4.0-dev"
     using Docile
 else
-    macro document() nothing end    
+    macro document() nothing end
 end
 @document
 
@@ -64,7 +64,7 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        airyai, airybi,
        zero, one
 import Base: transpose
-import Base: diff       
+import Base: diff
 import Base: factorial, gcd, lcm, isqrt
 import Base: gamma, beta
 import Base: length,  size
@@ -74,7 +74,7 @@ import Base:  inv, conj,
               cross, eigvals, eigvecs, trace, norm
 import Base: promote_rule
 import Base: match, replace, round
-import Base: +,-,*,/,\
+import Base: +, -, *, /, \
 import Base: ^, .^
 import Base: &, |, !, >, >=, ==, <=, <
 ## poly.jl
@@ -98,15 +98,15 @@ export Sym, @syms, @vars, symbols # @sym_str,
 export pprint,  jprint
 export SymFunction, SymMatrix,
        evalf, N,  subs,
-       simplify, nsimplify, 
+       simplify, nsimplify,
        expand, factor, trunc,
-       collect, separate, 
+       collect, separate,
        fraction,
        primitive, sqf, resultant, cancel,
        together, square,
        solve,
        limit,
-       series, integrate, 
+       series, integrate,
        summation,
        dsolve,
        poly,  nroots, real_roots, polyroots,
@@ -176,7 +176,7 @@ end
 for prop in union(core_object_properties,
                   summations_object_properties,
                   polynomial_predicates)
-    
+
     prop_name = string(prop)
     @eval ($prop)(ex::Sym) = ex[symbol($prop_name)]
     eval(Expr(:export, prop))

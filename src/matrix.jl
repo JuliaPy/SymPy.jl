@@ -50,8 +50,8 @@ function convert(::Type{Array{Sym}}, a::SymMatrix)
         reshape(b, sz)
     end
 end
-  
-## when projecting, we convert to a symbolic matrix then project  
+
+## when projecting, we convert to a symbolic matrix then project
 project(x::Array{Sym}) = convert(SymMatrix, x) |> project
 
 
@@ -74,7 +74,7 @@ for meth in (:norm,
     @eval ($meth)(a::Array{Sym}, args...; kwargs...) = ($meth)(convert(SymMatrix, a), args...;kwargs...)
     eval(Expr(:export, meth))
 end
-    
+
 for meth in (
            :has,
            )
@@ -97,10 +97,10 @@ end
 
 ## But
 ## is_symmetric <-> issym
-## istriu, istril, 
-for meth in  (:is_anti_symmetric, :is_diagonal, :is_diagonalizable,:is_nilpotent, 
+## istriu, istril,
+for meth in  (:is_anti_symmetric, :is_diagonal, :is_diagonalizable,:is_nilpotent,
                 :is_symbolic, :is_symmetric)
-    
+
     meth_name = string(meth)
     @eval ($meth)(ex::SymMatrix, args...; kwargs...) = ex[symbol($meth_name)]()
     @eval ($meth)(ex::Matrix{Sym}, args...; kwargs...) = ex[symbol($meth_name)]()
@@ -112,7 +112,7 @@ end
 
 ## is_upper <-> itriu
 ## is_lower <-> istril
-matrix_operators = (:H, :C,  
+matrix_operators = (:H, :C,
                     :is_lower, :is_lower_hessenberg, :is_square, :is_upper,  :is_upper_hessenberg, :is_zero
 )
 
@@ -136,10 +136,10 @@ map_matrix_methods = (:LDLsolve,
                       :LUsolve,
                       :QRdecomposition, :QRsolve,
                       :adjoint, :adjugate,
-                      :cholesky, :cholesky_solve, :cofactor, :conjugate, 
+                      :cholesky, :cholesky_solve, :cofactor, :conjugate,
                       :diagaonal_solve, :diagonalize, :dual,
                       :expand,
-                      :integrate, 
+                      :integrate,
                       :inverse_ADJ, :inverse_GE, :inverse_LU,
                       :jordan_cells, :jordan_form,
                       :limit,
@@ -171,7 +171,7 @@ Base.conj(a::SymMatrix) = conjugate(a)
 Base.conj(a::Sym) = conjugate(a)
 
 
-## :eigenvals, returns {val => mult, val=> mult} 
+## :eigenvals, returns {val => mult, val=> mult}
 ## we return an array of eigen values, as eigvals does
 function eigvals(a::Matrix{Sym})
     ## this is a hack, as  d = a[:eigenvals]() may not convert to a Julia dict (Ubuntu...)
@@ -192,7 +192,7 @@ function eigvecs(a::Matrix{Sym})
     hcat([hcat([convert(Array{Sym}, v) for v in d[3]]...) for d in ds]...)
 
 end
-eigvecs(a::SymMatrix) = eigvecs(convert(Array{Sym}, a))   
+eigvecs(a::SymMatrix) = eigvecs(convert(Array{Sym}, a))
 
 ## Take any matrix and return reduced row-echelon form and indices of pivot vars
 ## To simplify elements before finding nonzero pivots set simplified=True
@@ -207,8 +207,8 @@ function rref(a::Matrix{Sym}; kwargs...)
     convert(Array{Sym}, d[1])
 end
 
-## rref. The sympy method returns 
-function rref(a::SymMatrix) 
+## rref. The sympy method returns
+function rref(a::SymMatrix)
   d = a[:rref]()
   convert(Array{Sym}, d[1]) ## return Array{Sym}, not SymMatrix
 end
@@ -227,7 +227,7 @@ end
 #     @eval ($fn)(A::Sym, b::Sym) = convert(Array{Sym}, pyeval("A.($fn)(b)", A=project(A), b=project(b)))
 #     @eval ($fn)(A::Array{Sym, 2}, b::Vector{Sym}) = ($fn)(convert(SymMatrix, A), convert(SymMatrix, b))
 # end
-    
+
 
 ### Higher dimensional derivatives
 
@@ -275,7 +275,7 @@ hessian(ex::Sym) = hessian(ex, get_free_symbols(ex))
 
 
 
-    
+
 
 
 

@@ -1,5 +1,6 @@
 using SymPy
 using Base.Test
+using Compat
 
 ## syms
 x = Sym("x")
@@ -22,8 +23,8 @@ Sym(1 + 2im)
 Sym(pi)
 Sym(e)
 Sym(catalan)
-            
-      
+
+
 
 
 ## subs, |> (x == number)
@@ -104,8 +105,8 @@ integrate(sin(x), (x, a, b)) |> replace(a, 0) |> replace(b, pi)
 summation(1/x^2, (x, 1, 10))
 out = summation(1/x^2, (x, 1, 10))
 out1 = sum([1//x^2 for  x in 1:10])
-@assert out[:p] |> integer == out1.num
-@assert out[:q] |> integer == out1.den
+@assert @compat round(Integer, out[:p]) == out1.num
+@assert @compat round(Integer, out[:q]) == out1.den
 
 ## matrices
 ## these can also be tested by matrix-tests.jl
@@ -140,18 +141,18 @@ rv - s
 s - a
 a - s
 
-2v   
-2rv  
-2a   
+2v
+2rv
+2a
 s .* v
 v .* s
 s .* rv
 rv .* s
-s .* a 
-a .* s 
+s .* a
+a .* s
 
 ## s / v  ## broadcasts s Depreacated
-s ./ v 
+s ./ v
 v / s
 v .\ s
 s \ v
@@ -161,23 +162,23 @@ rv / s
 rv .\ s
 s \ rv
 ## s / a ## broadcasts s Deprecated
-s ./ a 
+s ./ a
 a / s
 a .\ s
 s \ a
 
 @test_throws MethodError  s ^ v ## error
-s .^ v  
+s .^ v
 @test_throws MethodError  v ^ s ## error
-v .^ s 
+v .^ s
 @test_throws MethodError  s ^ rv ## error
 s .^ rv
 @test_throws DimensionMismatch  rv ^ s ## error
-rv .^ s 
+rv .^ s
 @test_throws MethodError  s ^ a ## error
 s .^ a
 a ^ s
-a .^ s 
+a .^ s
 
 
 ## vector vector
@@ -192,7 +193,7 @@ v * rv ## 2x1 1x2 == 2x2
 rv * v ## 1x2 2 x 1 == 1x1
 v .* rv ## XXX ?? should be what? -- not 2 x 2
 rv .* v ## XXX ditto
-## @test_throws MethodError  v / v ## error 
+## @test_throws MethodError  v / v ## error
 v ./ v ## ones()
 v .\ v
 ## @test_throws MethodError  v / rv ## error
@@ -244,7 +245,7 @@ a .^ a
 ## Number theory
 @test isprime(100) == isprime(Sym(100))
 @test prime(Sym(100)) == 541
-@test int(collect(primerange(Sym(2),10))) == primes(10)
+@test @compat round(Int, collect(primerange(Sym(2),10))) == primes(10)
 @test multiplicity(Sym(10), 100) == 2
 @test factorint(Sym(100)) == factor(100)
 
@@ -262,9 +263,9 @@ x = Sym("x")
 p = piecewise((x, Ge(x,0)), (0, Lt(x,0)), (1, Eq(x,0)))
 ## using infix \ll<tab>, \gt<tab>, \Equal<tab>
 p = piecewise((x, x ≥ 0), (0, x ≪ 0), (1, x ⩵ 0))
-@assert int(subs(p,x,2)) == 2
-@assert int(subs(p,x,-1)) == 0
-@assert int(subs(p,x,0)) == 0
+@assert @compat Int(subs(p,x,2)) == 2
+@assert @compat Int(subs(p,x,-1)) == 0
+@assert @compat Int(subs(p,x,0)) == 0
 
 
 

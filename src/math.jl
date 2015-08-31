@@ -1,9 +1,9 @@
 ## Imported math functions
 ## make vectorized version while we are at it
 for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
-           :asinh, :acosh, :atanh, :sec, :csc, :cot, :asec, :acsc, :acot, 
-           :sech, :csch, 
-           :coth, :acoth, 
+           :asinh, :acosh, :atanh, :sec, :csc, :cot, :asec, :acsc, :acot,
+           :sech, :csch,
+           :coth, :acoth,
            :atan2,
            :radians2degrees, :degrees2radians,
            :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
@@ -44,7 +44,7 @@ for fn in (:cospi, :sinpi)
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
-## :asech, :acsch, :sinc, :cosc, 
+## :asech, :acsch, :sinc, :cosc,
 ## These fail, so define from definitions
 ## http://mathworld.wolfram.com/InverseHyperbolicSecant.html
 asech(z::Sym) = log(sqrt(1/z-1)*sqrt(1/z+1) + 1/z)
@@ -60,16 +60,15 @@ cosc(as::Array{Sym}) = map(cosc, as)
 
 ## (x:Sym, ...) , export
 sympy_math_methods = (:Prod,
-                      :Ylm, 
-                      :assoc_legendre, 
+                      :Ylm,
+                      :assoc_legendre,
                       :chebyshevt
                       )
-for meth in sympy_math_methods 
+for meth in sympy_math_methods
     meth_name = string(meth)
     @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
     eval(Expr(:export, meth))
 end
-
 
 
 ## in julia, not SymPy
@@ -104,11 +103,11 @@ Base.copysign(x::Sym, y::Sym) = abs(x)*sign(y)
 Min(ex::Sym, ex1::Sym) = sympy_meth(:Min, ex, ex1)
 Max(ex::Sym, ex1::Sym) = sympy_meth(:Max, ex, ex1)
 
-for meth in (:separate, :flatten, 
+for meth in (:separate, :flatten,
              :igcd, :ilcm,
              :sqf,
-             :together, 
-             :limit, 
+             :together,
+             :limit,
              :Derivative
              )
     meth_name = string(meth)
@@ -124,7 +123,7 @@ function Base.diff(ex::Sym, args...; kwargs...)
         sympy_meth(:diff, ex, args...; kwargs...)
     end
 end
-    
+
 
 
 
@@ -144,7 +143,7 @@ function diff(f::Function, k::Int=1; kwargs...)
     x = Sym("x")
     diff(f(x), x, k; kwargs...)
 end
-    
+
 
 
 
@@ -177,7 +176,7 @@ Base.one(::Type{Sym}) = Sym(1)
 
 Create a piecewise defined function.
 
-To create conditions on the variable, the functions `Lt`, `Le`, `Eq`, `Ge`, and `Gt` can be used. For infix notation, 
+To create conditions on the variable, the functions `Lt`, `Le`, `Eq`, `Ge`, and `Gt` can be used. For infix notation,
 unicode operators can be used: `\ll<tab>`, `\le<tab>`, `\Equal<tab>`, `\ge<tab>`, and `\gg<tab>`.
 
 To combine terms, the unicode `\vee<tab>` (for "or"), `\wedge<tab>` (for "and") can be used
@@ -191,13 +190,11 @@ subs(p, x, 2) ## 2
 p = piecewise((1, Lt(x, a)), (2, Ge(x,a)))  # same as piecewise((1,  x ≪ a), (2, x ≥ a))
 subs(p, x, a - 1)
 ```
-"""                 
+"""
 function piecewise(args...)
     args = [map(project, x) for x in args]
     sympy_meth(:Piecewise, args...)
 end
-
-
 
 
 ## special numbers are initialized after compilation

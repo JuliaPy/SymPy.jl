@@ -29,11 +29,11 @@ macro syms(x...)
     if length(x) == 1 && isa(x[1],Expr)
         @assert x[1].head === :tuple "@syms expected a list of symbols"
         x = x[1].args
-    end 
+    end
     for s in x
         @assert isa(s,Symbol) "@syms expected a list of symbols"
         push!(q.args, Expr(:(=), s, Expr(:call, :Sym, Expr(:quote, s))))
-           end 
+           end
     push!(q.args, Expr(:tuple, x...))
     q
 end
@@ -49,7 +49,7 @@ macro vars(x...)
     if length(x) == 1 && isa(x[1],Expr)
         @assert x[1].head === :tuple "@vars expected a list of symbols"
         x = x[1].args
-    end 
+    end
     for s in x
         @assert isa(s,Symbol) "@vars expected a list of symbols"
         push!(q.args, Expr(:(=), s, Expr(:call, :Sym, Expr(:quote, s))))
@@ -59,10 +59,10 @@ macro vars(x...)
 end
 
 
-"Macro to create a symbolic object: `sym\"x\"`"
 #macro sym_str(x)
 #    Sym(x)
 #end
+
 ##@deprecate sym_str(x)  symbols(x::String)
 
 ## define one or more symbols directly
@@ -82,10 +82,27 @@ x,y,z = symbols("x, y, z", real=true)
 ```
 
 """
+
 function symbols(x::String; kwargs...) 
     out = sympy_meth(:symbols, x; kwargs...)
 end
 
+function length(x::SymbolicObject)
+    sz = size(x)
+    length(sz) == 0 && return(0)
+    *(sz...)
+end
+function size(x::SymbolicObject)
+    return ()
+end
+function size(x::SymbolicObject, dim::Integer)
+    if dim <= 0
+        error("dimension out of range")
+
+    else
+        return 1
+    end
+end
 
 ## pull out x property of Sym objects or leave alone
 project(x::Any) = x
@@ -136,7 +153,7 @@ Base.done(x::Sym, state) = state <= 0
 
 """
 convert args so that we can use obj[:methname](x,...) without needing to project to
-python: obj.method(arg1, arg2, ...) -> julia: obj[:meth](args...) 
+python: obj.method(arg1, arg2, ...) -> julia: obj[:meth](args...)
 
 Examples:
 ```
@@ -150,8 +167,8 @@ function getindex(x::SymbolicObject, i::Symbol)
     ## find method
     if haskey(project(x), i)
         out = project(x)[i]
-        if isa(out, Function) 
-            function f(args...;kwargs...) 
+        if isa(out, Function)
+            function f(args...;kwargs...)
                 out(project(args)...; [(k,project(v)) for (k,v) in kwargs]...)
             end
             return f
@@ -177,7 +194,7 @@ end
 
 ## Helper function from PyCall.pywrap:
 function members(o::Union(PyObject, Sym))
-    out = convert(Vector{(String,PyObject)}, 
+    out = convert(Vector{(String,PyObject)},
                   pycall(PyCall.inspect["getmembers"], PyObject, project(o)))
     String[u[1] for u in out]
 end
