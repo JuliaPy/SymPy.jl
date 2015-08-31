@@ -44,7 +44,7 @@ function latex(s::SymbolicObject, args...; kwargs...)
     sympy_meth(:latex, s, args...; kwargs...)
 end
 writemime(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
-function writemime(io::IO, ::MIME"text/latex", x::Array{Sym}) 
+function writemime(io::IO, ::MIME"text/latex", x::Array{Sym})
     function toeqnarray(x::Vector{Sym})
         a = join([latex(x[i]) for i in 1:length(x)], "\\\\")
         "\\begin{bmatrix}$a\\end{bmatrix}"
@@ -58,10 +58,10 @@ function writemime(io::IO, ::MIME"text/latex", x::Array{Sym})
 end
 
 ## Pretty print dicts
-function writemime{T<:Any, S<:Any}(io::IO, ::MIME"text/latex", d::Dict{T,S})    
+function writemime{T<:Any, S<:Any}(io::IO, ::MIME"text/latex", d::Dict{T,S})
     Latex(x::Sym) = latex(x)
     Latex(x) = sprint(Base.showlimited, x)
-    
+
     out = "\\begin{equation*}\\begin{cases}"
     for (k,v) in d
         out = out * Latex(k) * " & \\text{=>} &" * Latex(v) * "\\\\"

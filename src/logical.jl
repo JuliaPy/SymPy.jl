@@ -43,7 +43,7 @@ Base.(:≤)(a::Sym, b::Sym) = Le(a,b)  # \le<tab>
 Base.(:≤)(a::Sym, b::Number) = Le(a,Sym(b))  # \le<tab>
 Base.(:≤)(a::Number, b::Sym) = Le(Sym(a),b)  # \le<tab>
 
-"For hashing, we use equality at the python level." 
+"For hashing, we use equality at the python level."
 ## Base.isequal(x::Sym, y::Sym) = x.x == y.x
 ==(x::Sym, y::Sym) = x.x == y.x
 
@@ -65,7 +65,7 @@ Base.(:>=)(a::Number, b::Sym) = Ge(Sym(a),b)
 export ≪,⩵,≫
 
 
-# ## XXX need a decision. 
+# ## XXX need a decision.
 # ## These are useful for `piecewise` and `plot_implicit`, but mess up generic code
 # ## we likely only need to define isequal, ==, isless and < for generic code, but there is
 # ## no way for < to return a boolean in general, save for (x < y -> float(x) < float(y)???)
