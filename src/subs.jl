@@ -60,13 +60,15 @@ Base.replace(ex::SymbolicObject; kwargs...) = subs(ex, kwargs...)
 ## Make callable expression, so that function notation is more natural
 ## **Problematic** as x=Sym("x") will work -- but **not** x= symbols("x", real=true), say.
 
-"""
+# """
 
-```
-`ex(1,2)`  ## uses order of get_free_symbols
-`ex(x=1, y=2)`
-```
-"""
+# ```
+# ex(1,2)  ## uses order of get_free_symbols
+# ex(x=1, y=2)
+# ```
+#     """
+
+
 if VERSION >= v"0.4.0-dev"
     Base.call(ex::SymbolicObject; kwargs...) = subs(ex, kwargs...)
     function Base.call(ex::SymbolicObject, args...)

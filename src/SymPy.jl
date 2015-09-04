@@ -1,4 +1,4 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__(false) ## won't work until updated Requires, Macrotools can be compiled
+VERSION >= v"0.4.0-" && __precompile__(false) ## won't work until updated Requires, Macrotools can be compiled
 
 ## TODO:
 ## * make tests work under travis
