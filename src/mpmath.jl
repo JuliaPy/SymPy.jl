@@ -39,7 +39,11 @@ end
 ## automatic mappings may throw warning about strings, though it is expected these
 ## will be addressed by PyCall
 function init_mpmath()
-    PyCall.mpmath_init()
+    try
+        PyCall.mpmath_init()
+    catch err
+        return()
+    end
     ## try to load mpmath module
     try
         const global mpmath = pyimport("sympy.mpmath")
