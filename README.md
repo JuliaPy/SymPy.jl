@@ -1,5 +1,5 @@
-[![SymPy](http://pkg.julialang.org/badges/SymPy_release.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=release)
-[![SymPy](http://pkg.julialang.org/badges/SymPy_nightly.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=nightly)
+[![SymPy](http://pkg.julialang.org/badges/SymPy_0.3.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=0.3)
+[![SymPy](http://pkg.julialang.org/badges/SymPy_0.4.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=0.4)
 &nbsp;
 Linux: [![Build Status](https://travis-ci.org/jverzani/SymPy.jl.svg?branch=master)](https://travis-ci.org/jverzani/SymPy.jl)
 &nbsp;
