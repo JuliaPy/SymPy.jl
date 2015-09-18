@@ -86,7 +86,7 @@ end
 ## helper, as :is_rational will find 1.2 rational...
 function _is_rational(ex::Sym)
     ex[:is_rational] == nothing && return false
-    ex[:is_rational] && ex[:numer]()[:is_integer]
+    ex[:is_rational] && convert(Function, ex[:denom])(SymPy.project(ex))[:is_integer]
 end
 
 ## evalf, n, N

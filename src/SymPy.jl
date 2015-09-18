@@ -1,4 +1,4 @@
-VERSION >= v"0.4.0-" && __precompile__(false) ## won't work until updated Requires, Macrotools can be compiled
+VERSION >= v"0.4.0-" && __precompile__(true) 
 
 ## TODO:
 ## * make tests work under travis
@@ -32,7 +32,6 @@ using Compat
 
 using PyCall
 
-using Requires ## for @require macro
 
 ## * Docile is used for documentation
 if VERSION < v"0.4.0-dev"
@@ -42,6 +41,7 @@ else
 end
 @document
 
+VERSION >= v"0.4.0-dev" && using Plots
 
 import Base: show, writemime
 import Base: convert, promote_rule
@@ -137,8 +137,12 @@ include("poly.jl")
 include("matrix.jl")
 include("ntheory.jl")
 include("display.jl")
-include("plot.jl")
 
+if VERSION < v"0.4.0-dev"
+    include("plot.jl")
+else
+    include("plots.jl")                 # uses Plots interface
+end
 
 ## create some methods
 
@@ -204,12 +208,14 @@ function __init__()
 
 
     ## Makes it possible to call in a sympy method, witout worrying about Sym objects
+
     global call_sympy_fun(fn::Function, args...; kwargs...) = fn(map(project, args)...; [(k,project(v)) for (k,v) in kwargs]...)
+    global call_sympy_fun(fn::PyCall.PyObject, args...; kwargs...) = call_sympy_fun(convert(Function, fn), args...; kwargs...)
 
     ## Main interface to methods in sympy
     ## sympy_meth(:name, ars, kwars...)
     global sympy_meth(meth::Symbol, args...; kwargs...) = begin
-        ans = call_sympy_fun(sympy[meth], args...; kwargs...)
+        ans = call_sympy_fun(convert(Function, sympy[meth]), args...; kwargs...)
         ## make nicer...
         if isa(ans, Vector)
             ans = Sym[i for i in ans]
@@ -234,7 +240,7 @@ function __init__()
     init_logical()
     init_math()
     init_mpmath()
-    init_plot()
+    VERSION < v"0.4.0-" && init_plot()
 end
 
 end
