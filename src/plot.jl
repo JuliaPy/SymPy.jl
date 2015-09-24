@@ -151,7 +151,7 @@ plot3d_parametric_surface(ex1, ex2, ex3, args...; kwargs...) = sympy[:plotting][
     
 ## Must put Requires.require outside of compilation
 function init_plot()
-info("init plotting for sympy")
+
 ## Try to support Winston, PyPlot, and Gadfly to varying degrees
 ## Basically our goal here is to massage the data and let args... and kwargs.. be from the
 ## plotting packages.
@@ -213,7 +213,6 @@ end
 
 
   Requires.@require PyPlot begin
-    info("Loading PyPlot")
     function PyPlot.plot(ex::Sym, a::Real, b::Real, n=250, args...; kwargs...)
         vars = get_free_symbols(ex)
         if length(vars) <= 1

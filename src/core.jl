@@ -34,9 +34,15 @@ core_object_methods = (:as_poly, :atoms,
 core_object_properties = (:assumptions0,
                           :is_even, :is_odd,
                           :is_number, :is_integer, :is_real, :is_complex, :is_rational,
-                          :is_commutative,
-                          :free_symbols # a bit funny, returns a set
+                          :is_commutative
                           )
+
+
+"""
+Return a vector of free symbols in an expression
+"""
+free_symbols(ex::Sym) =  convert(Vector{Sym}, collect(ex[:free_symbols]))
+export free_symbols
 
 
 ## From relational

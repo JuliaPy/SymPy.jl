@@ -11,6 +11,10 @@ x,y = Sym(:x, :y)
 x,y = @syms x y
 x,y = symbols("x,y")
 
+## extract symbols
+ex = x*y
+@test isa(free_symbols(ex), Vector{Sym})
+
 ## number conversions
 Sym(2)
 Sym(2.0)

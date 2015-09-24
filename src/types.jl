@@ -111,7 +111,7 @@ function convert(::Type{Function}, ex::Sym)
     (args...) -> begin
         out = ex
         for i in 1:len
-            out = out[:subs](vars[i], args[i])
+            out = object_meth(out, :subs, vars[i], args[i]) #convert(Function, out[:subs])(project(vars[i]), args[i])
         end
         out
     end

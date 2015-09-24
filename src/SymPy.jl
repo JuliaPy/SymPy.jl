@@ -31,7 +31,7 @@ SymPy
 using Compat
 
 using PyCall
-
+using Requires 
 
 ## * Docile is used for documentation
 if VERSION < v"0.4.0-dev"
@@ -240,7 +240,8 @@ function __init__()
     init_logical()
     init_math()
     init_mpmath()
-    VERSION < v"0.4.0-" && init_plot()
+    #    VERSION < v"0.4.0-" && init_plot()
+    init_plot()
 end
 
 end
