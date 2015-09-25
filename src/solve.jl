@@ -66,7 +66,7 @@ end
 
 function solve(exs::Vector{Sym}, args...; kwargs...)
     ans = sympy_meth(:solve, map(project, exs),  args...; kwargs...) #  dictionary with keys, values as PyObjects
-    tmp = map(get_free_symbols, exs)
+    tmp = map(free_symbols, exs)
     xs = shift!(tmp)
     for ss in tmp
         for s in ss

@@ -35,7 +35,7 @@ export plot_implicit, plot_parametric, plot3d,
 function prepare_parametric(exs, t0, t1)
     n = length(exs)
     (n==2) | (n==3) || throw(DimensionMismatch("parametric plot requires the initial tuple to have 2 or 3 variables"))
-    vars = [SymPy.get_free_symbols(ex) for ex in exs]
+    vars = [SymPy.free_symbols(ex) for ex in exs]
     m,M = extrema(map(length,vars))
     (m == M) & (m == 1) || throw(DimensionMismatch("parametric plot requires exactly one free variable"))
     for i in 1:(n-1)
@@ -158,7 +158,7 @@ function init_plot()
 
 Requires.@require Winston begin
     function Winston.plot(ex::Sym, a, b, args...; kwargs...)
-        vars = get_free_symbols(ex)
+        vars = free_symbols(ex)
         if length(vars) == 1
             f = convert(Function, ex)
             plot(x -> convert(Float64, f(x)), a, b, args...; kwargs...)
@@ -168,7 +168,7 @@ Requires.@require Winston begin
         end
     end
     function Winston.oplot(ex::Sym, args...; kwargs...)
-        vars = get_free_symbols(ex)
+        vars = free_symbols(ex)
         if length(vars) == 1
             f = convert(Function, ex)
             oplot(x -> convert(Float64, f(x)), args...; kwargs...)
@@ -187,7 +187,7 @@ Requires.@require Winston begin
     end
 
     function contour(ex::Sym, x1,x2, y1, y2, args...; kwargs...)
-        vars = get_free_symbols(ex)
+        vars = free_symbols(ex)
         length(vars) == 2 || error("wrong number of free variables for a contour plot")
         f = convert(Function, ex)
 
@@ -214,7 +214,7 @@ end
 
   Requires.@require PyPlot begin
     function PyPlot.plot(ex::Sym, a::Real, b::Real, n=250, args...; kwargs...)
-        vars = get_free_symbols(ex)
+        vars = free_symbols(ex)
         if length(vars) <= 1
             f = convert(Function, ex)
             xs = linspace(a,b, n)
@@ -254,7 +254,7 @@ end
 
         length(f) == 2 || throw(DimensionMismatch("vector of symbolic objects must have length 2"))
         for ex in f
-            nvars = length(get_free_symbols(ex))
+            nvars = length(free_symbols(ex))
             nvars == 2 || throw(DimensionMismatch("Expression has $nvars, expecting 2 for a quiver plot"))
         end
 
@@ -286,7 +286,7 @@ end
     end
 
     function plot_surface(ex::Sym, x1,x2, y1, y2, n=250,  args...; kwargs...)
-        nvars = length(get_free_symbols(ex))
+        nvars = length(free_symbols(ex))
         nvars == 2 || throw(DimensionMismatch("Expression has $nvars, expecting 2 for a surface plot"))
         xs = linspace(sort([x1,x2])..., n)
         ys = linspace(sort([y1,y2])..., n)
@@ -316,7 +316,7 @@ Requires.@require Gadfly begin
         ## import Gadfly: plot
 
     function Gadfly.plot(ex::Sym, a::Real, b::Real, args...; kwargs...)
-        vars = get_free_symbols(ex)
+        vars = free_symbols(ex)
         if length(vars) <= 1
             f = convert(Function, ex)
             plot(x -> convert(Float64, f(x)), a, b, args...; kwargs...)

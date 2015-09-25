@@ -63,7 +63,7 @@ Base.replace(ex::SymbolicObject; kwargs...) = subs(ex, kwargs...)
 # """
 
 # ```
-# ex(1,2)  ## uses order of get_free_symbols
+# ex(1,2)  ## uses order of free_symbols
 # ex(x=1, y=2)
 # ```
 #     """
@@ -72,7 +72,7 @@ Base.replace(ex::SymbolicObject; kwargs...) = subs(ex, kwargs...)
 if VERSION >= v"0.4.0-dev"
     Base.call(ex::SymbolicObject; kwargs...) = subs(ex, kwargs...)
     function Base.call(ex::SymbolicObject, args...)
-        xs = get_free_symbols(ex)
+        xs = free_symbols(ex)
         subs(ex, collect(zip(xs, args))...)
     end
 end
@@ -86,7 +86,7 @@ end
 ## helper, as :is_rational will find 1.2 rational...
 function _is_rational(ex::Sym)
     ex[:is_rational] == nothing && return false
-    ex[:is_rational] && convert(Function, ex[:denom])(SymPy.project(ex))[:is_integer]
+    ex[:is_rational] && denom(ex)[:is_integer]
 end
 
 ## evalf, n, N

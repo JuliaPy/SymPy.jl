@@ -231,7 +231,7 @@ end
 
 ### Higher dimensional derivatives
 
-## For gradient we have [diff(ex,var) for var in get_free_symbols(ex)]... but order is of importance...
+## For gradient we have [diff(ex,var) for var in free_symbols(ex)]... but order is of importance...
 
 
 """
@@ -270,7 +270,7 @@ function hessian(f::Sym, x::Vector{Sym})
     out = sympy_meth(:hessian, f, x)
     convert(SymMatrix, out) |> u -> convert(Array{Sym}, u)
 end
-hessian(ex::Sym) = hessian(ex, get_free_symbols(ex))
+hessian(ex::Sym) = hessian(ex, free_symbols(ex))
 
 
 

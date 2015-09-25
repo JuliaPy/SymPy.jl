@@ -80,7 +80,12 @@ convert(::Type{Sym}, o::String) = sympy_meth(:sympify, o)
 convert(::Type{Sym}, o::Symbol) = sympy_meth(:sympify, string(o))
 
 
-"get the free symbols in a more convenient form that as returned by `free_symbols`"
+"""
+
+Get the free symbols in a more convenient form than as returned by `free_symbols`.
+
+Just `free_symbols` now does the same thing. This function will be deprecated.
+"""    
 function get_free_symbols(ex::Sym)
     free = free_symbols(ex)
     n = free[:__len__]()
