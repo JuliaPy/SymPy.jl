@@ -29,7 +29,7 @@ integrals_instance_methods = (:as_sum,
 
 
 
-typealias SymOrReal @compat Union{Sym, Real}
+
 
 ## Alternate interface for simple integral
 """

@@ -31,7 +31,6 @@ ex |> subs(x=e)
 ## ex(x=2, y=3)     ## will only work if Sym(:y) == y, which isn't case, say when y=symbols("y", real=true)
 ```
 """
-typealias SymbolicTypes  @compat Union{String, Symbol, SymbolicObject}
 subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any})) =
     object_meth(ex, :subs, Sym(y[1]), convert(Sym,y[2]))
 subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any}), args...) = subs(subs(ex, y), args...)
@@ -153,7 +152,7 @@ function N(ex::Sym)
     elseif _is_rational(ex)
         try (return(convert(Rational, ex))) catch e end
     elseif ex[:is_real]
-        for T in [MathConst, Float64] ## BigFloat???
+        for T in [Irrational, Float64] ## BigFloat???
               try (return(convert(T, ex))) catch e end
         end
     elseif ex[:is_complex]

@@ -4,7 +4,9 @@
 ## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y), @syms x y, symbols("x y")
 
 "Create a symbolic object from a symbol or string"
-Sym(s::@compat Union{Symbol, String}) = sympy_meth(:symbols, string(s))
+Sym(s::AbstractString) = sympy_meth(:sympify, s)
+Sym(s::Symbol) = Sym(string(s))
+
 
 "Create a symbolic number"
 Sym{T <: Number}(x::T) = convert(Sym, x)
@@ -83,7 +85,7 @@ x,y,z = symbols("x, y, z", real=true)
 
 """
 
-function symbols(x::String; kwargs...) 
+function symbols(x::AbstractString; kwargs...) 
     out = sympy_meth(:symbols, x; kwargs...)
 end
 
@@ -116,11 +118,11 @@ function project{T <: Any}(x::Dict{Sym,T})
     end
     D
 end
-project(x::MathConst{:π}) = project(convert(Sym, x))
-project(x::MathConst{:e}) = project(convert(Sym, x))
-project(x::MathConst{:γ}) = project(convert(Sym, x))
-project(x::MathConst{:catalan}) = project(convert(Sym, x))
-project(x::MathConst{:φ}) = project(convert(Sym, x))
+project(x::Irrational{:π}) = project(convert(Sym, x))
+project(x::Irrational{:e}) = project(convert(Sym, x))
+project(x::Irrational{:γ}) = project(convert(Sym, x))
+project(x::Irrational{:catalan}) = project(convert(Sym, x))
+project(x::Irrational{:φ}) = project(convert(Sym, x))
 
 ## for size of containers
 function length(x::SymbolicObject)
@@ -194,8 +196,8 @@ end
 
 ## Helper function from PyCall.pywrap:
 function members(o::@compat Union{PyObject, Sym})
-    out = convert(Vector{(String,PyObject)},
+    out = convert(Vector{(AbstractString,PyObject)},
                   pycall(PyCall.inspect["getmembers"], PyObject, project(o)))
-    String[u[1] for u in out]
+    AbstractString[u[1] for u in out]
 end
 

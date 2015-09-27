@@ -159,8 +159,8 @@ Base.isinf(x::Sym) = try isinf(convert(Float64, x)) catch e false end
 Base.isnan(x::Sym) = try isnan(convert(Float64, x)) catch e false end
 
 ## we rename sympy.div -> polydiv
-Base.div(x::Sym, y::Union(Sym, Number)) = convert(Sym, sympy[:floor](project(x/convert(Sym,y))))
-Base.rem(x::Sym, y::Union(Sym, Number)) = x-Sym(y)*Sym(sympy[:floor](project(x/y)))
+Base.div(x::Sym, y::SymOrNumber) = convert(Sym, sympy[:floor](project(x/convert(Sym,y))))
+Base.rem(x::Sym, y::SymOrNumber) = x-Sym(y)*Sym(sympy[:floor](project(x/y)))
 
 ## zero and one (zeros?)
 Base.zero(x::Sym) = Sym(0)
@@ -213,9 +213,9 @@ function init_math()
 
 
     ## math constants
-    Base.convert(::Type{Sym}, x::MathConst{:π}) = PI
-    Base.convert(::Type{Sym}, x::MathConst{:e}) = E
-    Base.convert(::Type{Sym}, x::MathConst{:γ}) = sympy[:EulerGamma]
-    Base.convert(::Type{Sym}, x::MathConst{:catalan}) = sympy[:Catalan]
-    Base.convert(::Type{Sym}, x::MathConst{:φ}) = (1 + Sym(5)^(1//2))/2
+    Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
+    Base.convert(::Type{Sym}, x::Irrational{:e}) = E
+    Base.convert(::Type{Sym}, x::Irrational{:γ}) = sympy[:EulerGamma]
+    Base.convert(::Type{Sym}, x::Irrational{:catalan}) = sympy[:Catalan]
+    Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
 end

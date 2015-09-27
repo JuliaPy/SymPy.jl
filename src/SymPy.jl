@@ -30,7 +30,7 @@ SymPy
 
 using Compat
 
-using PyCall
+using PyCall, Conda
 using Requires 
 
 ## * Docile is used for documentation
@@ -141,6 +141,7 @@ include("ntheory.jl")
 include("display.jl")
 
 include("plot.jl")
+
 
 ## create some methods
 

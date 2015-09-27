@@ -330,7 +330,8 @@ Requires.@require Gadfly begin
         end
     end
 
-    function Gadfly.plot(exs::Array{Sym,1},a::Real,b::Real,args::Union(Gadfly.Element,DataType,Gadfly.Theme,Function)...; kwargs...)
+    typealias GadflyType @compat Union{Gadfly.Element,DataType,Gadfly.Theme,Function}
+    function Gadfly.plot(exs::Array{Sym,1},a::Real,b::Real,args::GadflyType...; kwargs...)
         fs = map(ex->convert(Function, ex), exs)
         plot(fs, a, b, args...; kwargs...)
     end

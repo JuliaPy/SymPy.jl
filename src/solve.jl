@@ -83,12 +83,12 @@ function solve(exs::Vector{Sym}, xs::Vector{Sym}, args...; kwargs...)
     ans = sympy_meth(:solve, map(project, exs), map(project, xs), args...; kwargs...) #  dictionary with keys, values as PyObjects
 
     function mapit(out) ## can be a tuple if m=n
-        d = Dict{String, Sym}()
+        d = Dict{AbstractString, Sym}()
         [d[string(xs[i])] = out[i] for i in 1:length(out)]
         d
     end
     function mapit(out::Dict)
-        d = Dict{String,Sym}()
+        d = Dict{AbstractString,Sym}()
         [d[string(k)]=v for (k,v) in out]
         d
     end
@@ -125,7 +125,7 @@ export nsolve
 
 ## dsolve
 ## Make a function argument, but munge arguments from Sym -> PyObject class
-SymFunction(nm::Union(Symbol, String)) = (args...) -> Sym(sympy[:Function](nm)(project(args)...))
+SymFunction(nm::SymOrString) = (args...) -> Sym(sympy[:Function](nm)(project(args)...))
 
 
 """

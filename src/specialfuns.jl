@@ -1,5 +1,4 @@
 ## simple (x::Union(Sym, Number;...) signature, export
-typealias SymOrNumber @compat Union{Sym, Number}
 for fn in (
            :hankel1, :hankel2,             # hankel function of second kind H_n^2(x) = J_n(x) - iY_n(x)
            :legendre,

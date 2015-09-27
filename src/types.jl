@@ -20,6 +20,13 @@ end
 #mpctype = sympy.mpmath["ctx_mp_python"]
 #pytype_mapping(mpctype, Sym)
 
+## some typealiases
+typealias SymOrReal @compat Union{Sym, Real}
+typealias SymOrNumber @compat Union{Sym, Number}
+typealias SymOrString @compat Union{Sym, AbstractString}
+typealias SymbolicTypes  @compat Union{AbstractString, Symbol, SymbolicObject}
+
+
 ## Promotion 
 ## promote up to symbolic so that math ops work
 promote_rule{T<:SymbolicObject, S<:Number}(::Type{T}, ::Type{S} ) = T
@@ -76,7 +83,7 @@ convert(::Type{Sym}, o::SymMatrix) = Sym(o.x)
 convert(::Type{SymMatrix}, o::Sym) = SymMatrix(o.x)
 
 ## string
-convert(::Type{Sym}, o::String) = sympy_meth(:sympify, o)
+convert(::Type{Sym}, o::AbstractString) = sympy_meth(:sympify, o)
 convert(::Type{Sym}, o::Symbol) = sympy_meth(:sympify, string(o))
 
 
