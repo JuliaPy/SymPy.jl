@@ -1,5 +1,10 @@
 ## add plotting commands for various packages (Winston, PyPlot, Gadfly)
-
+## This is a bit of a mess
+## Going forward it would be nice to work with the `Plots.jl` abstraction for the backends
+## However, this will require adding some more plot types to that package.
+## So for now, if `Plots` is loaded, plotting will work for some graphs as it should for plots
+## of functions, only symbolic expressions are used. For other functionality, the graphing
+## package should be required.
 
 using Requires ## for @require macro
 
@@ -35,7 +40,7 @@ export plot_implicit, plot_parametric, plot3d,
 function prepare_parametric(exs, t0, t1)
     n = length(exs)
     (n==2) | (n==3) || throw(DimensionMismatch("parametric plot requires the initial tuple to have 2 or 3 variables"))
-    vars = [SymPy.free_symbols(ex) for ex in exs]
+    vars = [free_symbols(ex) for ex in exs]
     m,M = extrema(map(length,vars))
     (m == M) & (m == 1) || throw(DimensionMismatch("parametric plot requires exactly one free variable"))
     for i in 1:(n-1)
@@ -350,5 +355,102 @@ Requires.@require Gadfly begin
 
         eval(Expr(:export, :parametricplot))
         eval(Expr(:export, :contour))
+end
+
+## Plots interface
+Requires.@require Plots begin
+
+    import Plots.plotter!
+    plotter!(:pyplot) # default, not :gadfly
+
+
+
+function _plot(fn::Function, ex::SymbolicObject, a, b; kwargs...) 
+    vars = free_symbols(ex)
+    if length(vars) == 1
+        f(x) = N(subs(ex, vars[1], x))
+        fn(f, a, b; kwargs...)
+    elseif length(vars) == 2
+        error("Expression to plot may have only one free variable")
     end
+end
+
+
+
+function _plot{T<:SymbolicObject}(fn::Function, exs::Vector{T}, a, b; kwargs...) 
+    vars = free_symbols(maximum(exs))
+    if length(vars) == 1
+        fns = map(ex -> (x -> N(subs(ex, vars[1], x))), exs)
+        fn(fns, a, b; kwargs...)
+    elseif length(vars) == 2
+        error("Expressions to plot may have only one common free variable")
+    end
+end
+
+# Parametric plots
+## 2d parametric plot plot((ex1, ex2), a, b)
+function _plot{T<:SymbolicObject, S<:SymbolicObject}(fn::Function, exs::Tuple{T,S}, t0::Real, t1::Real, args...; kwargs...)
+    vars = free_symbols(max(exs[1], exs[2]))
+    if length(vars) == 1
+        f1(x) = N(subs(exs[1], vars[1], x))
+        f2(x) = N(subs(exs[2], vars[1], x))
+        fn(f1, f2, t0, t1, args...; kwargs...)
+    else
+        error("Parametric plot may have only one free variable")
+    end
+end
+
+"""
+
+Plotting of symbolic objects.
+
+`SymPy` uses the `Plots` package to provide a uniform interface to many of `Julia`'s plotting packages. The default one used is `Gadfly`. These methods are extended to plot symbolic objects:
+
+
+* `plot(ex::Sym, a, b; kwargs...)` will plot a function evaluating `ex`
+
+* `plot(exs::Vector{Sym}, a, b; kwargs...)` will plot the functions evaluating `exs`
+
+* `plot((ex1, ex2), a, b; kwargs...)` will plot the two expressions in a parametric plot over the interval `[a,b]`
+
+* `plot(ex1, ex2, a, b; kwargs...)` will plot a parametric plot of `ex1` and `ex2` over `[a,b]`
+
+* `plot((ex1, ex2, ex3), a0, a1, b0, b1; kwargs)` will create a 3D parametric plot over `[a,b]`
+
+* `plot(ex1, ex2, ex3, a0, a1, b0, b1; kwargs)` will create a 3D parametric plot over `[a,b]`
+
+
+```
+A summary:
+                                Plots  PyPlot     Gadfly    Winston
+plot(::Sym)                        ✓     ✓           ✓          ✓
+plot(::Vector{Sym})                ✓     .           ✓          .
+plot(::Tuple{Sym})                 ✓(2D) ✓           ✓(2D)      ✓(2D)
+```
+
+* `contour(ex1, x0, x1, y0, y1; kwargs...)` wiil plot a contour plot over the interval
+
+* `plot_implicit(XXX, x0, x1, y0, y1; kwargs...)` XXX
+"""
+Plots.plot(ex::SymbolicObject, a, b; kwargs...) = _plot(Plots.plot, ex, a, b; kwargs...)
+Plots.plot!(ex::SymbolicObject, a, b; kwargs...) = _plot(Plots.plot!, ex, a, b; kwargs...)
+
+Plots.plot{T<:SymbolicObject}(ex::Vector{T}, a, b; kwargs...) = _plot(Plots.plot, exs, a, b; kwargs...)
+Plots.plot!{T<:SymbolicObject}(ex::Vector{T}, a, b; kwargs...) = _plot(Plots.plot!, exs, a, b; kwargs...)
+
+Plots.plot{T<:SymbolicObject, S<:SymbolicObject}(exs::Tuple{T,S}, t0::Real, t1::Real, args...; kwargs...) =
+    _plot(Plots.plot, exs, t0, t1, args...; kwargs...)
+Plots.plot!{T<:SymbolicObject, S<:SymbolicObject}(exs::Tuple{T,S}, t0::Real, t1::Real, args...; kwargs...) =
+    _plot(Plots.plot!, exs, t0, t1, args...; kwargs...)
+ 
+Plots.plot{T<:SymbolicObject, S<:SymbolicObject}(ex1::T, ex2::S, t0::Real, t1::Real, args...; kwargs...) =
+    _plot(Plots.plot, (ex1, ex2), t0, t1, args...; kwargs...)
+Plots.plot!{T<:SymbolicObject, S<:SymbolicObject}(ex1::T, ex2::S, t0::Real, t1::Real, args...; kwargs...) =
+    _plot(Plots.plot!, (ex1, ex2), t0, t1, args...; kwargs...)
+
+
+
+
+end
+
 end

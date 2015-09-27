@@ -46,15 +46,15 @@ function init_mpmath()
     end
     ## try to load mpmath module
     try
-        const global mpmath = pyimport("sympy.mpmath")
+        copy!(mpmath, pyimport("sympy.mpmath"))
     catch err
         try
-            const global mpmath = pyimport("mpmath")
+	    copy!(mpmath, pyimport("mpmath"))			
         catch err
-            const global mpmath = nothing
+	    warn("Issue loading mpmath module")
         end
     end
-    if !isa(mpmath, Nothing)
+    if mpmath != PyCall.PyNULL()
         ## ignore warnings for now...
         mpftype = mpmath["mpf"]
         pytype_mapping(mpftype, BigFloat) ## Raises warning!!!

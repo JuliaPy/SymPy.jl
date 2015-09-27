@@ -41,8 +41,6 @@ else
 end
 @document
 
-VERSION >= v"0.4.0-dev" && using Plots
-
 import Base: show, writemime
 import Base: convert, promote_rule
 import Base: getindex
@@ -118,6 +116,10 @@ export PI, E, IM, oo
 export relation, piecewise
 export members, doc, _str
 
+## Following PyPlot, we initialize our variables outside _init_
+const sympy  = PyCall.PyNULL()
+const mpmath = PyCall.PyNULL()
+
 
 include("types.jl")
 include("utils.jl")
@@ -138,11 +140,7 @@ include("matrix.jl")
 include("ntheory.jl")
 include("display.jl")
 
-if VERSION < v"0.4.0-dev"
-    include("plot.jl")
-else
-    include("plots.jl")                 # uses Plots interface
-end
+include("plot.jl")
 
 ## create some methods
 
@@ -191,7 +189,25 @@ end
 function __init__()
     
     ## Define sympy, mpmath, ...
-    global const sympy = pyimport("sympy")
+    try
+        copy!(sympy, pyimport("sympy"))
+    catch e
+        error("Failed to pyimport(\"sympy\"): SymPy will not work until you have a functioning sympy module.  ", e)
+        if PyCall.conda
+            info("Installing sympy via the Conda package...")
+            Conda.add("sympy")
+            copy!(sympy, pyimport("sympy"))
+        else
+            error("""Failed to pyimport("sympy"): SymPy will not work until you have a functioning sympy module.
+
+                  For automated SymPy installation, try configuring PyCall to use the Conda Python distribution within Julia.  Relaunch Julia and run:
+                        ENV["PYTHON"]=""
+                        Pkg.build("PyCall")
+                        using SymPy
+
+                  pyimport exception was: """, e)
+        end
+     end
 
     ## mappings from PyObjects to types.
     basictype = sympy[:basic]["Basic"]
@@ -240,7 +256,6 @@ function __init__()
     init_logical()
     init_math()
     init_mpmath()
-    #    VERSION < v"0.4.0-" && init_plot()
     init_plot()
 end
 
