@@ -207,7 +207,7 @@ function __init__()
 
                   pyimport exception was: """, e)
         end
-     end
+    end
 
     ## mappings from PyObjects to types.
     basictype = sympy[:basic]["Basic"]
