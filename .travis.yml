@@ -1,25 +1,27 @@
-language: julia
-os:
-    - osx
-    - linux
-julia:
-    - release
-    - nightly
-notifications:
-    email: false
+language: python
+python:
+    - 2.6
+    - 2.7
+    - 3.2
+    - 3.3
+compiler:
+  - clang
 env:
   matrix:
     - JULIAVERSION="juliareleases"
+    - JULIAVERSION="julianightlies"
+notifications:
+  email: false
 before_install:
   - sudo add-apt-repository ppa:staticfloat/julia-deps -y
   - sudo add-apt-repository ppa:staticfloat/${JULIAVERSION} -y
   - sudo apt-get update -qq -y
   - sudo apt-get install libpcre3-dev julia -y
-  - sudo apt-get install python-numpy python-sympy python-mpmath -y
+  - sudo apt-get install python-numpy python3-numby python-sympy python3-sympy python-mpmath python3-mpmath -y
   - git config --global user.name "Travis User"
   - git config --global user.email "travis@example.net"
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi    
 script:
     - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - julia -e 'Pkg.clone(pwd()); Pkg.build("SymPy"); Pkg.test("SymPy"; coverage=true)';
+    - julia -e 'Pkg.clone(pwd()); Pkg.build("SymPy"); Pkg.test("SymPy")';
     - julia -e 'cd(Pkg.dir("SymPy")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';

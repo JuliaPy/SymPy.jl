@@ -1,4 +1,5 @@
 ## simple (x::Union(Sym, Number;...) signature, export
+typealias SymOrNumber @compat Union{Sym, Number}
 for fn in (
            :hankel1, :hankel2,             # hankel function of second kind H_n^2(x) = J_n(x) - iY_n(x)
            :legendre,
@@ -8,7 +9,7 @@ for fn in (
            :laguerre
            )
     meth = string(fn)
-    @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) = sympy_meth(symbol($meth), xs...; kwargs...)
+    @eval ($fn)(xs::SymOrNumber...;kwargs...) = sympy_meth(symbol($meth), xs...; kwargs...)
     eval(Expr(:export, fn))
 end
 
@@ -18,8 +19,8 @@ end
 ## should dispatch to julia version.
 for fn in (:besselj, :bessely, :besseli, :besselk)
     meth = string(fn)
-    @eval ($fn)(nu::Union(Sym, Number), x::Sym;kwargs...) = sympy_meth(symbol($meth), x; kwargs...)
-    @eval ($fn)(nu::Union(Sym, Number), a::Array{Sym}) = map(x ->$fn(nu, x), a)
+    @eval ($fn)(nu::SymOrNumber, x::Sym;kwargs...) = sympy_meth(symbol($meth), x; kwargs...)
+    @eval ($fn)(nu::SymOrNumber, a::Array{Sym}) = map(x ->$fn(nu, x), a)
 end
 
 

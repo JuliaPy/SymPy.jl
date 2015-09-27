@@ -31,7 +31,7 @@ ex |> subs(x=e)
 ## ex(x=2, y=3)     ## will only work if Sym(:y) == y, which isn't case, say when y=symbols("y", real=true)
 ```
 """
-typealias SymbolicTypes  @compat Union(String, Symbol, SymbolicObject)
+typealias SymbolicTypes  @compat Union{String, Symbol, SymbolicObject}
 subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any})) =
     object_meth(ex, :subs, Sym(y[1]), convert(Sym,y[2]))
 subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any}), args...) = subs(subs(ex, y), args...)

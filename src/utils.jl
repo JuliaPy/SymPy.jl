@@ -4,7 +4,7 @@
 ## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y), @syms x y, symbols("x y")
 
 "Create a symbolic object from a symbol or string"
-Sym(s::Union(Symbol, String)) = sympy_meth(:symbols, string(s))
+Sym(s::@compat Union{Symbol, String}) = sympy_meth(:symbols, string(s))
 
 "Create a symbolic number"
 Sym{T <: Number}(x::T) = convert(Sym, x)
@@ -193,7 +193,7 @@ end
 
 
 ## Helper function from PyCall.pywrap:
-function members(o::Union(PyObject, Sym))
+function members(o::@compat Union{PyObject, Sym})
     out = convert(Vector{(String,PyObject)},
                   pycall(PyCall.inspect["getmembers"], PyObject, project(o)))
     String[u[1] for u in out]

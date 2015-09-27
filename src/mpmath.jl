@@ -2,6 +2,7 @@
 ## These are not right!!!
 ## see hyper and meijerg to indicate what needs to be done for these special function
 ## they really need to be coordinated with `Julia`'s as well.
+typealias SymOrNumber @compat Union{Sym, Number}
 mpmath_fns = (:hyp0f1, 
            :hyp1f1, :hyp1f2, 
            :hyp2f0, :hyp2f1, :hyp2f2, :hyp2f3,
@@ -30,7 +31,7 @@ mpmath_fns = (:hyp0f1,
            )
 for fn in mpmath_fns
     meth = string(fn)
-    @eval ($fn)(xs::Union(Sym, Number)...;kwargs...) = mpmath_meth(symbol($meth), xs...; kwargs...)
+    @eval ($fn)(xs::SymOrNumber...;kwargs...) = mpmath_meth(symbol($meth), xs...; kwargs...)
     eval(Expr(:export, fn))
 end
 
