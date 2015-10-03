@@ -28,7 +28,9 @@ Sym(pi)
 Sym(e)
 Sym(catalan)
 
-
+## function conversion
+f1 = convert(Function, x^2)
+@test f1(2) == Sym(4)
 
 
 ## subs, |> (x == number)

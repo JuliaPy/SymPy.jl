@@ -114,7 +114,7 @@ end
 ## Output is symbolic. Conversion is necessary to use output as Julia values.
 ## SymPy has `lamdify` for this task too.
 function convert(::Type{Function}, ex::Sym)
-    vars = get_free_symbols(ex)
+    vars = free_symbols(ex)
     len = length(vars)
     if len == 0
         return x -> ex

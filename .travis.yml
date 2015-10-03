@@ -17,7 +17,6 @@ before_install:
   - sudo apt-get install python-numpy python-sympy  python-mpmath -y
   - git config --global user.name "Travis User"
   - git config --global user.email "travis@example.net"
-  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi    
 script:
     - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
     - julia -e 'Pkg.clone(pwd()); Pkg.build("SymPy"); Pkg.test("SymPy")';
