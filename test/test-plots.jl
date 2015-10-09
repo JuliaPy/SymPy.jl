@@ -2,24 +2,21 @@
 ## not part of headless test suite
 ## has dependencies not in Test.REQUIRES
 
-XXX LOTS OF ISSUES with PyPlots XXX
-
 using SymPy
 using Plots
-#backend(:unicodeplots)
-plotter!(:unicodeplots)
 
 @vars x
 
 info("expression")
 plot(x^2, 0, 3)                   # single expression
+plot!(9-x^2, 0, 3, color=:green)  # plot!
 
 info("two graphs")
-plot([x^2, 1 - x^2/2], 0, 3)      # two graphs
+plot([x^2, 1 - x^2/2], 0, 3)      # two graphs at once
 
 info("parametric plot")
 plot((sin(x), cos(x)), 0, 2pi)    # parametric
-
+parametricplot(sin(x), cos(x), 0, 2pi)
 
 
 ## now clear out and use pyplot features

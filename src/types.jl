@@ -152,5 +152,5 @@ type ScalarFunction; end
 function Base.convert(::Type{ScalarFunction}, ex::Sym)
     vars = free_symbols(ex)
     length(vars) == 1 || error("Scalar function conversion is for expression of one variable")
-    u -> Float64(N(subs(ex, vars[1], u)))
+    u -> convert(Float64, N(subs(ex, vars[1], u)))
 end
