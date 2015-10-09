@@ -196,10 +196,10 @@ function __init__()
     try
         copy!(sympy, pyimport("sympy"))
     catch e
-        error("Failed to pyimport(\"sympy\"): SymPy will not work until you have a functioning sympy module.  ", e)
         if PyCall.conda
             info("Installing sympy via the Conda package...")
             Conda.add("sympy")
+            Conda.add("mpmath")
             copy!(sympy, pyimport("sympy"))
         else
             error("""Failed to pyimport("sympy"): SymPy will not work until you have a functioning sympy module.
