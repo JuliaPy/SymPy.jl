@@ -661,7 +661,11 @@ plot((cos(2x), sin(3x)), 0, 2pi)
 
 (Pass `Gadfly`'s `Geom.line`  to connect the points. In general, the plotting functions in `SymPy` concentrate on setting up the data but leave the aesthetics to the underlying plotting package.)
 
-When  `PyPlot` is loaded, the `plot` method dispatches to `PyPlot`'s. (Only one of the plotting packages from `Gadfly`, `PyPlot`, or `Winston` should be loaded with `SymPy`.) In addition to plots as above, there is `plot_surface`, `contour`, `contour3D`, and `plot_implicit`.
+When `PyPlot` is loaded, the `plot` method dispatches to
+`PyPlot`'s. (Only one of the plotting packages from `Gadfly`,
+`PyPlot`, or `Winston` should be loaded with `SymPy`.) In addition to
+plots as above, there is `contour`, `contour3D`, `plot_surface`,  `plot_parametric_surface`, and
+`plot_implicit`.
 
 
 

@@ -145,3 +145,12 @@ function as_nfunction(ex::Sym, nvars=1)
     end
 end
 
+"""
+Convert to a julia-valued function from R -> R::Float64
+"""
+type ScalarFunction; end
+function Base.convert(::Type{ScalarFunction}, ex::Sym)
+    vars = free_symbols(ex)
+    length(vars) == 1 || error("Scalar function conversion is for expression of one variable")
+    u -> Float64(N(subs(ex, vars[1], u)))
+end

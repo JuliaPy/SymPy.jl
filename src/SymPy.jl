@@ -1,4 +1,4 @@
-VERSION >= v"0.4.0-" && __precompile__(true) 
+VERSION >= v"0.4.0" && __precompile__(true) 
 
 ## TODO:
 ## * make tests work under travis
@@ -82,10 +82,13 @@ import Base: isinf, isnan
 import Base: real, imag
 import Base: expm
 
+
 ## conditional imports
-if VERSION < v"0.4.0-dev"
+if VERSION < v"0.4.0"
     import Base: rref, det
     import Base: radians2degrees, degrees2radians
+else
+    import Base: nullspace
 end
 
 

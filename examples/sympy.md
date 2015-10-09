@@ -1,17 +1,5 @@
 # SymPy.jl
 
-~~~{hide=true}
-## This file is 'weaveable' through Gadfly.weave or through Weave (which adds some things...)
-using Weave, GoogleCharts
-tabs = Weave.tabbable()
-~~~
-
-
-~~~{commands=false asis=true}
-## Start tab set and add the first tab
-tabs.start()
-tabs.next("About")
-~~~
 
 ## About
 
@@ -87,9 +75,6 @@ background. To dig the `PyObject` out of a `Sym` object, you access
 its property `x`, as in `y.x`.
 
 
-~~~{commands=false asis=true}
-tabs.next("Examples")
-~~~
 ## Examples
 
 
@@ -102,9 +87,9 @@ ways to make a symbolic object:
 ```
 x = Sym("x")			# Sym constructor
 a = Sym(:a)			# using a symbol, not a string
-y = sym"x"			# sym_str macro
 alpha, gamma = @syms alpha gamma # @syms macro
-A, B = symbols("A B", commutative=false) # symbol takes arguments
+@vars delta
+A, B = symbols("A B", commutative=false) # symbols takes assertions as keyword arguments
 ```
 
 Each new value is a symbolic value.  
@@ -130,7 +115,7 @@ The `subs` command is used to substitute values. These values are
 typically numeric, though they may be other symbols:
 
 ``` 
-x, y = @syms x y
+x,y = symbols("x,y")
 subs(x + y, x, 3)     # y + 3 
 subs(x*y, y, 24 - 2x) # x*(-2*x + 24)
 ```
@@ -154,50 +139,30 @@ Basic conversions from `SymPy` numeric types to the corresponding
 `convert(Rational, ex)`.
 
 ```
-x, y = @syms x y
 x |> replace(x, 1) |> int
 convert(Rational, sympy.harmonic(30))
 ```
 
-The `sympy` function `N` can be used to form a numerical value from an
-expression, though the expression is still a `Sym` instance.
+Sympy has both `N` and `evalf` for conversion. We use `N` to convert to a julia value and `evalf` for numeric conversions within SymPy.
+
 
 ```
-sqrt(x + 1) | replace(x, 2)		# pretty print sqrt(3)
-sqrt(x + 1) | replace(x, 2) | N	# 1.73205080756888 as Sym object
+evalf(PI) # a Sym object
 ```
 
-We don't try to convert numeric values into `julia` objects, as `sympy` can use arbitrary precision. For example,
-the `N` function takes an argument to control the number of
-digits displayed:
-
 ```
-sympy.pi			# a PyObject with pi
-PI = Sym(sympy.pi)		# a Sym object
-N(PI, 60)			# 3.14159265358979323846264338327950288419716939937510582097494
+N(PI)   # a Float64 value
 ```
 
-
-That above shows how to create the $\pi$ object. The following doesn't work
-
-```
-x = sym"x"
-x = subs(x, x, pi)
-N(x, 60)			# 3.14159265358979311599796346854418516159057617187500000000000
-```
-
-as the value substituted is `julia`'s floating point representation of
-`pi`, not the symbolic value `sympi.pi`, so gets truncated after
-enough digits.
-
-For another example, consider this:
+We can pass in an argument to control the number of digits
 
 ```
-factorial(100)			# integer overflow!
-factorial(Sym(100)) 		# 93326215443944152681....
+evalf(PI, 60) # still symbolic
 ```
 
-
+```
+N(PI, 60)  # a BigFloat with precision given by a heuristic
+```
 
 ### Printing
 
@@ -212,10 +177,6 @@ x = sym"x"
 [1/x, 1/x^2]
 map(SymPy._str,[1/x, 1/x^2])
 ```
-
-~~~{commands=false asis=true}
-tabs.next("Mathematics")
-~~~
 
 ## Mathematics
 
@@ -233,7 +194,7 @@ The package provides several functions for working with algebraic expressions.
 The `factor` and `expand` functions perform the tasks learned in basic algebra:
 
 ```
-x,y  = @syms x y
+x,y  = symbols("x, y")
 factor(x^2 - 2x + 1)
 factor(x^2 - 2x*y + y^2)
 expand((x-1)*(x+1))
@@ -279,15 +240,21 @@ The default  is $1.7$.
 
 ### Plotting
 
-Basic symbolic expressions can be plotted with `plot`, which uses `GoogleCharts` to make graphs of functions. 
+There is some experimental support for plotting of symbolic expressions. As there are many different backends for plotting with `Julia`, the available features depend on which backend. There is code for the `Plots`, `PyPlot`, `Gadfly`, and `Winston` packages. `PyPlot` provides many more graphics, including 3D graphics.
+
+Basic symbolic expressions can be plotted with `plot`. For example, the following should work with any of the above packages loaded, such as `Gadfly`:
 
 ```
-x = Sym(:x)
+using Gadfly
+```
+
+```
+x = symbols("x")
 f(x) = exp(-x) * sin(x)		# a julia function
 ```
 
 ```{asis=true}
-plot(f(x), 0, 2pi)		# opens plot in browser
+plot(f(x), 0, 2pi)	
 ```
 
 
@@ -297,24 +264,13 @@ plot( [sin(x), diff(sin(x)) ], 0, 2pi) # two plots
 
 
 
-Plotting as above requires a symbolic expression, not a function
-object. The expressions should be of a single variable `x`. The
-underlying command makes a function as follows:
-
-```
-u -> float(subs(ex, x, u)) # anonymous function to evaluate expression
-```
-
-Something similar can be used to plot expressions with `julia`'s other
-plotting packages. (Be warned, this isn't super fast as each value
-plotted takes a trip from `julia` to python and back.)
 
 ### Solving equations
 
 The `solve` function provides an interface to solve equations of the type `ex = 0`
 
 ```
-x, y, a, b, c = @syms x y a b c
+x,y,a,b,c  = symbols("x y a b c")
 solve(x^2 + 3*x + 2, x)
 solve(a*x^2 + b*x + c, x)
 ```
@@ -336,7 +292,7 @@ $0$. Unlike `solve`, the `nsolve` function requires a starting point.
 ```
 nsolve(sin(x) - cos(x), x, 0)
 ##
-x1, x2 = @syms x1 x2
+x1, x2 = symbols("x1", "x2")
 f1 = 3 * x1^2 - 2 * x2^2 - 1
 f2 = x1^2 - 2 * x1 + x2^2 + 2 * x2 - 8
 nsolve([f1,f2], [x1,x2], [-1,1])
@@ -350,7 +306,7 @@ The `limit` function can be used to compute limits:
 
 
 ```
-x, y = @syms x y
+x, y = symbols("x y")
 limit(sin(x)/x, x, 0)		# 1 as Sym object. Use integer() or float() to convert
 limit(sin(y*x)/x, x, 0)		# y
 limit(sin(y*x)/x, y, 0) 	# 0
@@ -366,7 +322,7 @@ limit(sin(x)/x, x, oo)		# 0
 One could take derivatives "by hand":
 
 ```
-x, h = @syms x h
+x, h = symbols("x h")
 f(x) = sin(x)
 limit(( f(x+h) - f(x) ) /h, h, 0)
 ```
@@ -384,7 +340,7 @@ limit(D(sin, x, h), h, 0)
 The `diff` function is used to compute  derivative of symbolic expressions. One can compute partial derivatives and higher order derivatives:
 
 ```
-x, y = @syms x y
+x, y = symbols("x y")
 f(x) = exp(-x) * sin(x)
 g(x, y) = x^2 + 17*x*y^2
 diff(f(x))
@@ -405,14 +361,14 @@ c = 2
 m = diff(f(x), x) |> replace(x, c)
 ```
 
-```{asis=true}
+```
 plot([f(x), f(c) + m*(x-c)], 1, 3)
 ```
 
 We can solve max and min problems. For example, a normal window with perimeter 20:
 
 ```
-x,y = @syms x y
+x,y = symbols("x y")
 Area(x, y) = x*y + pi*(x/2)^2/2
 y0 = solve(2y + x + pi/2*x - 20, y)[1]
 solve(diff(Area(x, y0)), x)
@@ -427,7 +383,7 @@ The `integrate` function provides symbolic integration. (http://docs.sympy.org/0
 Indefinite integrals can be computed:
 
 ```
-x,y,a,b,c = @syms x y a b c
+x,y,a,b,c = symbols("x y a b c")
 integrate(x^2 + x + 2)
 integrate(1/((1+x)*(x-1)))
 integrate(a*x^2 + b*x + c, x)	# if more than one symbol, specify here
@@ -473,7 +429,7 @@ series(sin(x), x, pi/4, 10)
 Sympy has some functions for dealing with sums, finite and infinite. The `Sum` function is used in a similar manner as `integrate`. Here we find the sum of $1/i^2$:
 
 ```
-i, n = @syms i n
+i, n = symbols("i, n")
 Sum(1/i^2, (i, 1, oo))
 Sum(1/i^2, (i, 1, oo)) |> doit
 ```
@@ -483,12 +439,6 @@ Finite sums are also computable using rational math:
 ```
 Sum(1/i, (i, 1, 100)) |> doit
 ```
-
-
-
-~~~{commands=false asis=true}
-tabs.next("Matrices")
-~~~
 
 ## Matrices
 
@@ -505,7 +455,7 @@ down a bit. It is hoped this tradeoff is worth it.
 Matrices can be constructed as usual just by using a symbolic object:
 
 ```
-x, y = @syms x y
+x, y = symbols("x y")
 m = [x 1; 1 x]
 ```
 
@@ -540,8 +490,4 @@ There are many other matrix functions provided by SymPy. Many are provided as me
 jordan_form(m)
 ```
 
-
-~~~{commands=false asis=true}
-tabs.finish()
-~~~
 

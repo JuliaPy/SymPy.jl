@@ -4,7 +4,7 @@
 
 core_object_methods = (:as_poly, :atoms,
                        :compare, :compare_pretty,
-                       :count, :doit, :dummy_eq,
+                       :doit, :dummy_eq, # :count,
                        :has, :match, ##:replace,
                        :rewrite, :sort_key,
                        :xreplace,
@@ -42,6 +42,30 @@ core_object_properties = (:assumptions0,
 Return a vector of free symbols in an expression
 """
 free_symbols(ex::Sym) =  convert(Vector{Sym}, collect(ex[:free_symbols]))
+function free_symbols{T<:SymbolicObject}(exs::Vector{T})
+    as = map(free_symbols, exs)
+    out = as[1]
+    if length(as) > 1
+        for j in 2:length(as)
+            for u in as[j]
+                u in out || push!(out, u)
+            end
+        end
+    end
+    out
+end
+function free_symbols(exs::Tuple)
+    as = map(free_symbols, exs)
+    out = as[1]
+    if length(as) > 1
+        for j in 2:length(as)
+            for u in as[j]
+                u in out || push!(out, u)
+            end
+        end
+    end
+    out
+end
 export free_symbols
 
 
