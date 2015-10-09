@@ -1,16 +1,25 @@
 environment:
-  global:
-    # Borrowing setup from https://github.com/brian-team/brian2/blob/master/appveyor.yml
-    # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
-    # /E:ON and /V:ON options are not enabled in the batch script intepreter
-    # See: http://stackoverflow.com/a/13751649/163740
-    CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\dev\\appveyor\\run_with_env.cmd"
-
   matrix:
+
+# Released versions
+    
   - JULIAVERSION: "julialang/bin/winnt/x86/0.3/julia-0.3-latest-win32.exe"
+    PYTHONDIR: "use_conda"
+    PYTHON: "use_conda"
+    
   - JULIAVERSION: "julialang/bin/winnt/x64/0.3/julia-0.3-latest-win64.exe"
+    PYTHONDIR: "use_conda"
+    PYTHON: "use_conda"
+
+# Nightlies
+    
   - JULIAVERSION: "julianightlies/bin/winnt/x86/julia-latest-win32.exe"
+    PYTHONDIR: "use_conda"
+    PYTHON: "use_conda"
+    
   - JULIAVERSION: "julianightlies/bin/winnt/x64/julia-latest-win64.exe"
+    PYTHONDIR: "use_conda"
+    PYTHON: "use_conda"
 
 branches:
   only:
@@ -22,15 +31,6 @@ notifications:
     on_build_success: false
     on_build_failure: false
     on_build_status_changed: false
-
-init:
-  - ps: Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda-3.5.5-Windows-x86_64.exe' C:\Miniconda.exe; echo "Done"
-  - cmd: C:\Miniconda.exe /S /D=C:\Miniconda
-  - ps: ls C:\Miniconda/Scripts
-  - C:\Miniconda\Scripts\conda config --set always_yes yes
-  # We need to do this first as other commands may not work with older versions of conda.
-  - C:\Miniconda\Scripts\conda update conda
-  - C:\Miniconda\Scripts\conda install -c conda pytest requests conda-env numpy scipy sympy mpmath --quiet
 
 install:
 # Download most recent Julia Windows binary
