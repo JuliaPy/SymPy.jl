@@ -1,29 +1,36 @@
 VERSION >= v"0.4.0" && __precompile__(true) 
 
 ## TODO:
-## * make tests work under travis
 ## * tidy up code
-## * wait out precompile
 
 module SymPy
 
 
 """
+
 SymPy package to interface with Python's [SymPy package](http://www.sympy.org) through `PyCall`.
 
-The basic idea is that a new type `Sym` is made to hold symbolic
+The basic idea is that a new type -- `Sym` -- is made to hold symbolic
 objects.  For this type, the basic operators and appropriate functions
 of `Julia` are overloaded for `Sym` objects so that the expressions
-are treated symbolically and not evaluated immediately.
+are treated symbolically and not evaluated immediately. Instances of
+this type are created by the constructor `Sym` or `symbols` or the macro
+`@vars`.
 
 As well, many -- but not all -- of the SymPy functions are ported to
 allow them to be called on `Sym` objects. Mostly these are implemented
-through metaprogramming, so adding missing functions is not hard.
+through metaprogramming, so adding missing functions is not hard. They
+are not generated automatically though, rather added by hand.
 
-For documentation on SymPy functions, one should refer to
+To find documentation on SymPy functions, one should refer to
 SymPy's [website](http://docs.sympy.org/latest/index.html).
 
-The package tutorial provides many examples.
+Plotting is provided through the `Plots` package interface. For more detail, see
+the help page for `sympy_plotting`.
+
+The package tutorial provides many examples. This can be read 
+[GitHub](https://github.com/jverzani/SymPy.jl/blob/master/examples/tutorial.ipynb).
+
 """
 SymPy
 
@@ -93,7 +100,6 @@ end
 
 
 
-
 export sympy, sympy_meth, object_meth, call_matrix_meth
 export Sym, @syms, @vars, symbols # @sym_str,
 export pprint,  jprint
@@ -118,6 +124,12 @@ export SymFunction, SymMatrix,
 export PI, E, IM, oo
 export relation, piecewise
 export members, doc, _str
+
+using Plots
+import Plots: plot, backend
+export plot, backend
+
+
 
 ## Following PyPlot, we initialize our variables outside _init_
 const sympy  = PyCall.PyNULL()

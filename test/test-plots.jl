@@ -3,9 +3,9 @@
 ## has dependencies not in Test.REQUIRES
 
 using SymPy
-using Plots
+backend(:unicodeplots)
 
-@vars x
+@vars x y
 
 info("expression")
 plot(x^2, 0, 3)                   # single expression
@@ -20,23 +20,25 @@ parametricplot(sin(x), cos(x), 0, 2pi)
 
 
 ## now clear out and use pyplot features
-workspace()
-using SymPy
-using PyPlot
+backend(:pyplot); using PyPlot
 @vars x y
 
 info("expression plot")
-plot(x, 0,1)
+SymPy.plot(x, 0,1)  ## qualify `plot` now, as `using PyPlot` was called
 
 info("expressions plot")
-plot([x,x^2], 0,1)
+SymPy.plot([x,x^2], 0,1)
 
 info("parametric")
-plot((cos(x), sin(x)), 0, 2pi)
+SymPy.plot((cos(x), sin(x)), 0, 2pi)
 parametricplot(cos(x), sin(x), 0, pi)
 
+info("3d parameteric")
+parametricplot(cos(x), sin(x), x, 0, pi)
+SymPy.plot((cos(x), sin(x), x), 0, 4pi)
+
 info("vectorplot")
-vectorplot([cos(x), sin(y)], (x,0,2pi), (y,0,2pi))
+quiver([cos(x), sin(y)], (x,0,2pi), (y,0,2pi))
 
 info("contour plot")
 contour(x^2 - y^2, (x,-5, 5), (y,-5, 5))

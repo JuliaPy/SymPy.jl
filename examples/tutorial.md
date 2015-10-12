@@ -468,7 +468,7 @@ access it using indexing notation or its alias `polyroots`.
 
 > Indexing with a symbol. When a symbolic expression is indexed by a
 > symbol it returns a function which maps to a corresponding SymPy
-> function. For example, `p[:roots](args...)` will call `roots(p,
+> function. For example, "p[:roots](args...)" will call `roots(p,
 > args...)` within SymPy. For methods of SymPy objects, the same is
 > true, so if `roots` were a class method, then the call would resolve
 > to `p.roots(args...)`.
@@ -608,16 +608,18 @@ solve(p-q, bs)
 
 ### Solving using logical operators
 
-The `solve` function does not need to just solve `ex = 0`. There are other means to specify an equation. Ideally, it would be nice to say `ex1 == ex2`, but the interpretation of `==` is not for this. Rather, `SymPy` introduces `Eq` for equality:
+The `solve` function does not need to just solve `ex = 0`. There are other means to specify an equation. Ideally, it would be nice to say `ex1 == ex2`, but the interpretation of `==` is not for this. Rather, `SymPy` introduces `Eq` for equality. So this expression
 
 ```
 solve(Eq(x, 1))
 ```
 
-Gives 1, as expected from solving `x == 1`. In addition to `Eq`, there
-are `Lt`, `Le`, `Ge`, `Gt`. The Unicode operators are not aliased to
-these, but there are alternatives `\ll[tab]`, `\le[tab]`,
-`\Equal[tab]`, `\ge[tab]`, `\gg[tab]` and `\neg[tab]` to negate.
+gives 1, as expected from solving `x == 1`.
+
+In addition to `Eq`, there are `Lt`, `Le`, `Ge`, `Gt`. The Unicode
+operators are not aliased to these, but there are alternatives
+`\ll[tab]`, `\le[tab]`, `\Equal[tab]`, `\ge[tab]`, `\gg[tab]` and
+`\neg[tab]` to negate.
 
 So, the above could have been written with the following nearly identical expression, though it is entered with `\Equal[tab]`. 
 
@@ -635,39 +637,85 @@ d = solve(exs)
 
 ## Plotting
 
-Within Python, SymPy has several plotting features that work with Matplotlib. Many of these are available from within `Julia` using `PyPlot`. However, as `Julia` has several plotting options, there is also support for other packages, for example `Gadfly`.
+The `Plots` package allows many 2-dimensional plots of `SymPy` objects
+to be agnostic as to a backend plotting package.  `SymPy` loads the
+`Plots` package and extends its `plot` and `plot!`
+methods. [See the help page for `sympy_plotting`.]
 
-With `Gadfly`, simple plots are straightforward:
+In particular, the following methods of `plot` are defined:
 
-```
-using Gadfly
-x = symbols("x")
-plot(x^2 - 2x + 3, -3, 3)
-```
+* `plot(ex::Sym, a, b)` will plot the expression of single variable over the interval `[a,b]`
+* `plot!(ex::Sym, a, b)` will add to the current plot a plot of  the expression of single variable over the interval `[a,b]`
+* `plot(exs::Vector{Sym}, a, b)` will plot each expression over `[a,b]`
+* `plot(ex1, ex2, a, b)` will plot a parametric plot of the two expressions over the interval `[a,b]`.
 
-More than one expression can be plotted by passing in a vector of expressions:
+There are corresponding `plot!` methods.
 
-```
-plot([x, x^2, x^3, 0], -2,2)
-```
+The basic idea, is where there is an interface in `Plots` for
+functions, a symbolic expression may be passed in.  Keyword arguments
+are passed onto the `plot` function of the `Plots` package.
 
-(The `0` is converted to a symbolic expression through `Julia`'s promotion rules.)
+As an alternative to the above style for parametric plots, we add
+`parametricplot(ex1, ex2, a, b)` and `plot((ex1, ex2), a, b)`.
 
-Passing a tuple of two expressions, will produce a 2D, parametric plot (as will `parametricplot`):
+When `Plots` adds contour plots and plots of vector fields, these will be added to `SymPy`.
 
-```
-plot((cos(2x), sin(3x)), 0, 2pi)
-```
+----
 
-(Pass `Gadfly`'s `Geom.line`  to connect the points. In general, the plotting functions in `SymPy` concentrate on setting up the data but leave the aesthetics to the underlying plotting package.)
-
-When `PyPlot` is loaded, the `plot` method dispatches to
-`PyPlot`'s. (Only one of the plotting packages from `Gadfly`,
-`PyPlot`, or `Winston` should be loaded with `SymPy`.) In addition to
-plots as above, there is `contour`, `contour3D`, `plot_surface`,  `plot_parametric_surface`, and
-`plot_implicit`.
+In addition, within Python, SymPy has several plotting features that work with Matplotlib. Many of these are available
+when the `:pyplot` backend end for `Plots` is used (`backend(:pyplot)`). These methods are only available *after* `PyPlot` is loaded. If this done through `Plots`, then this happens after an initial call to `plot`. If this is done through `using PyPlot`, then the `plot` method will be ambiguous with `PyPlot`'s and must be qualified, as in `SymPy.plot`.
 
 
+* `plot((ex1, ex2, ex3), a, b)` --  plot a 3D parametric plot of the expressions over `[a,b]`. (Also `parametricplot`.)
+
+* `contour(ex, (xvar, a0, b0), (yvar, a1, b1))` -- make a contourplot
+  of the expression of two variables over the region `[a0,b0] x
+  [a1,b1]`. The default region is `[-5,5]x[-5,5]` where the ordering
+  of the variables is given by `free_symbols(ex)`. This name may
+  change when `Plots` adds contour plots. There is also `contour3D` to
+  add a third dimension to the plot.
+
+* `quiver(exs::Vector{Sym}, (xvar, a0, b0), (yvar, a1, b1))` -- make a
+vector plot of the expressions over a grid within `[a0,b0] x
+[a1,b1]`. The default region is `[-5,5]x[-5,5]` where the ordering of
+the variables is given by `free_symbols(ex)`.  This name may change
+when `Plots` adds vector field plots. Currently, there is a
+`vectorplot` alias in anticipation of that.
+
+There are also 3 dimesional plots avaiable
+
+* `plot_surface(ex::Sym, (xvar, a0, b0), (yvar, a1, b1))` -- make a
+  surface plot of the expressions over a grid within `[a0,b0] x
+  [a1,b1]`. The default region is `[-5,5]x[-5,5]` where the ordering
+  of the variables is given by `free_symbols(ex)`.
+
+The plotting features of SymPy add some functions to Matplotlib and we
+copy these over:
+
+* `plot_parametric_surface(ex1::Sym, ex2::Sym, ex3::Sym), (uvar, a0,
+  b0), (vvar, a1, b1))` -- make a surface plot of the expressions
+  parameterized by the region `[a0,b0] x [a1,b1]`. The default region
+  is `[-5,5]x[-5,5]` where the ordering of the variables is given by
+  `free_symbols(ex)`.
+
+* `plot_implicit(predictate, (xvar, a0, b0), (yvar, a1, b1))` -- make
+an implicit equation plot of the expressions over the region `[a0,b0]
+x [a1,b1]`. The default region is `[-5,5]x[-5,5]` where the ordering
+of the variables is given by `free_symbols(ex)`.  To create predicates
+from the variable, the functions `Lt`, `Le`, `Eq`, `Ge`, and `Gt` can
+be used, as with `Lt(x*y, 1)`. For infix notation, unicode operators
+can be used: `\ll<tab>`, `\le<tab>`, `\Equal<tab>`, `\ge<tab>`, and
+`\gg<tab>`. For example, `x*y ≪ 1`.  To combine terms, the unicode
+`\vee<tab>` (for "or"), `\wedge<tab>` (for "and") can be used.
+
+----
+
+Underlying the plotting commands are two simple things. First, to
+easily create a function from a symbolic expression, the pattern
+`convert(Function, ex)` can be used. This is useful for expression
+containings a single variable. For others, the pattern
+`Float64[subs(ex, (xvar, x), (yvar),y)) for x in xs, y in ys]` is
+useful. 
 
 ## Calculus
 
@@ -917,36 +965,6 @@ Finally, we substitute back into the solution for $F(x)$:
 ```
 ex4 = subs(ex3, F(x), y)
 ```
-
-To visualize this, SymPy's `plot_implicit` function could be
-used. This requires `PyPlot` to be the graphing package, but we are
-using `Gadfly`. (The `PyPlot` call is just `plot_implicit(Eq(ex,
-0))`). We use the `ImplicitEquations` package which provides a similar
-means to plot implicit equations within `Gadfly`, though we need to
-create functions and not use our symbolic expressions (which don't
-play nicely with the underlying `ValidatedNumerics` package):
-
-
-```
-using ImplicitEquations
-
-f(x,y) = y^4 - x^4 - y^2 + 2x^2
-
-x0, y0 = (0,1)
-m = N(subs(ex3, (x,x0), (y,y0)))
-g(x,y) = y - (y0 + m*(x-x0))
-
-plot((f==0) | (g==0))  
-```
-
-(If `PyPlot` were loaded, this could have been written:
-`plot_implicit((f(x,y) ⩵ 0) ∨ (y ⩵ y0 + m * (x-x0)))` using the
-Unicode infix operators `\Equal[tab]` and `\vee[tab]` used as aliases
-for `Eq` and `Or`.)
-
-
-
-
 
 ###### Example: A Norman Window
 
@@ -1232,18 +1250,6 @@ hessian(ex)
 ```
 
 (When there are symbolic parameters, the free variables are specified as a vector, as in `hessian(ex, vars)`.)
-
-#### Plots
-
-Some of the standard plots for working with vector-valued functions or multivariate functions are available within `SymPy`. The support varies depending on the underlying plotting package, with `PyPlot` generally having more features.
-
-Parametric plots of vector expressions are supported. With `PyPlot`, the output can be 2 or 3D, but with Gadfly, just 2D. Here we illustrate:
-
-```
-parametricplot([cos(5x), sin(3x)], 0, 4pi, Geom.line(preserve_order=true))
-```
-
-Surface plots of function $f(x,y) \rightarrow R$ can be rendered with `PyPlot`, through a call like `plot_surface(x^2 + y^2, -5, 5, -5, 5)`. 
 
 ## Matrices
 
