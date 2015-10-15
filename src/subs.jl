@@ -84,8 +84,8 @@ end
 
 ## helper, as :is_rational will find 1.2 rational...
 function _is_rational(ex::Sym)
-    ex[:is_rational] == nothing && return false
-    ex[:is_rational] && denom(ex)[:is_integer]
+    ex.x[:is_rational] == nothing && return false
+    ex.x[:is_rational] && denom(ex).x[:is_integer]
 end
 
 ## evalf, n, N
@@ -142,20 +142,20 @@ Throws a `DomainError` if no conversion is possible, such as when the expression
 """
 function N(ex::Sym)
     ## more work than I'd like
-    if ex[:is_integer] == nothing
+    if ex.x[:is_integer] == nothing
         return(N(ex[:evalf]()))
     end
-    if ex[:is_integer]
+    if ex.x[:is_integer]
         for T in [Int, BigInt]
             try (return(convert(T, ex))) catch e end
         end
     elseif _is_rational(ex)
         try (return(convert(Rational, ex))) catch e end
-    elseif ex[:is_real]
+    elseif ex.x[:is_real]
         for T in [Irrational, Float64] ## BigFloat???
               try (return(convert(T, ex))) catch e end
         end
-    elseif ex[:is_complex]
+    elseif ex.x[:is_complex]
         try
             r, i = ex[:re](), ex[:im]()
             r, i = promote(N(r), N(i))
@@ -176,24 +176,24 @@ When given as an integer greater than 16, we try to match the digits of accuracy
 function N(x::Sym, digits::Int)
     ## check
     digits <= 16 && return(N(x))
-    if x[:is_integer] == nothing
+    if x.x[:is_integer] == nothing
         out = x[:evalf](digits)
         return( N(out, digits) )
     end
     
     ex = evalf(x, digits)
-    if x[:is_integer]
+    if x.x[:is_integer]
         return(convert(BigInt, x))
     elseif _is_rational(x)
         return(convert(Rational, x))
-    elseif x[:is_real]
+    elseif x.x[:is_real]
         p = round(Int,log2(10)*digits)
         
         out = with_bigfloat_precision(p) do 
             convert(BigFloat, ex)
         end
         return(out)
-    elseif x[:is_complex]
+    elseif x.x[:is_complex]
         r, i = ex[:re](), ex[:im]()
         u, v = promote(N(r, digits), N(i, digits))
         return(Complex(u, v))

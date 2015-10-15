@@ -117,7 +117,7 @@ end
 
 ## Calculus functions
 function Base.diff(ex::Sym, args...; kwargs...)
-    if ex[:is_Equality]
+    if ex.x[:is_Equality]
         Eq(diff(lhs(ex), args...; kwargs...), diff(rhs(ex), args...; kwargs...))
     else
         sympy_meth(:diff, ex, args...; kwargs...)

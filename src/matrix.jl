@@ -203,8 +203,7 @@ Return reduced row echelon form. This functino does not return the pivot variabl
 
 """
 function rref(a::Matrix{Sym}; kwargs...)
-    d = convert(SymMatrix, a)[:rref](; kwargs...)
-    convert(Array{Sym}, d[1])
+    rref(convert(SymMatrix, a); kwargs...)
 end
 
 ## rref. The sympy method returns

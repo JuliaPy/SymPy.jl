@@ -117,8 +117,8 @@ integrate(sin(x), (x, a, b)) |> replace(a, 0) |> replace(b, pi)
 summation(1/x^2, (x, 1, 10))
 out = summation(1/x^2, (x, 1, 10))
 out1 = sum([1//x^2 for  x in 1:10])
-@assert @compat round(Integer, out[:p]) == out1.num
-@assert @compat round(Integer, out[:q]) == out1.den
+@assert @compat round(Integer, out.x[:p]) == out1.num
+@assert @compat round(Integer, out.x[:q]) == out1.den
 
 ## matrices
 ## these can also be tested by matrix-tests.jl

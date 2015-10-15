@@ -41,7 +41,7 @@ core_object_properties = (:assumptions0,
 """
 Return a vector of free symbols in an expression
 """
-free_symbols(ex::Sym) =  convert(Vector{Sym}, collect(ex[:free_symbols]))
+free_symbols(ex::Sym) =  convert(Vector{Sym}, collect(ex.x[:free_symbols]))
 function free_symbols{T<:SymbolicObject}(exs::Vector{T})
     as = map(free_symbols, exs)
     out = as[1]
@@ -93,8 +93,8 @@ x = Sym("x")
 Eq(x, sin(x)) |> rhs  ## sin(x)
 ```
 """
-rhs(ex::Sym, args...; kwargs...) = ex[:rhs]
-lhs(ex::Sym, args...; kwargs...) = ex[:lhs]
+rhs(ex::Sym, args...; kwargs...) = ex.x[:rhs]
+lhs(ex::Sym, args...; kwargs...) = ex.x[:lhs]
 
 """
 
@@ -110,7 +110,7 @@ Eq(x, x^2) |> args ## (x, x^2)
 sin(x) |> args ## (x,)
 ```
 """
-args(ex::Sym) = ex[:args]
+args(ex::Sym) = ex.x[:args]
 
 
 ## need to import these

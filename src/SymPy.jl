@@ -120,7 +120,8 @@ export SymFunction, SymMatrix,
        ∨, ∧, ¬,
        rhs, lhs, args,
        jacobian, hessian,
-       Max, Min
+       Max, Min,
+       rref
 export PI, E, IM, oo
 export relation, piecewise
 export members, doc, _str
