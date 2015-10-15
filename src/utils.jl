@@ -154,8 +154,18 @@ Base.done(x::Sym, state) = state <= 0
 
 
 """
-convert args so that we can use obj[:methname](x,...) without needing to project to
-python: obj.method(arg1, arg2, ...) -> julia: obj[:meth](args...)
+
+In SymPy, the typical calling pattern is `obj.method` or
+`sympy.method` ... In `PyCall`, this becomes `obj[:method](...)` or
+`sympy.method(...)`. In `SymPy` many -- but no where near all --
+method calls become `method(obj, ...)`. For those that aren't
+included, this allows the call to follow `PyCall`, and be
+`obj[:method]` where a symbol is passed for the method name.
+
+These just dispatch to `sympy_meth` or `object_meth`, as
+appropriate. This no longer can be used to access properties of the
+underlying `PyObject`. For that, there is no special syntax beyond
+`object.x[:property]`.
 
 Examples:
 ```
@@ -166,12 +176,29 @@ x = Sym("x")
 
 """
 function getindex(x::SymbolicObject, i::Symbol)
+    if haskey(project(x), i)
+        function __XXxxXX__(args...;kwargs...) # replace with generated name
+            object_meth(x, i, args...; kwargs...)
+        end
+        return __XXxxXX__
+    elseif haskey(sympy, i)
+        function __XXxxXX__(args...;kwargs...)
+            sympy_meth(i, x, args...; kwargs...)
+        end
+        return __XXxxXX__
+    else
+       MethodError()
+    end
+end 
+
+## deprecate trying to access both a property or a method...        
+function getindexOLD(x::SymbolicObject, i::Symbol)
     ## find method
     if haskey(project(x), i)
         out = project(x)[i]
         if isa(out, Function)
             function f(args...;kwargs...)
-                out(project(args)...; [(k,project(v)) for (k,v) in kwargs]...)
+                object_meth(x, i, args...; kwargs...)
             end
             return f
         else
@@ -179,9 +206,10 @@ function getindex(x::SymbolicObject, i::Symbol)
         end
     elseif haskey(sympy, i)
         out = sympy[i]
-        if isa(out, Function) 
-            function f(args...;kwargs...) 
-                out(project(x), project(args)...; [(k,project(v)) for (k,v) in kwargs]... )
+        if isa(out, Function)
+            function f(args...;kwargs...)
+                sympy_meth(i, x, args...; kwargs...)
+#                out(project(x), project(args)...; [(k,project(v)) for (k,v) in kwargs]... )
             end
             return f
         else

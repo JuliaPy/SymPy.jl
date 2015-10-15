@@ -464,7 +464,7 @@ root. The `roots` function of SymPy does.
 
 This particular function is not exported (as it conflicts with the
 `roots` function from `Polynomials` and `Roots`) but we can still
-access it using indexing notation or its alias `polyroots`.
+access it using `p[:roots]()` or its alias `polyroots`.
 
 > Indexing with a symbol. When a symbolic expression is indexed by a
 > symbol it returns a function which maps to a corresponding SymPy
@@ -476,7 +476,7 @@ access it using indexing notation or its alias `polyroots`.
 The output of calling `roots` will be a dictionary whose keys are the roots and values the multiplicity.
 
 ```
-p[:roots]()     # or polyroots(p)
+polyroots(p)
 ```
 
 When exact answers are not provided, the `:roots` call is contentless:

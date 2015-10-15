@@ -57,6 +57,12 @@ z = subs(x,x,1)
 @assert isa(N(r), Float64)
 @assert isa(N(z), Int)
 
+## method calls via getindex
+p = (x-1)*(x-2)
+p[:roots]()  # sympy.roots
+p = Poly(p, x)
+p[:coeffs]() # p.coeffs
+
 ## algebra
 expand((x + 1)*(x+2))
 x1 = (x + 1)*(x+2)
