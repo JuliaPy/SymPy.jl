@@ -910,9 +910,9 @@ doit(ex)
 SymPy can be used to find derivatives of implicitly defined
 functions. For example, the task of finding $dy/dx$ for the equation:
 
-$$
+$$~
 y^4 - x^4 -y^2 + 2x^2 = 0
-$$
+~$$
 
 As with the mathematical solution, the key is to treat one of the variables as depending on the other. In this case, we think of $y$ locally as a function of $x$. SymPy allows us to create symbolic functions, and we will use one to substitute in for `y`.
 
@@ -1371,9 +1371,9 @@ We do one more example, this one borrowed from [here](http://nbviewer.ipython.or
 
 The equation is
 
-$$
+$$~
 \frac{m}{k} \frac{dv}{dt} = \alpha^2 - v^2.
-$$
+~$$
 
 We proceed through:
 
