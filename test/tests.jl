@@ -297,3 +297,30 @@ if isdefined(:mpmath)
     bei(2, 3.5)
     bei(1+im, 2+3im)
 end
+
+#Test subs for pars and dicts
+ex = 1
+dict1 = Dict{ASCIIString,Any}()
+dict2 = Dict{Any,Any}()
+#test subs
+for i=1:4
+    x = Sym("x$i")
+    ex=ex*x
+    dict2[x] = i
+    dict1[string(x)] = i
+end
+for d in [dict1, dict2]
+    @test ex |> subs(d) == factorial(4)
+    @test ex |> subs(d...) == factorial(4)    
+    @test subs(ex, d) == factorial(4)
+    @test subs(ex, d...) == factorial(4)
+    @test ex(d) == factorial(4)
+    @test ex(d...) == factorial(4)
+end
+
+a = Sym("a")
+b = Sym("b")
+line = x -> a + b * x
+sol = solve([line(0)-1, line(1)-2],[a,b])
+ex = line(10)
+@test ex |> subs(sol) == ex(sol) == ex(sol...) == 11
