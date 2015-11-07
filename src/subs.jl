@@ -18,35 +18,65 @@ subs(ex, (x,y^3), (y,2))
 subs(ex, y, 3)
 ```
 
-The following forms are *convenient*, but they will only work when the
-symbols satisfy `Sym(:y) == y`, which isn't the case, for example, for
-`y` defined through `y=symbols("y", real=true)`.
+There is a curried form of `subs` to use with the chaining `|>` operator
+
+```
+ex |> subs(x,e)
+```
+
+Since version 0.4, the use of pairs gives a convenient alternative:
+
+```
+subs(ex, x=>1, y=>2)
+ex |> subs(x=>1, y=>2)
+```
+
+There were some older convenience forms, but these will be deprecated, as they don't work as expected when a variable has assumptions. These are:
 
 ```
 subs(ex, :y, pi)    
-subs(ex, x=1, y=pi) 
+subs(ex, x=1, y=pi)
+## or
 ex |> subs(:x, e)   
 ex |> subs(x=e)     
-## julia v"0.4" only:
-## ex(x=2, y=3)     ## will only work if Sym(:y) == y, which isn't case, say when y=symbols("y", real=true)
+## or as of version 0.4:
+ex(x=2, y=3)     
 ```
 """
 subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any})) =
     object_meth(ex, :subs, Sym(y[1]), convert(Sym,y[2]))
 subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any}), args...) = subs(subs(ex, y), args...)
-subs{T <: SymbolicObject, S <: SymbolicTypes}(ex::T, y::S, val) = subs(ex, (y,val))
-subs{T <: SymbolicObject}(ex::T, d::Vararg{Pair}) = subs(ex, [(p.first, p.second) for p in d]...)
+subs{T <: SymbolicObject, S<:SymbolicObject}(ex::T, y::S, val) = subs(ex, (y,val))
 subs{T <: SymbolicObject}(ex::T, dict::Dict) = subs(ex, dict...)
+if VERSION >= v"0.4.0"
+    subs{T <: SymbolicObject}(ex::T, d::Vararg{Pair}) = subs(ex, [(p.first, p.second) for p in d]...)
+end
+function subs{T <: SymbolicObject, S <: Symbol}(ex::T, y::S, val)
+    warn("Calling subs with a symbol and not a symbolic variable is deprecated")
+    subs(ex, (y,val))
+end
 
-## curried version to use with |>
-subs(x::SymbolicTypes, y) = ex -> subs(ex, x, y)
+## curried versions to use with |>
+subs(x::SymbolicObject, y) = ex -> subs(ex, x, y)
 subs(;kwargs...) = ex -> subs(ex; kwargs...)
-subs(d::Vararg{Pair}) = ex -> subs(ex, [(p.first, p.second) for p in d]...)
 subs(dict::Dict) = ex -> subs(ex, dict...)
+if VERSION >= v"0.4.0"
+    subs(d::Vararg{Pair}) = ex -> subs(ex, [(p.first, p.second) for p in d]...)
+end
+function subs(x::Symbol, y)
+    warn("Calling `subs` with a symbol and not a symbolic variable is deprecated")
+    ex -> subs(ex, Sym(x), y)
+end
 
 ## Convenience method for keyword arguments
-subs{T <: SymbolicObject}(ex::T; kwargs...) = subs(ex, kwargs...)
-
+## Will deprecate this
+function subs{T <: SymbolicObject}(ex::T; kwargs...)
+    warn("""
+Calling `subs` with keyword arguments will be deprecated. From v0.4 onward, the use of pairs, as in
+`subs(ex, var1=>val1, var2=>val2)` is suggested.
+""")
+    subs(ex, kwargs...)
+end
 
 ## replace alias for subs
 Base.replace(ex::SymbolicObject, x::SymbolicObject, y) = subs(ex, x, y)
@@ -56,20 +86,30 @@ Base.replace(x::SymbolicObject, y) = ex -> subs(ex, x, y)
 Base.replace(ex::SymbolicObject; kwargs...) = subs(ex, kwargs...)
 
 
-## Make callable expression, so that function notation is more natural
-## **Problematic** as x=Sym("x") will work -- but **not** x= symbols("x", real=true), say.
-
 # """
+#
+# As of version 0.4, expressions are callable. The following works
+# using pairs, a dictionary or, one can not specify the variables and
+# use the order of the free symbols;
 
 # ```
+# ex = (x-3)*(y^2
+# ex(x=>1, y=>2)
+# ex(Dict(x=>1, y=>2))
 # ex(1,2)  ## uses order of free_symbols
-# ex(x=1, y=2)
 # ```
 #     """
 
 
 if VERSION >= v"0.4.0-dev"
-    Base.call(ex::SymbolicObject; kwargs...) = subs(ex, kwargs...)
+    function Base.call(ex::SymbolicObject; kwargs...)
+        warn("""
+Calling an expression with keyword arguments will be deprecated. From v0.4 onward, the use of pairs, as in
+`ex(var1=>val1, var2=>val2)` is suggested.
+""")
+        subs(ex, kwargs...)
+
+    end
     function Base.call(ex::SymbolicObject, args...)
         xs = free_symbols(ex)
         subs(ex, collect(zip(xs, args))...)

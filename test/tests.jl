@@ -30,17 +30,60 @@ Sym(catalan)
 f1 = convert(Function, x^2)
 @test f1(2) == Sym(4)
 
-
+### Subs
 ## subs, |> (x == number)
 f(x) = x^2 - 2
 y = f(x)
 @assert float(subs(y, x, 1)) == f(1)
 @assert float( y |> replace(x,1) ) == f(1)
 
+## interfaces
+ex = (x-1)*(y-2)
+@assert subs(ex, x, 1) == 0
+@assert subs(ex, (x,1)) == 0
+@assert subs(ex, (x,2),(y,2)) == 0
+
+if VERSION >= v"0.4.0"
+    @assert subs(ex, x=>1) == 0
+    @assert subs(ex, x=>2, y=>2) == 0
+    @assert subs(ex, Dict(x=>1)) == 0
+    @assert ex(x=>1) == 0
+end
+
+
+## Replace
 y = Sym("y")
 z = x - 3 + y
 subs(z, y, 3)
 @assert (z |> replace(x, 2) |> replace(y, 3) |> float) == (2 - 3 + 3)
+
+
+#Test subs for pars and dicts
+ex = 1
+dict1 = Dict{ASCIIString,Any}()
+dict2 = Dict{Any,Any}()
+#test subs
+for i=1:4
+    x = Sym("x$i")
+    ex=ex*x
+    dict2[x] = i
+    dict1[string(x)] = i
+end
+for d in [dict1, dict2]
+    @test ex |> subs(d) == factorial(4)
+    @test ex |> subs(d...) == factorial(4)    
+    @test subs(ex, d) == factorial(4)
+    @test subs(ex, d...) == factorial(4)
+    @test ex(d) == factorial(4)
+    @test ex(d...) == factorial(4)
+end
+
+a = Sym("a")
+b = Sym("b")
+line = x -> a + b * x
+sol = solve([line(0)-1, line(1)-2],[a,b])
+ex = line(10)
+@test ex |> subs(sol) == ex(sol) == ex(sol...) == 11
 
 ## Conversion
 x = Sym("x")
@@ -298,29 +341,3 @@ if isdefined(:mpmath)
     bei(1+im, 2+3im)
 end
 
-#Test subs for pars and dicts
-ex = 1
-dict1 = Dict{ASCIIString,Any}()
-dict2 = Dict{Any,Any}()
-#test subs
-for i=1:4
-    x = Sym("x$i")
-    ex=ex*x
-    dict2[x] = i
-    dict1[string(x)] = i
-end
-for d in [dict1, dict2]
-    @test ex |> subs(d) == factorial(4)
-    @test ex |> subs(d...) == factorial(4)    
-    @test subs(ex, d) == factorial(4)
-    @test subs(ex, d...) == factorial(4)
-    @test ex(d) == factorial(4)
-    @test ex(d...) == factorial(4)
-end
-
-a = Sym("a")
-b = Sym("b")
-line = x -> a + b * x
-sol = solve([line(0)-1, line(1)-2],[a,b])
-ex = line(10)
-@test ex |> subs(sol) == ex(sol) == ex(sol...) == 11

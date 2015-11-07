@@ -110,40 +110,36 @@ ex = x + y + z
 subs(ex, (x,1), (y,pi))      
 ```
 
-Or keyword arguments can be used to refer to the variable to substitute:
+For version 0.4 and greater, pairs can be used for substitution with:
 
 ```
-subs(ex, x=1, y=pi)
+subs(ex, x=>1, y=>pi)
 ```
 
-When used with the pipeline operator, `|>`, there is a curried form that allows the expression to be implicit:
+And, perhaps more conveniently, symbolic objects have their `call` method overloaded to allow substitution:
+
+```
+ex(x=>1, y=>pi)
+```
+
+A straight call is also possble, where the order of the variables is determined by `free_symbols`:
+
+```
+ex(1, pi)
+```
+
+When using the pipeline operator, `|>`, is convenient, there is a curried form that allows the expression to be implicit:
 
 ```
 ex |> subs(x, 1)
 ```
 
-As `subs` is very similar in spirit to `Julia`'s `replace` function, an alias is provided:
+As `subs` is very similar in spirit to `Julia`'s `replace` function, that alias is provided:
 
 ```
 ex |> replace(y, pi)
 ```
 
-### Using function notation to substitute
-
-For `julia` version 0.4 and onward, changes to the language allow for `subs` to be replaced by a function-like notation:
-
-```
-if VERSION >= v"0.4.0-dev"
-  x(100)
-  ex(y=pi)
-  ex(x=1, y=pi)
-end
-```
-
-The first example above uses the internal `get_free_symbols` function
-to order the symbols found in the expression. These may not be as
-expected. This style should really only be used when there is just one
-free symbol in the expression.
 
 ## Conversion from symbolic to numeric
 
@@ -404,7 +400,7 @@ subs(p, x, 0) # c
 Though one could use some trick like this to find all the coefficients:
 
 ```
-[[coeff(p, x^i) for i in N(degree(p)):-1:1], subs(p,x,0)]
+[[coeff(p, x^i) for i in N(degree(p)):-1:1]; subs(p,x,0)]
 ```
 
 that is cumbersome, at best. SymPy has a function `coeffs`, but it is defined for polynomial types, so will fail on `p`:
@@ -745,13 +741,13 @@ a = symbols("a", positive=true)
 ex = (sqrt(2a^3*x-x^4) - a*(a^2*x)^(1//3)) / (a - (a*x^3)^(1//4))
 ```
 
-The limit as $x$ goes to $a$ gives an indeterminate expression:
+Substituting $x=a$ gives an indeterminate form:
 
 ```
 subs(ex, x, a)
 ```
 
-we can see it is of the form $0/0$:
+We can see it is of the form $0/0$:
 
 ```
 subs(denom(ex), x, a), subs(numer(ex), x, a)

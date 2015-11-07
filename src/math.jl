@@ -103,11 +103,13 @@ Base.copysign(x::Sym, y::Sym) = abs(x)*sign(y)
 Min(ex::Sym, ex1::Sym) = sympy_meth(:Min, ex, ex1)
 Max(ex::Sym, ex1::Sym) = sympy_meth(:Max, ex, ex1)
 
+
+
+
 for meth in (:separate, :flatten,
              :igcd, :ilcm,
              :sqf,
              :together,
-             :limit,
              :Derivative
              )
     meth_name = string(meth)
@@ -116,6 +118,52 @@ for meth in (:separate, :flatten,
 end
 
 ## Calculus functions
+
+## bring over for function calls (not expressions)
+## returns a symbolic expression
+## limit(f, c) or limit(f,c,dir="-") or limit(f, c, dir="-")
+
+"""
+
+Compute symbolic limit of a function
+
+Examples
+```
+limit(x -> sin(x)/x, 0)
+limit(x -> x^x, 0, dir="+")
+```
+"""
+function limit(f::Function, c::Number=0; kwargs...)
+    x = Sym("x")
+    limit(f(x), x, c; kwargs...)
+end
+
+## """
+
+## Limit using pairs notation
+
+## ```
+## @vars x y
+## ex = 1/(x^2 - y^2)
+## limit(ex, x=>3)
+## ```
+## """
+
+if VERSION >= v"0.4.0"
+    limit(ex::Sym, d::Pair; kwargs...) = limit(ex, d.first, d.second;kwargs...)
+    ## XXX why can I not have dir="+" as keyword argument?
+    function limit(ex::Sym, d::Vararg{Pair})
+        for p in d
+            ex = limit(ex, p)
+        end
+        ex
+    end
+end
+
+limit(ex::Sym, args...; kwargs...) = sympy_meth(:limit, ex, args...; kwargs...)
+export limit
+
+    
 function Base.diff(ex::Sym, args...; kwargs...)
     if ex.x[:is_Equality]
         Eq(diff(lhs(ex), args...; kwargs...), diff(rhs(ex), args...; kwargs...))
@@ -124,19 +172,11 @@ function Base.diff(ex::Sym, args...; kwargs...)
     end
 end
 
-
+## 
 
 
 ## diff for matrix doesn't handle vectors well, so we vectorize here
 diff(exs::Array{Sym}, args...; kwargs...) = map(ex -> diff(ex, args...;kwargs...), exs)
-
-## bring over for function calls (not expressions)
-## returns a symbolic expression
-## limit(f, c) or limit(f,c,dir="-") or limit(f, c, dir="-")
-function limit(f::Function, c::Number=0; kwargs...)
-    x = Sym("x")
-    limit(f(x), x, c; kwargs...)
-end
 
 ## find symbolic derivatives from a function
 function diff(f::Function, k::Int=1; kwargs...)
