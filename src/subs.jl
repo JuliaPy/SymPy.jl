@@ -35,17 +35,17 @@ subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any})) =
     object_meth(ex, :subs, Sym(y[1]), convert(Sym,y[2]))
 subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any}), args...) = subs(subs(ex, y), args...)
 subs{T <: SymbolicObject, S <: SymbolicTypes}(ex::T, y::S, val) = subs(ex, (y,val))
+subs{T <: SymbolicObject}(ex::T, d::Vararg{Pair}) = subs(ex, [(p.first, p.second) for p in d]...)
+subs{T <: SymbolicObject}(ex::T, dict::Dict) = subs(ex, dict...)
 
 ## curried version to use with |>
 subs(x::SymbolicTypes, y) = ex -> subs(ex, x, y)
 subs(;kwargs...) = ex -> subs(ex; kwargs...)
-
+subs(d::Vararg{Pair}) = ex -> subs(ex, [(p.first, p.second) for p in d]...)
+subs(dict::Dict) = ex -> subs(ex, dict...)
 
 ## Convenience method for keyword arguments
-function subs{T <: SymbolicObject}(ex::T; kwargs...)
-    ts = [(Sym(k),v) for (k,v) in kwargs]
-    subs(ex, ts...)
-end
+subs{T <: SymbolicObject}(ex::T; kwargs...) = subs(ex, kwargs...)
 
 
 ## replace alias for subs
@@ -74,6 +74,8 @@ if VERSION >= v"0.4.0-dev"
         xs = free_symbols(ex)
         subs(ex, collect(zip(xs, args))...)
     end
+    Base.call(ex::SymbolicObject, x::Dict) = subs(ex, x)
+    Base.call(ex::SymbolicObject, x::Vararg{Pair}) = subs(ex, x...)
 end
 
 #####
