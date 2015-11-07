@@ -8,25 +8,42 @@
 const SymPoly = Sym
 
 ## rename these, their use is special to polynomials, so we prefix
+## Renamed polynomial methods.
+
+## The functions `div`, `rem, `divrem` had slightly different meaning in
+## Julia than SymPy, where they are polynomial methods. Here we rename
+## them by prefixing with "poly". We do the same for `roots`, so as to
+## not conflict with the `roots` function from `Polynomials.jl`.
+
 """
 
-Renamed polynomial methods.
-
-The functions `div`, `rem, `divrem` had slightly different meaning in Julia than SymPy, where they are polynomial methods. Here we renames them by prefixing with "poly". We do the same for `roots`, so as to not conflict with the `roots` function from `Polynomials.jl`.
+Polynomial division. Renamed from `div` in SymPy to avoid confusion with Julia's `div`
 
 """
-polynomial_sympy_methods_renamed = ((:div, :polydiv),
-                                    (:rem, :polyrem),
-                                    (:divrem, :polydivrem),
-                                    (:roots, :polyroots)
-                                    )
+polydiv(ex::Sym, args...; kwargs...) = sympy_meth(:div, ex, args...; kwargs...)
 
+"""
 
-for (meth, newmeth) in polynomial_sympy_methods_renamed
-    meth_name = string(meth)
-    @eval ($newmeth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
-    eval(Expr(:export, newmeth))
-end
+Polynomial division remainerd. Renamed from `rem` in SymPy to avoid confusion with Julia's `rem`
+
+"""
+polyrem(ex::Sym, args...; kwargs...) = sympy_meth(:rem, ex, args...; kwargs...)
+
+"""
+
+Polynomial division with remainder. Renamed from `divrem` in SymPy to avoid confusion with Julia's `divrem`
+
+"""
+polydivrem(ex::Sym, args...; kwargs...) = sympy_meth(:divrem, ex, args...; kwargs...)
+
+"""
+
+Find roots of a polynomial. Renamed from `roots` in
+SymPy to avoid confusion with the `roots` function of `Polynomials`
+
+"""
+polyroots(ex::Sym, args...; kwargs...) = sympy_meth(:roots, ex, args...; kwargs...)
+export polydiv, polyrem, polydivrem, polyroots
 
 
 

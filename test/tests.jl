@@ -18,8 +18,6 @@ ex = x*y
 ## number conversions
 Sym(2)
 Sym(2.0)
-Sym(big(2))
-Sym(big(2.0))                   # may need mpmath (e.g., conda install mpmath)
 Sym(2//1)
 Sym(im)
 Sym(2im)
@@ -291,6 +289,9 @@ ex = Eq(x^2, x)
 ## mpmath functions
 if isdefined(:mpmath)
     x = Sym("x")
+    Sym(big(2))
+    Sym(big(2.0))                   # may need mpmath (e.g., conda install mpmath)
+    
     @assert limit(besselj(1,1/x), x, 0) == Sym(0)
     complex(hankel2(2, pi))
     bei(2, 3.5)
