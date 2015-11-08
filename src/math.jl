@@ -152,7 +152,7 @@ end
 if VERSION >= v"0.4.0"
     limit(ex::Sym, d::Pair; kwargs...) = limit(ex, d.first, d.second;kwargs...)
     ## XXX why can I not have dir="+" as keyword argument?
-    function limit(ex::Sym, d::Vararg{Pair})
+    function limit(ex::Sym, d::Pair...)
         for p in d
             ex = limit(ex, p)
         end
