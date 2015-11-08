@@ -101,7 +101,7 @@ end
 
 
 export sympy, sympy_meth, object_meth, call_matrix_meth
-export Sym, @syms, @vars, symbols # @sym_str,
+export Sym, @syms, @vars, @osyms, symbols
 export pprint,  jprint
 export SymFunction, SymMatrix,
        evalf, N,  subs,

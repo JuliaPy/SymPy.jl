@@ -16,34 +16,48 @@ Sym{T <: Number}(x::T) = convert(Sym, x)
 "vectorized version of `Sym`"
 Sym(args...) = map(Sym, args)
 
-## (a,b,c) = @syms a b c --- no commas on right hand side!
-## (x,) @syms x is needed for single arguments
+## @syms a b c --- no commas on right hand side!
 ## Thanks to vtjnash for this!
 """
 
 Macro to create many symbolic objects at once. (Written by `@vtjnash`.)
 
-Example: ` @syms a b c`
+Example:
 
+```
+@syms a b c
+```
+
+The `@syms` macros creates the variables and assigns them into the
+module `Main`. The `@vars` macro is identical, but this is
+transitional and `@syms` should be used. (This is the name used in
+MATLAB.). The old behaviour of `@syms` was to create the symbols and
+return them for assignment through the left hand side.  The `symbols`
+function does this with just few more keystrokes and allows
+assumptions to be made. Hence, `@syms` is repurposed. The old behavior
+is kept, for now, through `@osyms`. A name clearly to be replaced,
+perhaps with `@vars`.
+
+Original macro magic contributed by @vtjnash.
 """
 macro syms(x...)
     q=Expr(:block)
     if length(x) == 1 && isa(x[1],Expr)
-        @assert x[1].head === :tuple "@syms expected a list of symbols"
+        @assert x[1].head === :tuple "@vars expected a list of symbols"
         x = x[1].args
     end
     for s in x
-        @assert isa(s,Symbol) "@syms expected a list of symbols"
+        @assert isa(s,Symbol) "@vars expected a list of symbols"
         push!(q.args, Expr(:(=), s, Expr(:call, :Sym, Expr(:quote, s))))
-           end
+    end
     push!(q.args, Expr(:tuple, x...))
-    q
+    eval(Main, q)
 end
+
 
 """
 
-The `vars` macro is like `syms` except it assigns the variables into `Main`, so can be
-called as `@vars a b c`. This simplifies construction of variables, but pollutes the `Main` module.
+The `vars` macro is identical to  `@syms`. this usage will be deprecated.
 
 """
 macro vars(x...)
@@ -60,12 +74,25 @@ macro vars(x...)
     eval(Main, q)
 end
 
+"""
 
-#macro sym_str(x)
-#    Sym(x)
-#end
+Macro to create an assign variables. Similar to `symbols`.
 
-##@deprecate sym_str(x)  symbols(x::String)
+"""
+macro osyms(x...)
+    q=Expr(:block)
+    if length(x) == 1 && isa(x[1],Expr)
+        @assert x[1].head === :tuple "@syms expected a list of symbols"
+        x = x[1].args
+    end
+    for s in x
+        @assert isa(s,Symbol) "@syms expected a list of symbols"
+        push!(q.args, Expr(:(=), s, Expr(:call, :Sym, Expr(:quote, s))))
+           end
+    push!(q.args, Expr(:tuple, x...))
+    q
+end
+
 
 ## define one or more symbols directly
 ## a,b,c = symbols("a,b,c", commutative=false)

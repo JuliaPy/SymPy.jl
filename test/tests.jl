@@ -6,9 +6,9 @@ using Compat
 x = Sym("x")
 #x = sym"x" # deprecated
 x = Sym(:x)
-(x,) = @syms x
+@syms x
 x,y = Sym(:x, :y)
-x,y = @syms x y
+x,y = @osyms x y
 x,y = symbols("x,y")
 
 ## extract symbols
@@ -138,7 +138,7 @@ diff(sin(x), x)
 out = diff(sin(x), x, 2)
 @assert abs((out |> replace(x, pi/4) |> float) - - sin(pi/4)) < sqrt(eps())
 
-x,y = @syms x y
+@syms x y
 diff(x^2 + x*y^2, x, 1)         # partial derivatives
 
 t = symbols("t", real=true)     # vector-valued functions
@@ -154,7 +154,7 @@ diff(eqn, x)
 ## integrate
 integrate(sin(x))
 integrate(sin(x), (x, 0, pi))
-a,b = @syms a b
+@syms a b
 integrate(sin(x), (x, a, b))
 integrate(sin(x), (x, a, b)) |> replace(a, 0) |> replace(b, pi)
 
@@ -168,7 +168,7 @@ out1 = sum([1//x^2 for  x in 1:10])
 
 ## matrices
 ## these can also be tested by matrix-tests.jl
-(x,) = @syms x
+@syms x
 A = [x 1; 1 x]
 b = [x, 2]
 
@@ -308,7 +308,7 @@ a .^ a
 @test factorint(Sym(100)) == factor(100)
 
 ## polynomials
-x,y = @syms x y
+@syms x y
 f1 = 5x^2  + 10x + 3
 g1 = 2x + 2
 q,r = polydiv(f1,g1, domain="QQ") # not div, as can't disambiguate div(Sym(7), 5)) to do integer division

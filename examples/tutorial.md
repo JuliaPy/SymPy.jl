@@ -30,11 +30,11 @@ x = Sym("x")
 This creates a symbolic object `x`, which can be manipulated through further function calls.
 
 
-There are two macros that make creating multiple variables a bit less typing. The `@vars` macro will create variables in the *Main workspace*, so no assignment is necessary. The `@syms` macro will return newly defined symbolic variables. As these are macros, the arguments need not be separated by commas.
+There are two macros that make creating multiple variables a bit less typing. The `@syms` macro will create variables in the *Main workspace*, so no assignment is necessary. The `@osyms` macro will return newly defined symbolic variables. As these are macros, the arguments need not be separated by commas.
 
 ```
-@vars a b c
-a,b,c = @syms a,b,c
+@syms a b c
+a,b,c = @osyms a,b,c
 ```
 
 

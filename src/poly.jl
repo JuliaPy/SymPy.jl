@@ -1,6 +1,6 @@
 ## There are many Poly class methods
 ## Instances of Poly can be created via:
-## x, y, z = @syms x y z
+## @syms x y z
 ## p = poly(x^2 -x - 1)
 ##
 

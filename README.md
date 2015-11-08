@@ -71,7 +71,7 @@ This gets replaced by a more `julia`n syntax:
 
 ```
 using SymPy                     # some warnings need cleaning up
-x = Sym("x")		            # or  Sym(:x), symbols("x"), (x,) = @syms x, or @vars x
+x = Sym("x")		            # or  Sym(:x), symbols("x"),  @syms x
 y = sin(pi*x)                    
 N(subs(y, x, 1))                # substitute for 1 then convert from symbolic to numeric value
 ```

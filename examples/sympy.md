@@ -62,7 +62,7 @@ this gets replaced by a more `julia`n syntax:
 
 ```
 using SymPy                     # some warnings need cleaning up
-x = sym"x"			# or Sym("x") or Sym(:x) or (x,) = @syms x
+x = sym"x"			# or Sym("x") or Sym(:x) or @syms x
 y = sin(pi*x)
 subs(y, x, 1) |> float
 ```
@@ -87,8 +87,7 @@ ways to make a symbolic object:
 ```
 x = Sym("x")			# Sym constructor
 a = Sym(:a)			# using a symbol, not a string
-alpha, gamma = @syms alpha gamma # @syms macro
-@vars delta
+@syms alpha gamma delta # @syms macro
 A, B = symbols("A B", commutative=false) # symbols takes assertions as keyword arguments
 ```
 
