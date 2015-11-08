@@ -70,12 +70,14 @@ for i=1:4
     dict1[string(x)] = i
 end
 for d in [dict1, dict2]
-    @test ex |> subs(d) == factorial(4)
-    @test ex |> subs(d...) == factorial(4)    
+    @test ex |> subs(d) == factorial(4) 
     @test subs(ex, d) == factorial(4)
     @test subs(ex, d...) == factorial(4)
-    @test ex(d) == factorial(4)
-    @test ex(d...) == factorial(4)
+    if VERSION >= v"0.4.0" 
+        @test ex |> subs(d...) == factorial(4)
+        @test ex(d) == factorial(4)
+        @test ex(d...) == factorial(4)
+    end
 end
 
 a = Sym("a")
@@ -83,7 +85,10 @@ b = Sym("b")
 line = x -> a + b * x
 sol = solve([line(0)-1, line(1)-2],[a,b])
 ex = line(10)
-@test ex |> subs(sol) == ex(sol) == ex(sol...) == 11
+@test ex |> subs(sol) == 11
+if VERSION >= v"0.4.0" 
+    @test ex(sol) == ex(sol...) == 11
+end
 
 ## Conversion
 x = Sym("x")
