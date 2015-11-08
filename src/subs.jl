@@ -49,7 +49,7 @@ subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any}), args...)
 subs{T <: SymbolicObject, S<:SymbolicObject}(ex::T, y::S, val) = subs(ex, (y,val))
 subs{T <: SymbolicObject}(ex::T, dict::Dict) = subs(ex, dict...)
 if VERSION >= v"0.4.0"
-    subs{T <: SymbolicObject}(ex::T, d::Vararg{Pair}) = subs(ex, [(p.first, p.second) for p in d]...)
+    subs{T <: SymbolicObject}(ex::T, d::Pair...) = subs(ex, [(p.first, p.second) for p in d]...)
 end
 function subs{T <: SymbolicObject, S <: Symbol}(ex::T, y::S, val)
     warn("Calling subs with a symbol and not a symbolic variable is deprecated")
@@ -61,7 +61,7 @@ subs(x::SymbolicObject, y) = ex -> subs(ex, x, y)
 subs(;kwargs...) = ex -> subs(ex; kwargs...)
 subs(dict::Dict) = ex -> subs(ex, dict...)
 if VERSION >= v"0.4.0"
-    subs(d::Vararg{Pair}) = ex -> subs(ex, [(p.first, p.second) for p in d]...)
+    subs(d::Pair...) = ex -> subs(ex, [(p.first, p.second) for p in d]...)
 end
 function subs(x::Symbol, y)
     warn("Calling `subs` with a symbol and not a symbolic variable is deprecated")
@@ -115,7 +115,7 @@ Calling an expression with keyword arguments will be deprecated. From v0.4 onwar
         subs(ex, collect(zip(xs, args))...)
     end
     Base.call(ex::SymbolicObject, x::Dict) = subs(ex, x)
-    Base.call(ex::SymbolicObject, x::Vararg{Pair}) = subs(ex, x...)
+    Base.call(ex::SymbolicObject, x::Pair...) = subs(ex, x...)
 end
 
 #####
