@@ -12,7 +12,7 @@ Base.|(x::Sym, y::Sym) = PyCall.pyeval("x | y", x=project(x), y=project(y))
 ¬(x::Sym) = !x
 
 
-"""
+#=
 
 In SymPy, symbolic equations are not represented by `=` or `==`,
 rather ther function `Eq` is used. Here we use the unicode
@@ -24,7 +24,7 @@ rather ther function `Eq` is used. Here we use the unicode
 * `>=` is `\ge<tab>`
 * `>` is `\gg<tab>`
 
-"""
+=#
 
 ## These are useful with pairwise and plot_implicit, but they cause  issues elsewhere with linear algebra functions
 #Base.isless(a::Sym, b::Sym) = Lt(a,b)
