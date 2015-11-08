@@ -15,32 +15,33 @@ info("two graphs")
 plot([x^2, 1 - x^2/2], 0, 3)      # two graphs at once
 
 info("parametric plot")
-plot((sin(x), cos(x)), 0, 2pi)    # parametric
+plot(sin(x), cos(x), 0, 2pi)    # parametric
 parametricplot(sin(x), cos(x), 0, 2pi)
 
 
 ## now clear out and use pyplot features
-backend(:pyplot); using PyPlot
+backend(:pyplot)
 @vars x y
 
 info("expression plot")
-SymPy.plot(x, 0,1)  ## qualify `plot` now, as `using PyPlot` was called
+plot(x, 0,1)  ## qualify `plot` now, as `using PyPlot` was called
 
 info("expressions plot")
-SymPy.plot([x,x^2], 0,1)
+plot([x,x^2], 0,1)
 
 info("parametric")
-SymPy.plot((cos(x), sin(x)), 0, 2pi)
+plot(cos(x), sin(x), 0, 2pi)
 parametricplot(cos(x), sin(x), 0, pi)
 
 info("3d parameteric")
 parametricplot(cos(x), sin(x), x, 0, pi)
-SymPy.plot((cos(x), sin(x), x), 0, 4pi)
+
 
 info("vectorplot")
 quiver([cos(x), sin(y)], (x,0,2pi), (y,0,2pi))
 
 info("contour plot")
+plot(linspace(-5,5,25), linspace(-5,5,25), x^2 - y^2)
 contour(x^2 - y^2, (x,-5, 5), (y,-5, 5))
 
 info("surface")
