@@ -12,7 +12,7 @@
 ## that doesn't depend on the backend plotting packages
 ##
 ## The `Plots` package will provide that, but right now it doesn't support
-## all the graphics here, including `contour`, `quiver`, `plot_implicit` and the 3D plots.
+## all the graphics here, including  `quiver`, `plot_implicit` and the 3D plots.
 ## Currently those are supported by the PyPlot package.
 ##
 ## When they are supported, the names of the functions below will change to match
@@ -44,10 +44,13 @@ using Requires ## for conditional `@require`ing of packages
 
 Plotting of symbolic objects.
 
-The `Plots` package  provide a uniform interface to
-many of `Julia`'s plotting packages. `SymPy` extends these methods to plot symbolic objects.
+The `Plots` package provide a uniform interface to many of `Julia`'s
+plotting packages. `SymPy` extends the methods for functions to plot
+symbolic objects.
 
-If no backend plotting package is loaded directly, then the `plot` and `plot!` methods of `Plots` allow for direct plotting of `SymPy` objects.
+If no backend plotting package is loaded directly, then the `plot` and
+`plot!` methods of `Plots` allow for direct plotting of `SymPy`
+objects.
 
 In particular:
 
@@ -72,14 +75,23 @@ Example:
 plot([sin(x), cos(x)], 0, 2pi)
 ```
 
-* `plot(ex1, ex2, a, b; kwargs...)` will plot the two expressions in a parametric plot over the interval `[a,b]`.   This has alternative styles `plot((ex1, ex2), a, b; kwargs...)`  and `parametricplot(sin(2x), cos(3x), 0, 4pi)`.
+* `plot(ex1, ex2, a, b; kwargs...)` will plot the two expressions in a parametric plot over the interval `[a,b]`.   
 
 Example:
 
 ```
 @vars x
-plot((sin(2x), cos(3x)), 0, 4pi) ## also 
+plot(sin(2x), cos(3x), 0, 4pi) ## also 
 ```
+
+
+* `plot(xs, ys, expression)` will make a contour plot (for many backends).
+
+```
+@vars x y
+plot(linspace(0,5), linspace(0,5), x*y)
+```
+
 
 The basic goal is that when `Plots` provides an interface for function
 objects, this package extends the interface to symbolic
@@ -200,6 +212,59 @@ xs]`.
 sympy_plotting = nothing
 export sympy_plotting
 
+## Additions to Plots so that expressions are treated like functions
+typealias SymOrSyms @compat(Union{Sym, Plots.AVec{Sym}})
+Plots.convertToAnyVector(ex::Sym; kw...) = Any[ex], nothing
+Plots.computeY(xs, ex::Sym) = Float64[ex(x) for x in xs]
+
+mapSymOrSyms(f::Sym, u::Plots.AVec) = Float64[f(x) for x in u]
+mapSymOrSyms(fs::Plots.AVec{Sym}, u::Plots.AVec) = [mapSymOrSyms(f, u) for f in fs]
+
+
+## # contours or surfaces... 
+function Plots.createKWargsList(plt::Plots.PlottingObject, x::Plots.AVec, y::Plots.AVec, zf::Sym; kw...)
+    # only allow sorted x/y for now
+    # TODO: auto sort x/y/z properly
+    @assert x == sort(x)
+    @assert y == sort(y)
+    surface = Float64[zf(xi, yi) for xi in x, yi in y]
+    Plots.createKWargsList(plt, x, y, surface; kw...)  # passes it to the zmat version
+end
+
+
+# list of expressions
+function Plots.createKWargsList(plt::Plots.PlottingObject, f::SymOrSyms, x; kw...)
+    @assert !(typeof(x) <: Sym)  # otherwise we'd hit infinite recursion here
+    Plots.createKWargsList(plt, x, f; kw...)
+end
+
+# special handling... xmin/xmax with function(s)
+function Plots.createKWargsList(plt::Plots.PlottingObject, f::SymOrSyms, xmin::Real, xmax::Real; kw...)
+    width = plt.initargs[:size][1]
+    x = collect(linspace(xmin, xmax, width))  # we don't need more than the width
+    Plots.createKWargsList(plt, x, f; kw...)
+end
+
+# special handling... xmin/xmax with parametric function(s)
+Plots.createKWargsList{T<:Real}(plt::Plots.PlottingObject, fx::Sym, fy::Sym, u::Plots.AVec{T}; kw...) =
+    Plots.createKWargsList(plt, mapSymOrSyms(fx, u), mapSymOrSyms(fy, u); kw...)
+    
+
+Plots.createKWargsList{T<:Real}(plt::Plots.PlottingObject, u::Plots.AVec{T}, fx::SymOrSyms, fy::SymOrSyms; kw...) =
+    Plots.createKWargsList(plt, mapSymOrSyms(fx, u), mapSymOrSyms(fy, u); kw...)
+
+
+Plots.createKWargsList(plt::Plots.PlottingObject, fx::Sym, fy::Sym, umin::Real, umax::Real, numPoints::Int = 1000; kw...) =
+    Plots.createKWargsList(plt, fx, fy, linspace(umin, umax, numPoints); kw...)
+
+###
+
+
+
+
+
+
+
 ## Helper function
 ## prepare parametic takes exs, [t0,t1] and returns [xs, ys] or [xs, ys, zs]
 function _prepare_parametric(exs, t0, t1, n=250)
@@ -279,28 +344,32 @@ end
 ## Plots interface
 ## Add to this as more plots become standard in `Plots` (e.g., `contourplot`, `vectorplot`...)
 ## ex
-Plots.plot(ex::SymbolicObject, args...; kwargs...) = _plot(Plots.plot, ex, args...; kwargs...)
-Plots.plot!(ex::SymbolicObject, args...; kwargs...) = _plot(Plots.plot!, ex, args...; kwargs...)
+## Plots.plot(ex::SymbolicObject, args...; kwargs...) = _plot(Plots.plot, ex, args...; kwargs...)
+## Plots.plot!(ex::SymbolicObject, args...; kwargs...) = _plot(Plots.plot!, ex, args...; kwargs...)
 
-## [ex1, ex2...]
-Plots.plot{T<:SymbolicObject}(exs::Vector{T}, args...; kwargs...) = _plot(Plots.plot, exs, args...; kwargs...)
-Plots.plot!{T<:SymbolicObject}(exs::Vector{T}, args...; kwargs...) = _plot(Plots.plot!, exs, args...; kwargs...)
+## ## [ex1, ex2...]
+## Plots.plot{T<:SymbolicObject}(exs::Vector{T}, args...; kwargs...) = _plot(Plots.plot, exs, args...; kwargs...)
+## Plots.plot!{T<:SymbolicObject}(exs::Vector{T}, args...; kwargs...) = _plot(Plots.plot!, exs, args...; kwargs...)
 
-## (ex1, ex2) -- parametric
-Plots.plot{T<:SymbolicObject, S<:SymbolicObject}(exs::(@compat Tuple{T,S}), t0::Real, t1::Real, args...; kwargs...) =
-    _plot(Plots.plot, exs, t0, t1, args...; kwargs...)
-    Plots.plot!{T<:SymbolicObject, S<:SymbolicObject}(exs::(@compat Tuple{T,S}), t0::Real, t1::Real, args...; kwargs...) =
-        _plot(Plots.plot!, exs, t0, t1, args...; kwargs...)
+## ## (ex1, ex2) -- parametric
+## Plots.plot{T<:SymbolicObject, S<:SymbolicObject}(exs::(@compat Tuple{T,S}), t0::Real, t1::Real, args...; kwargs..## .) =
+##     _plot(Plots.plot, exs, t0, t1, args...; kwargs...)
+##     Plots.plot!{T<:SymbolicObject, S<:SymbolicObject}(exs::(@compat Tuple{T,S}), t0::Real, t1::Real, args...; kwargs...) =
+##         _plot(Plots.plot!, exs, t0, t1, args...; kwargs...)
 
 
-## ex1, ex2 -- parametric
-Plots.plot{T<:SymbolicObject, S<:SymbolicObject}(ex1::T, ex2::S, t0::Real, t1::Real, args...; kwargs...) =
-    _plot(Plots.plot, [ex1, ex2], t0, t1, args...; kwargs...)
-Plots.plot!{T<:SymbolicObject, S<:SymbolicObject}(ex1::T, ex2::S, t0::Real, t1::Real, args...; kwargs...) =
-    _plot(Plots.plot!, [ex1, ex2], t0, t1, args...; kwargs...)
-        
+## ## ex1, ex2 -- parametric
+## Plots.plot{T<:SymbolicObject, S<:SymbolicObject}(ex1::T, ex2::S, t0::Real, t1::Real, args...; kwargs...) =
+##     _plot(Plots.plot, [ex1, ex2], t0, t1, args...; kwargs...)
+## Plots.plot!{T<:SymbolicObject, S<:SymbolicObject}(ex1::T, ex2::S, t0::Real, t1::Real, args...; kwargs...) =
+##     _plot(Plots.plot!, [ex1, ex2], t0, t1, args...; kwargs...)
 
-## parametric (3 ways seems like 2 too many!)
+
+## parametric plots interfaces
+## plot((ex1, ex2), a, b)
+Plots.plot{T<:SymbolicObject, S<:SymbolicObject}(exs::(@compat Tuple{T,S}), t0::Real, t1::Real, args...; kwargs...) = Plots.plot(exs[1], exs[2], t0, t1, args...; kwargs...)
+
+## ## parametric (3 ways seems like 2 too many!)
 function parametricplot(ex1::Sym, ex2::Sym, a::Real, b::Real, args...; kwargs...)
     Plots.plot((ex1, ex2), a,b, args...; kwargs...)
 end
