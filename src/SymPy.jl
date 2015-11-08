@@ -127,8 +127,8 @@ export relation, piecewise
 export members, doc, _str
 
 using Plots
-import Plots: plot, backend
-export plot, backend
+import Plots: plot, plot!, backend
+export plot, plot!, backend
 
 
 

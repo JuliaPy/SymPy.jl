@@ -21,7 +21,7 @@
 ## To this we add a light interface for explicitness:
 ##
 ## parametricplot(ex1, ex2, [ex3], a, b) parametric plot
-## contour(ex, (xvar, a, b), (yvar, c,d)) contour plot
+## contourplot(ex, (xvar, a, b), (yvar, c,d)) contour plot
 ##
 ##
 ## The PyPlot package adds 3d plotting, quiver (vectorplot), and implicit plots
@@ -92,7 +92,7 @@ plot(linspace(0,5), linspace(0,5), x*y)
 For explicitness, we provide `contourplot(ex::Sym, (xvar, a, b), (yvar, c, d))` as an alternative:
 
 ```
-contour(x^2 - y^2, (x,-5,5), (y,-5,5)) # default is [-5,5] x [-5,5]
+contourplot(x^2 - y^2, (x,-5,5), (y,-5,5)) # default is [-5,5] x [-5,5]
 ```
 
 
@@ -219,7 +219,7 @@ the associated variable inferred using the ordering of `free_symbols`.
 `plot(xs, ys, ex::Sym)`.)
 
 """
-function contour(ex::Sym,
+function contourplot(ex::Sym,
                  xvar=(-5.0, 5.0),
                  yvar=(-5.0, 5.0),
                  args...;
@@ -228,7 +228,7 @@ function contour(ex::Sym,
     U,V,xs,ys = _find_us_vs(ex, xvar, yvar, n)
     plot(xs, ys, ex, args...; kwargs...)
 end
-export(contour)
+export(contourplot)
 
 ### Plug into Plots interface. Where there is something defined for Functions we
 ### define for symbolic expressions
@@ -329,7 +329,23 @@ See ?sympy_plotting for some more details
             PyPlot.plot3D(out..., args...; kwargs...)
         end
 
+        ## Ideally we would name `contourplot` just `contour`, but for a few reasons:
+        ## * adding the suffix "plot" is consistent with `parametricplot` and `vectorplot`
+        ## * if the user calls in `PyPlot` via `using`, there is no naming conflict.
+        ## here we add in the `contour` name for convenience when the user is using `PyPlot`.
+        eval(Expr(:import, :PyPlot, :contour))
+        function contour(ex::Sym, xvar=(-5.0, 5.0),
+                         yvar=(-5.0, 5.0),
+                         args...;
+                         n::Int=25,
+                         kwargs...)
+            contourplot(ex, xvar,yvar, args...;n=n, kwargs...)
+        end
+
+        
         ## quiver ,,,http://matplotlib.org/examples/pylab_examples/quiver_demo.html
+        ## We add a plot of vectors (vectorplot). Hopefully this will be in `Plots` one
+        ## day
         eval(Expr(:import, :PyPlot, :quiver))
         function quiver(exs::Vector{Sym},
                                xvar=(-5.0, 5.0),
@@ -353,7 +369,7 @@ See ?sympy_plotting for some more details
         end
         global  vectorplot = PyPlot.quiver
         
-        ## Need an interface decision here...
+        ## XXX Need an interface decision here...
         global add_arrow(p::Vector, v::Vector, args...; kwargs...) = begin
             n = length(p)
             if n == 2
@@ -365,7 +381,7 @@ See ?sympy_plotting for some more details
         end
 
         
-        ## 3D contour plo
+        ## 3D contour plot
         eval(Expr(:import, :PyPlot, :contour3D))        
         function contour3D(ex::Sym,
                                   xvar=(-5.0, 5.0),
@@ -424,7 +440,8 @@ See ?sympy_plotting for some more details
             
             PyPlot.plot_surface(xs, ys, zs, args...; kwargs...)
         end
-        
+
+        ## Implict equations plot
         plot_implicit(ex, args...; kwargs...) = sympy[:plotting][:plot_implicit](ex.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
 
         eval(Expr(:export, :contour3D))
