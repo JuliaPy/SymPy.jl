@@ -9,33 +9,23 @@
 ## * plot_implicit: Plots 2D implicit and region plots.
 ##
 ## Our goal here is to give this a Julia interface
-## that doesn't depend on the backend plotting packages
+## that doesn't depend on the backend plotting packages, so we
+## use the `Plots` package.
 ##
-## The `Plots` package will provide that, but right now it doesn't support
-## all the graphics here, including `contour`, `quiver`, `plot_implicit` and the 3D plots.
-## Currently those are supported by the PyPlot package.
 ##
-## When they are supported, the names of the functions below will change to match
-## those in the `Plots` package.
+## plot(::Sym, a, b)          2d-line plot of function
+## plot(Vector{Sym}, a, b)    plot of expressions over same axis
+## plot(::Sym, ::Sym, a, b)   parametric plot of two expressions over [a,b]
+## plot(xs, ys, ex::Sym)      contour plot of expression over regions xs x ys
 ##
+## To this we add a light interface for explicitness:
+##
+## parametricplot(ex1, ex2, [ex3], a, b) parametric plot
+## contour(ex, (xvar, a, b), (yvar, c,d)) contour plot
+##
+##
+## The PyPlot package adds 3d plotting, quiver (vectorplot), and implicit plots
 
-## The plotting package determines what is available. Implementations:
-#
-#                                PyPlot     Gadfly    Winston    Plots
-# plot(::Sym)                     ✓           ✓          ✓        ✓
-# plot(::Vector{Sym})             .           ✓          .         ✓
-# plot(::Tuple{Sym})              ✓           ✓(2D)      ✓(2D)    ✓ (2D)  (aka parametricplot)
-# contour(::Vector{Sym})          ✓           .          .        .
-# quiver(::Vector{Sym})           ✓           .          .        .
-# contour3D(::Vector{Sym})        ✓           .          .        .
-# plot_surface(::Vector{Sym})     ✓           .          .        .
-# plot_parametric_surface(::Vector{Sym})     ✓           .          .        .
-# add_arrow(p,v)                  ✓           .          .        .
-# text...                         .           .          .        .
-
-## [DONE] TODO: use type `(var, a,b)` when region is specified
-## [DONE] TODO: use n, not nx and ny to speciy no. of points.
-## TODO: deprecate `parametricplot`...
 ## TODO: should `add_arrow`  be `quiver!`? `quiver` be `vectorplot`? `plot_vectorfield`? ...
 
 using Requires ## for conditional `@require`ing of packages
@@ -44,10 +34,18 @@ using Requires ## for conditional `@require`ing of packages
 
 Plotting of symbolic objects.
 
-The `Plots` package  provide a uniform interface to
-many of `Julia`'s plotting packages. `SymPy` extends these methods to plot symbolic objects.
+The `Plots` package provide a uniform interface to many of `Julia`'s
+plotting packages. `SymPy` extends the methods for functions to plot
+symbolic objects.
 
-If no backend plotting package is loaded directly, then the `plot` and `plot!` methods of `Plots` allow for direct plotting of `SymPy` objects.
+The basic goal is that when `Plots` provides an interface for function
+objects, this package extends the interface to symbolic
+expressions. The convenience comes at a cost -- the plots are
+slow to render. (There is a conversion from SymPy value to numeric values that is slow.)
+
+If no backend plotting package is loaded directly, then the `plot` and
+`plot!` methods of `Plots` allow for direct plotting of `SymPy`
+objects.
 
 In particular:
 
@@ -72,44 +70,44 @@ Example:
 plot([sin(x), cos(x)], 0, 2pi)
 ```
 
-* `plot(ex1, ex2, a, b; kwargs...)` will plot the two expressions in a parametric plot over the interval `[a,b]`.   This has alternative styles `plot((ex1, ex2), a, b; kwargs...)`  and `parametricplot(sin(2x), cos(3x), 0, 4pi)`.
+* `plot(ex1, ex2, a, b; kwargs...)` will plot the two expressions in a parametric plot over the interval `[a,b]`.   
 
 Example:
 
 ```
 @vars x
-plot((sin(2x), cos(3x)), 0, 4pi) ## also 
+plot(sin(2x), cos(3x), 0, 4pi) ## also 
 ```
 
-The basic goal is that when `Plots` provides an interface for function
-objects, this package extends the interface to symbolic
-expressions. The convenience comes at a cost -- the plots are
-slow to render. (There is a conversion from SymPy value to numeric values that is slow.)
+For explicitness, we provide `parametricplot(ex1, ex2, a, b)` as an alteranative.
+
+
+* `plot(xs, ys, expression)` will make a contour plot (for many backends).
+
+```
+@vars x y
+plot(linspace(0,5), linspace(0,5), x*y)
+```
+
+For explicitness, we provide `contourplot(ex::Sym, (xvar, a, b), (yvar, c, d))` as an alternative:
+
+```
+contour(x^2 - y^2, (x,-5,5), (y,-5,5)) # default is [-5,5] x [-5,5]
+```
+
 
 ----
 
 If the `PyPlot` backend is used (as with `backend(:pyplot)`), then there are additional methods added. 
 
-* `plot((ex1, ex2, ex3), a, b; kwargs)` produces a 3D parametric plot over `[a,b]` (also `parametricplot`)
+* `plot(ex1, ex2, ex3, a, b; kwargs)` produces a 3D parametric plot over `[a,b]` (also `parametricplot`)
 
 ```
 @vars x
-plot((sin(x), cos(x), x), 0, 4pi)  
+plot(sin(x), cos(x), x, 0, 4pi)  
 ```
 
-* `contour(ex, (x,x0, x1), (y,y0, y1), args...; kwargs...)`
-  produces a contour plot over the region specified with tuples. The
-  variables `x` and `y` are the free variables in `ex`. The default
-  region is `[-5,5]x[-5,5]`.
-
-Example:
-
-```
-@vars x y
-contour(x^2 - y^2, (x,-5,5), (y,-5,5)) # default is [-5,5] x [-5,5]
-```
-
-* `contour3D(ex, (x,x0, x1), (y,y0, y1); kwargs...)` wiil plot a 3D contour plot over the region
+* `contour3D(ex, (x,x0, x1), (y,y0, y1); kwargs...)` wiil plot a contour plot in  3D over the region.
 
 
 ```
@@ -193,14 +191,96 @@ Underneath these plotting functions is a fairly simple translation
 from a symbolic expression to a function. The `convert(Function, ex)`
 pattern can be used for scalar function. (Or if using version `v0.4`
 or higher, `x->N(ex(x))`.) As well, numeric values can be generated
-explicitly via a pattern akin to `Float64[subs(ex,var,x) for x in
-xs]`.
+explicitly via a pattern akin to `Float64[ex(x) for x in xs]`.
 
 """
 sympy_plotting = nothing
 export sympy_plotting
 
-## Helper function
+## Our alternatives
+"""
+
+Create a parametric plot of the expressions over the interval `[a,b]`.
+
+(A more explicit call of the type `plot(ex1, ex2, a, b)`.
+"""
+function parametricplot(ex1::Sym, ex2::Sym, a::Real, b::Real, args...; kwargs...)
+    Plots.plot(ex1, ex2, a,b, args...; kwargs...)
+end
+export(parametricplot)
+
+"""
+
+Create a contour plot of the expression over the indicated region. The
+region is specified as a tuple `(a,b)` or `(x,a,b)`. The former has
+the associated variable inferred using the ordering of `free_symbols`.
+
+(This is a more explicit form of interface provided by `Plot`:
+`plot(xs, ys, ex::Sym)`.)
+
+"""
+function contour(ex::Sym,
+                 xvar=(-5.0, 5.0),
+                 yvar=(-5.0, 5.0),
+                 args...;
+                 n::Int=50,
+                 kwargs...)
+    U,V,xs,ys = _find_us_vs(ex, xvar, yvar, n)
+    plot(xs, ys, ex, args...; kwargs...)
+end
+export(contour)
+
+### Plug into Plots interface. Where there is something defined for Functions we
+### define for symbolic expressions
+## Additions to Plots so that expressions are treated like functions
+
+typealias SymOrSyms @compat(Union{Sym, Plots.AVec{Sym}})
+Plots.convertToAnyVector(ex::Sym; kw...) = Any[ex], nothing
+Plots.computeY(xs, ex::Sym) = Float64[ex(x) for x in xs]
+
+mapSymOrSyms(f::Sym, u::Plots.AVec) = Float64[f(x) for x in u]
+mapSymOrSyms(fs::Plots.AVec{Sym}, u::Plots.AVec) = [mapSymOrSyms(f, u) for f in fs]
+
+## # contours or surfaces... 
+function Plots.createKWargsList{T<:Real,S<:Real}(plt::Plots.PlottingObject, x::Plots.AVec{T}, y::Plots.AVec{S}, zf::Sym; kw...)
+    # only allow sorted x/y for now
+    # TODO: auto sort x/y/z properly
+    @assert x == sort(x)
+    @assert y == sort(y)
+    surface = Float64[zf(xi, yi) for xi in x, yi in y]
+    Plots.createKWargsList(plt, x, y, surface; kw...)  # passes it to the zmat version
+end
+
+
+# list of expressions
+function Plots.createKWargsList(plt::Plots.PlottingObject, f::SymOrSyms, x; kw...)
+    @assert !(typeof(x) <: Sym)  # otherwise we'd hit infinite recursion here
+    Plots.createKWargsList(plt, x, f; kw...)
+end
+
+# special handling... xmin/xmax with function(s)
+function Plots.createKWargsList(plt::Plots.PlottingObject, f::SymOrSyms, xmin::Real, xmax::Real; kw...)
+    width = plt.initargs[:size][1]
+    x = collect(linspace(xmin, xmax, width))  # we don't need more than the width
+    Plots.createKWargsList(plt, x, f; kw...)
+end
+
+# special handling... xmin/xmax with parametric function(s)
+Plots.createKWargsList{T<:Real}(plt::Plots.PlottingObject, fx::Sym, fy::Sym, u::Plots.AVec{T}; kw...) =
+    Plots.createKWargsList(plt, mapSymOrSyms(fx, u), mapSymOrSyms(fy, u); kw...)
+    
+
+Plots.createKWargsList{T<:Real}(plt::Plots.PlottingObject, u::Plots.AVec{T}, fx::SymOrSyms, fy::SymOrSyms; kw...) =
+    Plots.createKWargsList(plt, mapSymOrSyms(fx, u), mapSymOrSyms(fy, u); kw...)
+
+
+Plots.createKWargsList(plt::Plots.PlottingObject, fx::Sym, fy::Sym, umin::Real, umax::Real, numPoints::Int = 1000; kw...) =
+    Plots.createKWargsList(plt, fx, fy, linspace(umin, umax, numPoints); kw...)
+
+###
+
+
+## Helper functions
 ## prepare parametic takes exs, [t0,t1] and returns [xs, ys] or [xs, ys, zs]
 function _prepare_parametric(exs, t0, t1, n=250)
     vars = free_symbols(exs)
@@ -212,6 +292,7 @@ function _prepare_parametric(exs, t0, t1, n=250)
     [Float64[convert(Float64, convert(Function, exs[i])(t)) for t in ts] for i in 1:nexs] # [[xs...], [ys...], [zs...]]
 end
 
+## parse (ex, ([x], a, b), ([y], c,d)) into variables x,y and ranges xs, ys.
 function _find_us_vs(ex, xvar, yvar, n=100)
     vars = free_symbols(ex)
     if length(xvar) == 2
@@ -232,81 +313,6 @@ function _find_us_vs(ex, xvar, yvar, n=100)
 end
 
 
-## plot(ex, a, b)
-function _plot(fn::Function, ex::SymbolicObject, args...; kwargs...) 
-    vars = free_symbols(ex)
-    if length(vars) == 1
-        fn(convert(ScalarFunction, ex), args...; kwargs...)
-    elseif length(vars) == 2
-        error("Expression to plot may have only one free variable")
-    end
-end
-
-
-## plot([exs], a, b)
-function _plot{T<:SymbolicObject}(fn::Function, exs::Vector{T}, args...; kwargs...) 
-    vars = free_symbols(exs)
-    if length(vars) == 1
-        fns = map(ex -> convert(ScalarFunction, ex), exs)
-        fn(fns, args...; kwargs...)
-    elseif length(vars) == 2
-        error("Expressions to plot may have only one common free variable")
-    end
-end
-
-# Parametric plots
-## 2d parametric plot plot((ex1, ex2), a, b)
-function _plot{T<:SymbolicObject, S<:SymbolicObject}(fn::Function, exs::(@compat Tuple{T,S}), t0::Real, t1::Real, args...; kwargs...)
-    vars = free_symbols(exs)
-    if length(vars) == 1
-        fn(map(ex->convert(ScalarFunction, ex), exs)..., t0, t1, args...; kwargs...)
-    else
-        error("Parametric plot may have only one free variable")
-    end
-end
-
-## 3D parametric plot
-function _plot{T<:SymbolicObject, S<:SymbolicObject, R<:SymbolicObject}(fn::Function, exs::(@compat Tuple{T,S,R}), t0::Real, t1::Real, args...; kwargs...)
-    vars = free_symbols(exs)
-    if length(vars) == 1
-        fn(map(ex->convert(ScalarFunction, ex), exs)..., t0, t1, args...; kwargs...)
-    else
-        error("Parametric plot may have only one free variable")
-    end
-end
-
-##################
-## Plots interface
-## Add to this as more plots become standard in `Plots` (e.g., `contourplot`, `vectorplot`...)
-## ex
-Plots.plot(ex::SymbolicObject, args...; kwargs...) = _plot(Plots.plot, ex, args...; kwargs...)
-Plots.plot!(ex::SymbolicObject, args...; kwargs...) = _plot(Plots.plot!, ex, args...; kwargs...)
-
-## [ex1, ex2...]
-Plots.plot{T<:SymbolicObject}(exs::Vector{T}, args...; kwargs...) = _plot(Plots.plot, exs, args...; kwargs...)
-Plots.plot!{T<:SymbolicObject}(exs::Vector{T}, args...; kwargs...) = _plot(Plots.plot!, exs, args...; kwargs...)
-
-## (ex1, ex2) -- parametric
-Plots.plot{T<:SymbolicObject, S<:SymbolicObject}(exs::(@compat Tuple{T,S}), t0::Real, t1::Real, args...; kwargs...) =
-    _plot(Plots.plot, exs, t0, t1, args...; kwargs...)
-    Plots.plot!{T<:SymbolicObject, S<:SymbolicObject}(exs::(@compat Tuple{T,S}), t0::Real, t1::Real, args...; kwargs...) =
-        _plot(Plots.plot!, exs, t0, t1, args...; kwargs...)
-
-
-## ex1, ex2 -- parametric
-Plots.plot{T<:SymbolicObject, S<:SymbolicObject}(ex1::T, ex2::S, t0::Real, t1::Real, args...; kwargs...) =
-    _plot(Plots.plot, [ex1, ex2], t0, t1, args...; kwargs...)
-Plots.plot!{T<:SymbolicObject, S<:SymbolicObject}(ex1::T, ex2::S, t0::Real, t1::Real, args...; kwargs...) =
-    _plot(Plots.plot!, [ex1, ex2], t0, t1, args...; kwargs...)
-        
-
-## parametric (3 ways seems like 2 too many!)
-function parametricplot(ex1::Sym, ex2::Sym, a::Real, b::Real, args...; kwargs...)
-    Plots.plot((ex1, ex2), a,b, args...; kwargs...)
-end
-eval(Expr(:export, :parametricplot))
-    
-
 ######################################    
 ## Must put Requires.require outside of compilation
 function init_plot()
@@ -315,16 +321,12 @@ function init_plot()
     Requires.@require PyPlot begin
 
         info("""Loading additional PyPlot commands for graphing for SymPy objects:
-contour, quiver, plot_surface, plot_parametric_surface, and plot_implicit.
+quiver, parametricplot (for 3D), contour3D, plot_surface, plot_parametric_surface, and plot_implicit.
 See ?sympy_plotting for some more details
 """)
-
-        function plot{T<:Sym, S<:Sym,R<:Sym}(exs::(@compat Tuple{T,S,R}), t0::Real, t1::Real, args...; n::Int=250, kwargs...)
-            out = _prepare_parametric(exs, t0, t1,n)
+        function parametricplot(ex1::Sym, ex2::Sym, ex3::Sym, a::Real, b::Real, args...; n=250, kwargs...)
+            out = _prepare_parametric([ex1,ex2,ex3], a, b, n)
             PyPlot.plot3D(out..., args...; kwargs...)
-        end
-        function parametricplot(ex1::Sym, ex2::Sym, ex3::Sym, a::Real, b::Real, args...; kwargs...)
-            plot((ex1, ex2, ex3), a,b, args...; kwargs...)
         end
 
         ## quiver ,,,http://matplotlib.org/examples/pylab_examples/quiver_demo.html
@@ -362,20 +364,6 @@ See ?sympy_plotting for some more details
             end
         end
 
-        ## Contour plot
-        eval(Expr(:import, :PyPlot, :contour))        
-        function contour(ex::Sym,
-                                xvar=(-5.0, 5.0),
-                                yvar=(-5.0, 5.0),
-                                args...;
-                                n::Int=50,
-                                kwargs...)
-
-            U,V,xs,ys = _find_us_vs(ex, xvar, yvar, n)            
-            
-            zs = Float64[subs(ex, (U,x), (V,y)) for x in xs, y in ys]
-            PyPlot.contour(xs, ys, zs, args...; kwargs...)
-        end
         
         ## 3D contour plo
         eval(Expr(:import, :PyPlot, :contour3D))        
@@ -439,7 +427,6 @@ See ?sympy_plotting for some more details
         
         plot_implicit(ex, args...; kwargs...) = sympy[:plotting][:plot_implicit](ex.x, project(args)...;  [(k,project(v)) for (k,v) in kwargs]...)
 
-        eval(Expr(:export, :contour))
         eval(Expr(:export, :contour3D))
         eval(Expr(:export, :vectorplot))
         eval(Expr(:export, :quiver))
