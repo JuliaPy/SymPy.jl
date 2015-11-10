@@ -250,8 +250,11 @@ function __init__()
     global sympy_meth(meth::Symbol, args...; kwargs...) = begin
         ans = call_sympy_fun(convert(Function, sympy[meth]), args...; kwargs...)
         ## make nicer...
-        if isa(ans, Vector)
-            ans = Sym[i for i in ans]
+        try
+            if isa(ans, Vector)
+                ans = Sym[i for i in ans]
+            end
+        catch err
         end
         ans
     end
