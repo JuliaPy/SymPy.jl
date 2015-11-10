@@ -236,9 +236,17 @@ export(contourplot)
 
 typealias SymOrSyms @compat(Union{Sym, Plots.AVec{Sym}})
 Plots.convertToAnyVector(ex::Sym; kw...) = Any[ex], nothing
-Plots.computeY(xs, ex::Sym) = Float64[ex(x) for x in xs]
+function Plots.computeY(xs, ex::Sym)
+    u = free_symbols(ex)[1]
+    mapsubs(ex, u, xs)
+end
 
-mapSymOrSyms(f::Sym, u::Plots.AVec) = Float64[f(x) for x in u]
+
+function mapSymOrSyms(f::Sym, u::Plots.AVec)
+    u = free_symbols(f)[1]
+    mapsubs(f, u, xs) ## much faster than Float64[ex(x) for x in xs]
+end
+    
 mapSymOrSyms(fs::Plots.AVec{Sym}, u::Plots.AVec) = [mapSymOrSyms(f, u) for f in fs]
 
 ## # contours or surfaces... 
@@ -247,7 +255,9 @@ function Plots.createKWargsList{T<:Real,S<:Real}(plt::Plots.PlottingObject, x::P
     # TODO: auto sort x/y/z properly
     @assert x == sort(x)
     @assert y == sort(y)
-    surface = Float64[zf(xi, yi) for xi in x, yi in y]
+
+    fs=free_symbols(zf)
+    surface = mapsubs2(zf, fs[1], x, fs[2], y)
     Plots.createKWargsList(plt, x, y, surface; kw...)  # passes it to the zmat version
 end
 
@@ -281,6 +291,26 @@ Plots.createKWargsList(plt::Plots.PlottingObject, fx::Sym, fy::Sym, umin::Real, 
 
 
 ## Helper functions
+
+## the pattern Float64[ex(x) for x in xs] has the disadvantage of several round trips between Julia and Python
+## This functions passes the xs all at once to Python, has it loop there, and then returns the values. They
+## come back as an array of type Any, so need conversion.
+function mapsubs(ex::Sym, x::Sym, vals::AbstractVector)
+    out = pyeval("[fn(x,val) for val in vals]", fn=project(ex)[:subs], x=project(x), vals=vals)
+    map(Float64, out)
+end
+
+## This is similar to the above, but is used for two variables. It
+## mimics Float64[ex(x,y) for x in xs, y in ys]
+function mapsubs2(ex::Sym, x,xs, y, ys)
+    out = PyCall.pyeval("[fn(x,xval).subs(y,yval) for yval in yvals for xval in xvals]",
+                        fn=ex.x[:subs],x=x.x,y=y.x,xvals=xs, yvals=ys)
+    out = reshape(out, (length(xs), length(ys)))
+    map(Float64, out)
+end
+
+
+
 ## prepare parametic takes exs, [t0,t1] and returns [xs, ys] or [xs, ys, zs]
 function _prepare_parametric(exs, t0, t1, n=250)
     vars = free_symbols(exs)
@@ -361,9 +391,9 @@ See ?sympy_plotting for some more details
             end
             
             U,V,xs,ys = _find_us_vs(exs, xvar, yvar, n)
-            
-            us = Float64[subs(exs[1], (U,x), (V,y)) for x in xs, y in ys]
-            vs = Float64[subs(exs[2], (U,x), (V,y)) for x in xs, y in ys]
+
+            us = mapsubs2(exs[1], U, xs, V,ys)
+            vs = mapsubs2(exs[2], U, xs, V,ys)
             
             PyPlot.quiver(xs, ys, us, vs, args...; kwargs...)
         end
@@ -393,7 +423,7 @@ See ?sympy_plotting for some more details
 
             U,V,xs,ys = _find_us_vs(ex, xvar, yvar, n)                        
 
-            zs = Float64[subs(ex, (U,x), (V,y)) for x in xs, y in ys]
+            zs = mapsubs2(ex, U, xs, V,ys)
             PyPlot.contour3D(xs, ys, zs, args...; kwargs...)
         end
         
@@ -412,7 +442,7 @@ See ?sympy_plotting for some more details
             U,V,xs,ys = _find_us_vs(ex, xvar, yvar, n)        
 
          
-            zs = Float64[subs(ex, (U,x), (V,y)) for x in xs, y in ys]
+            zs = mapsubs2(ex, U, xs, V,ys)
             PyPlot.plot_surface(xs, ys, zs, args...; kwargs...)
         end
         
@@ -432,11 +462,9 @@ See ?sympy_plotting for some more details
             
             U,V,us,vs = _find_us_vs(exs, xvar, yvar, n)        
 
-            
-            xs = Float64[subs(exs[1], (U,u), (V,v)) for u in us, v in vs]
-            ys = Float64[subs(exs[2], (U,u), (V,v)) for u in us, v in vs]
-            zs = Float64[subs(exs[3], (U,u), (V,v)) for u in us, v in vs]
-            
+            xs = mapsubs2(exs[1], U, ys, V,vs)
+            ys = mapsubs2(exs[2], U, ys, V,vs)
+            zs = mapsubs2(exs[3], U, ys, V,vs)            
             
             PyPlot.plot_surface(xs, ys, zs, args...; kwargs...)
         end
