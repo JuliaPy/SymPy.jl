@@ -4,7 +4,7 @@ import Base: isprime
 ## http://docs.sympy.org/dev/modules/ntheory.html?highlight=ntheory#sympy.ntheory.factor_
 ntheory_sympy_methods = (
                          :sieve,
-                         :prime, :primepi, :primerange,
+                         :prime, :primepi,
                          :isprime, # import
                          :nextprime, :prevprime, :primorial,
                          :trailing,
@@ -18,3 +18,18 @@ ntheory_sympy_methods = (
                          :n_order, :is_primitive_root, :is_quad_residue,
                          :legendre_symbol, :jacobi_symbol
                          )
+
+"""
+
+[primrange](http://docs.sympy.org/dev/modules/ntheory.html): Generate all prime numbers in the range [a, b).
+
+This is a replication of `primes` to which we dispatch.
+
+"""
+function primerange(a::Sym,b)
+    a = max(2,convert(Int, a))
+    b = max(a+1, convert(Int, b))
+    primes(a,b)
+end
+export primerange
+    
