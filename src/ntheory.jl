@@ -21,7 +21,7 @@ ntheory_sympy_methods = (
 
 """
 
-[primrange](http://docs.sympy.org/dev/modules/ntheory.html): Generate all prime numbers in the range [a, b).
+[primerange](http://docs.sympy.org/dev/modules/ntheory.html): Generate all prime numbers in the range [a, b).
 
 This is a replication of `primes` to which we dispatch.
 

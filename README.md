@@ -64,16 +64,16 @@ need to evaluate python code. Here is one solution:
 x = sympy.Symbol("x")
 y = pyeval("k*x", k=sympy.pi, x=x)     
 z = sympy.sin(y)		
-z[:subs](x, 1) |> float		
+z[:subs](x, 1)	
 ```
 
 This gets replaced by a more `julia`n syntax:
 
 ```
-using SymPy                     # some warnings need cleaning up
+using SymPy                    # some warnings need cleaning up
 x = Sym("x")		            # or  Sym(:x), symbols("x"),  @syms x
-y = sin(pi*x)                    
-N(subs(y, x, 1))                # substitute for 1 then convert from symbolic to numeric value
+y = sin(pi*x)
+subs(y, x, 1)                    # Or just y(1), or y(x=>1) with newer versions of Julia
 ```
 
 The object `x` we create is of type `Sym`, a simple proxy for the
