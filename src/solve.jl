@@ -79,17 +79,21 @@ function solve(exs::Vector{Sym}, args...; kwargs...)
     solve(exs, xs, args...; kwargs...)
 
 end
+
+## Override this so that using symbols as keys in a dict works
+Base.hash(x::Sym) = hash(project(x))
+
 function solve(exs::Vector{Sym}, xs::Vector{Sym}, args...; kwargs...)
     ans = sympy_meth(:solve, map(project, exs), map(project, xs), args...; kwargs...) #  dictionary with keys, values as PyObjects
 
     function mapit(out) ## can be a tuple if m=n
-        d = Dict{AbstractString, Sym}()
-        [d[string(xs[i])] = out[i] for i in 1:length(out)]
+        d = Dict{Sym, Sym}()
+        [d[xs[i]] = out[i] for i in 1:length(out)]
         d
     end
     function mapit(out::Dict)
-        d = Dict{AbstractString,Sym}()
-        [d[string(k)]=v for (k,v) in out]
+        d = Dict{Sym,Sym}()
+        [d[k]=v for (k,v) in out]
         d
     end
     if isa(ans, Dict)

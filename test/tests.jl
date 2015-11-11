@@ -122,6 +122,10 @@ solve(x^2 - 2a, x)
 solve(x^2 - 2a, a)
 solve(Lt(x-2, 0))
 solve( x-2 ≪ 0)
+exs = [x-y-1, x+y-2]
+d = solve(exs)
+@assert d[x] == 3//2
+@assert map(ex -> subs(ex, d), exs) == [0,0]
 solve([x-y-a, x+y], [x,y])
 
 

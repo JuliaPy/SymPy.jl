@@ -64,7 +64,7 @@ need to evaluate python code. Here is one solution:
 x = sympy.Symbol("x")
 y = pyeval("k*x", k=sympy.pi, x=x)     
 z = sympy.sin(y)		
-z[:subs](x, 1)	
+z[:subs](x, 1) |> float
 ```
 
 This gets replaced by a more `julia`n syntax:
@@ -79,8 +79,10 @@ subs(y, x, 1)                    # Or just y(1), or y(x=>1) with newer versions 
 The object `x` we create is of type `Sym`, a simple proxy for the
 underlying `PyObject`. We then overload the familiar math functions so
 that working with symbolic expressions can use natural `julia`
-idioms. The `N` function is used to convert a symbolic numeric
-expression into a numeric value within `Julia`.
+idioms. The final result is here is a symbolic value of `0`, which
+prints as `0` and not `PyObject 0`. To convert it into a numeric value
+within `Julia`, the `N` function may be used, which acts like the
+`float` call, only attempts to preserve the variable type.
 
 However, for some tasks the `PyCall` interface is still needed, as
 only a portion of the `SymPy` interface is exposed. To call an

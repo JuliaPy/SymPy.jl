@@ -19,7 +19,11 @@ The start up time is a bit lengthy.
 
 ## Symbols
 
-At the core of `SymPy` is the introduction of symbolic variables that differ quite a bit from `Julia`'s variables. Symbolic variables do not immediately evaluate to a value, rather the "symbolicness" propagates when interacted with. To keep things manageable, SymPy does some simplifications along the way.
+At the core of `SymPy` is the introduction of symbolic variables that
+differ quite a bit from `Julia`'s variables. Symbolic variables do not
+immediately evaluate to a value, rather the "symbolicness" propagates
+when interacted with. To keep things manageable, SymPy does some
+simplifications along the way.
 
 Symbolic expressions are primarily of the `Sym` type and can be constructed in the standard way:
 
@@ -30,17 +34,16 @@ x = Sym("x")
 This creates a symbolic object `x`, which can be manipulated through further function calls.
 
 
-There are two macros that make creating multiple variables a bit less typing. The `@syms` macro will create variables in the *Main workspace*, so no assignment is necessary. The `@osyms` macro will return newly defined symbolic variables. As these are macros, the arguments need not be separated by commas.
+There is the `@syms`  macro that makes creating multiple variables a bit less typing. It creates variables in the *Main workspace*, so no assignment is necessary.
 
 ```
 @syms a b c
-a,b,c = @osyms a,b,c
 ```
 
 
 ### Assumptions
 
-Finally, there is the `symbols` constructor. With `symbols` it is
+Finally, there is the `symbols` constructor for producting symbolic objects. With `symbols` it is
 possible to pass assumptions onto the variables. A list of possible
 assumptions is
 [here](http://docs.sympy.org/dev/modules/core.html#module-sympy.core.assumptions). Some
