@@ -303,7 +303,6 @@ a .^ a
 ## Number theory
 @test isprime(100) == isprime(Sym(100))
 @test prime(Sym(100)) == 541
-#@test @compat round(Int, collect(primerange(Sym(2),10))) == primes(10)
 @test multiplicity(Sym(10), 100) == 2
 @test factorint(Sym(100)) == factor(100)
 
