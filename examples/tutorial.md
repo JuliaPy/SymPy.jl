@@ -34,10 +34,11 @@ x = Sym("x")
 This creates a symbolic object `x`, which can be manipulated through further function calls.
 
 
-There is the `@syms`  macro that makes creating multiple variables a bit less typing. It creates variables in the *Main workspace*, so no assignment is necessary.
+There is the `@syms`  macro that makes creating multiple variables a bit less typing. It creates variables in the *Main workspace*, so no assignment is necessary. Compare these similar ways to create symbolic variables:
 
 ```
 @syms a b c
+a,b,c = Sym("a,b,c")
 ```
 
 
@@ -78,13 +79,14 @@ solve(y1 + 1)    # -1 is not positive
 PI, E, oo
 ```
 
+(The pretty printing of SymPy objects does not work for tuples.)
 
 Numeric values themselves can be symbolic. This example shows the
 difference. The first `asin` call dispatches to `Julia`'s `asin`
 function, the second to `SymPy`'s:
 
 ```
-asin(1), asin(Sym(1))
+[asin(1), asin(Sym(1))]
 ```
 
 ## Substitution
@@ -160,13 +162,13 @@ To see the difference, we use both on `PI`:
 N(PI)  # floating-point value
 ```
 
-Whereas, this may look the same, it is still symbolic:
+Whereas, while this may look the same, it is still symbolic:
 
 ```
 evalf(PI)
 ```
 
-Both allow for a precision argument to be passed through the second argument. This is how 30 digits of $\pi$ can be extracted:
+Both `N` and `evalf` allow for a precision argument to be passed through the second argument. This is how 30 digits of $\pi$ can be extracted:
 
 ```
 N(PI, 30)
@@ -365,7 +367,7 @@ Calling either `simplify` or `trigsimp` will apply the Pythagorean identity:
 simplify(p)
 ```
 
-Students may forget, but the `trigsimp` function is, of course, course aware of the double angle formulas:
+While often forgotten,  the `trigsimp` function is, of course,  aware of the double angle formulas:
 
 ```
 simplify(sin(2theta) - 2sin(theta)*cos(theta))
@@ -403,7 +405,7 @@ subs(p, x, 0) # c
 Though one could use some trick like this to find all the coefficients:
 
 ```
-[[coeff(p, x^i) for i in N(degree(p)):-1:1]; subs(p,x,0)]
+[[coeff(p, x^i) for i in N(degree(p)):-1:1]; p(0)]
 ```
 
 that is cumbersome, at best. SymPy has a function `coeffs`, but it is defined for polynomial types, so will fail on `p`:
@@ -467,7 +469,7 @@ access it using `p[:roots]()` or its alias `polyroots`.
 
 > Indexing with a symbol. When a symbolic expression is indexed by a
 > symbol it returns a function which maps to a corresponding SymPy
-> function. For example, "p[:roots](args...)" will call `roots(p,
+> function. For example, `p[:roots](args...)` will call `roots(p,
 > args...)` within SymPy. For methods of SymPy objects, the same is
 > true, so if `roots` were a class method, then the call would resolve
 > to `p.roots(args...)`.
@@ -478,7 +480,7 @@ The output of calling `roots` will be a dictionary whose keys are the roots and 
 polyroots(p)
 ```
 
-When exact answers are not provided, the `:roots` call is contentless:
+When exact answers are not provided, the `polyroots` call is contentless:
 
 ```
 p = x^5 - x + 1
@@ -555,15 +557,10 @@ exs = [2x+3y-6, 3x-4y-12]
 d = solve(exs)
 ```
 
-Plugging the solutions into the equations to check is a bit
-cumbersome, as the keys of the dictionary that is returned are
-strings, but functions like `subs` prefer the variables. Here is one
-workaround:
+We can "check our work" by plugging into each equation. We take advantage of how the `subs` function allows us to pass in a dictionary:
 
 ```
-vars = [x,y]
-vals = [d[string(var)] for var in vars]
-[subs(ex, zip(vars, vals)...) for ex in exs]
+map(ex -> subs(ex, d), exs)
 ```
 
 In the previous example, the system had two equations and two
@@ -583,9 +580,7 @@ Again, a dictionary is returned. The polynomial itself can be found by
 substituting back in for `a`, `b`, and `c`:
 
 ```
-vars=[a,b,c]
-vals = [d[string(var)] for var in vars]
-quad_approx = subs(p, zip(vars, vals)...)
+quad_approx = subs(p, d)
 ```
 
 (Taking the limit as $h$ goes to 0 produces the answer $1 - x^2/2$.)
@@ -638,26 +633,34 @@ d = solve(exs)
 
 The `Plots` package allows many 2-dimensional plots of `SymPy` objects
 to be agnostic as to a backend plotting package.  `SymPy` loads the
-`Plots` package and extends its `plot` and `plot!`
-methods. [See the help page for `sympy_plotting`.]
+`Plots` package and extends it a bit to allow symbolic expressions to
+be used in the same manner as functions are.
+[See the help page for `sympy_plotting`.]
 
 In particular, the following methods of `plot` are defined:
 
 * `plot(ex::Sym, a, b)` will plot the expression of single variable over the interval `[a,b]`
 * `plot!(ex::Sym, a, b)` will add to the current plot a plot of  the expression of single variable over the interval `[a,b]`
 * `plot(exs::Vector{Sym}, a, b)` will plot each expression over `[a,b]`
-* `plot(ex1, ex2, a, b)` will plot a parametric plot of the two expressions over the interval `[a,b]`.
+* `plot(ex1, ex2, a, b)` will plot a parametric plot of the two expressions over the interval `[a,b]`. There is the equivalent, but perhaps more memorable, `parametricplot(ex1, ex2, a, b)`.
+* `plot(xs, ys, ex::Sym)` will make a contour plot of the expression of two variables over the grid specifed by the `xs` and `ys`.  There is the similar, but perhaps more memorable, `contourplot(ex, (xvar,a,b), (yvar,c,d))`.
 
-There are corresponding `plot!` methods.
 
-The basic idea, is where there is an interface in `Plots` for
-functions, a symbolic expression may be passed in.  Keyword arguments
-are passed onto the `plot` function of the `Plots` package.
+For example:
 
-As an alternative to the above style for parametric plots, we add
-`parametricplot(ex1, ex2, a, b)` and `plot((ex1, ex2), a, b)`.
+```
+x = symbols("x")
+using Plots
+backend(:gadfly)
+#
+plot(x^2 - 2, -2,2)
+```
 
-When `Plots` adds contour plots and plots of vector fields, these will be added to `SymPy`.
+Or a parametric plot:
+
+```
+plot(sin(2x), cos(3x), 0, 4pi)
+```
 
 ----
 
@@ -665,20 +668,21 @@ In addition, within Python, SymPy has several plotting features that work with M
 when the `:pyplot` backend end for `Plots` is used (`backend(:pyplot)`). These methods are only available *after* `PyPlot` is loaded. If this done through `Plots`, then this happens after an initial call to `plot`. If this is done through `using PyPlot`, then the `plot` method will be ambiguous with `PyPlot`'s and must be qualified, as in `SymPy.plot`.
 
 
-* `plot((ex1, ex2, ex3), a, b)` --  plot a 3D parametric plot of the expressions over `[a,b]`. (Also `parametricplot`.)
+* `plot(ex1, ex2, ex3, a, b)` --  plot a 3D parametric plot of the expressions over `[a,b]`. (Also `parametricplot`.)
 
-* `contour(ex, (xvar, a0, b0), (yvar, a1, b1))` -- make a contourplot
+* `contour(ex, (xvar, a0, b0), (yvar, a1, b1))` -- make a contour plot
   of the expression of two variables over the region `[a0,b0] x
   [a1,b1]`. The default region is `[-5,5]x[-5,5]` where the ordering
-  of the variables is given by `free_symbols(ex)`. This name may
-  change when `Plots` adds contour plots. There is also `contour3D` to
-  add a third dimension to the plot.
+  of the variables is given by `free_symbols(ex)`. This is an
+  alternative to the means of specifying contour plots with `Plots`,
+  that is more in line with the `PyPlot` usage. There is also
+  `contour3D` to add a third dimension to the plot.
 
 * `quiver(exs::Vector{Sym}, (xvar, a0, b0), (yvar, a1, b1))` -- make a
 vector plot of the expressions over a grid within `[a0,b0] x
 [a1,b1]`. The default region is `[-5,5]x[-5,5]` where the ordering of
 the variables is given by `free_symbols(ex)`.  This name may change
-when `Plots` adds vector field plots. Currently, there is a
+if `Plots` adds vector field plots. Currently, there is a
 `vectorplot` alias in anticipation of that.
 
 There are also 3 dimesional plots avaiable
@@ -707,15 +711,6 @@ can be used: `\ll<tab>`, `\le<tab>`, `\Equal<tab>`, `\ge<tab>`, and
 `\gg<tab>`. For example, `x*y ≪ 1`.  To combine terms, the unicode
 `\vee<tab>` (for "or"), `\wedge<tab>` (for "and") can be used.
 
-----
-
-Underlying the plotting commands are two simple things. First, to
-easily create a function from a symbolic expression, the pattern
-`convert(Function, ex)` can be used. This is useful for expression
-containings a single variable. For others, the pattern
-`Float64[subs(ex, (xvar, x), (yvar),y)) for x in xs, y in ys]` is
-useful. 
-
 ## Calculus
 
 `SymPy` has many of the basic operations of calculus provided through a relatively small handful of functions.
@@ -730,10 +725,16 @@ For example, this shows Gauss was right:
 limit(sin(x)/x, x, 0)
 ```
 
+Alternatively, the second and third arguments can be specified as a pair:
+
+```
+limit(sin(x)/x, x=>0)
+```
+
 Limits at infinity are done by using `oo` for $\infty$:
 
 ```
-limit((1+1/x)^x, x, oo)
+limit((1+1/x)^x, x => oo)
 ```
 
 
@@ -747,7 +748,7 @@ ex = (sqrt(2a^3*x-x^4) - a*(a^2*x)^(1//3)) / (a - (a*x^3)^(1//4))
 Substituting $x=a$ gives an indeterminate form:
 
 ```
-subs(ex, x, a)
+ex(x=>a)         # or subs(ex, x, a)
 ```
 
 We can see it is of the form $0/0$:
@@ -759,13 +760,13 @@ subs(denom(ex), x, a), subs(numer(ex), x, a)
 And we get
 
 ```
-limit(ex, x, a)
+limit(ex, x => a)
 ```
 
 In a previous example, we defined `quad_approx`. The limit as `h` goes to $0$ gives `1 - x^2/2`, as expected:
 
 ```
-limit(quad_approx, h, 0)
+limit(quad_approx, h => 0)
 ```
 
 #### Left and right limits
@@ -773,13 +774,13 @@ limit(quad_approx, h, 0)
 The limit is defined when both the left and right limits exist and are equal. But left and right limits can exist and not be equal. The `sign` function is $1$ for positive $x$, $-1$ for negative $x$ and $0$ when $x$ is 0. It should not have a limit at $0$:
 
 ```
-limit(sign(x), x, 0)
+limit(sign(x), x => 0)
 ```
 
 Oops. Well, the left and right limits are different anyways:
 
 ```
-limit(sign(x), x, 0, dir="-"), limit(sign(x), x, 0, dir="+")
+limit(sign(x), x => 0, dir="-"), limit(sign(x), x => 0, dir="+")
 ```
 
 (The `limit` function finds the *right* limit by default. To be
@@ -801,7 +802,7 @@ limit(f, 0)
 The `limit` function uses the
 [Gruntz](http://docs.sympy.org/latest/modules/series.html#the-gruntz-algorithm)
 algorithm. It is far more reliable then simple numeric attempts at
-integration. An example of Gruntz is the right limit at $0$ of the
+limits. An example of Gruntz is the right limit at $0$ of the
 function:
 
 ```
@@ -1095,7 +1096,7 @@ integrate(x^5*sin(x), x)
 
 The SymPy tutorial says:
 
-"`integrate` uses powerful algorithms that are always improving to compute both definite and indefinite integrals, including heuristic pattern matching type algorithms, a partial implementation of the Risch algorithm, and an algorithm using Meijer G-functions that is useful for computing integrals in terms of special functions, especially definite integrals."
+> "`integrate` uses powerful algorithms that are always improving to compute both definite and indefinite integrals, including heuristic pattern matching type algorithms, a partial implementation of the Risch algorithm, and an algorithm using Meijer G-functions that is useful for computing integrals in terms of special functions, especially definite integrals."
 
 The tutorial gives the following example:
 
@@ -1151,7 +1152,7 @@ integrate(sin, 0, pi)
 ### Taylor series
 
 The `series` function can compute series expansions around a point to a specified order. For example,
-the following command finds 4 terms of the series expansion os `exp(sin(x))` in `x` about $c=0$:
+the following command finds 4 terms of the series expansion of `exp(sin(x))` in `x` about $c=0$:
 
 ```
 s1 = series(exp(sin(x)), x, 0, 4)

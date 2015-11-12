@@ -242,12 +242,12 @@ function Plots.computeY(xs, ex::Sym)
 end
 
 
-function mapSymOrSyms(f::Sym, u::Plots.AVec)
+function mapSymOrSyms(f::Sym, xs::Plots.AVec)
     u = free_symbols(f)[1]
     mapsubs(f, u, xs) ## much faster than Float64[ex(x) for x in xs]
 end
     
-mapSymOrSyms(fs::Plots.AVec{Sym}, u::Plots.AVec) = [mapSymOrSyms(f, u) for f in fs]
+mapSymOrSyms(fs::Plots.AVec{Sym}, xs::Plots.AVec) = [mapSymOrSyms(f, xs) for f in fs]
 
 ## # contours or surfaces... 
 function Plots.createKWargsList{T<:Real,S<:Real}(plt::Plots.PlottingObject, x::Plots.AVec{T}, y::Plots.AVec{S}, zf::Sym; kw...)
