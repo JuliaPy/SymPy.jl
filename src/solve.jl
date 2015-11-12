@@ -35,17 +35,36 @@ The `SymPy` docs say this about `solve`:
 > them.
         
 
-If succesful, returns an array of possible answers, a dictionary, or an array of dictionaries. The dictionaries are
-of the form `string => Sym`, so to access the values, use `d[string(x)]` or `d["x"]`, but not `d[x]`, where `x` is symbolic.
+The return value depends on the inputs:
+
+* If there is one equation with one specified variable (either explicit, or because `free_symbols` returns only one variable), the return value is an array of solutions.
+
+* Otherwise, if there is a unique solution found a dictionary is returned. 
+
+* Otherwise, if there is 0 or more than one solution found, an array of dictionaries is returned.
+
+[Note: this may change. The current arrangement is perhaps more convenient, but having a consistent return type has other advantages.]
 
 Note: The individual components of the array display more nicely than the array.
 
 Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html#algebraic-equations)
 
 """  
-function solve(ex::Sym, args...;  kwargs...)
-    a = sympy_meth(:solve, ex, args...;  kwargs...)
+function solve{T<:Sym}(ex::(@compat Union{T,Vector{T}});  kwargs...)
+    ## No symbols specified? Find them
+    xs = free_symbols(ex)
+    if length(xs) ==0 
+        error("The expression has non free variables")
+    elseif length(xs) == 1
+        xs = xs[1]
+    end
+    solve(ex, xs; kwargs...)
+end
 
+## solve for a single variable, Return Sym[]
+function solve(ex::Sym, x::Sym; kwargs...)
+    a = sympy_meth(:solve, ex, x;  kwargs...)
+    
     ## Way too much work here to finesse into a nice enough output
     ## (Issue comes from solving without specifying variable when 2 or more variables in the expression
     isa(a, Dict) && return(a)
@@ -63,43 +82,29 @@ function solve(ex::Sym, args...;  kwargs...)
     end
 end
 
-
-function solve(exs::Vector{Sym}, args...; kwargs...)
-    ans = sympy_meth(:solve, map(project, exs),  args...; kwargs...) #  dictionary with keys, values as PyObjects
-    tmp = map(free_symbols, exs)
-    xs = shift!(tmp)
-    for ss in tmp
-        for s in ss
-            if !(s in xs)
-                push!(xs, s)
-            end
-        end
-    end
-
-    solve(exs, xs, args...; kwargs...)
-
+function _mapdict(out, xs) ## can be a tuple if m=n
+    d = Dict{Sym, Sym}()
+    [d[xs[i]] = out[i] for i in 1:length(out)]
+    d
+end
+function _mapdict(out::Dict,xs=nothing)
+    d = Dict{Sym,Sym}()
+    [d[k]=v for (k,v) in out]
+    d
 end
 
-## Override this so that using symbols as keys in a dict works
-Base.hash(x::Sym) = hash(project(x))
+## Solve for a single variable from equations. Return Dict{Sym,Sym}
+function solve{T<:Sym}(exs::(@compat Union{T,Vector{T}}), x::Sym; kwargs...)
+    solve(exs, [x;]; kwargs...)
+end
 
-function solve(exs::Vector{Sym}, xs::Vector{Sym}, args...; kwargs...)
-    ans = sympy_meth(:solve, map(project, exs), map(project, xs), args...; kwargs...) #  dictionary with keys, values as PyObjects
-
-    function mapit(out) ## can be a tuple if m=n
-        d = Dict{Sym, Sym}()
-        [d[xs[i]] = out[i] for i in 1:length(out)]
-        d
-    end
-    function mapit(out::Dict)
-        d = Dict{Sym,Sym}()
-        [d[k]=v for (k,v) in out]
-        d
-    end
-    if isa(ans, Dict)
-        mapit(ans)              # XXX type unstable! should be array...
+function solve{T<:Sym,S<:Sym}(exs::(@compat Union{T,Vector{T}}), xs::Vector{S}; kwargs...)
+    a = sympy_meth(:solve, exs, xs;  kwargs...)
+    ## nicer output
+    if isa(a, Dict)
+        _mapdict(a)              # XXX type unstable! should be array... Should we change? XXX
     else
-        map(mapit, ans)
+        [_mapdict(_,xs) for _ in a]
     end
 end
 

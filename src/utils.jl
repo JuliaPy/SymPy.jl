@@ -247,6 +247,8 @@ function getindexOLD(x::SymbolicObject, i::Symbol)
     end
 end
 
+## Override this so that using symbols as keys in a dict works
+Base.hash(x::Sym) = hash(project(x))
 
 
 ## Helper function from PyCall.pywrap:
@@ -255,4 +257,5 @@ function members(o::@compat Union{PyObject, Sym})
                   pycall(PyCall.inspect["getmembers"], PyObject, project(o)))
     AbstractString[u[1] for u in out]
 end
+
 
