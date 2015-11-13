@@ -349,3 +349,7 @@ if isdefined(:mpmath)
     bei(1+im, 2+3im)
 end
 
+## Assumptions
+@assert ask(Q.even(2)) == true
+@assert ask(Q.even(3)) == false
+@assert ask(Q.zero(3)) == false
