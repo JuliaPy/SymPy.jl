@@ -157,3 +157,47 @@ dsolve(ex::Sym;kwargs...) = sympy_meth(:dsolve, ex; kwargs...)
 dsolve(exs::Vector{Sym};kwargs...) = sympy_meth(:dsolve, exs; kwargs...)
 dsolve(exs::Vector{Sym}, fx::Sym; kwargs...) = sympy_meth(:dsolve, exs, fx; kwargs...)
 
+
+## SymPy is moving to solveset to replace solve (with 1.0)
+## http://omg.readthedocs.org/en/cleanup/modules/solvers/solveset.html
+function solveset{T<:Sym}(ex::(@compat Union{T,Vector{T}});  kwargs...)
+    ## No symbols specified? Find them
+    xs = free_symbols(ex)
+    if length(xs) ==0 
+        error("The expression has non free variables")
+    elseif length(xs) == 1
+        xs = xs[1]
+    end
+    solveset(ex, xs; kwargs...)
+end
+
+## solve for a single variable, Return Sym[]
+function solveset(ex::Sym, x::Sym; kwargs...)
+    a = sympy_meth(:solveset, ex, x;  kwargs...)
+    ## massage output
+    a
+end
+
+## Solve for a single variable from equations. Return Dict{Sym,Sym}
+function solveset{T<:Sym}(exs::(@compat Union{T,Vector{T}}), x::Sym; kwargs...)
+    solveset(exs, [x;]; kwargs...)
+end
+
+function solveset{T<:Sym,S<:Sym}(exs::(@compat Union{T,Vector{T}}), xs::Vector{S}; kwargs...)
+    a = sympy_meth(:solveset, exs, xs;  kwargs...)
+    ## finesse output
+    a
+end
+
+function solveset_real{T<:Sym}(ex::T, x::Sym; kwargs...)
+    a = sympy_meth(:solveset_real, ex, x;  kwargs...)
+    ## finesse output
+    a
+end
+
+function solveset_complex{T<:Sym}(ex::T, x::Sym; kwargs...)
+    a = sympy_meth(:solveset_complex, ex, x;  kwargs...)
+    ## finesse output
+    a
+end
+export solveset, solveset_real, solveset_complex
