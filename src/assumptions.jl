@@ -1,11 +1,26 @@
 ## Assumptions
 ## http://docs.sympy.org/0.7.2/modules/assumptions/index.html
 
+## TODO: Deprecate Qeven, etc. in favor of Q.even
+
+
 """
 refine: http://docs.sympy.org/dev/modules/assumptions/refine.html
 """
 refine(ex, assumpts...) = sympy_meth(:refine, ex, assumpts...)
 export refine
+
+"""
+
+ask. Returns true, false or nothing
+
+ask(Qinteger(x*y), And(Qinteger(x), Qinteger(y)))
+## really slow isprime:
+filter(x -> ask(Qprime(x)), [1:1000])
+
+"""
+ask(x::Sym, args...) = sympy_meth(:ask, x, args...)
+export ask
 
 ## This is a bit messed up, as we use Qeven in place of Q.even, ...
 Q_predicates = (:even, :odd, :prime, :nonzero,
@@ -17,7 +32,7 @@ Q_nms = [symbol("Q" * string(i)) for i in Q_predicates]
 
 for (fn, meth) in zip(Q_nms, Q_predicates)
     nm = string(meth)
-    @eval ($fn)(x) = PyCall.pyeval("f(x)", f=sympy[:Q][($nm)], x=project(x))
+    @eval ($fn)(x) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
     eval(Expr(:export, fn))
 end
 
@@ -37,10 +52,26 @@ logic_sympy_methods = (
                      )
 
 
-## ask. Returns true, false or nothing
-##
-## ask(Qinteger(x*y), And(Qinteger(x), Qinteger(y)))
-## ## really slow isprime:
-## filter(x -> ask(Qprime(x)), [1:1000])
-ask(x::Sym, args...) = sympy_meth(:ask, x, args...)
-export ask
+## How to make Q.even in place of Qeven
+module Q
+import SymPy
+import PyCall
+## This is a bit messed up, as we use Qeven in place of Q.even, ...
+Q_predicates = (:even, :odd,
+                :prime,
+                :zero, :nonzero,
+                :complex, :extended_real, :imaginary, :infinitesimal,
+                :integer, :irrational,
+                :real,
+                :positive, :negative,
+                :bounded, :finite, ## :bounded is dprecated
+                :infinity, :infinite, ## infinity has been deprecated
+                :commutative)
+for meth in Q_predicates
+    nm = string(meth)
+    @eval ($meth)(x) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
+end
+
+end
+export Q
+
