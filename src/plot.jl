@@ -470,8 +470,9 @@ See ?sympy_plotting for some more details
         end
 
         ## Implict equations plot
-        ## XXX: We use the sympy interface here, as PyPlot does not have an interface..
-        plot_implicit(ex, args...; kwargs...) = call_sympy_fun(sympy[:plotting][:plot_implicit], ex, args...; kwargs...)
+        ## XXX: We use the sympy interface here, as PyPlot does not have an interface for implicit plots
+        ## XXX: There are others that *could* be used here:
+        plot_implicit(ex, args...; kwargs...) = SymPy.call_sympy_fun(sympy[:plotting][:plot_implicit], ex, args...; kwargs...)
 
 
         eval(Expr(:export, :contour3D))

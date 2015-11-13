@@ -123,7 +123,7 @@ export SymFunction, SymMatrix,
        Max, Min,
        rref
 export PI, E, IM, oo
-export relation, piecewise
+export relation, piecewise, Piecewise, piecewise_fold
 export members, doc, _str
 
 using Plots

@@ -230,12 +230,16 @@ subs(p, x, 2) ## 2
 p = piecewise((1, Lt(x, a)), (2, Ge(x,a)))  # same as piecewise((1,  x ≪ a), (2, x ≥ a))
 subs(p, x, a - 1)
 ```
+
+[Note: there is also an alias `Piecewise` for copy-n-pasting from python code, but despite the capital letter, this is not a constructor for a type.]
 """
 function piecewise(args...)
     args = [map(project, x) for x in args]
     sympy_meth(:Piecewise, args...)
 end
+const Piecewise = piecewise
 
+piecewise_fold(ex::Sym) = sympy_meth(:piecewise_fold, ex)
 
 ## special numbers are initialized after compilation
 function init_math()
