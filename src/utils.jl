@@ -236,7 +236,6 @@ function getindexOLD(x::SymbolicObject, i::Symbol)
         if isa(out, Function)
             function f(args...;kwargs...)
                 sympy_meth(i, x, args...; kwargs...)
-#                out(project(x), project(args)...; [(k,project(v)) for (k,v) in kwargs]... )
             end
             return f
         else
@@ -253,9 +252,8 @@ Base.hash(x::Sym) = hash(project(x))
 
 ## Helper function from PyCall.pywrap:
 function members(o::@compat Union{PyObject, Sym})
-    out = convert(Vector{(AbstractString,PyObject)},
-                  pycall(PyCall.inspect["getmembers"], PyObject, project(o)))
-    AbstractString[u[1] for u in out]
+    out = pycall(PyCall.inspect["getmembers"], PyObject, project(o))
+    [a for (a,b) in out]
 end
 
 
