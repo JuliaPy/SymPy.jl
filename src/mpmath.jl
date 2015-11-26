@@ -51,21 +51,20 @@ function init_mpmath()
         try
 	    copy!(mpmath, pyimport("mpmath"))			
         catch e
-            error("Failed to pyimport(\"mpmath\"): This is a soft dependency.  ", e)
-        if PyCall.conda
-            info("Installing mpmath via the Conda package...")
-            Conda.add("mpmath")
-            copy!(mpmath, pyimport("mpmath"))
-        else
-            error("""Failed to pyimport("mpmath"): SymPy will have less functionality.
+            if PyCall.conda
+                info("Installing mpmath via the Conda package...")
+                Conda.add("mpmath")
+                copy!(mpmath, pyimport("mpmath"))
+            else
+                error("""Failed to pyimport("mpmath"): SymPy will have less functionality.
 
-                  For automated mpmath installation, try configuring PyCall to use the Conda Python distribution within Julia.  Relaunch Julia and run:
-                        ENV["PYTHON"]=""
-                        Pkg.build("PyCall")
-                        using SymPy
+                      For automated mpmath installation, try configuring PyCall to use the Conda Python distribution within Julia.  Relaunch Julia and run:
+                            ENV["PYTHON"]=""
+                            Pkg.build("PyCall")
+                            using SymPy
 
-                  pyimport exception was: """, e)
-        end
+                      pyimport exception was: """, e)
+            end
         end
     end
     if mpmath != PyCall.PyNULL()
