@@ -7,8 +7,18 @@ julia:
   - 0.4
   - nightly
 env:
+    global:
     - PYTHON=conda
+    matrix:
+    - MPMATH=true
+    - MPMATH=false
 notifications:
   email: false
+before_install:
+    #install mpmath to test functionallity
+  - if [ $MPMATH = "true" ]; then julia -e 'Pkg.add("Conda"); using Conda; Conda.add("mpmath")';fi
+script:
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - julia -e 'Pkg.clone(pwd()); Pkg.build("SymPy"); Pkg.test("SymPy"; coverage=true)'
 after_success: 
   - julia -e 'Pkg.add("Coverage"); cd(Pkg.dir("SymPy")); using Coverage; Coveralls.submit(process_folder())'
