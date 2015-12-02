@@ -253,7 +253,7 @@ Base.hash(x::Sym) = hash(project(x))
 ## Helper function from PyCall.pywrap:
 function members(o::@compat Union{PyObject, Sym})
     out = pycall(PyCall.inspect["getmembers"], PyObject, project(o))
-    [a for (a,b) in out]
+    AbstractString[a for (a,b) in out]
 end
 
 

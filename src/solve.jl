@@ -120,15 +120,16 @@ solve(x^5 - x -1) # inconclusive
 nsolve(x^5 - x - 1, 1)
 ```
 
+Returns symbolic values. Use `N`, or some other means, to convert to floating point.
+
 Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html#algebraic-equations)
 """              
-nsolve(ex::Sym, x::Sym, x0::Number) = sympy_meth(:nsolve, project(ex), project(x), x0) |> x -> convert(Float64, x)
+nsolve(ex::Sym, x::Sym, x0::Number) = sympy_meth(:nsolve, project(ex), project(x), x0)
 nsolve(ex::Sym, x0::Number) =  sympy_meth(:nsolve, project(ex), x0) |> x -> convert(Float64, x)
 function nsolve{T <: Number}(ex::Vector{Sym}, x::Vector{Sym}, x0::Vector{T}; kwargs...)
     out = sympy_meth(:nsolve, tuple(map(project,ex)...), tuple(map(project,x)...), tuple(x0...); kwargs...)
     ## ans is matrix object -- convert
-    out = convert(Array{Sym}, sympy[:Matrix](out))
-    map(x -> convert(Float64, x), out)
+    convert(Array{Sym}, sympy[:Matrix](out))
 end
 export nsolve
 
