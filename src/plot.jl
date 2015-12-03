@@ -303,7 +303,7 @@ function mapsubs(ex::Sym, x::Sym, vals::AbstractVector)
         out = pyeval("[fn(x,val) for val in vals]", fn=project(ex)[:subs], x=project(x), vals=vals)
         out = map(Float64, out)
     catch err
-        out = Float64[ex(x) for x in xs]
+        out = Float64[ex(x) for x in vals]
     end
     out
 end
