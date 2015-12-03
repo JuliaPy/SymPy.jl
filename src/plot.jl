@@ -270,7 +270,7 @@ end
 
 # special handling... xmin/xmax with function(s)
 function Plots.createKWargsList(plt::Plots.PlottingObject, f::SymOrSyms, xmin::Real, xmax::Real; kw...)
-    width = plt.initargs[:size][1]
+    width = plt.plotargs[:size][1]
     x = collect(linspace(xmin, xmax, width))  # we don't need more than the width
     Plots.createKWargsList(plt, x, f; kw...)
 end
