@@ -31,7 +31,7 @@ it provides a single installation of `Python` that includes `SymPy`
 and many other scientifice libraries that can be profitably accessed
 within `Julia` via `PyCall`. (Otherwise, install `Python` then
 download the `sympy` library from
-http://code.google.com/p/sympy/downloads/list and install.)
+https://github.com/sympy/sympy/releases and install.)
 
 ## The `PyCall` interface to `SymPy`
 
@@ -124,6 +124,5 @@ methods, not `Julia` methods that have been ported. (Hence,
 ## TODO
 
 - Try `@doc` for documentation links back to SymPy's documentation.
-
 
 
