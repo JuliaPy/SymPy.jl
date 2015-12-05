@@ -18,7 +18,7 @@ end
 ## should dispatch to julia version.
 for fn in (:besselj, :bessely, :besseli, :besselk)
     meth = string(fn)
-    @eval ($fn)(nu::SymOrNumber, x::Sym;kwargs...) = sympy_meth(symbol($meth), x; kwargs...)
+    @eval ($fn)(nu::SymOrNumber, x::Sym;kwargs...) = sympy_meth(symbol($meth), nu, x; kwargs...)
     @eval ($fn)(nu::SymOrNumber, a::Array{Sym}) = map(x ->$fn(nu, x), a)
 end
 
