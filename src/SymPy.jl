@@ -156,7 +156,14 @@ include("matrix.jl")
 include("ntheory.jl")
 include("display.jl")
 
-include("plot.jl")
+## hand onto v"0.3.0" of julia by putting in conditional plot.jl files...
+if Pkg.installed("Plots") <= v"0.4.2"
+    include("plot_v0-4-2.jl")
+elseif Pkg.installed("Plots") == v"0.5.0"
+    include("plot_v0-5-0.jl")
+else
+    include("plot.jl")
+end
 
 
 ## create some methods

@@ -1,38 +1,6 @@
-## add plotting commands for various packages (Winston, PyPlot, Gadfly)
-##
-## Based on Plots.jl v"0.5.1+".  In particular, this assume Julia v"0.4+"
-##
-##
-## SymPy (http://docs.sympy.org/latest/modules/plotting.html ) has its plotting module that provides
-## * plot: Plots 2D line plots.
-## * plot_parametric: Plots 2D parametric plots.
-## * plot3d_parametric_line: Plots 3D line plots, defined by a parameter.
-## * plot3d: Plots 3D plots of functions in two variables.
-## * plot3d_parametric_surface: Plots 3D parametric surface plots.
-## * plot_implicit: Plots 2D implicit and region plots.
-##
-## Our goal here is to give this a Julia interface
-## that doesn't depend on the backend plotting packages, so we
-## use the `Plots` package.
-##
-##
-## plot(::Sym, a, b)          2d-line plot of function
-## plot(Vector{Sym}, a, b)    plot of expressions over same axis
-## plot(::Sym, ::Sym, a, b)   parametric plot of two expressions over [a,b]
-## plot(xs, ys, ex::Sym)      contour plot of expression over regions xs x ys
-##
-## To this we add a light interface for explicitness:
-##
-## parametricplot(ex1, ex2, [ex3], a, b) # parametric plot in 2 or 3d
-## contourplot(ex, (xvar, a, b), (yvar, c,d))  # also Plots.contour(xs, ys, ex)
-## plot_surface(ex, (xvar, a, b), (yvar, c,d)) # also Plots.surface(xs, ys, ex)
-## plot_parametric_surface((ex1, ex2, ex3), (uvar, a, b), (cvar, c,d))
-##
-## The PyPlot package adds quiver (vectorplot), 3d contours, and implicit plots
-##
-## TODO: should `add_arrow`  be `quiver!`? `quiver` be `vectorplot`? `vectorfieldplot`? ...
-
-using Requires ## for conditional `@require`ing of packages
+## add plotting commands for Plots.jl for julia version 0.3
+## As Plots.jl no longer supports v0.3, this is not as full featured
+## as the plotting features for v0.4 and forward
 
 """
 
@@ -83,14 +51,7 @@ Example:
 plot(sin(2x), cos(3x), 0, 4pi) ## also 
 ```
 
-For explicitness, we provide `parametricplot(ex1, ex2, a, b)` as an alternative.
-
-For a few backends (those that support `:path3d`) a third symbolic
-expression may be added to have a 3d parametric plot rendered:
-
-```
-parametricplot(sin(x), cos(x), x, 0, 4pi) # helix in 3d
-```
+For explicitness, we provide `parametricplot(ex1, ex2, a, b)` as an alteranative.
 
 
 * `plot(xs, ys, expression)` will make a contour plot (for many backends).
@@ -107,52 +68,18 @@ contourplot(x^2 - y^2, (x,-5,5), (y,-5,5)) # default is [-5,5] x [-5,5]
 ```
 
 
-
-* To plot the surface  `z=ex(x,y)` over a region we have `plot_surface(ex, (x,-5,5), (y,-5,5); kwargs...)`. For example,
-
-```
-@vars x y
-plot_surface(25 - (x^2 + y^2), (x,0,5), (y,0,5)) # default region could have been dropped
-```
-
-The `Plots.surface` function (for a few backends) can also make sureface plots through the syntax:
-
-`Plots.surface(xs, ys, expression)`
-
-(The `surface` method is not exported, as `plot` is by `SymPy`, hence the qualification of the package. The syntax `plot(xs, ys, expression, linetype=:surf)` should also work.)
-
-
-
-* `plot_parametric_surface(exs::Tuple, (uvar,a0,b0), (vvar,a1,b1);
-  kwargs)` will make parametrically defined surface plots.
-
-Plot the parametrically defined surface `[exs[1](u,v), exs[2](u,v), exs[3](u,v)]` over `[a0,a1] x
-[b0,b1]`. The specification of the variables uses a tuple of the form
-`(Sym, Real, Real)` following the style of SymPy in `integrate`, say,
-where disambiguation of variable names is needed.
-
-```
-@vars theta, phi
-r = 1
-plot_parametric_surface((r*sin(theta)*sin(phi), r*sin(theta)*cos(phi), r*cos(theta)),
-                        (theta, 0, pi), (phi, 0, pi/2))
-```
-
-(The SymPy name for this function is `plot3d_parametric_surface`, we have dropped the "`3d`" part.)
-
-
-## PyPlot only
-
-The SymPy plotting module in Python also adds the following two
-features to Matplotlib. As such, these are not in `PyPlot`, but rather
-the `SymPy` namespace.
-
-
 ----
 
 If the `PyPlot` backend is used (as with `backend(:pyplot)`), then there are additional methods added. 
 
-* `contour3D(ex, (x,x0, x1), (y,y0, y1); kwargs...)` will plot a contour plot in  3D over the region.
+* `plot(ex1, ex2, ex3, a, b; kwargs)` produces a 3D parametric plot over `[a,b]` (also `parametricplot`)
+
+```
+@vars x
+plot(sin(x), cos(x), x, 0, 4pi)  
+```
+
+* `contour3D(ex, (x,x0, x1), (y,y0, y1); kwargs...)` wiil plot a contour plot in  3D over the region.
 
 
 ```
@@ -168,6 +95,30 @@ contour3D( x^2 - y^2) # default is [-5,5] x [-5,5]
 quiver([-y, x], (x, -5,5), (y, -5,5 ))  ## same as vectorplot([-y,x]) using the default range
 ```
 
+* `plot_surface(ex, (x,-5,5), (y,-5,5); kwargs)` Plot  surface of z=ex(x,y) over region
+
+```
+@vars x y
+plot_surface(25 - (x^2 + y^2))
+```
+
+The SymPy plotting module in Python also adds the following two features to Matplotlib. As such, these are not in `PyPlot`, but rather the `SymPy` namespace.
+
+* `plot_parametric_surface(exs::Tuple, (uvar,a0,b0), (vvar,a1,b1);  kwargs)`
+
+Plot the parametrically defined surface `[exs[1](u,v), exs[2](u,v), exs[3](u,v)]` over `[a0,a1] x
+[b0,b1]`. The specification of the variables uses a tuple of the form
+`(Sym, Real, Real)` following the style of SymPy in `integrate`, say,
+where disambiguation of variable names is needed.
+
+```
+@vars theta, phi
+r = 1
+plot_parametric_surface((r*sin(theta)*sin(phi), r*sin(theta)*cos(phi), r*cos(theta)),
+                        (theta, 0, pi), (phi, 0, pi/2))
+```
+
+(The SymPy name for this function is `plot3d_parametric_surface`, we have dropped the "`3d`" part.)
 
 * `plot_implicit(pred, [(xvar,x0,x1), (yvar, y0,y1)]; kwargs...)` Make
   implicit plot of region. To specify the region use `(variable, a,b)`
@@ -196,7 +147,7 @@ These methods are added *after* the `PyPlot` package is loaded.
 
 This can cause confusion:
 
-* If `PyPlot` is loaded through `Plots` (by specifying `backend(:pyplot)`)
+* If `PyPlot` is loaded through `Plots` (by specifiying `backend(:pyplot)`)
   then `PyPlot` is not loaded until after the first `plot` call. The
   extended features for `PyPlot` are added then (at runtime), so can't
   be accessed until `PyPlot` is loaded.
@@ -257,86 +208,6 @@ function contourplot(ex::Sym,
 end
 export(contourplot)
 
-## XXX Rename these?? surface?)
-## surface plot. Uses surface()
-"""
-
-Make a surface plot defined by the expression of two variables. 
-
-
-Example
-```
-plot_surface(x*y, (x,0,3), (y,0,2))
-```
-
-This is an *alternative* to the use of surface plots in Plots.
-That is, the above is the same as:
-
-```
-xs = linspace(0,3, 35)
-ys = linspace(0,2,35)
-Plots.surface(xs, ys, x*y)
-```
-
-Eventually uses `Plots.plot(..., linetype=:surf)`, so surface plots must be defined for the backend in use.
-"""
-function plot_surface(ex::Sym,
-                      xvar=(-5.0, 5.0),
-                      yvar=(-5.0, 5.0),
-                      args...;
-                      n::Int=35,
-                      kwargs...)
-    
-    vars = free_symbols(ex)
-    length(vars) == 2 || throw(DimensionMismatch("Expression has wrong number of variables. Expecting 2 for a surface plot"))
-    
-    U,V,xs,ys = _find_us_vs(ex, xvar, yvar, n)        
-    
-    
-    zs = mapsubs2(ex, U, xs, V,ys)
-    Plots.surface(xs, ys, z=Surface(zs), args...; kwargs...)
-end
-export plot_surface
-
-
-## surface plot xvar = Tuple(Sym, Real, Real)
-##
-"""
-
-Render a parametrically defined surface plot.
-
-Example:
-```
-@vars u, v
-plot_parametric_surface((u*v,u-v,u+v), (u,0,1), (v,0,1))
-```
-
-Eventually uses `Plots.plot(..., linetype=:surf)`, so surface plots must be defined for the backend in use.
-"""
-function plot_parametric_surface(exs::(@compat Tuple{Sym,Sym,Sym}),
-                                 xvar=(-5.0, 5.0),
-                                 yvar=(-5.0, 5.0),
-                                 args...;
-                                 n::Int=25, # really small, as otherwise this takes forever to plot
-                                 kwargs...)
-    
-    vars = free_symbols(exs)
-    
-    nvars = length(vars)
-    nvars == 2 || throw(DimensionMismatch("Expression has $nvars, expecting 2 for a surface plot"))
-            
-    U,V,us,vs = _find_us_vs(exs, xvar, yvar, n)        
-    
-    xs = mapsubs2(exs[1], U, us, V,vs)
-    ys = mapsubs2(exs[2], U, us, V,vs)
-    zs = mapsubs2(exs[3], U, us, V,vs)            
-    
-    Plots.surface(xs, ys, z=Surface(zs), args...; kwargs...)
-end
-export plot_parametric_surface
-
-
-##################################################
 ### Plug into Plots interface. Where there is something defined for Functions we
 ### define for symbolic expressions
 ## Additions to Plots so that expressions are treated like functions
@@ -377,7 +248,7 @@ end
 
 # special handling... xmin/xmax with function(s)
 function Plots.createKWargsList(plt::Plots.PlottingObject, f::SymOrSyms, xmin::Real, xmax::Real; kw...)
-    width = plt.plotargs[:size][1]
+    width = plt.initargs[:size][1]
     x = collect(linspace(xmin, xmax, width))  # we don't need more than the width
     Plots.createKWargsList(plt, x, f; kw...)
 end
@@ -394,7 +265,9 @@ Plots.createKWargsList{T<:Real}(plt::Plots.PlottingObject, u::Plots.AVec{T}, fx:
 Plots.createKWargsList(plt::Plots.PlottingObject, fx::Sym, fy::Sym, umin::Real, umax::Real, numPoints::Int = 1000; kw...) =
     Plots.createKWargsList(plt, fx, fy, linspace(umin, umax, numPoints); kw...)
 
-##################################################
+###
+
+
 ## Helper functions
 
 ## the fallback pattern Float64[ex(x) for x in xs] has the
@@ -408,7 +281,8 @@ function mapsubs(ex::Sym, x::Sym, vals::AbstractVector)
         out = pyeval("[fn(x,val) for val in vals]", fn=project(ex)[:subs], x=project(x), vals=vals)
         out = map(Float64, out)
     catch err
-        out = Float64[ex(x) for x in vals]
+        u = free_symbols(ex)[1]
+        out = Float64[subs(ex,u,x) for x in vals]
     end
     out
 end
@@ -423,7 +297,8 @@ function mapsubs2(ex::Sym, x,xs, y, ys)
         out = reshape(out, (length(xs), length(ys)))
         out = map(Float64, out)
     catch err
-        out =Float64[ex(x,y) for x in xs, y in ys]
+        u,v = free_symbols(ex)[1:2]
+        out = Float64[subs(ex, (u,x),(v,y)) for x in xs, y in ys]
     end
     out
 end
@@ -470,9 +345,14 @@ function init_plot()
     Requires.@require PyPlot begin
 
         info("""Loading additional PyPlot commands for graphing for SymPy objects:
-quiver, contour3D, and plot_implicit.
+quiver, parametricplot (for 3D), contour3D, plot_surface, plot_parametric_surface, and plot_implicit.
 See ?sympy_plotting for some more details
 """)
+        function parametricplot(ex1::Sym, ex2::Sym, ex3::Sym, a::Real, b::Real, args...; n=250, kwargs...)
+            out = _prepare_parametric([ex1,ex2,ex3], a, b, n)
+            PyPlot.plot3D(out..., args...; kwargs...)
+        end
+
 
         ## Ideally we would name `contourplot` just `contour`, but for a few reasons:
         ## * adding the suffix "plot" is consistent with `parametricplot` and `vectorplot`
@@ -542,7 +422,48 @@ See ?sympy_plotting for some more details
             PyPlot.contour3D(xs, ys, zs, args...; kwargs...)
         end
         
+                ## surface plot
+        eval(Expr(:import, :PyPlot, :plot_surface))        
+        function plot_surface(ex::Sym,
+                                     xvar=(-5.0, 5.0),
+                                     yvar=(-5.0, 5.0),
+                                     args...;
+                                     n::Int=35,
+                                     kwargs...)
+
+            vars = free_symbols(ex)
+            length(vars) == 2 || throw(DimensionMismatch("Expression has wrong number of variables. Expecting 2 for a surface plot"))
+            
+            U,V,xs,ys = _find_us_vs(ex, xvar, yvar, n)        
+
+         
+            zs = mapsubs2(ex, U, xs, V,ys)
+            PyPlot.plot_surface(xs, ys, zs, args...; kwargs...)
+        end
         
+        ## surface plot xvar = Tuple(Sym, Real, Real)
+        ##
+        function plot_parametric_surface(exs::(@compat Tuple{Sym,Sym,Sym}),
+                                         xvar=(-5.0, 5.0),
+                                         yvar=(-5.0, 5.0),
+                                         args...;
+                                         n::Int=25, # really small, as otherwise this takes forever to plot
+                                         kwargs...)
+
+            vars = free_symbols(exs)
+            
+            nvars = length(vars)
+            nvars == 2 || throw(DimensionMismatch("Expression has $nvars, expecting 2 for a surface plot"))
+            
+            U,V,us,vs = _find_us_vs(exs, xvar, yvar, n)        
+
+            xs = mapsubs2(exs[1], U, us, V,vs)
+            ys = mapsubs2(exs[2], U, us, V,vs)
+            zs = mapsubs2(exs[3], U, us, V,vs)            
+            
+            PyPlot.plot_surface(xs, ys, zs, args...; kwargs...)
+        end
+
 
         ## Implict equations plot
         ## XXX: We use the sympy interface here, as PyPlot does not have an interface for implicit plots
@@ -554,6 +475,8 @@ See ?sympy_plotting for some more details
         eval(Expr(:export, :vectorplot))
         eval(Expr(:export, :quiver))
         eval(Expr(:export, :add_arrow))
+        eval(Expr(:export, :plot_surface))        
+        eval(Expr(:export, :plot_parametric_surface))
         eval(Expr(:export, :plot_implicit))
         
     end

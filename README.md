@@ -26,12 +26,16 @@ viewable as an `IJulia` notebook
 ### Installation
 
 To use this package, both `Python` and its `SymPy` library must be
-installed on your system. The `Anaconda` distribution is suggested, as
-it provides a single installation of `Python` that includes `SymPy`
-and many other scientifice libraries that can be profitably accessed
-within `Julia` via `PyCall`. (Otherwise, install `Python` then
-download the `sympy` library from
-https://github.com/sympy/sympy/releases and install.)
+installed on your system. If `PyCall` is installed using `Conda`
+(which is the default if no system `python` is found), then the
+underlying `SymPy` library will be installed via `Conda` when the
+package is first loaded. Otherwise, installing both `Python` and
+`SymPy` (which also requires `mpmath`) can be done by other means.
+The `Anaconda` distribution is suggested, as it provides a single
+installation of `Python` that includes `SymPy` and many other
+scientifice libraries that can be profitably accessed within `Julia`
+via `PyCall`. (Otherwise, install `Python` then download the `sympy`
+library from https://github.com/sympy/sympy/releases and install.)
 
 ## The `PyCall` interface to `SymPy`
 
