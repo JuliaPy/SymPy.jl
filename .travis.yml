@@ -6,6 +6,8 @@ julia:
   - 0.3
   - 0.4
   - nightly
+git:
+    depth: 99999
 env:
     global:
     - PYTHON=conda
