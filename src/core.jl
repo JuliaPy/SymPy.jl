@@ -120,6 +120,12 @@ core_sympy_methods_base = (:factorial,
                            )
 for meth in core_sympy_methods_base
     meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) =
-      sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+    @eval begin
+                @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($meth)(ex::Sym, args...; kwargs...) =
+            sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+    end
 end

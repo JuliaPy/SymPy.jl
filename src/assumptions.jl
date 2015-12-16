@@ -48,7 +48,13 @@ Q_nms = [symbol("Q" * string(i)) for i in Q_predicates]
 
 for (fn, meth) in zip(Q_nms, Q_predicates)
     nm = string(meth)
-    @eval ($fn)(x) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
+    @eval begin
+        @doc """
+`$($nm)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($nm)
+""" ->
+        ($fn)(x) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
+    end
     eval(Expr(:export, fn))
 end
 
@@ -123,7 +129,14 @@ Q_predicates = (:antihermitian,
 
 for meth in Q_predicates
     nm = string(meth)
-    @eval ($meth)(x) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
+    @eval begin
+                @doc """
+`$($nm)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($nm)
+""" ->
+
+        ($meth)(x) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
+    end
 end
 
 end

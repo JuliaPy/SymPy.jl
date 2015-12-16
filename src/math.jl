@@ -12,8 +12,15 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
            :factorial2,
            :airyai, :airybi
            )
-    meth = string(fn)
-    @eval ($fn)(x::Sym;kwargs...) = sympy_meth(symbol($meth), x; kwargs...)#sympy[symbol($meth)](project(x),[(k,project(v)) for (k,v) in kwargs]...)
+    meth_name = string(fn)
+    
+    @eval begin
+        @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($fn)(x::Sym;kwargs...) = sympy_meth(symbol($meth_name), x; kwargs...)#sympy[symbol($meth)](project(x),[(k,project(v)) for (k,v) in kwargs]...)
+    end
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
@@ -66,7 +73,13 @@ sympy_math_methods = (:Prod,
                       )
 for meth in sympy_math_methods
     meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+    @eval begin
+           @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+    end
     eval(Expr(:export, meth))
 end
 
@@ -113,7 +126,13 @@ for meth in (:separate, :flatten,
              :Derivative
              )
     meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+    @eval begin
+           @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+    end
     eval(Expr(:export, meth))
 end
 

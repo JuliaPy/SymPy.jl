@@ -61,8 +61,15 @@ for meth in (:condition_number,
            )
 
     cmd = "x." * string(meth) * "()"
-    @eval ($meth)(a::SymMatrix) = Sym(pyeval(($cmd), x=project(a)))
-    @eval ($meth)(a::Matrix{Sym}) = ($meth)(convert(SymMatrix, a))
+    meth_name=string(meth)
+    @eval begin
+           @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($meth)(a::SymMatrix) = Sym(pyeval(($cmd), x=project(a)))
+        ($meth)(a::Matrix{Sym}) = ($meth)(convert(SymMatrix, a))
+    end
     eval(Expr(:export, meth))
 end
 
@@ -70,8 +77,14 @@ end
 for meth in (:norm,
              )
     meth_name = string(meth)
-    @eval ($meth)(a::SymMatrix, args...; kwargs...) = object_meth(a, symbol($meth_name), args...;kwargs...)
-    @eval ($meth)(a::Array{Sym}, args...; kwargs...) = ($meth)(convert(SymMatrix, a), args...;kwargs...)
+    @eval begin
+        @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($meth)(a::SymMatrix, args...; kwargs...) = object_meth(a, symbol($meth_name), args...;kwargs...)
+        ($meth)(a::Array{Sym}, args...; kwargs...) = ($meth)(convert(SymMatrix, a), args...;kwargs...)
+    end
     eval(Expr(:export, meth))
 end
 
@@ -79,8 +92,14 @@ for meth in (
            :has,
            )
     meth_name = string(meth)
-    @eval ($meth)(a::SymMatrix, args...; kwargs...) = object_meth(a, symbol($meth_name), args...;kwargs...)
-    @eval ($meth)(a::Matrix{Sym}, args...; kwargs...) = ($meth)(convert(SymMatrix, a), args...;kwargs...)
+    @eval begin
+      @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($meth)(a::SymMatrix, args...; kwargs...) = object_meth(a, symbol($meth_name), args...;kwargs...)
+        ($meth)(a::Matrix{Sym}, args...; kwargs...) = ($meth)(convert(SymMatrix, a), args...;kwargs...)
+    end
     eval(Expr(:export, meth))
 end
 
@@ -102,8 +121,14 @@ for meth in  (:is_anti_symmetric, :is_diagonal, :is_diagonalizable,:is_nilpotent
                 :is_symbolic, :is_symmetric)
 
     meth_name = string(meth)
-    @eval ($meth)(ex::SymMatrix, args...; kwargs...) = ex[symbol($meth_name)]()
-    @eval ($meth)(ex::Matrix{Sym}, args...; kwargs...) = ex[symbol($meth_name)]()
+    @eval begin
+      @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($meth)(ex::SymMatrix, args...; kwargs...) = ex[symbol($meth_name)]()
+        ($meth)(ex::Matrix{Sym}, args...; kwargs...) = ex[symbol($meth_name)]()
+    end
     eval(Expr(:export, meth))
 end
 
@@ -118,8 +143,14 @@ matrix_operators = (:H, :C,
 
 for meth in matrix_operators
      meth_name = string(meth)
-     @eval ($meth)(ex::SymMatrix, args...; kwargs...) = ex[symbol($meth_name)]
-     @eval ($meth)(ex::Matrix{Sym}, args...; kwargs...) = ex[symbol($meth_name)]
+    @eval begin
+      @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($meth)(ex::SymMatrix, args...; kwargs...) = ex[symbol($meth_name)]
+        ($meth)(ex::Matrix{Sym}, args...; kwargs...) = ex[symbol($meth_name)]
+    end
     eval(Expr(:export, meth))
 end
 
@@ -155,8 +186,14 @@ map_matrix_methods = (:LDLsolve,
 
 for meth in map_matrix_methods
     meth_name = string(meth)
-    @eval ($meth)(ex::SymMatrix, args...; kwargs...) = call_matrix_meth(ex, symbol($meth_name), args...; kwargs...)
-    @eval ($meth)(ex::Matrix{Sym}, args...; kwargs...) = call_matrix_meth(convert(SymMatrix, ex), symbol($meth_name), args...; kwargs...)
+    @eval begin
+      @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($meth)(ex::SymMatrix, args...; kwargs...) = call_matrix_meth(ex, symbol($meth_name), args...; kwargs...)
+        ($meth)(ex::Matrix{Sym}, args...; kwargs...) = call_matrix_meth(convert(SymMatrix, ex), symbol($meth_name), args...; kwargs...)
+    end
     eval(Expr(:export, meth))
 end
 
@@ -216,8 +253,15 @@ end
 for fn in (:cross,
            :LUSolve)
     cmd = "x." * string(fn) * "()"
-    @eval ($fn)(A::SymMatrix, b::Sym) = convert(Array{Sym}, pyeval(($cmd), A=project(A), b=project(b)))
-    @eval ($fn)(A::Array{Sym, 2}, b::Vector{Sym}) = $(fn)(convert(SymMatrix,A), convert(SymMatrix, b))
+    meth_name = string(fn)
+    @eval begin
+      @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($fn)(A::SymMatrix, b::Sym) = convert(Array{Sym}, pyeval(($cmd), A=project(A), b=project(b)))
+        ($fn)(A::Array{Sym, 2}, b::Vector{Sym}) = $(fn)(convert(SymMatrix,A), convert(SymMatrix, b))
+    end
 end
 
 ## GramSchmidt -- how to call?
