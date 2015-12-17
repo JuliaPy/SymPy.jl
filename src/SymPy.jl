@@ -79,7 +79,7 @@ import Base:  inv, conj,
               cross, eigvals, eigvecs, trace, norm
 import Base: promote_rule
 import Base: match, replace, round
-import Base: +, -, *, /, \
+import Base: +, -, *, /, //, \
 import Base: ^, .^
 import Base: &, |, !, >, >=, ==, <=, <
 ## poly.jl

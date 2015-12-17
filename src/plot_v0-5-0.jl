@@ -266,6 +266,7 @@ end
 
 
 # list of expressions
+
 function Plots.createKWargsList(plt::Plots.PlottingObject, f::SymOrSyms, x; kw...)
     @assert !(typeof(x) <: Sym)  # otherwise we'd hit infinite recursion here
     Plots.createKWargsList(plt, x, f; kw...)
