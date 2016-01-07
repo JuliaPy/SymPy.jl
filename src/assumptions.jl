@@ -53,7 +53,7 @@ for (fn, meth) in zip(Q_nms, Q_predicates)
 `$($nm)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($nm)
 """ ->
-        ($fn)(x) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
+        ($fn)(x::SymbolicObject) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
     end
     eval(Expr(:export, fn))
 end
@@ -80,12 +80,16 @@ end
 module Q
 import SymPy
 import PyCall
-
+if VERSION < v"0.4.0"
+    eval(parse("using Docile"))
+    eval(parse("Docile.@document"))
+end
+import Base: complex, integer, real, zero
 ##http://docs.sympy.org/dev/_modules/sympy/assumptions/ask.html#ask
 Q_predicates = (:antihermitian,
                 :bounded, :finite, # bounded deprecated
                 :commutative,
-                :complex,
+#                :complex,
                 :composite,
                 :even,
                 :extended_real,
@@ -126,19 +130,16 @@ Q_predicates = (:antihermitian,
                 :complex_elements,
                 :integer_elements)
                 
-
 for meth in Q_predicates
-    nm = string(meth)
-    @eval begin
-                @doc """
+        nm = string(meth)
+        @eval begin
+            @doc """
 `$($nm)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($nm)
 """ ->
-
-        ($meth)(x) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
+            ($meth)(x::SymPy.SymbolicObject) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
+        end
     end
-end
-
 end
 export Q
 

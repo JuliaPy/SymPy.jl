@@ -40,13 +40,11 @@ using Compat
 using PyCall, Conda
 using Requires 
 
-## * Docile is used for documentation
+
 if VERSION < v"0.4.0"
-    eval(Expr(:using, :Docile))
-else
-    macro document() nothing end
+    eval(parse("using Docile"))
+    eval(parse("Docile.@document"))
 end
-@document
 
 import Base: show, writemime
 import Base: convert, promote_rule
