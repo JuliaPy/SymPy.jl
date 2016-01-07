@@ -350,6 +350,6 @@ if isdefined(:mpmath)
 end
 
 ## Assumptions
-@assert ask(Q.even(2)) == true
-@assert ask(Q.even(3)) == false
-@assert ask(Q.zero(3)) == false
+@assert ask(Q.even(Sym(2))) == true
+@assert ask(Q.even(Sym(3))) == false
+@assert ask(Q.nonzero(Sym(3))) == true

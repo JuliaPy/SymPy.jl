@@ -84,7 +84,7 @@ if VERSION < v"0.4.0"
     eval(parse("using Docile"))
     eval(parse("Docile.@document"))
 end
-import Base: complex, integer, real, zero
+import Base: complex, integer, real
 ##http://docs.sympy.org/dev/_modules/sympy/assumptions/ask.html#ask
 Q_predicates = (:antihermitian,
                 :bounded, :finite, # bounded deprecated
@@ -111,7 +111,6 @@ Q_predicates = (:antihermitian,
                 :is_true,
                 :nonpositive,
                 :nonnegative,
-                :zero,
                 :symmetric,
                 :invertible,
                 :singular,
@@ -140,6 +139,7 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
             ($meth)(x::SymPy.SymbolicObject) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
         end
     end
-end
+    end
+
 export Q
 
