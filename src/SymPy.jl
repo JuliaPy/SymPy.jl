@@ -41,8 +41,8 @@ using PyCall, Conda
 using Requires 
 
 ## * Docile is used for documentation
-if VERSION < v"0.4.0-dev"
-    using Docile
+if VERSION < v"0.4.0"
+    eval(Expr(:using, :Docile))
 else
     macro document() nothing end
 end
