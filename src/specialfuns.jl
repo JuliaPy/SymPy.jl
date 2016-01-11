@@ -25,7 +25,7 @@ end
 
 ## :gamma, :beta, # need import
 beta(x::Sym, y::Sym) = sympy_meth(:beta, x, y)
-gamma(x::Sym, y::Sym) = sympy_meth(:gamma, x, y)
+gamma(x::Sym) = sympy_meth(:gamma, x)
 
 
 ## Hyper and friends don't really have symbolic use...
