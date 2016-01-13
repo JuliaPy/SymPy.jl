@@ -7,6 +7,12 @@
 
 const SymPoly = Sym
 
+
+Base.divrem(p::Sym, q::Sym) = sympy_meth(:div, p, q)
+Base.div(p::Sym, q::Sym) = divrem(p,q)[1]
+Base.rem(p::Sym, q::Sym) = divrem(p,q)[2]
+
+
 ## rename these, their use is special to polynomials, so we prefix
 ## Renamed polynomial methods.
 
@@ -15,26 +21,34 @@ const SymPoly = Sym
 ## them by prefixing with "poly". We do the same for `roots`, so as to
 ## not conflict with the `roots` function from `Polynomials.jl`.
 
+## [This isn't really needed. We do keep the `polyroots`, as `roots` does not live in base.]
+
 """
 
-Polynomial division. Renamed from `div` in SymPy to avoid confusion with Julia's `div`
+Polynomial division. Renamed from `div` in SymPy to avoid confusion with Julia's `div`. Also, same as `divrem`.
 
 """
 polydiv(ex::Sym, args...; kwargs...) = sympy_meth(:div, ex, args...; kwargs...)
 
 """
 
-Polynomial division remainerd. Renamed from `rem` in SymPy to avoid confusion with Julia's `rem`
+Polynomial division remainer. 
 
 """
-polyrem(ex::Sym, args...; kwargs...) = sympy_meth(:rem, ex, args...; kwargs...)
+
+polyrem(ex::Sym, args...; kwargs...) = rem(ex, args...; kwargs...)
 
 """
 
 Polynomial division with remainder. Renamed from `divrem` in SymPy to avoid confusion with Julia's `divrem`
 
 """
-polydivrem(ex::Sym, args...; kwargs...) = sympy_meth(:divrem, ex, args...; kwargs...)
+polydivrem(ex::Sym, args...; kwargs...) = sympy_meth(:div, ex, args...; kwargs...)
+
+## deprecate these
+Base.@deprecate polydivrem(p::Sym, q::Sym) divrem(p::Sym, q::Sym)
+Base.@deprecate polydiv(p::Sym, q::Sym) divrem(p::Sym, q::Sym)
+Base.@deprecate polyrem(p::Sym, q::Sym) rem(p::Sym, q::Sym)
 
 """
 
