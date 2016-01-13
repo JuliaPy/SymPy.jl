@@ -180,6 +180,7 @@ if VERSION >= v"0.4.0"
     end
 end
 
+limit(ex::Sym, x::Sym, c; kwargs...) = sympy_meth(:limit, ex, x, Sym(c); kwargs...)
 limit(ex::Sym, args...; kwargs...) = sympy_meth(:limit, ex, args...; kwargs...)
 export limit
 
