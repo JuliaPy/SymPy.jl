@@ -28,9 +28,12 @@
 ## plot_surface(ex, (xvar, a, b), (yvar, c,d)) # also Plots.surface(xs, ys, ex)
 ## plot_parametric_surface((ex1, ex2, ex3), (uvar, a, b), (cvar, c,d))
 ##
-## The PyPlot package adds quiver (vectorplot), 3d contours, and implicit plots
+## we also add
+## vectorfieldplot([ex1, ex2], (xvar, a, b), (yvar, a, b)) for a vector field plot
 ##
-## TODO: should `add_arrow`  be `quiver!`? `quiver` be `vectorplot`? `vectorfieldplot`? ...
+## The PyPlot package adds quiver (like vectorfieldplot), 3d contours, and implicit plots
+##
+## TODO: should `add_arrow`  be `quiver!`? 
 
 using Requires ## for conditional `@require`ing of packages
 
@@ -63,7 +66,7 @@ Example. Here we use the default backend for `Plots` to make a plot:
 plot(x^2 - 2x, 0, 4)
 ```
 
-The backend could be switched out with a call like, `backend(:pyplot)`, say.
+The backend could be switched out with a call like, `pyplot()` or `backend(:pyplot)`, say.
 
 * `plot(exs::Vector{Sym}, a, b; kwargs...)` will plot the functions evaluating `exs` over [a,b]
 
@@ -90,6 +93,12 @@ expression may be added to have a 3d parametric plot rendered:
 
 ```
 parametricplot(sin(x), cos(x), x, 0, 4pi) # helix in 3d
+```
+
+* `vectorfieldplot([ex1, ex2], (x,x0,x1), (y,y0,y1), ...)` will create a vectorfield plot where for a grid of values `(x,y)`, a vector in the direction `[ex1, ex2]`, evaluated at `(x,y)`, will be plotted.
+
+```
+vectorfield([-y,x], (x, -5,5), (y, -5,5))
 ```
 
 
@@ -235,6 +244,104 @@ function parametricplot(ex1::Sym, ex2::Sym, ex3::Sym, a::Real, b::Real, args...;
     Plots.path3d(xs, ys, z=zs, args...; kwargs...)
 end
 export(parametricplot)
+
+
+"""
+
+Vector plot. At each (x,y) on a grid, plot a "vector" of [fx(x,y), fy(x,y)], suitably scaled.
+
+Example:
+```
+fx(x,y) = -y; fy(x,y) = x
+vectorfieldplot(fx, fy)
+```
+
+We can plot a direction field of an ODE too.
+
+```
+F(y,x) = 1 - y/x   # solution to y'(x) = F(y(x),x) is C/x + x/2
+fx(x,y) = 1; fy(x,y) = F(y,x)
+vectorfieldplot(fx, fy, xlim=(1,5))
+y(x) = 2/x + x/2
+plot!(y, 1, 5, linewidth=3)
+```
+
+"""
+function vectorfieldplot(fx::Function, fy::Function; xlim=(-5,5), ylim=(-5,5),  n::Int=15, kwargs...)
+
+    x₀, x₁ = xlim
+    y₀, y₁ = ylim
+    Δx = (x₁ - x₀) / (n-1)
+    Δy = (y₁ - y₀) / (n-1)
+
+    xs = x₀:Δx:x₁
+    ys = y₀:Δy:y₁
+    p = plot(xlim=xlim, ylim=ylim, legend=false, kwargs...)
+
+    mx, my = 0.0, 0.0
+
+    ## two loops, first to identify scaling factor so
+    ## lines stay within box of width Δx by Δy
+    for x in xs, y in ys
+        mx = max(mx, abs(fx(x,y)))
+        my = max(my, abs(fy(x,y)))
+    end
+
+    ## we want all lines to be in the box, so we scale
+    λ = .95 *  min(Δx/mx, Δy/my)
+    
+    for x in xs, y in ys
+        plot!([x, x + λ * fx(x,y)], [y, y + λ * fy(x,y)])
+    end
+    
+    p
+end
+
+"""
+
+Vector field plot. At each point (x,y) on a grid, plots the vector specified by the expression.
+
+The limits are passed in as tuples of the form `(a,b)` or `(x,a,b)`. The latter specifies the symbol. The former will assign the "`x`" symbol to be the first free symbol and the "`y`" variable the second.
+
+Example
+```
+@vars x y
+vectorfieldplot([-y, x], (x, -5, 5), (y, -5, 5))
+```
+"""
+function vectorfieldplot(exs::Vector{Sym},
+            xvar=(-5.0, 5.0),
+            yvar=(-5.0, 5.0);
+            n::Int=15,
+            kwargs...) 
+            
+    length(exs) == 2 || throw(DimensionMismatch("vector of symbolic objects must have length 2"))
+    for ex in exs
+                nvars = length(free_symbols(ex))
+        nvars <= 2 || throw(DimensionMismatch("Expression has $nvars, expecting 2 for a quiver plot"))
+    end
+    
+    ## get variables, U, V, xlim, ylim
+    vars = free_symbols(exs)
+    if length(xvar) == 2
+        U = vars[1]
+        xlim = xvar
+    else
+        U, xlim = xvar[1], xvar[2:3]
+    end
+    if length(yvar) == 2
+        V, ylim = vars[2], yvar
+    else
+        V, ylim = yvar[1], yvar[2:3]
+    end
+
+    fx(x,y) = convert(Float64, exs[1](U=>x, V=>y))
+    fy(x,y) = convert(Float64, exs[2](U=>x, V=>y))
+
+    vectorfieldplot(fx, fy; xlim=xlim, ylim=ylim, n=n, kwargs...)
+end
+export vectorfieldplot
+
 
 """
 
@@ -512,7 +619,8 @@ See ?sympy_plotting for some more details
             
             PyPlot.quiver(xs, ys, us, vs, args...; kwargs...)
         end
-        global  vectorplot = PyPlot.quiver
+        ## deprecate this. We leave `quiver` for internal use.
+        ##global  vectorplot = PyPlot.quiver
         
         ## XXX Need an interface decision here...
         global add_arrow(p::Vector, v::Vector, args...; kwargs...) = begin
