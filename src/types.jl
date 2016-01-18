@@ -68,9 +68,9 @@ function convert(::Type{Sym}, x::Complex)
         return(Sym(sympy[:I]))
     end
     if real(x) == 0
-        Sym(sympy[:Symbol]("$(imag(x))*I"))
+        imag(x) * IM
     else
-        Sym(sympy[:Symbol]("$(real(x)) + $(imag(x))*I"))
+        real(x) + imag(x) * IM
     end
 end
 convert(::Type{Complex}, x::Sym) = complex(map(x -> convert(Float64, x), x[:as_real_imag]())...)
