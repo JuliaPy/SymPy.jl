@@ -353,3 +353,7 @@ end
 @assert ask(Q.even(Sym(2))) == true
 @assert ask(Q.even(Sym(3))) == false
 @assert ask(Q.nonzero(Sym(3))) == true
+
+
+## Issue # 56
+@assert Sym(1+2im) == 1+2IM

@@ -65,10 +65,7 @@ convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 ## Sym(PyCall.PyObject(im)) gives 1j, not i (One is python, the other SymPy)
 function convert(::Type{Sym}, x::Complex)
     if isa(x, Complex{Bool})
-        return(Sym(sympy[:I]))
-    end
-    if real(x) == 0
-        imag(x) * IM
+        IM
     else
         real(x) + imag(x) * IM
     end
