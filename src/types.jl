@@ -62,13 +62,11 @@ convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 
 
 ## complex
-## Sym(PyCall.PyObject(im)) gives 1j, not i (One is python, the other SymPy)
+## IM is SymPy's "i" (sympy[:I], not Python's
+## Sym(PyCall.PyObject(im)) which gives 1j.
 function convert(::Type{Sym}, x::Complex)
-    if isa(x, Complex{Bool})
-        IM
-    else
-        real(x) + imag(x) * IM
-    end
+    y = ifelse(isa(x, Complex{Bool}), real(x) + imag(x) * im, x)
+    real(y) + imag(y) * IM
 end
 convert(::Type{Complex}, x::Sym) = complex(map(x -> convert(Float64, x), x[:as_real_imag]())...)
 complex(x::Sym) = convert(Complex, x)
