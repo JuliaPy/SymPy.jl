@@ -11,7 +11,7 @@ _str(s::SymbolicObject) = s[:__str__]()
 _str(a::Array{SymbolicObject}) = map(_str, a)
 
 "call SymPy's pretty print"
-pprint(s::SymbolicObject, args...; kwargs...) = sympy_meth(:pprint, x, args...; kwargs...)
+pprint(s::SymbolicObject, args...; kwargs...) = sympy_meth(:pprint, s, args...; kwargs...)
 
 "Call SymPy's `latex` function. Not exported. "
 latex(s::SymbolicObject, args...; kwargs...)  = sympy_meth(:latex, s, args...; kwargs...)
