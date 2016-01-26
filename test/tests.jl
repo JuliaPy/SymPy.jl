@@ -357,3 +357,10 @@ end
 
 ## Issue # 56
 @assert Sym(1+2im) == 1+2IM
+
+
+## Issue #59
+cse(sin(x)+sin(x)*cos(x))
+cse([sin(x), sin(x)*cos(x)])
+cse([sin(x) sin(x)*cos(x); cos(x) sin(x)*cos(x)])
+

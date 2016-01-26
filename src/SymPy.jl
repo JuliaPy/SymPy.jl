@@ -184,12 +184,11 @@ for meth in union(core_sympy_methods,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+        ($meth){T<:SymbolicObject}(ex::T, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
         
     end
     eval(Expr(:export, meth))
 end
-
 
 for meth in union(core_object_methods,
                   integrals_instance_methods,
