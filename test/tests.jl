@@ -158,9 +158,14 @@ diff(eqn, x)
 ## integrate
 integrate(sin(x))
 integrate(sin(x), (x, 0, pi))
-@syms a b
+@vars a b t
 integrate(sin(x), (x, a, b))
 integrate(sin(x), (x, a, b)) |> replace(a, 0) |> replace(b, pi)
+integrate(sin(x) * DiracDelta(Sym(0))) # sin(0)
+integrate(Heaviside(x), (x, -1, 1))
+C = Curve([exp(t)-1, exp(t)+1], (t, 0, log(Sym(2))))
+line_integrate(x + y, C, [x,y])
+
 
 
 ## summation

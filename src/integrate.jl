@@ -18,7 +18,8 @@ integrals_sympy_methods = (:integrate, :Integral,
                            :deltaintegrate,
                            :ratint,
                            :heurisch,
-                           :trigintegrate
+                           :trigintegrate,
+                           :line_integrate
                            )
 
 
@@ -28,8 +29,36 @@ integrals_instance_methods = (:as_sum,
                               :variables)
 
 
+"""
+Create a parameterized curve for line integrals
 
+```
+@vars t x y
+C = Curve([exp(t)+1, exp(t)-1], (t, 0, log(Sym(2))))
+line_integrate(x + y, C, [x,y])
+```
 
+"""
+Curve{T<:Sym}(exs::Vector{T}, p) = sympy_meth(:Curve, exs, p)
+export Curve
+
+"""
+Dirac delta for integration
+
+[SymPy Documentation](http://docs.sympy.org/dev/modules/functions/special.html)
+"""
+DiracDelta(x::Number) = convert(Function, sympy[:DiracDelta])(project(x))
+export DiracDelta
+
+"""
+Heaviside function for integration.
+
+`H(x) = x < 0 ? 0 : (x > 0 ? 1 : 1/2)`
+
+[SymPy Documentation](http://docs.sympy.org/dev/modules/functions/special.html)
+"""
+Heaviside(x::Number) = convert(Function, sympy[:Heaviside])(project(x))
+export Heaviside
 
 ## Alternate interface for simple integral
 """
