@@ -512,10 +512,15 @@ Plots.createKWargsList(plt::Plots.PlottingObject, fx::Sym, fy::Sym, umin::Real, 
 function mapsubs(ex::Sym, x::Sym, vals::AbstractVector)
     out = Float64[]
     try
-        out = pyeval("[fn(x,val) for val in vals]", fn=project(ex)[:subs], x=project(x), vals=vals)
+        out = map(lambdify(ex), vals)
         out = map(Float64, out)
     catch err
-        out = Float64[ex(x) for x in vals]
+        try
+            out = pyeval("[fn(x,val) for val in vals]", fn=project(ex)[:subs], x=project(x), vals=vals)
+            out = map(Float64, out)
+        catch err
+            out = Float64[ex(x) for x in vals]
+        end
     end
     out
 end
@@ -525,12 +530,17 @@ end
 function mapsubs2(ex::Sym, x,xs, y, ys)
     out = Float64[]
     try
-        out = PyCall.pyeval("[fn(x,xval).subs(y,yval) for yval in yvals for xval in xvals]",
-                            fn=ex.x[:subs],x=x.x,y=y.x,xvals=xs, yvals=ys)
-        out = reshape(out, (length(xs), length(ys)))
+        out = map(lambdify(ex,[x,y]), xs, ys)
         out = map(Float64, out)
     catch err
-        out =Float64[ex(x,y) for x in xs, y in ys]
+        try
+            out = PyCall.pyeval("[fn(x,xval).subs(y,yval) for yval in yvals for xval in xvals]",
+                                fn=ex.x[:subs],x=x.x,y=y.x,xvals=xs, yvals=ys)
+            out = reshape(out, (length(xs), length(ys)))
+            out = map(Float64, out)
+        catch err
+            out =Float64[ex(x,y) for x in xs, y in ys]
+        end
     end
     out
 end

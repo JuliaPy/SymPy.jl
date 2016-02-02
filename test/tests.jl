@@ -369,3 +369,14 @@ cse(sin(x)+sin(x)*cos(x))
 cse([sin(x), sin(x)*cos(x)])
 cse([sin(x) sin(x)*cos(x); cos(x) sin(x)*cos(x)])
 
+## Issue #60, lambidfy
+@vars x,y
+lambdify(sin(x)*cos(2x) * exp(x^2/2))
+lambdify(sin(x)*asin(x)*sinh(x))(0.25)
+lambdify(real(x)*imag(x))
+@assert lambdify(Min(x,y))(3,2) == 2
+
+ex = 2*x^2/(3-x)*exp(x)*sin(x)*sind(x)
+map(lambdify(ex), rand(10))
+ex = x - y
+@assert lambdify(ex)(3,2) == 1
