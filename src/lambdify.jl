@@ -32,6 +32,7 @@ fn_map = Dict(
               "Min" => :min,
               "Max" => :max
               )
+              
 map_fn(key) = haskey(fn_map, key) ? fn_map[key] : symbol(key)              
               
               
