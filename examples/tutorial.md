@@ -644,6 +644,7 @@ In particular, the following methods of `plot` are defined:
 * `plot(exs::Vector{Sym}, a, b)` will plot each expression over `[a,b]`
 * `plot(ex1, ex2, a, b)` will plot a parametric plot of the two expressions over the interval `[a,b]`. There is the equivalent, but perhaps more memorable, `parametricplot(ex1, ex2, a, b)`.
 * `plot(xs, ys, ex::Sym)` will make a contour plot of the expression of two variables over the grid specifed by the `xs` and `ys`.  There is the similar, but perhaps more memorable, `contourplot(ex, (xvar,a,b), (yvar,c,d))`.
+* `vectorfieldplot([ex1, ex2], (x, x0, x1), (y, y0, y1))` will plot a vectorfield.
 
 
 For example:
@@ -662,10 +663,23 @@ Or a parametric plot:
 plot(sin(2x), cos(3x), 0, 4pi)
 ```
 
+
+Behind the scenes, plotting works by generating many points. The
+`lamdify` function, which turns a SymPy expression into a Julia
+function is used (when possible) to speed this up, as
+`map(lambdify(ex), xs)` is much faster than `map(x -> N(ex(x)), xs)`,
+as less needs to be done in `SymPy` and more in `Julia`.
+
+
 ----
 
-In addition, within Python, SymPy has several plotting features that work with Matplotlib. Many of these are available
-when the `:pyplot` backend end for `Plots` is used (`backend(:pyplot)`). These methods are only available *after* `PyPlot` is loaded. If this done through `Plots`, then this happens after an initial call to `plot`. If this is done through `using PyPlot`, then the `plot` method will be ambiguous with `PyPlot`'s and must be qualified, as in `SymPy.plot`.
+In addition, within Python, SymPy has several plotting features that
+work with Matplotlib. Many of these are available when the `:pyplot`
+backend end for `Plots` is used (`backend(:pyplot)`). These methods
+are only available *after* `PyPlot` is loaded. If this done through
+`Plots`, then this happens after an initial call to `plot`. If this is
+done through `using PyPlot`, then the `plot` method will be ambiguous
+with `PyPlot`'s and must be qualified, as in `SymPy.plot`.
 
 
 * `plot(ex1, ex2, ex3, a, b)` --  plot a 3D parametric plot of the expressions over `[a,b]`. (Also `parametricplot`.)

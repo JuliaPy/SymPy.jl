@@ -8,14 +8,16 @@ _srepr(x) = sympy_meth(:srepr, x)
 
 ## Mapping of SymPy Values into julia values
 val_map = Dict(
-               "NegativeOne" => :(-1),
-               "Half" => :(1/2),
-               "Pi" => :pi,
-               "Exp1" => :e,
-               "Infinity" => :Inf,
+               "Zero"             => :(0),
+               "One"              => :(1),
+               "NegativeOne"      => :(-1),
+               "Half"             => :(1/2),
+               "Pi"               => :pi,
+               "Exp1"             => :e,
+               "Infinity"         => :Inf,
                "NegativeInfinity" => :(-Inf),
-               "ComplexInfinity" => :Inf, # error?
-               "ImaginaryUnit" => :im
+               "ComplexInfinity"  => :Inf, # error?
+               "ImaginaryUnit"    => :im
                )
 
 ## Mapping of Julia function names into julia ones
@@ -26,8 +28,8 @@ fn_map = Dict(
               "Mul" => :*,
               "Div" => :/,
               "Pow" => :^,
-              "re" => :real,
-              "im" => :imag,
+              "re"  => :real,
+              "im"  => :imag,
               "Abs" => :abs,
               "Min" => :min,
               "Max" => :max
@@ -36,8 +38,9 @@ fn_map = Dict(
 map_fn(key) = haskey(fn_map, key) ? fn_map[key] : symbol(key)              
               
               
-
-function walk_expression(ex, domap=true)
+## TODO? In SymPy, one can pass in dictionary keys to replace functions
+## http://docs.sympy.org/dev/tutorial/manipulation.html
+function walk_expression(ex)
 
     fn = _funcname(ex)
     
@@ -52,22 +55,35 @@ function walk_expression(ex, domap=true)
     end
 
     as = _args(ex)
-    if domap
-        return Expr(:call, map_fn(fn), [walk_expression(a, domap) for a in as]...)
-    else
-        return tuple(fn, [walk_expression(a, domap) for a in as]...)
-    end
+
+    Expr(:call, map_fn(fn), [walk_expression(a) for a in as]...)
 end
 
 """
 
-`lambidfy(ex::Sym,[vars])`: Lambidfy an expression returning a native Julia function.
+`lambidfy(ex::Sym,[vars])`: Lambidfy an expression returning a native
+Julia function.  SymPy's
+[lambdify](http://docs.sympy.org/dev/modules/utilities/lambdify.html)
+function translates code into Python, this translates an expression
+into a `Julia` function.
 
 Evaluating the function does not call into SymPy, so should be much faster.
 
-The optional `[vars]` specifies the order of the variables when more than one is in `ex`. The default is to use the ordering of `free_symbols(ex)`.
+The optional `[vars]` specifies the order of the variables when more
+than one is in `ex`. The default is to use the ordering of
+`free_symbols(ex)`.
 
-Not all expressions can be lambdified. If not, an error is thrown. 
+Not all expressions can be lambdified. If not, an error is thrown.
+
+Some simple examples
+
+```
+@vars x y
+lambdify(x^2)(2)       # 4
+lambdify(x*y^2)(2,3)   # 2*3^2 using default ordering
+lambdify(x*y^2, [y, x])(2,3) # 3*2^2, as function is (y,x) -> x*y^2 equivalent in Julia
+
+
 
 Compare times
 ```
