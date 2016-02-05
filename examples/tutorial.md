@@ -1408,3 +1408,98 @@ It is linear, but not solvable. Proceeding with `dsolve` gives:
 ```
 dsolve(ex, v(t))
 ```
+
+### Initial Value Problems
+
+Solving an initial value problem can be a bit tedious with `SymPy`, as
+the `ics` argument for `dsolve` only works for a few types of
+equations. These do not include, by default, the familiar "book"
+examples, such as $y'(x) = a\cdot y(x)$.
+
+To work around this, there is the function `ivpsolve` which allows a
+specification of the initial conditions when solving. For this function, rather than a `SymFunction` object, as similar `IVPSolution` object is used. To illustrate, we follow an example from [Wolfram](https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html).
+
+```
+y = IVPSolution("y")
+a,x = symbols("a,x")
+eqn = y'(x) - 3*x*y(x) - 1
+```
+
+Unlike with `SymFunction`, the advantage of using `IVPSolution` is
+that we can more familiarly express the equations, as the `ctranspose`
+operator is defined to be a derivative.
+
+We solve the initial value problem with $y(0) = 4$ as follows:
+
+```
+x0, y0 = 0, 4
+out = ivpsolve(eqn, x, (y, x0, y0))
+```
+
+Verifying this requires combining some operations:
+
+```
+u = rhs(out)
+diff(u, x) - 3*x*u - 1
+```
+
+To solve with a general initial condition is similar:
+
+```
+x0, y0 = 0, a
+out = ivpsolve(eqn, x, (y, x0, y0))
+```
+
+
+To plot this over a range of values for `a` we have:
+
+```
+as = -2:0.6:2
+ex = rhs(out)
+p = plot(ex(a=>as[1]), -1.8, 1.8, ylims=(-4, 4))
+for i in as[2:end]
+  plot!(p, ex(a=>i), -1.8, 1.8, ylims=(-4, 4))
+end
+p  
+```
+
+The comment from the example is "This plots several integral curves of the equation for different values of $a$. The plot shows that the solutions have an inflection point if the parameter  lies between $-1$ and $1$ , while a global maximum or minimum arises for other values of $a$."
+
+
+##### Example
+
+We continue with another example from the Wolfram documentation, that
+of solving $y'' + 5y' + 6y=0$ with values prescribed for both $y$ and
+$y'$ at $x_0=0$.
+
+```
+y = IVPSolution("y")
+x = symbols("x")
+eqn = y''(x) + 5y'(x) + 6y(x)
+```
+
+To solve with $y(0) = 1$ and $y'(0) = 1$ we have:
+
+```
+out = ivpsolve(eqn, x, (y, 0, 1), (y', 0, 1))
+```
+
+To make a plot, we only need the right-hand-side of the answer:
+
+```
+plot(rhs(out), -1/3, 2)
+```
+
+##### Example
+
+The name `ivpsolve` is a bit of a misnomer, as boundary value problems
+can be solved for as well through a similar syntax. Continuing with
+examples from the
+[Wolfram](https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html)
+page, we solve $y''(x) +y(x) = e^x$ over $[0,1]$ with conditions
+$y(0)=1$, $y(1) = 1/2$:
+
+```
+eqn = y''(x) + y(x) - exp(x)
+ivpsolve(eqn, x, (y, 0, 1), (y, 1, 1//2))
+```
