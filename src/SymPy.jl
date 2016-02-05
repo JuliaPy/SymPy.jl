@@ -144,6 +144,9 @@ include("math.jl")
 include("mpmath.jl")
 include("specialfuns.jl")
 include("solve.jl")
+if VERSION >= v"0.4.0"
+    include("dsolve.jl")
+end
 include("subs.jl")
 include("simplify.jl")
 include("series.jl")

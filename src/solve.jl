@@ -133,30 +133,6 @@ function nsolve{T <: Number}(ex::Vector{Sym}, x::Vector{Sym}, x0::Vector{T}; kwa
 end
 export nsolve
 
-## dsolve
-## Make a function argument, but munge arguments from Sym -> PyObject class
-SymFunction(nm::SymOrString) = (args...) -> Sym(sympy[:Function](nm)(project(args)...))
-
-
-"""
-
-Solve an odinary differential equation.
-
-Examples:
-
-```
-f = SymFunction("f")
-x = Sym("x")
-dsolve(diff(f(x), x) + f(x), f(x)) ## solve f'(x) + f(x) = 0
-dsolve(diff(f(x), x, x) + f(x), f(x)) ## solve f''(x) + f(x) = 0
-```
-
-References: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/ode.html#ode-docs)
-"""             
-dsolve(ex::Sym, fx::Sym;kwargs...) = sympy_meth(:dsolve, ex, fx; kwargs...)
-dsolve(ex::Sym;kwargs...) = sympy_meth(:dsolve, ex; kwargs...)
-dsolve(exs::Vector{Sym};kwargs...) = sympy_meth(:dsolve, exs; kwargs...)
-dsolve(exs::Vector{Sym}, fx::Sym; kwargs...) = sympy_meth(:dsolve, exs, fx; kwargs...)
 
 
 ## SymPy is moving to solveset to replace solve (with 1.0)
