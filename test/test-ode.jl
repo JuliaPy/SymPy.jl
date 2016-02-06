@@ -22,14 +22,14 @@ if VERSION >= v"0.4.0"
     u = SymFunction("u")
     a,x, y, y0, y1 = symbols("a, x, y, y0, y1")
 
-    ivpsolve(u'(x) - a*u(x), x, (u, 0, 1))
-    ivpsolve(u'(x) - a*u(x), x, (u, 0, y1))
-    ivpsolve(u'(x) - a*u(x), x, (u, y0, y1))
-    ivpsolve(x*u'(x) + x*u(x) + 1, x, (u, 1, 1))
-    ivpsolve((u'(x))^2 - a*u(x), x, (u, 0, 1))
-    ivpsolve(u''(x) - a * u(x), x, (u, 0, 1), (u', 0, 0))
+    dsolve(u'(x) - a*u(x), x, (u, 0, 1))
+    dsolve(u'(x) - a*u(x), x, (u, 0, y1))
+    dsolve(u'(x) - a*u(x), x, (u, y0, y1))
+    dsolve(x*u'(x) + x*u(x) + 1, x, (u, 1, 1))
+    dsolve((u'(x))^2 - a*u(x), x, (u, 0, 1))
+    dsolve(u''(x) - a * u(x), x, (u, 0, 1), (u', 0, 0))
 
-    F, G, K = map(SymFunction, ["F", "G", "K"])
+    F, G, K = symbols("F, G, K", cls = symfunction)
     eqn = F(x)*u'(y)*y + G(x)*u(y) + K(x)
-    ivpsolve(eqn, y, (u, 1, 0))
+    dsolve(eqn, y, (u, 1, 0))
 end

@@ -3,6 +3,7 @@
 ## Make a function argument, but munge arguments from Sym -> PyObject class
 if VERSION < v"0.4.0"
     SymFunction(nm::SymOrString) = (args...) -> Sym(sympy[:Function](nm)(project(args)...))
+    symfunction(x) = SymFunction(x)
 else
 
 
@@ -14,15 +15,24 @@ else
     
     """
 
-Create a symbolic solution to an initial value problem.  This is like
-`SymFunction`, only we can specify derivatives with the transpose
-operator (e.g., `u''`) as oppd to, say `diff(u(x), x, 2)`.
+Create a symbolic function. These can be used for specifying differential equations.
+For these objects we can specify derivatives with the transpose
+operator (e.g., `u''`) as opposed to, say `diff(u(x), x, 2)`.
 
 Example:
 ```
 u = SymFunction("u")
 u'
 ```
+
+Alternatively, we can pass `symfunction` to the `cls` argument of
+`symbols`. This provides a convenient way to create more than one
+symbolic function per call.
+
+```
+F, G = symbols("F,G", cls=symfunction)
+```
+
 """
     function SymFunction{T<:AbstractString}(x::T)
         u = sympy[:Function](x)
@@ -33,6 +43,8 @@ u'
     export IVPSolution
     ## Need to deprecate this...
     @deprecate IVPSolution(x::AbstractString) SymFunction(x)
+
+    symfunction(x) = SymFunction(x) # for use with symbols("F", cls=symfunction)
     
     # some display of objects
     Base.display(u::SymFunction) = println("$(string(Sym(u.u)))" * repeat("'", u.n))
@@ -69,28 +81,16 @@ Examples:
 ```
 f = SymFunction("f")
 x = Sym("x")
-dsolve(diff(f(x), x) + f(x), f(x)) ## solve f'(x) + f(x) = 0
-dsolve(diff(f(x), x, x) + f(x), f(x)) ## solve f''(x) + f(x) = 0
+dsolve(diff(f(x), x) + f(x)) ## solve f'(x) + f(x) = 0
+dsolve(diff(f(x), x, x) + f(x)) ## solve f''(x) + f(x) = 0
 ```
 
 References: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/ode.html#ode-docs)
-"""             
-dsolve(ex::Sym, fx::Sym;kwargs...) = sympy_meth(:dsolve, ex, fx; kwargs...)
-dsolve(ex::Sym;kwargs...) = sympy_meth(:dsolve, ex; kwargs...)
-dsolve(exs::Vector{Sym};kwargs...) = sympy_meth(:dsolve, exs; kwargs...)
-dsolve(exs::Vector{Sym}, fx::Sym; kwargs...) = sympy_meth(:dsolve, exs, fx; kwargs...)
 
+In addition, we add a `Julia`n interface to solve initial-value
+problems. (Julia `v"0.4.0"+`) For this, the calling pattern is
 
-
-## The dsolve function is not good with initial values problems
-## The `ics` argument seems to only work with power series solutions
-##
-## This adds the ability to more naturally specify the equations.
-##
-## This interface is subject to change"""
-
-"""
-Solve an intial value problem
+`dsolve(eqn::Sym, var::Sym, args::Tuple...; kwargs...)` where
 
 * `eqn` the equation. Can be written as `u'(x) - u(x)` where `u` is of type `SymFunction`
 * `var` the variable of the equation. Typically `free_symbols(x)[1]`, but still, for now, is specified
@@ -103,12 +103,24 @@ Example:
 u = SymFunction("u")
 @vars x
 dsolve(u'(x) - 2u(x))                  # u(x) = C_1 e^(2x)
-ivpsolve(u'(x) - 2u(x), x, (u, 0 , 1)) # u(x) = e^(2x)
-ivpsolve(u''(x) - 2u(x), x, (u, 0, 1), (u', 0, 2))  ## some expression
+dsolve(u'(x) - 2u(x), x, (u, 0 , 1)) # u(x) = e^(2x)
+dsolve(u''(x) - 2u(x), x, (u, 0, 1), (u', 0, 2))  ## some expression
 ```
 
-"""
-function ivpsolve(eqn, var::Sym, args::Tuple...; kwargs...)
+
+"""             
+
+dsolve(ex::Sym;kwargs...) = sympy_meth(:dsolve, ex; kwargs...)
+dsolve(exs::Vector{Sym};kwargs...) = sympy_meth(:dsolve, exs; kwargs...)
+dsolve(exs::Vector{Sym}, fx::Sym; kwargs...) = sympy_meth(:dsolve, exs, fx; kwargs...)
+## Note, dsolve(ex, var::Sym; kwargs...) is depracated so that initial value problems can be specifiedx
+
+
+## The dsolve function is not great for initial value problems
+## The `ics` argument seems to only work with power series solutions
+##
+## This adds the ability to more naturally specify the equations.
+function dsolve(eqn::Sym, var::Sym, args::Tuple...; kwargs...)
     out = dsolve(eqn; kwargs...)
     
     eqns = Sym[rhs(diff(out, var, f.n))(var=>x0) - y0 for (f, x0, y0) in args]
@@ -129,4 +141,4 @@ function ivpsolve(eqn, var::Sym, args::Tuple...; kwargs...)
     out([k=>v for (k,v) in sols]...)
 end
 
-export SymFunction, ivpsolve
+export SymFunction, symfunction, dsolve

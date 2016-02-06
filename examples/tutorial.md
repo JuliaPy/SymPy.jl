@@ -1436,8 +1436,12 @@ for `dsolve` only works for a few types of equations. These do not
 include, by default, the familiar "book" examples, such as $y'(x) =
 a\cdot y(x)$.
 
-To work around this, `SymPy.jl` provides the function `ivpsolve` which allows a
-specification of the initial conditions when solving. To illustrate, we follow an example from [Wolfram](https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html).
+To work around this, `SymPy.jl` extends the function `dsolve` to allow
+a specification of the initial conditions when solving.  The new
+ingredients are the independent variable (`x` in the examples) and
+tuples to specify each condition. The are conditions on the values of
+`u`, `u'`', ....  To illustrate, we follow an example from
+[Wolfram](https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html).
 
 ```
 y = SymFunction("y")
@@ -1451,7 +1455,7 @@ We solve the initial value problem with $y(0) = 4$ as follows:
 
 ```
 x0, y0 = 0, 4
-out = ivpsolve(eqn, x, (y, x0, y0))
+out = dsolve(eqn, x, (y, x0, y0))
 ```
 
 Verifying this requires combining some operations:
@@ -1465,7 +1469,7 @@ To solve with a general initial condition is similar:
 
 ```
 x0, y0 = 0, a
-out = ivpsolve(eqn, x, (y, x0, y0))
+out = dsolve(eqn, x, (y, x0, y0))
 ```
 
 
@@ -1499,7 +1503,7 @@ eqn = y''(x) + 5y'(x) + 6y(x)
 To solve with $y(0) = 1$ and $y'(0) = 1$ we have:
 
 ```
-out = ivpsolve(eqn, x, (y, 0, 1), (y', 0, 1))
+out = dsolve(eqn, x, (y, 0, 1), (y', 0, 1))
 ```
 
 To make a plot, we only need the right-hand-side of the answer:
@@ -1510,14 +1514,13 @@ plot(rhs(out), -1/3, 2)
 
 ##### Example
 
-The name `ivpsolve` is a bit of a misnomer, as boundary value problems
-can be solved for as well through a similar syntax. Continuing with
-examples from the
+Boundary value problems can be solved for as well through a similar
+syntax. Continuing with examples from the
 [Wolfram](https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html)
 page, we solve $y''(x) +y(x) = e^x$ over $[0,1]$ with conditions
 $y(0)=1$, $y(1) = 1/2$:
 
 ```
 eqn = y''(x) + y(x) - exp(x)
-ivpsolve(eqn, x, (y, 0, 1), (y, 1, 1//2))
+dsolve(eqn, x, (y, 0, 1), (y, 1, 1//2))
 ```
