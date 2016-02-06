@@ -5,20 +5,21 @@ using Base.Test
 
 ## ODEs
 x, a = Sym("x, a")
-F = symbols("F", cls=SymFunction)
-ex = Eq(diff(F(x),x), a*F(x))
-ex1 = dsolve(ex, F(x))
+F = SymFunction("F")
+ex = diff(F(x), x) - a*F(x)
+ex1 = dsolve(ex)
 ex2 = rhs(ex1) |> subs(Sym(:C1), 1) |> subs(a, 2)
 @assert ex2 == exp(2x)
 
 t, = @syms t
-X, Y = symbols("X, Y", cls=SymFunction)
+X, Y = map(SymFunction, ("X", "Y"))
 eq = [Eq(diff(X(t),t), 12*t*X(t) + 8*Y(t)), Eq(diff(Y(t),t), 21*X(t) + 7*t*Y(t))]
 dsolve(eq)
 
 
-if VERSION >= v0.4.0
-    u = IVPSolution("u")
+if VERSION >= v"0.4.0"
+    ## version 0.4+ allow use of u'(x) in lieu of diff(u(x), x) and `ivpsolve`
+    u = SymFunction("u")
     a,x, y, y0, y1 = symbols("a, x, y, y0, y1")
 
     ivpsolve(u'(x) - a*u(x), x, (u, 0, 1))
@@ -28,7 +29,7 @@ if VERSION >= v0.4.0
     ivpsolve((u'(x))^2 - a*u(x), x, (u, 0, 1))
     ivpsolve(u''(x) - a * u(x), x, (u, 0, 1), (u', 0, 0))
 
-    f, g, k = map(SymFunction, ["f", "g", "k"])
-    eqn = f(x)*u'(y)*y + g(x)*u(y) + k(x)
+    F, G, K = map(SymFunction, ["F", "G", "K"])
+    eqn = F(x)*u'(y)*y + G(x)*u(y) + K(x)
     ivpsolve(eqn, y, (u, 1, 0))
 end

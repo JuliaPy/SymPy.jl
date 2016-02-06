@@ -931,10 +931,10 @@ y^4 - x^4 -y^2 + 2x^2 = 0
 As with the mathematical solution, the key is to treat one of the variables as depending on the other. In this case, we think of $y$ locally as a function of $x$. SymPy allows us to create symbolic functions, and we will use one to substitute in for `y`.
 
 
-In SymPy, symbolic functions use the class name  "Function", but in `SymPy` we use `SymFunction` to avoid a name collision with one of `Julia`'s primary types. The constructor can be used as `SymFunction(:F)`, or more clearly passed to the `symbols` function through the `cls` keyword:
+In SymPy, symbolic functions use the class name  "Function", but in `SymPy` we use `SymFunction` to avoid a name collision with one of `Julia`'s primary types. The constructor can be used as `SymFunction(:F)`:
 
 ```
-F, G = symbols("F, G", cls=SymFunction)
+F, G = SymFunction("F"); SymFunction("G")
 ```
 
 We can call these functions, but we get a function expression:
@@ -1326,10 +1326,13 @@ D
 
 ## Differential equations
 
-SymPy has facilities for solving ordinary differential [equations](http://docs.sympy.org/latest/modules/solvers/ode.html). The key is to create a symbolic function expression using the `SymFunction` class. Again, this may be done through:
+SymPy has facilities for solving ordinary differential
+[equations](http://docs.sympy.org/latest/modules/solvers/ode.html). The
+key is to create a symbolic function expression using 
+`SymFunction`. Again, this may be done through:
 
 ```
-F = symbols("F", cls=SymFunction)
+F = SymFunction("F")
 ```
 
 With this, we can  construct a  differential equation. Following the SymPy tutorial, we solve $f''(x) - 2f'(x) + f(x) = \sin(x)$:
@@ -1339,10 +1342,22 @@ diffeq = Eq(diff(F(x), x, 2) - 2*diff(F(x)) + F(x), sin(x))
 ```
 
 
-With this, we just need the `dsolve` function. This is called as `dsolve(eq, variable)`:
+With this, we just need the `dsolve` function. This is called as `dsolve(eq)`:
 
 ```
-ex = dsolve(diffeq, F(x))
+ex = dsolve(diffeq)
+```
+
+The `dsolve` function in SymPy has an extensive list of named
+arguments to control the underlying algorithm. These can be passed
+through with the appropriate keyword arguments.
+
+More clearly, the `SymFunction` objects have the `'` method defined to
+find a derivative, so the above could also have been:
+
+```
+diffeq = F''(x) - 2F'(x) + F(x) - sin(x)
+dsolve(diffeq)
 ```
 
 This solution has two constants, $C_1$ and $C_2$, that would be found from initial conditions. Say we know $F(0)=0$ and $F'(0)=1$, can we find the constants? To work with the returned expression, it is most convenient to get just the right hand side. The `rhs` function will return the right-hand side of a relation:
@@ -1351,7 +1366,9 @@ This solution has two constants, $C_1$ and $C_2$, that would be found from initi
 ex1 = rhs(ex)
 ```
 
-(The [args](http://docs.sympy.org/dev/modules/core.html#sympy.core.basic.Basic.args) function also can be used to break up the expression into parts.)
+(The
+[args](http://docs.sympy.org/dev/modules/core.html#sympy.core.basic.Basic.args)
+function also can be used to break up the expression into parts.)
 
 With this, we can solve for `C1` through substituting in $0$ for $x$:
 
@@ -1377,6 +1394,8 @@ This gives `C2=3/2`. Again we substitute in to get our answer:
 ex3 = subs(ex2, Sym("C2"), 3//2)
 ```
 
+
+
 ###### Example
 
 We do one more example, this one borrowed from [here](http://nbviewer.ipython.org/github/garth-wells/IA-maths-Ipython/blob/master/notebooks/Lecture1.ipynb).
@@ -1393,8 +1412,8 @@ We proceed through:
 
 ```
 t, m,k,alpha = symbols("t,m,k,alpha")
-v = symbols("v", cls=SymFunction)
-ex = Eq( (m/k)*diff(v(t),t), alpha^2 - v(t)^2 )
+v = SymFunction("v")
+ex = Eq( (m/k)*v'(t), alpha^2 - v(t)^2 )
 ```
 
 We can "classify" this ODE with the method `classify_ode`. As this is not exported, we call it using indexing:
@@ -1406,28 +1425,27 @@ ex[:classify_ode]()
 It is linear, but not solvable. Proceeding with `dsolve` gives:
 
 ```
-dsolve(ex, v(t))
+dsolve(ex)
 ```
 
 ### Initial Value Problems
 
-Solving an initial value problem can be a bit tedious with `SymPy`, as
-the `ics` argument for `dsolve` only works for a few types of
-equations. These do not include, by default, the familiar "book"
-examples, such as $y'(x) = a\cdot y(x)$.
+Solving an initial value problem can be a bit tedious with `SymPy`.
+The first example shows the steps. This is because the `ics` argument
+for `dsolve` only works for a few types of equations. These do not
+include, by default, the familiar "book" examples, such as $y'(x) =
+a\cdot y(x)$.
 
-To work around this, there is the function `ivpsolve` which allows a
-specification of the initial conditions when solving. For this function, rather than a `SymFunction` object, as similar `IVPSolution` object is used. To illustrate, we follow an example from [Wolfram](https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html).
+To work around this, `SymPy.jl` provides the function `ivpsolve` which allows a
+specification of the initial conditions when solving. To illustrate, we follow an example from [Wolfram](https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html).
 
 ```
-y = IVPSolution("y")
-a,x = symbols("a,x")
+y = SymFunction("y")
+a, x = symbols("a,x")
 eqn = y'(x) - 3*x*y(x) - 1
 ```
 
-Unlike with `SymFunction`, the advantage of using `IVPSolution` is
-that we can more familiarly express the equations, as the `ctranspose`
-operator is defined to be a derivative.
+
 
 We solve the initial value problem with $y(0) = 4$ as follows:
 
@@ -1473,7 +1491,7 @@ of solving $y'' + 5y' + 6y=0$ with values prescribed for both $y$ and
 $y'$ at $x_0=0$.
 
 ```
-y = IVPSolution("y")
+y = SymFunction("y")
 x = symbols("x")
 eqn = y''(x) + 5y'(x) + 6y(x)
 ```

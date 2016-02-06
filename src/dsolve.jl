@@ -1,11 +1,68 @@
 ## dsolve
 
 ## Make a function argument, but munge arguments from Sym -> PyObject class
-SymFunction(nm::SymOrString) = (args...) -> Sym(sympy[:Function](nm)(project(args)...))
+if VERSION < v"0.4.0"
+    SymFunction(nm::SymOrString) = (args...) -> Sym(sympy[:Function](nm)(project(args)...))
+else
+
+
+    ## A type akin to SymFunction but with the ability to keep track of derivative
+    type SymFunction <: SymPy.SymbolicObject
+        u::PyCall.PyObject
+        n::Int
+    end
+    
+    """
+
+Create a symbolic solution to an initial value problem.  This is like
+`SymFunction`, only we can specify derivatives with the transpose
+operator (e.g., `u''`) as oppd to, say `diff(u(x), x, 2)`.
+
+Example:
+```
+u = SymFunction("u")
+u'
+```
+"""
+    function SymFunction{T<:AbstractString}(x::T)
+        u = sympy[:Function](x)
+        SymFunction(u, 0)
+    end
+
+    IVPSolution{T<:AbstractString}(x::T) = SymFunction(x)
+    export IVPSolution
+    ## Need to deprecate this...
+    @deprecate IVPSolution(x::AbstractString) SymFunction(x)
+    
+    # some display of objects
+    Base.display(u::SymFunction) = println("$(string(Sym(u.u)))" * repeat("'", u.n))
+    
+    ## override call
+    Base.call(u::SymFunction, x::Base.Dict) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
+    Base.call(u::SymFunction, x::Base.Pair) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
+    function Base.call(u::SymFunction, x) 
+        if u.n == 0
+            u.u(SymPy.project(x))
+        else
+            __x = Sym("__x")
+            diff(u.u(__x.x), __x, u.n)(x)
+        end
+    end
+    
+
+
+    ## rather than use `diff(u(x),x,1)` we can use `u'(x)`
+    function Base.ctranspose(x::SymFunction)
+        SymFunction(x.u, x.n + 1)
+    end
+    
+    
+end
+
 
 """
 
-Solve an odinary differential equation.
+Solve an ordinary differential equation.
 
 Examples:
 
@@ -30,56 +87,12 @@ dsolve(exs::Vector{Sym}, fx::Sym; kwargs...) = sympy_meth(:dsolve, exs, fx; kwar
 ##
 ## This adds the ability to more naturally specify the equations.
 ##
-## This interface is subject to change
-
-## A type akin to SymFunction but with the ability to keep track of derivative
-type IVPSolution <: SymPy.SymbolicObject
-    u::PyCall.PyObject
-    n::Int
-end
+## This interface is subject to change"""
 
 """
-
-Create a symbolic solution to an initial value problem.  This is like
-`SymFunction`, only we can specify derivatives with the transpose
-operator (e.g., `u''`) as opposed to, say `diff(u(x), x, 2)`.
-
-Example:
-```
-u = IVPSolution("u")
-u'
-```
-"""
-function IVPSolution{T<:AbstractString}(x::T)
-    u = sympy[:Function](x)
-    IVPSolution(u, 0)
-end
-
-# some display of objects
-Base.display(u::IVPSolution) = println("$(string(Sym(u.u)))" * repeat("'", u.n))
-
-## override call
-Base.call(u::IVPSolution, x::Base.Dict) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
-Base.call(u::IVPSolution, x::Base.Pair) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
-function Base.call(u::IVPSolution, x) 
-    if u.n == 0
-        u.u(SymPy.project(x))
-    else
-        __x = Sym("__x")
-        diff(u.u(__x.x), __x, u.n)(x)
-    end
-end
-
-## rather than use `diff(u(x),x,1)` we can use `u'(x)`
-function Base.ctranspose(x::IVPSolution)
-    IVPSolution(x.u, x.n + 1)
-end
-
-"""
-
 Solve an intial value problem
 
-* `eqn` the equation. Can be written as `u'(x) - u(x)` where `u` is of type `IVPSolution`
+* `eqn` the equation. Can be written as `u'(x) - u(x)` where `u` is of type `SymFunction`
 * `var` the variable of the equation. Typically `free_symbols(x)[1]`, but still, for now, is specified
 * `args::Tuple...` Specification of initial values in style of `(u, x0, y0)` or `(u', x0, y0)`.
 * `kwargs...` are passed onto `dsolve`
@@ -87,7 +100,7 @@ Solve an intial value problem
 Example:
 
 ```
-u = IVPSolution("u")
+u = SymFunction("u")
 @vars x
 dsolve(u'(x) - 2u(x))                  # u(x) = C_1 e^(2x)
 ivpsolve(u'(x) - 2u(x), x, (u, 0 , 1)) # u(x) = e^(2x)
@@ -116,4 +129,4 @@ function ivpsolve(eqn, var::Sym, args::Tuple...; kwargs...)
     out([k=>v for (k,v) in sols]...)
 end
 
-export IVPSolution, ivpsolve
+export SymFunction, ivpsolve
