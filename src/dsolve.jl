@@ -121,6 +121,14 @@ dsolve(exs::Vector{Sym}, fx::Sym; kwargs...) = sympy_meth(:dsolve, exs, fx; kwar
 ##
 ## This adds the ability to more naturally specify the equations.
 function dsolve(eqn::Sym, var::Sym, args::Tuple...; kwargs...)
+
+    if length(args) == 0
+        throw(ArgumentError("""Some initial value specification is needed.
+Specifying the function, as in `dsolve(ex, f(x))`, is deprecated.
+Use `sympy_meth(:dsolve, ex, f(x); kwargs...)` directly for that underlying interface.
+"""))
+    end
+    
     out = dsolve(eqn; kwargs...)
     
     eqns = Sym[rhs(diff(out, var, f.n))(var=>x0) - y0 for (f, x0, y0) in args]
