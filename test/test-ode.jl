@@ -32,4 +32,7 @@ if VERSION >= v"0.4.0"
     F, G, K = symbols("F, G, K", cls = symfunction)
     eqn = F(x)*u'(y)*y + G(x)*u(y) + K(x)
     dsolve(eqn, y, (u, 1, 0))
+
+    ## dsolve eqn has two answers, but we want to eliminate based on initial condition
+    dsolve(u'(x) - (u(x)-1)*u(x)*(u(x)+1), x, (u, 0, 1//2))
 end

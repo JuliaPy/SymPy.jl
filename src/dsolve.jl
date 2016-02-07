@@ -107,6 +107,11 @@ dsolve(u'(x) - 2u(x), x, (u, 0 , 1)) # u(x) = e^(2x)
 dsolve(u''(x) - 2u(x), x, (u, 0, 1), (u', 0, 2))  ## some expression
 ```
 
+This is a simple wrapper for: 1) substituting in the values for the
+initial conditions 2) calling `solve` for the constants `C1`, `C2`,
+... 3) putting these values back into the equations. If this automated
+approach breaks down, then those steps can be done manually starting
+with the output of `dsolve` without the initial conditions.
 
 """             
 
@@ -120,6 +125,8 @@ dsolve(exs::Vector{Sym}, fx::Sym; kwargs...) = sympy_meth(:dsolve, exs, fx; kwar
 ## The `ics` argument seems to only work with power series solutions
 ##
 ## This adds the ability to more naturally specify the equations.
+##
+## There are issues with the number of solutions that need ironing out.
 function dsolve(eqn::Sym, var::Sym, args::Tuple...; kwargs...)
 
     if length(args) == 0
@@ -130,10 +137,31 @@ Use `sympy_meth(:dsolve, ex, f(x); kwargs...)` directly for that underlying inte
     end
     
     out = dsolve(eqn; kwargs...)
-    
+    ord = sympy_meth(:ode_order, eqn, var)
+
+    ## `out` may be an array of solutions. If so we do each one.
+    ## we want to use an array for output only if needed
+    if !isa(out, Array)
+        return _solve_ivp(out, var, args,ord)
+    else
+        output = Sym[]
+        for o in out
+            a = _solve_ivp(o, var, args,ord)
+            a != nothing && push!(output, a)
+        end
+        return length(output) == 1 ? output[1] : output
+    end
+end
+
+## Helper.
+## out is an equation in var with constants. Args are intial conditions
+## Return `nothing` if initial condition is not satisfied (found by `solve`)
+function _solve_ivp(out, var, args, o)
     eqns = Sym[rhs(diff(out, var, f.n))(var=>x0) - y0 for (f, x0, y0) in args]
-    o = sympy_meth(:ode_order, eqn, var)
     sols = solve(eqns, Sym["C$i" for i in 1:o])
+    if length(sols) == 0
+       return nothing
+    end
 
     ## massage output
     ## Might have more than one solution, though unlikely. But if we substitute a variable
