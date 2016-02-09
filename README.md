@@ -74,10 +74,10 @@ z[:subs](x, 1) |> float
 This gets replaced by a more `julia`n syntax:
 
 ```
-using SymPy                    # some warnings need cleaning up
-x = Sym("x")		            # or  Sym(:x), symbols("x"),  @syms x
+using SymPy                    
+x = Sym("x")		           # or  Sym(:x), symbols("x"),  @syms x
 y = sin(pi*x)
-subs(y, x, 1)                    # Or just y(1), or y(x=>1) with newer versions of Julia
+y(1)                           # Does subs(y, x, 1). Use y(x=>1) to be specific as to which symbol to substitute
 ```
 
 The object `x` we create is of type `Sym`, a simple proxy for the

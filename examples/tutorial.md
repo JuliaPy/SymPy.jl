@@ -44,7 +44,7 @@ a,b,c = Sym("a,b,c")
 
 ### Assumptions
 
-Finally, there is the `symbols` constructor for producting symbolic objects. With `symbols` it is
+Finally, there is the `symbols` constructor for producing symbolic objects. With `symbols` it is
 possible to pass assumptions onto the variables. A list of possible
 assumptions is
 [here](http://docs.sympy.org/dev/modules/core.html#module-sympy.core.assumptions). Some
@@ -198,7 +198,7 @@ generic definitions are used, as possible. This also introduces some
 edge cases. For example, `x^(-2)` will balk due to the negative,
 integer exponent, but either `x^(-2//1)` or `x^Sym(-2)` will work as
 expected, as the former call first dispatches to a generic defintion,
-but the two latter expressions do not.
+but the latter two expressions do not.
 
 
 `SymPy` makes it very easy to work with polynomial and rational expressions. First we create some variables:
@@ -399,13 +399,13 @@ coeff(p, x)   # b
 The constant can be found through substitution:
 
 ```
-subs(p, x, 0) # c
+p(x=>0)
 ```
 
 Though one could use some trick like this to find all the coefficients:
 
 ```
-[[coeff(p, x^i) for i in N(degree(p)):-1:1]; p(0)]
+Sym[[coeff(p, x^i) for i in N(degree(p)):-1:1]; p(0)]
 ```
 
 that is cumbersome, at best. SymPy has a function `coeffs`, but it is defined for polynomial types, so will fail on `p`:
@@ -572,7 +572,7 @@ that approximates $\cos(x)$ near $0$:
 a,b,c,h = symbols("a,b,c,h", real=true)
 p = a*x^2 + b*x + c
 fn = cos
-exs = [fn(0*h)-subs(p,x,0), fn(h)-subs(p,x,h), fn(2h)-subs(p,x,2h)]
+exs = [fn(0*h)-p(x=>0), fn(h)-p(x => h), fn(2h)-p(x => 2h)]
 d = solve(exs, [a,b,c])
 ```
 
@@ -652,7 +652,7 @@ For example:
 ```
 x = symbols("x")
 using Plots
-backend(:gadfly)
+gadfly()
 #
 plot(x^2 - 2, -2,2)
 ```
@@ -674,8 +674,8 @@ as less needs to be done in `SymPy` and more in `Julia`.
 ----
 
 In addition, within Python, SymPy has several plotting features that
-work with Matplotlib. Many of these are available when the `:pyplot`
-backend end for `Plots` is used (`backend(:pyplot)`). These methods
+work with Matplotlib. Many of these are available when the `pyplot`
+backend end for `Plots` is used (`Plots.pyplot()`). These methods
 are only available *after* `PyPlot` is loaded. If this done through
 `Plots`, then this happens after an initial call to `plot`. If this is
 done through `using PyPlot`, then the `plot` method will be ambiguous
@@ -777,7 +777,13 @@ And we get
 limit(ex, x => a)
 ```
 
-In a previous example, we defined `quad_approx`. The limit as `h` goes to $0$ gives `1 - x^2/2`, as expected:
+In a previous example, we defined `quad_approx`:
+
+```
+quad_approx
+```
+
+The limit as `h` goes to $0$ gives `1 - x^2/2`, as expected:
 
 ```
 limit(quad_approx, h => 0)
@@ -877,7 +883,9 @@ diff(exp(-x^2), x, x, x)     # same as diff(..., x, 3)
 This could include variables besides `x`.
 
 
-The output is a simple expression, so `diff` can be composed with other functions, such as `solve`. For example, here we find the critical points of a rational function:
+The output is a simple expression, so `diff` can be composed with
+other functions, such as `solve`. For example, here we find the
+critical points where the derivative is $0$ of some rational function:
 
 ```
 f(x) = (12x^2 - 1) / (x^3)
@@ -934,7 +942,7 @@ As with the mathematical solution, the key is to treat one of the variables as d
 In SymPy, symbolic functions use the class name  "Function", but in `SymPy` we use `SymFunction` to avoid a name collision with one of `Julia`'s primary types. The constructor can be used as `SymFunction(:F)`:
 
 ```
-F, G = SymFunction("F"); SymFunction("G")
+F, G = SymFunction("F"), SymFunction("G")
 ```
 
 We can call these functions, but we get a function expression:
@@ -949,6 +957,8 @@ SymPy can differentiate symbolically, again with `diff`:
 diff(F(x))
 ```
 
+Of for symbolic functions the more natural `F'(x)`.
+
 To get back to our problem, we have our expression:
 
 ```
@@ -959,7 +969,7 @@ ex = y^4 - x^4 - y^2 + 2x^2
 Now we substitute:
 
 ```
-ex1 = subs(ex, y, F(x))
+ex1 = ex(y=>F(x))
 ```
 
 We want to differentiate "both" sides. As the right side is just $0$, there isn't anything to do here, but mentally keep track. As for the left we have:
@@ -971,13 +981,13 @@ ex2 = diff(ex1, x)
 Now we collect terms and solve in terms of $F'(x)$
 
 ```
-ex3 = solve(ex2, diff(F(x)))[1]
+ex3 = solve(ex2, F'(x))[1]
 ```
 
 Finally, we substitute back into the solution for $F(x)$:
 
 ```
-ex4 = subs(ex3, F(x), y)
+ex4 = ex3(F(x) => y)
 ```
 
 ###### Example: A Norman Window
@@ -1010,7 +1020,7 @@ substitute back into `A`. We solve `P-p==0`:
 
 ```
 h0 =  solve(P-p, h)[1]
-A1 = subs(A, h, h0)
+A1 = A(h => h0)
 ```
 
 Now we note this is a parabola in `w`, so any maximum will be an
@@ -1033,7 +1043,7 @@ parabola. Now we check that when $w=0$ (the left endpoint) the area is
 $0$:
 
 ```
-subs(A1, w, 0)
+A1(w => 0)
 ```
 
 The other endpoint is when $h=0$, or
@@ -1053,8 +1063,8 @@ c = solve(diff(A1, w), w)[1]
 The answer will be the larger of `A1` at `b` or `c`:
 
 ```
-atb = subs(A1, w, b)
-atc = subs(A1, w, c)
+atb = A1(w => b)
+atc = A1(w => c)
 ```
 
 A simple comparison isn't revealing:
@@ -1092,7 +1102,7 @@ ex = integrate(x^n, x)
 The output here is a *piecewise function*, performing a substitution will choose a branch in this case:
 
 ```
-subs(ex, n, 3)
+ex(n => 3)
 ```
 
 Definite integrals are just as easy. Here is Archimedes' answer:
@@ -1373,13 +1383,13 @@ function also can be used to break up the expression into parts.)
 With this, we can solve for `C1` through substituting in $0$ for $x$:
 
 ```
-solve(subs(ex1, x, 0), Sym("C1"))
+solve(ex1(x => 0), Sym("C1"))
 ```
 
 We see that $C1=-1/2$, which we substitute in:
 
 ```
-ex2 = subs(ex1, Sym("C1"), -1//2)
+ex2 = ex1(Sym("C1") => -1//2)
 ```
 
 We know that $F'(0)=1$ now, so we solve for `C2` through
@@ -1391,7 +1401,7 @@ solve( subs(diff(ex2, x), x, 0) - 1, Sym("C2") )
 This gives `C2=3/2`. Again we substitute in to get our answer:
 
 ```
-ex3 = subs(ex2, Sym("C2"), 3//2)
+ex3 = ex2(Sym("C2") => 3//2)
 ```
 
 

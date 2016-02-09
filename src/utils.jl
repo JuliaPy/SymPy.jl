@@ -43,12 +43,12 @@ Original macro magic contributed by @vtjnash.
 macro syms(x...)
     q=Expr(:block)
     if length(x) == 1 && isa(x[1],Expr)
-        @assert x[1].head === :tuple "@vars expected a list of symbols"
+        @assert x[1].head === :tuple "@syms expected a list of symbols"
         x = x[1].args
     end
     for s in x
-        @assert isa(s,Symbol) "@vars expected a list of symbols"
-        push!(q.args, Expr(:(=), s, Expr(:call, :Sym, Expr(:quote, s))))
+        @assert isa(s,Symbol) "@syms expected a list of symbols"
+        push!(q.args, Expr(:(=), s, Expr(:call, :symbols, Expr(:quote, s))))
     end
     push!(q.args, Expr(:tuple, x...))
     eval(Main, q)
@@ -57,7 +57,7 @@ end
 
 """
 
-The `vars` macro is identical to  `@syms`. this usage will be deprecated.
+The `vars` macro is identical to  `@syms`. This name will be deprecated.
 
 """
 macro vars(x...)
@@ -68,7 +68,7 @@ macro vars(x...)
     end
     for s in x
         @assert isa(s,Symbol) "@vars expected a list of symbols"
-        push!(q.args, Expr(:(=), s, Expr(:call, :Sym, Expr(:quote, s))))
+        push!(q.args, Expr(:(=), s, Expr(:call, :symbols, Expr(:quote, s))))
     end
     push!(q.args, Expr(:tuple, x...))
     eval(Main, q)
@@ -87,7 +87,7 @@ macro osyms(x...)
     end
     for s in x
         @assert isa(s,Symbol) "@syms expected a list of symbols"
-        push!(q.args, Expr(:(=), s, Expr(:call, :Sym, Expr(:quote, s))))
+        push!(q.args, Expr(:(=), s, Expr(:call, :symbols, Expr(:quote, s))))
            end
     push!(q.args, Expr(:tuple, x...))
     q
@@ -115,6 +115,7 @@ x,y,z = symbols("x, y, z", real=true)
 function symbols(x::AbstractString; kwargs...) 
     out = sympy_meth(:symbols, x; kwargs...)
 end
+symbols(x::Symbol; kwargs...) = symbols(string(x); kwargs...)
 
 function length(x::SymbolicObject)
     sz = size(x)
