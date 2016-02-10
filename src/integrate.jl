@@ -60,6 +60,7 @@ Heaviside function for integration.
 Heaviside(x::Number) = convert(Function, sympy[:Heaviside])(project(x))
 export Heaviside
 
+
 ## Alternate interface for simple integral
 """
 

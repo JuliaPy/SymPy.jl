@@ -69,7 +69,9 @@ solve(x^2 + 1)   # ±i are not real
 solve(y1 + 1)    # -1 is not positive
 ```
 
-
+As can be seen, there are several ways to create symbolic values. One
+caveat is that one can't use `Syms` to create a variable from a
+function name in Base.
 
 ### Special constants
 

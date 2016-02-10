@@ -262,6 +262,18 @@ const Piecewise = piecewise
 
 piecewise_fold(ex::Sym) = sympy_meth(:piecewise_fold, ex)
 
+"""
+Indicator function
+
+`Χ(x, a, b)` is `1` on `[a,b]` and 0 otherwise.
+
+"""
+Χ(x, a=-oo, b=oo) = piecewise((1, (a <= x) ∧ (x <= b)), (0,true))
+Indicator(x, a=-oo, b=oo) = Χ(x, a, b) 
+export Indicator, Χ
+
+
+##################################################
 ## special numbers are initialized after compilation
 function init_math()
     "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors." 

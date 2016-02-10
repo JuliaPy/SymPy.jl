@@ -75,7 +75,7 @@ This gets replaced by a more `julia`n syntax:
 
 ```
 using SymPy                    
-x = Sym("x")		           # or  Sym(:x), symbols("x"),  @syms x
+x = symbols("x")		       # or   @syms x, Sym("x"), or  Sym(:x)
 y = sin(pi*x)
 y(1)                           # Does subs(y, x, 1). Use y(x=>1) to be specific as to which symbol to substitute
 ```
@@ -110,7 +110,7 @@ installed. For example, the matrix functions rely on features of
 In that particular instance, calls such as
 
 ```
-x = Sym("x")
+x = symbols("x")
 a = [x 1; 1 x]
 det(a)
 ```

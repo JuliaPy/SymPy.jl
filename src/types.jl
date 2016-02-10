@@ -5,6 +5,18 @@
 abstract SymbolicObject <: Number
 
 ## Basic types defined here
+"""
+
+* `Sym("x")`
+* `Sym(:x)`
+* `Sym("x, y, z")`
+
+The `Sym` type is an immutable type holding a reference to an
+underlying python-based SymPy object. Many methods are extended to the
+`Sym` type. Instances can be constructed in many ways. The one caveat
+is the variables can not be function names in base.
+
+"""
 immutable Sym <: SymbolicObject
     x::PyCall.PyObject
 end
