@@ -1,8 +1,9 @@
 ## Call symbolic object with natural syntax
 ## ex(x=>val)
-function (ex::T){T<:SymbolicObject}(args...)
+## how to do from any symbolic object?
+function (ex::Sym)(args...)
     xs = free_symbols(ex)
     subs(ex, collect(zip(xs, args))...)
 end
-(ex::SymbolicObject)(x::Dict) = subs(ex, x)
-(ex::SymbolicObject)(x::Pair...) = subs(ex, x...)
+(ex::Sym)(x::Dict) = subs(ex, x)
+(ex::Sym)(x::Pair...) = subs(ex, x...)
