@@ -207,20 +207,20 @@ function getindexOLD(x::SymbolicObject, i::Symbol)
     if haskey(project(x), i)
         out = project(x)[i]
         if isa(out, Function)
-            function f(args...;kwargs...)
+            function _f1(args...;kwargs...)
                 object_meth(x, i, args...; kwargs...)
             end
-            return f
+            return _f1
         else
             return out
         end
     elseif haskey(sympy, i)
         out = sympy[i]
         if isa(out, Function)
-            function f(args...;kwargs...)
+            function _f2(args...;kwargs...)
                 sympy_meth(i, x, args...; kwargs...)
             end
-            return f
+            return _f2
         else
             return out
         end
