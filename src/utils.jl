@@ -152,24 +152,6 @@ project(x::Irrational{:γ}) = project(convert(Sym, x))
 project(x::Irrational{:catalan}) = project(convert(Sym, x))
 project(x::Irrational{:φ}) = project(convert(Sym, x))
 
-## for size of containers
-function length(x::SymbolicObject)
-    sz = size(x)
-    length(sz) == 0 && return(0)
-    *(sz...)
-end
-function size(x::SymbolicObject)
-    return ()
-end
-function size(x::SymbolicObject, dim::Integer)
-    if dim <= 0
-        error("dimension out of range")
-   
-    else
-        return 1
-    end
-end
-
 
 ## Iterator for Sym
 Base.start(x::Sym) = 1
@@ -210,10 +192,10 @@ function getindex(x::SymbolicObject, i::Symbol)
         end
         return __XXxxXX__
     elseif haskey(sympy, i)
-        function __XXxxXX__(args...;kwargs...)
+        function __XXyyXX__(args...;kwargs...)
             sympy_meth(i, x, args...; kwargs...)
         end
-        return __XXxxXX__
+        return __XXyyXX__
     else
        MethodError()
     end

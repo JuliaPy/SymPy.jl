@@ -102,7 +102,7 @@ Base.replace(ex::SymbolicObject; kwargs...) = subs(ex, kwargs...)
 
 
 if VERSION >= v"0.4.0-dev"
-    function Base.call(ex::SymbolicObject; kwargs...)
+    function Base.call{T <: SymbolicObject}(ex::T; kwargs...)
         warn("""
 Calling an expression with keyword arguments will be deprecated. From v0.4 onward, the use of pairs, as in
 `ex(var1=>val1, var2=>val2)` is suggested.

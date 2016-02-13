@@ -5,8 +5,6 @@ if VERSION < v"0.4.0"
     SymFunction(nm::SymOrString) = (args...) -> Sym(sympy[:Function](nm)(project(args)...))
     symfunction(x) = SymFunction(x)
 else
-
-
     ## A type akin to SymFunction but with the ability to keep track of derivative
     type SymFunction <: SymPy.SymbolicObject
         u::PyCall.PyObject
