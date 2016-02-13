@@ -110,7 +110,7 @@ if VERSION >= v"0.4.0-dev"
 #        subs(ex, kwargs...)#
 #
 #    end
-    function Base.call{T <: SymbolicObject}(ex::SymbolicObject, args...)
+    function Base.call{T <: SymbolicObject}(ex::T, args...)
         xs = free_symbols(ex)
         subs(ex, collect(zip(xs, args))...)
     end

@@ -55,7 +55,7 @@ F, G = symbols("F,G", cls=symfunction)
             u.u(SymPy.project(x))
         else
             __x = Sym("__x")
-            diff(u.u(__x.x), __x, u.n)(x)
+            diff(u.u(__x.x), __x, u.n)(__x => x)
         end
     end
     
