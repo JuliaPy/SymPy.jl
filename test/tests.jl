@@ -333,6 +333,10 @@ p = piecewise((x, x ≥ 0), (0, x ≪ 0), (1, x ⩵ 0))
 @assert @compat Int(subs(p,x,-1)) == 0
 @assert @compat Int(subs(p,x,0)) == 0
 
+u = ifelse(Lt(x, 0), "neg", ifelse(Gt(x, 0), "pos", "zero"))
+@assert subs(u,x,-1) == Sym("neg")
+@assert subs(u,x, 0) == Sym("zero")
+@assert subs(u,x, 1) == Sym("pos")
 
 
 ## relations
@@ -381,4 +385,9 @@ if VERSION >= v"0.4.0"
     map(lambdify(ex), rand(10))
     ex = x - y
     @assert lambdify(ex)(3,2) == 1
+
+    i = Indicator(x, 0, 1)
+    u = lambdify(i)
+    @assert u(.5) == 1
+    @assert u(1.5) == 0
 end

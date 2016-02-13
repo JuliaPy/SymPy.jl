@@ -262,6 +262,8 @@ const Piecewise = piecewise
 
 piecewise_fold(ex::Sym) = sympy_meth(:piecewise_fold, ex)
 
+Base.ifelse(ex::Sym, a, b) = piecewise((a, ex), (b, true))
+
 """
 Indicator function
 

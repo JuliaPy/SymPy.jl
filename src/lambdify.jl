@@ -17,12 +17,25 @@ val_map = Dict(
                "Infinity"         => :Inf,
                "NegativeInfinity" => :(-Inf),
                "ComplexInfinity"  => :Inf, # error?
-               "ImaginaryUnit"    => :im
+               "ImaginaryUnit"    => :im,
+               "BooleanTrue"      => :true,
+               "BooleanFalse"     => :false
                )
 
 ## Mapping of Julia function names into julia ones
 ## most are handled by symbol(fnname), this catches exceptions
 _heaviside(x) = 1//2 * (1 + sign(x))
+function _piecewise(args...)
+    as = copy([args...])
+    val, cond = pop!(as)
+    ex = Expr(:call, :ifelse, cond, val, :nothing)
+    while length(as) > 0
+        val, cond = pop!(as)
+        ex = Expr(:call, :ifelse, cond, val, ex)
+    end
+    ex
+end
+
 fn_map = Dict(
               "Add" => :+,
               "Sub" => :-,
@@ -35,7 +48,15 @@ fn_map = Dict(
               "Min" => :min,
               "Max" => :max,
               "Poly" => :identity,
-              "Heaviside" => :(_heaviside)
+              "Heaviside" => :(_heaviside),
+              "Piecewise" => :(_piecewise),
+              "And" => :(&),
+              "Or" => :(|),
+              "Less" => :(<),
+              "LessThan" => :(<=),
+              "Equal" => :(==),
+              "GreaterThan" => :(>=),
+              "Greater" => :(>) 
               )
               
 map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : symbol(key)              
@@ -55,7 +76,13 @@ function walk_expression(ex; values=Dict(), fns=Dict())
     elseif fn in ["Integer" , "Float"]
         return N(ex)
     elseif fn == "Rational"
-        return convert(Int, numer(ex))//convert(Int, denom(ex))        
+        return convert(Int, numer(ex))//convert(Int, denom(ex))
+        ## piecewise requires special treatment
+    elseif fn == "Piecewise"
+        return _piecewise([walk_expression(cond) for cond in _args(ex)]...)
+    elseif fn == "ExprCondPair"
+        val, cond = _args(ex)
+        return (val, walk_expression(cond))
     elseif haskey(vals_map, fn)
         return vals_map[fn]
     end
