@@ -296,6 +296,7 @@ function __init__()
     init_logical()
     init_math()
     init_mpmath()
+    init_lambdify()
     init_plot()
 end
 

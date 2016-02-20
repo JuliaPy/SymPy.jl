@@ -138,13 +138,26 @@ This is a *temporary* solution. The proper fix is to do this in SymPy.
 
 """
 function lambdify(ex::Sym, vars=free_symbols(ex); fns=Dict(), values=Dict())
+    # if :julia_code printer is there, use it
+    if haskey(sympy, :julia_code)
+        body = parse(sympy_meth(:julia_code, ex))
+    else
+        body = walk_expression(ex, fns=fns, values=values)
+    end
     try
         eval(Expr(:function,
                   Expr(:call, gensym(), map(symbol,vars)...),
-                  walk_expression(ex, fns=fns, values=values)))
+                  body))
     catch err
         throw(ArgumentError("Expression does not lambdify"))
     end
 end
 
 export(lambdify)
+
+function init_lambdify()
+    if haskey(sympy, :julia_code)
+        global julia_code(ex::Sym; assign_to=nothing, kwargs...) = sympy_meth(:julia_code, ex; assign_to=assign_to, kwargs...)
+        eval(Expr(:export, :julia_code))
+    end
+end

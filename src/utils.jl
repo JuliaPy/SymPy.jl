@@ -172,7 +172,7 @@ method calls become `method(obj, ...)`. For those that aren't
 included, this allows the call to follow `PyCall`, and be
 `obj[:method]` where a symbol is passed for the method name.
 
-These just dispatch to `sympy_meth` or `object_meth`, as
+These just dispatches to `sympy_meth` or `object_meth`, as
 appropriate. This no longer can be used to access properties of the
 underlying `PyObject`. For that, there is no special syntax beyond
 `object.x[:property]`.
