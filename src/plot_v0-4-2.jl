@@ -1,6 +1,7 @@
 ## add plotting commands for Plots.jl for julia version 0.3
 ## As Plots.jl no longer supports v0.3, this is not as full featured
 ## as the plotting features for v0.4 and forward
+using Requires
 
 """
 
