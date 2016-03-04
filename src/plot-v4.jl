@@ -31,8 +31,11 @@
 ## we also add
 ## vectorfieldplot([ex1, ex2], (xvar, a, b), (yvar, a, b)) for a vector field plot
 ##
-## The `plot_implicit` function gives access to `plot_implicit`, but requires `PyPlot` to be installed.
+## The PyPlot package adds quiver (like vectorfieldplot), 3d contours, and implicit plots
+##
+## TODO: should `add_arrow`  be `quiver!`? 
 
+using Requires ## for conditional `@require`ing of packages
 
 """
 
@@ -145,6 +148,80 @@ plot_parametric_surface((r*sin(theta)*sin(phi), r*sin(theta)*cos(phi), r*cos(the
 ```
 
 (The SymPy name for this function is `plot3d_parametric_surface`, we have dropped the "`3d`" part.)
+
+
+## PyPlot only
+
+The SymPy plotting module in Python also adds the following two
+features to Matplotlib. As such, these are not in `PyPlot`, but rather
+the `SymPy` namespace.
+
+
+----
+
+If the `PyPlot` backend is used (as with `backend(:pyplot)`), then there are additional methods added. 
+
+* `contour3D(ex, (x,x0, x1), (y,y0, y1); kwargs...)` will plot a contour plot in  3D over the region.
+
+
+```
+@vars x y z
+contour3D( x^2 - y^2) # default is [-5,5] x [-5,5]
+```
+
+* `quiver(Vector{Sym})` produces a plot of a vector field. The alias
+  `vectorplot` is provided, though this may change if vector-field
+  plots get added to the `Plots` package.
+
+```
+quiver([-y, x], (x, -5,5), (y, -5,5 ))  ## same as vectorplot([-y,x]) using the default range
+```
+
+
+* `plot_implicit(pred, [(xvar,x0,x1), (yvar, y0,y1)]; kwargs...)` Make
+  implicit plot of region. To specify the region use `(variable, a,b)`
+  for the two variables.
+
+
+To create conditions on the variable, the functions `Lt`, `Le`, `Eq`,
+`Ge`, and `Gt` can be used. For infix notation, unicode operators can
+be used: `\ll<tab>`, `\le<tab>`, `\Equal<tab>`, `\ge<tab>`, and
+`\gg<tab>`. To combine terms, the unicode `\vee<tab>` (for "or"),
+`\wedge<tab>` (for "and") can be used
+
+Examples:
+
+```
+@vars x y
+plot_implicit(sin(x+y) - cos(x^2 + y^2), (x, -5,5), (y, -5, 5))
+plot_implicit(x ≫ y)  # over default region of [-5,5] x [-5,5]
+f(x,y) = x^2 + y^2
+plot_implicit((f(x,y) ≪ 5) ∧ (f(x,y) ≥ 2), (x,-5,5), (y,-5,5))
+```
+
+### Note:
+
+These methods are added *after* the `PyPlot` package is loaded.
+
+This can cause confusion:
+
+* If `PyPlot` is loaded through `Plots` (by specifying `backend(:pyplot)`)
+  then `PyPlot` is not loaded until after the first `plot` call. The
+  extended features for `PyPlot` are added then (at runtime), so can't
+  be accessed until `PyPlot` is loaded.
+
+* If `PyPlot` is loaded with `using PyPlot`, then the `plot` command
+  is ambiguous with that of `PyPlot` and must be qualified
+  (e.g. `SymPy.plot(...)`). However, the extended methods can be
+  accessed directly. This would also be the case were another package
+  with a `plot` method loaded, such as `Gadfly` or `Winston`.
+
+
+Underneath these plotting functions is a fairly simple translation
+from a symbolic expression to a function. The `convert(Function, ex)`
+pattern can be used for scalar function. (Or if using version `v0.4`
+or higher, `x->N(ex(x))`.) As well, numeric values can be generated
+explicitly via a pattern akin to `Float64[ex(x) for x in xs]`.
 
 """
 sympy_plotting = nothing
@@ -502,18 +579,101 @@ function _find_us_vs(ex, xvar, yvar, n=100)
 end
 
 
-## These functions give acces to SymPy's plotting module. They will work if PyPlot is installed, but may otherwise cause an error
-""
-Plot an implicit equation
+######################################    
+## Must put Requires.require outside of compilation
+function init_plot()
 
-```
-@syms x y
-plot(Eq(x^2+ y^2,3), (x, -2,2), (y,-2,2))
-```
+    ## PyPlot
+    Requires.@require PyPlot begin
 
-"""
-plot_implicit(ex, args...; kwargs...) = SymPy.call_sympy_fun(sympy[:plotting][:plot_implicit], ex, args...; kwargs...)
-export plot_implicit
+        info("""Loading additional PyPlot commands for graphing for SymPy objects:
+quiver, contour3D, and plot_implicit.
+See ?sympy_plotting for some more details
+""")
 
+        ## Ideally we would name `contourplot` just `contour`, but for a few reasons:
+        ## * adding the suffix "plot" is consistent with `parametricplot` and `vectorplot`
+        ## * if the user calls in `PyPlot` via `using`, there is no naming conflict.
+        ## here we add in the `contour` name for convenience when the user is using `PyPlot`.
+        eval(Expr(:import, :PyPlot, :contour))
+        function contour(ex::Sym, xvar=(-5.0, 5.0),
+                         yvar=(-5.0, 5.0),
+                         args...;
+                         n::Int=25,
+                         kwargs...)
+            contourplot(ex, xvar,yvar, args...;n=n, kwargs...)
+        end
+
+        
+        ## quiver ,,,http://matplotlib.org/examples/pylab_examples/quiver_demo.html
+        ## We add a plot of vectors (vectorplot). Hopefully this will be in `Plots` one
+        ## day
+        eval(Expr(:import, :PyPlot, :quiver))
+        function quiver(exs::Vector{Sym},
+                               xvar=(-5.0, 5.0),
+                               yvar=(-5.0, 5.0),
+                               args...;
+                               n::Int=25,
+                               kwargs...) 
+                                   
+            length(exs) == 2 || throw(DimensionMismatch("vector of symbolic objects must have length 2"))
+            for ex in exs
+                nvars = length(free_symbols(ex))
+                nvars <= 2 || throw(DimensionMismatch("Expression has $nvars, expecting 2 for a quiver plot"))
+            end
+            
+            U,V,xs,ys = _find_us_vs(exs, xvar, yvar, n)
+
+            us = mapsubs2(exs[1], U, xs, V,ys)
+            vs = mapsubs2(exs[2], U, xs, V,ys)
+            
+            PyPlot.quiver(xs, ys, us, vs, args...; kwargs...)
+        end
+        ## deprecate this. We leave `quiver` for internal use.
+        ##global  vectorplot = PyPlot.quiver
+        
+        ## XXX Need an interface decision here...
+        global add_arrow(p::Vector, v::Vector, args...; kwargs...) = begin
+            n = length(p)
+            if n == 2
+                PyPlot.arrow(p..., v...; kwargs...)
+            elseif n==3
+                out = [hcat(p,p+v)'[:,i] for i in 1:n]
+                PyPlot.plot3D(out..., args...; kwargs...)
+            end
+        end
+
+        
+        ## 3D contour plot
+        eval(Expr(:import, :PyPlot, :contour3D))        
+        function contour3D(ex::Sym,
+                                  xvar=(-5.0, 5.0),
+                                  yvar=(-5.0, 5.0),
+                                  args...;
+                                  n::Int=50,
+                                  kwargs...)
+
+
+            U,V,xs,ys = _find_us_vs(ex, xvar, yvar, n)                        
+
+            zs = mapsubs2(ex, U, xs, V,ys)
+            PyPlot.contour3D(xs, ys, zs, args...; kwargs...)
+        end
+        
+        
+
+        ## Implict equations plot
+        ## XXX: We use the sympy interface here, as PyPlot does not have an interface for implicit plots
+        ## XXX: There are others that *could* be used here:
+        plot_implicit(ex, args...; kwargs...) = SymPy.call_sympy_fun(sympy[:plotting][:plot_implicit], ex, args...; kwargs...)
+
+
+        eval(Expr(:export, :contour3D))
+        eval(Expr(:export, :vectorplot))
+        eval(Expr(:export, :quiver))
+        eval(Expr(:export, :add_arrow))
+        eval(Expr(:export, :plot_implicit))
+        
+    end
 
 end

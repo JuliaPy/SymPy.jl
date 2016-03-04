@@ -164,7 +164,11 @@ if Pkg.installed("Plots") <= v"0.4.2"
 elseif Pkg.installed("Plots") == v"0.5.0"
     include("plot_v0-5-0.jl")
 else
-    include("plot.jl")
+    if VERSION >= v"0.5.0"
+        include("plot.jl")
+    else
+        include("plot-v4.jl")
+    end
 end
 
 
@@ -297,7 +301,7 @@ function __init__()
     init_math()
     init_mpmath()
     init_lambdify()
-    init_plot()
+    VERSION <= v"0.5.0" && init_plot()  # as of version 0.5.0 deprecate Requires.jl, and hence need for init_plot
 end
 
 end
