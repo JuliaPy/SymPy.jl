@@ -38,7 +38,6 @@ SymPy
 using Compat
 
 using PyCall, Conda
-using Requires 
 
 
 if VERSION < v"0.4.0"
@@ -164,7 +163,7 @@ if Pkg.installed("Plots") <= v"0.4.2"
 elseif Pkg.installed("Plots") == v"0.5.0"
     include("plot_v0-5-0.jl")
 else
-    if VERSION >= v"0.5.0"
+    if VERSION >= v"0.5.0-"
         include("plot.jl")
     else
         include("plot-v4.jl")

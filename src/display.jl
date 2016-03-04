@@ -39,10 +39,6 @@ Base.show(io::IO, s::Array{Sym}) = print(io, "\n", sympy[:pretty](project(conver
 writemime(io::IO, ::MIME"text/plain", s::Array{Sym}) =  print(io, summary(s), "\n", sympy[:pretty](project(convert(SymMatrix, s))))
 writemime(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy[:pretty](project(s)))
 
-## text/latex -- for IJulia
-function latex(s::SymbolicObject, args...; kwargs...)
-    sympy_meth(:latex, s, args...; kwargs...)
-end
 writemime(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
 function writemime(io::IO, ::MIME"text/latex", x::Array{Sym})
     function toeqnarray(x::Vector{Sym})

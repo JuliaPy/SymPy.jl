@@ -215,7 +215,7 @@ function N(x::Sym, digits::Int)
     elseif x.x[:is_real]
         p = round(Int,log2(10)*digits)
         
-        out = with_bigfloat_precision(p) do 
+        out = setprecision(p) do 
             convert(BigFloat, ex)
         end
         return(out)
