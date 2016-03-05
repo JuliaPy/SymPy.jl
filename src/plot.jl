@@ -503,7 +503,7 @@ end
 
 
 ## These functions give acces to SymPy's plotting module. They will work if PyPlot is installed, but may otherwise cause an error
-""
+"""
 Plot an implicit equation
 
 ```
