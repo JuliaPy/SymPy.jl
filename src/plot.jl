@@ -515,4 +515,5 @@ plot(Eq(x^2+ y^2,3), (x, -2,2), (y,-2,2))
 plot_implicit(ex, args...; kwargs...) = SymPy.call_sympy_fun(sympy[:plotting][:plot_implicit], ex, args...; kwargs...)
 export plot_implicit
 
-
+## no Requires means no init this will be removed...
+init_plot() = nothing

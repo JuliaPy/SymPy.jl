@@ -300,7 +300,7 @@ function __init__()
     init_math()
     init_mpmath()
     init_lambdify()
-    VERSION <= v"0.5.0" && init_plot()  # as of version 0.5.0 deprecate Requires.jl, and hence need for init_plot
+    init_plot()  
 end
 
 end
