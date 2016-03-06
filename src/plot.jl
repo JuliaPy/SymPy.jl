@@ -516,4 +516,3 @@ plot_implicit(ex, args...; kwargs...) = SymPy.call_sympy_fun(sympy[:plotting][:p
 export plot_implicit
 
 
-end
