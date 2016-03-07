@@ -139,7 +139,7 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
             ($meth)(x::SymPy.SymbolicObject) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
         end
     end
-    end
+end
 
 export Q
 

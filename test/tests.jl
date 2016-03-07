@@ -363,6 +363,14 @@ end
 @assert ask(Q.even(Sym(3))) == false
 @assert ask(Q.nonzero(Sym(3))) == true
 
+## sets
+s = FiniteSet("H","T")
+s1 = powerset(s)
+@assert length(collect(convert(Set, s1))) == length(collect(s1.x))
+a, b = Interval(0,1), Interval(2,3)
+@assert is_disjoint(a, b) == true
+@assert measure(union(a, b)) == 2
+
 
 ## Issue # 56
 @assert Sym(1+2im) == 1+2IM
@@ -391,3 +399,4 @@ if VERSION >= v"0.4.0"
     @assert u(.5) == 1
     @assert u(1.5) == 0
 end
+
