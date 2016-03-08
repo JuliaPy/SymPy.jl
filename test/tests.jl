@@ -400,3 +400,5 @@ if VERSION >= v"0.4.0"
     @assert u(1.5) == 0
 end
 
+## issue #67
+@assert N(Sym(4//3)) == 4//3

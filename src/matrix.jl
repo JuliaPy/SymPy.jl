@@ -249,6 +249,11 @@ function rref(a::SymMatrix)
   convert(Array{Sym}, d[1]) ## return Array{Sym}, not SymMatrix
 end
 
+if VERSION >= v"0.4.0"
+    rref{T <: Integer}(a::Matrix{T}) = N(rref(convert(Matrix{Sym}, a)))
+    rref{T <: Integer}(a::Matrix{Rational{T}}) = N(rref(convert(Matrix{Sym}, a)))
+end
+
 ## call with a (A,b), return array
 for fn in (:cross,
            :LUSolve)

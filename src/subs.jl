@@ -176,7 +176,8 @@ function N(ex::Sym)
             try (return(convert(T, ex))) catch e end
         end
     elseif _is_rational(ex)
-        try (return(convert(Rational, ex))) catch e end
+        return N(numer(ex)) // N(denom(ex))
+        ## `convert(Rational, ex)))` fails on `Sym(4//3)`
     elseif ex.x[:is_real]
         for T in [Irrational, Float64] ## BigFloat???
               try (return(convert(T, ex))) catch e end
@@ -211,7 +212,7 @@ function N(x::Sym, digits::Int)
     if x.x[:is_integer]
         return(convert(BigInt, x))
     elseif _is_rational(x)
-        return(convert(Rational, x))
+        return N(numer(x)) / N(denom(x))
     elseif x.x[:is_real]
         p = round(Int,log2(10)*digits)
         
