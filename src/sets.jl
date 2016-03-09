@@ -60,8 +60,8 @@ end
 end
 
 
-export S, FiniteSet, Interval, ProductSet
-export powerset
+export S, FiniteSet, Interval, ProductSet, ConditionSet
+export powerset, imageset
 export contains,  boundary, sup, measure
 export is_disjoint
 export is_proper_subset, is_subset, is_superset
@@ -99,6 +99,8 @@ powerset(s::Sym) = s[:powerset]()
 
 "Does I contain x?"
 Base.contains(I::Sym, x) = (I[:contains](x) == Sym(true))
+Base.in(x::Number, I::Sym) = contains(I, x)
+
 
 
 "Complement of set within the universe"
@@ -138,6 +140,8 @@ sup(I::Sym) = I.x[:sup]
 "Union of two intervals"
 Base.union(I::Sym, J::Sym) = I[:union](J)
 
+"Symmetric difference of two intervals, in one or other, but not both: `(I ∪ J) \ (I  ∩ J)"
+Base.symdiff(I::Sym, J::Sym) = complement(intersection(I,J), union(I,J))
 
 "rexpress I in terms of relations involving variable `x`"
 as_relational(I::Sym, x::Sym) = I[:as_relational](x)
@@ -174,8 +178,44 @@ function init_sets()
 
 Create a finite set
 """
+    "FiniteSet: http://docs.sympy.org/latest/modules/sets.html"
     global FiniteSet(args...) = sympy_meth(:FiniteSet, args...)
-    global ProductSet(args...) = sympyt_meth(:ProductSet, args...)
+
+    "ProductSet: http://docs.sympy.org/latest/modules/sets.html"
+    global ProductSet(args...) = sympy_meth(:ProductSet, args...)
+
+    """
+    Means to filter a set to pull out elements by a condition.
+
+    ConditionSet:  A set of elements which satisfies a given condition.
+
+    `ConditionSet(x, condition, S) = {x | condition(x) == true for x in S}`
+
+    (Introduced in SymPy 1.0)
+    """
+    global ConditionSet(var::Sym, pred::Sym, S) = sympy_meth(:ConditionSet, var, pred, S)
+
+
+    """
+    Represent a ComplexRegion.
+    working?
+```    
+    I, J = Interval(0,1), Interval(0,2)
+    R = ComplexRegion(I * J)
+    1 in R        # true
+    2 + 1im in R  # false
+```
+"""
+    ComplexRegion(IJ::Sym; kwargs...) = sympy_meth(:ComplexRegion, IJ; kwargs...)
+    
+    "imageset: http://docs.sympy.org/latest/modules/sets.html"
+    global imageset(fn::Function, args...) = begin
+        x = Sym("x")
+        imageset(x, fn(x), args...)
+    end
+    global imageset(args...) = sympy_meth(:imageset, args...)
+
+    
     ## Interval
     
 """
