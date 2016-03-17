@@ -27,6 +27,12 @@ immutable SymMatrix <: SymbolicObject
     x::PyCall.PyObject
 end
 
+## sets
+immutable SymSet <: SymbolicObject
+    x::PyCall.PyObject
+end
+
+
 ## complex float
 ## this cause issue with printing on non-complex objects
 #mpctype = sympy.mpmath["ctx_mp_python"]

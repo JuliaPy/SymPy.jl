@@ -1,4 +1,5 @@
 ## sets module
+## TODO: SymSets class so that we can better manage dispatch?
 
 """
 `SymPy` has the [sets](http://docs.sympy.org/latest/modules/sets.html) module that provides:
