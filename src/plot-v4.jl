@@ -1,4 +1,3 @@
-println("plot-v4")
 ## add plotting commands for various packages (Winston, PyPlot, Gadfly)
 ##
 ## Based on Plots.jl v"0.5.1+".  In particular, this assume Julia v"0.4+"

@@ -1,4 +1,3 @@
-println("plot-0.5.3")
 ## add plotting commands for various packages (Winston, PyPlot, Gadfly)
 ##
 ## Based on Plots.jl v"0.5.1+".  In particular, this assume Julia v"0.4+"
@@ -137,6 +136,8 @@ Plot the parametrically defined surface `[exs[1](u,v), exs[2](u,v), exs[3](u,v)]
 [b0,b1]`. The specification of the variables uses a tuple of the form
 `(Sym, Real, Real)` following the style of SymPy in `integrate`, say,
 where disambiguation of variable names is needed.
+
+Requires `PyPlot`.
 
 ```
 @vars theta, phi
@@ -281,10 +282,12 @@ function contourplot(ex::Sym,
                  xvar=(-5.0, 5.0),
                  yvar=(-5.0, 5.0),
                  args...;
-                 n::Int=50,
+                     n::Int=50,
+                     linetype=:contour,
                  kwargs...)
     U,V,xs,ys = _find_us_vs(ex, xvar, yvar, n)
-    plot(xs, ys, ex, args...; kwargs...)
+    zs = mapsubs2(ex, U, xs, V,ys)
+    plot(xs, ys, zs, args...; linetype=:contour, kwargs...)
 end
 export(contourplot)
 
@@ -322,49 +325,54 @@ function plot_surface(ex::Sym,
     length(vars) == 2 || throw(DimensionMismatch("Expression has wrong number of variables. Expecting 2 for a surface plot"))
     
     U,V,xs,ys = _find_us_vs(ex, xvar, yvar, n)        
-    
-    
     zs = mapsubs2(ex, U, xs, V,ys)
+
+    println(typeof(xs))
+    println(typeof(zs))
+    
     Plots.surface(xs, ys, z=Surface(zs), args...; kwargs...)
 end
 export plot_surface
 
 
-## surface plot xvar = Tuple(Sym, Real, Real)
-##
-"""
+## ## surface plot xvar = Tuple(Sym, Real, Real)
+## ##
+## """
 
-Render a parametrically defined surface plot.
+## Render a parametrically defined surface plot.
 
-Example:
-```
-@vars u, v
-plot_parametric_surface((u*v,u-v,u+v), (u,0,1), (v,0,1))
-```
+## Example:
+## ```
+## @vars u, v
+## plot_parametric_surface((u*v,u-v,u+v), (u,0,1), (v,0,1))
+## ```
 
-Eventually uses `Plots.plot(..., linetype=:surf)`, so surface plots must be defined for the backend in use.
-"""
-function plot_parametric_surface(exs::(@compat Tuple{Sym,Sym,Sym}),
-                                 xvar=(-5.0, 5.0),
-                                 yvar=(-5.0, 5.0),
-                                 args...;
-                                 n::Int=25, # really small, as otherwise this takes forever to plot
-                                 kwargs...)
+## Eventually uses `Plots.plot(..., linetype=:surf)`, so surface plots must be defined for the backend in use.
+## """
+## function plot_parametric_surface(exs::(@compat Tuple{Sym,Sym,Sym}),
+##                                  xvar=(-5.0, 5.0),
+##                                  yvar=(-5.0, 5.0),
+##                                  args...;
+##                                  n::Int=25, # really small, as otherwise this takes forever to plot
+##                                  kwargs...)
     
-    vars = free_symbols(exs)
+##     vars = free_symbols(exs)
     
-    nvars = length(vars)
-    nvars == 2 || throw(DimensionMismatch("Expression has $nvars, expecting 2 for a surface plot"))
+##     nvars = length(vars)
+##     nvars == 2 || throw(DimensionMismatch("Expression has $nvars, expecting 2 for a surface plot"))
             
-    U,V,us,vs = _find_us_vs(exs, xvar, yvar, n)        
+##     U,V,us,vs = _find_us_vs(exs, xvar, yvar, n)        
     
-    xs = mapsubs2(exs[1], U, us, V,vs)
-    ys = mapsubs2(exs[2], U, us, V,vs)
-    zs = mapsubs2(exs[3], U, us, V,vs)            
+##     xs = mapsubs2(exs[1], U, us, V,vs)
+##     ys = mapsubs2(exs[2], U, us, V,vs)
+##     zs = mapsubs2(exs[3], U, us, V,vs)            
+
+##     println(typeof(xs))
+##     println(typeof(zs))
     
-    Plots.surface(xs, ys, z=Surface(zs), args...; kwargs...)
-end
-export plot_parametric_surface
+##     Plots.surface(xs, ys, z=Surface(zs), args...; kwargs...)
+## end
+## export plot_parametric_surface
 
 
 ##################################################
@@ -373,7 +381,10 @@ export plot_parametric_surface
 ## Additions to Plots so that expressions are treated like functions
 
 typealias SymOrSyms @compat(Union{Sym, Plots.AVec{Sym}})
+
 Plots.convertToAnyVector(ex::Sym; kw...) = Any[ex], nothing
+Plots.convertToAnyVector(ex::Sym, d::Dict; kw...) = Any[ex], nothing
+
 function Plots.computeY(xs, ex::Sym)
     u = free_symbols(ex)[1]
     mapsubs(ex, u, xs)
@@ -454,7 +465,8 @@ end
 function mapsubs2(ex::Sym, x,xs, y, ys)
     out = Float64[]
     try
-        out = map(lambdify(ex,[x,y]), xs, ys)
+        fn = lambdify(ex, [x,y])
+        out = [fn(u,v) for u in xs, v in ys]
         out = map(Float64, out)
     catch err
         try
@@ -504,6 +516,40 @@ end
 
 
 ## These functions give acces to SymPy's plotting module. They will work if PyPlot is installed, but may otherwise cause an error
+
+
+
+
+## surface plot xvar = Tuple(Sym, Real, Real)
+##
+"""
+
+Render a parametrically defined surface plot.
+
+Example:
+```
+@vars u, v
+plot_parametric_surface((u*v,u-v,u+v), (u,0,1), (v,0,1))
+```
+
+This uses `PyPlot`, not `Plots` for now.
+"""
+function plot_parametric_surface(exs::(@compat Tuple{Sym,Sym,Sym}),
+                                 xvar=(-5.0, 5.0),
+                                 yvar=(-5.0, 5.0),
+                                 args...;
+                                 n::Int=25, # really small, as otherwise this takes forever to plot
+                                 kwargs...)
+
+    SymPy.call_sympy_fun(sympy[:plotting][:plot3d_parametric_surface], exs..., args...; kwargs...)
+    
+end
+export plot_parametric_surface
+
+
+
+
+
 """
 Plot an implicit equation
 
