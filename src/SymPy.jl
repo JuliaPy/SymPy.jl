@@ -123,10 +123,11 @@ export PI, E, IM, oo
 export relation, piecewise, Piecewise, piecewise_fold
 export members, doc, _str
 
+if VERSION <= v"0.5.0-"  ## Plots and vv0.5
 using Plots
 import Plots: plot, plot!, backend
 export plot, plot!, backend
-
+end
 
 
 ## Following PyPlot, we initialize our variables outside _init_
@@ -159,18 +160,30 @@ if VERSION >= v"0.4.0"
 end
 
 ## hand onto v"0.3.0" of julia by putting in conditional plot.jl files...
+if VERSION <= v"0.5.0-"
 if Pkg.installed("Plots") <= v"0.4.2"
+    println("0-4-2")
     include("plot_v0-4-2.jl")
 elseif Pkg.installed("Plots") == v"0.5.0"
+        println("0-5-0")
     include("plot_v0-5-0.jl")
+elseif Pkg.installed("Plots") >= v"0.5.3"
+    println("0-5-3")
+    if VERSION <= v"0.5.0-"
+        include("plot_v0_5.3.jl")
+    else
+        include("plot_v0_5.3.jl")
+    end
 else
+    println("0-5-huh")    
     if VERSION >= v"0.5.0-"
         include("plot.jl")
     else
         include("plot-v4.jl")
     end
 end
-
+end
+    
 
 ## create some methods
 
@@ -302,7 +315,7 @@ function __init__()
     init_mpmath()
     init_sets()
     init_lambdify()
-    init_plot()  
+    VERSION <= v"0.5.0-" && init_plot()  
 end
 
 end

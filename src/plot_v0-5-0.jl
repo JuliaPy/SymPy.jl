@@ -1,3 +1,4 @@
+println("plot-v0.5.0")
 ## Plot for v0.5.0 of Plots.jl
 ## (Afterwards, there is support for some 3d plots
 

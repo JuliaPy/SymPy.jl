@@ -1,4 +1,4 @@
-println("plot.")
+println("plot-0.5.3")
 ## add plotting commands for various packages (Winston, PyPlot, Gadfly)
 ##
 ## Based on Plots.jl v"0.5.1+".  In particular, this assume Julia v"0.4+"
@@ -32,7 +32,7 @@ println("plot.")
 ## we also add
 ## vectorfieldplot([ex1, ex2], (xvar, a, b), (yvar, a, b)) for a vector field plot
 ##
-## The `plot_implicit` function gives access to `plot_implicit`, but requires `PyPlot` to be installed.
+## The `plot_implicit` function gives access to `plot_implicit`, but requixres `PyPlot` to be installed.
 
 
 """
@@ -388,7 +388,7 @@ end
 mapSymOrSyms(fs::Plots.AVec{Sym}, xs::Plots.AVec) = [mapSymOrSyms(f, xs) for f in fs]
 
 ## # contours or surfaces... 
-function Plots.createKWargsList{T<:Real,S<:Real}(plt::Plots.Plots, x::Plots.AVec{T}, y::Plots.AVec{S}, zf::Sym; kw...)
+function Plots.createKWargsList{T<:Real,S<:Real}(plt::Plots.Plot, x::Plots.AVec{T}, y::Plots.AVec{S}, zf::Sym; kw...)
     # only allow sorted x/y for now
     # TODO: auto sort x/y/z properly
     @assert x == sort(x)
@@ -401,28 +401,28 @@ end
 
 
 # list of expressions
-function Plots.createKWargsList(plt::Plots.Plots, f::SymOrSyms, x; kw...)
+function Plots.createKWargsList(plt::Plots.Plot, f::SymOrSyms, x; kw...)
     @assert !(typeof(x) <: Sym)  # otherwise we'd hit infinite recursion here
     Plots.createKWargsList(plt, x, f; kw...)
 end
 
 # special handling... xmin/xmax with function(s)
-function Plots.createKWargsList(plt::Plots.Plots, f::SymOrSyms, xmin::Real, xmax::Real; kw...)
+function Plots.createKWargsList(plt::Plots.Plot, f::SymOrSyms, xmin::Real, xmax::Real; kw...)
     width = plt.plotargs[:size][1]
     x = collect(linspace(xmin, xmax, width))  # we don't need more than the width
     Plots.createKWargsList(plt, x, f; kw...)
 end
 
 # special handling... xmin/xmax with parametric function(s)
-Plots.createKWargsList{T<:Real}(plt::Plots.Plots, fx::Sym, fy::Sym, u::Plots.AVec{T}; kw...) =
+Plots.createKWargsList{T<:Real}(plt::Plots.Plot, fx::Sym, fy::Sym, u::Plots.AVec{T}; kw...) =
     Plots.createKWargsList(plt, mapSymOrSyms(fx, u), mapSymOrSyms(fy, u); kw...)
     
 
-Plots.createKWargsList{T<:Real}(plt::Plots.Plots, u::Plots.AVec{T}, fx::SymOrSyms, fy::SymOrSyms; kw...) =
+Plots.createKWargsList{T<:Real}(plt::Plots.Plot, u::Plots.AVec{T}, fx::SymOrSyms, fy::SymOrSyms; kw...) =
     Plots.createKWargsList(plt, mapSymOrSyms(fx, u), mapSymOrSyms(fy, u); kw...)
 
 
-Plots.createKWargsList(plt::Plots.Plots, fx::Sym, fy::Sym, umin::Real, umax::Real, numPoints::Int = 1000; kw...) =
+Plots.createKWargsList(plt::Plots.Plot, fx::Sym, fy::Sym, umin::Real, umax::Real, numPoints::Int = 1000; kw...) =
     Plots.createKWargsList(plt, fx, fy, linspace(umin, umax, numPoints); kw...)
 
 ##################################################
