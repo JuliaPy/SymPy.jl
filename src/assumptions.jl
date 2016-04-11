@@ -84,7 +84,7 @@ if VERSION < v"0.4.0"
     eval(parse("using Docile"))
     eval(parse("Docile.@document"))
 end
-import Base: complex, integer, real
+import Base: complex, integer, real, zero
 ##http://docs.sympy.org/dev/_modules/sympy/assumptions/ask.html#ask
 Q_predicates = (:antihermitian,
                 :bounded, :finite, # bounded deprecated

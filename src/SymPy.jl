@@ -155,7 +155,7 @@ end
 
 
 ## Plotting
-if VERSION <= v"0.5.0-"  ## Plots and v0.5
+if VERSION <= v"0.5.0-"  ## Plots and v0.5 has Requires issue right now
     using Plots
     import Plots: plot, plot!, backend
     export plot, plot!, backend
@@ -164,13 +164,7 @@ if VERSION <= v"0.5.0-"  ## Plots and v0.5
     if VERSION <= v"0.5.0-"
         if Pkg.installed("Plots") <= v"0.4.2"
             include("plot_v0-4-2.jl")
-        elseif Pkg.installed("Plots") == v"0.5.0"
-            include("plot_v0-5-0.jl")
-        elseif Pkg.installed("Plots") > v"0.5.0" && Pkg.installed("Plots") <= v"0.5.3"
-            include("plot_v0_5.3.jl")
-        elseif Pkg.installed("Plots") >= v"0.5.4"
-	    include("plot_v0-5-4.jl")
-	else
+        else 
             include("plot.jl")
         end
     end
