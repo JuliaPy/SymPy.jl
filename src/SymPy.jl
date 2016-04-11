@@ -166,9 +166,11 @@ if VERSION <= v"0.5.0-"  ## Plots and v0.5
             include("plot_v0-4-2.jl")
         elseif Pkg.installed("Plots") == v"0.5.0"
             include("plot_v0-5-0.jl")
-        elseif Pkg.installed("Plots") >= v"0.5.3"
+        elseif Pkg.installed("Plots") > v"0.5.0" && Pkg.installed("Plots") <= v"0.5.3"
             include("plot_v0_5.3.jl")
-        else
+        elseif Pkg.installed("Plots") >= v"0.5.4"
+	    include("plot_v0-5-4.jl")
+	else
             include("plot.jl")
         end
     end
