@@ -402,3 +402,6 @@ end
 
 ## issue #67
 @assert N(Sym(4//3)) == 4//3
+
+## issue #71
+@test log(Sym(3), Sym(4)) == log(Sym(4)) / log(Sym(3))

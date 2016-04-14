@@ -28,7 +28,7 @@ end
 
 ## Log function handles arguments differently
 log(x::Sym) = sympy_meth(:log, x)
-log(b::Sym, x::Sym) = sympy_meth(:log(x,b))
+log(b::Sym, x::Sym) = sympy_meth(:log, x, b)
 
 ### Trigonometry
 
