@@ -35,7 +35,7 @@ f1 = convert(Function, x^2)
 f(x) = x^2 - 2
 y = f(x)
 @assert float(subs(y, x, 1)) == f(1)
-@assert float( y |> replace(x,1) ) == f(1)
+@assert float( y |> subs(x,1) ) == f(1)
 
 ## interfaces
 ex = (x-1)*(y-2)
@@ -50,13 +50,35 @@ if VERSION >= v"0.4.0"
     @assert ex(x=>1) == 0
 end
 
+## match, replace, xreplace, rewrite
+x,y,z = symbols("x, y, z")
+a,b,c = map(Wild, (:a,:b,:c))
+## match: we have pattern, expression to follow `match`
+d = match(a^a, (x+y)^(x+y))
+@test d[a] == x+y
+d = match(a^b, (x+y)^(x+y))
+@test d[b] == x + y
+ex = (2x)^2
+pat = a*b^c
+d = match(pat, ex)
+@test d[a] == 4 && d[b] == x && d[c] == 2
+@test xreplace(pat, d) == 4x^2
 
-## Replace
-y = Sym("y")
-z = x - 3 + y
-subs(z, y, 3)
-@assert (z |> replace(x, 2) |> replace(y, 3) |> float) == (2 - 3 + 3)
+## replace
+ex = log(sin(x)) + tan(sin(x^2))
+@test replace(ex, func(sin(x)), func(cos(x))) == log(cos(x)) + tan(cos(x^2))
+@test replace(ex, func(sin(x)), u ->  sin(2u)) == log(sin(2x)) + tan(sin(2*x^2))
+@test replace(ex, sin(a), tan(a)) ==  log(tan(x)) + tan(tan(x^2))
+@test replace(ex, sin(a), a) == log(x) + tan(x^2)
+@test replace(x*y, a*x, a) == y
+            
+## xreplace
+@test xreplace(1 + x*y, x => PI) == 1 + PI*y
+@test xreplace(x*y + z, x*y => PI) == z + PI
+@test xreplace(x*y * z, x*y => PI) == x* y * z
+@test xreplace(x +2 + exp(x + 2), x+2=>y) == x + exp(y) + 2
 
+            
 
 #Test subs for pars and dicts
 ex = 1

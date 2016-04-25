@@ -5,7 +5,7 @@
 """
 
 `subs` is used to subsitute a value in an expression with another
-value. The `replace` function is also overrided to do this task.
+value. 
 
 Examples:
 
@@ -42,6 +42,9 @@ ex |> subs(x=e)
 ## or as of version 0.4:
 ex(x=2, y=3)     
 ```
+
+The `replace` function is related, but not identical to subs.
+
 """
 subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any})) =
     object_meth(ex, :subs, Sym(y[1]), convert(Sym,y[2]))
@@ -77,14 +80,6 @@ Calling `subs` with keyword arguments will be deprecated. From v0.4 onward, the 
 """)
     subs(ex, kwargs...)
 end
-
-## replace alias for subs
-Base.replace(ex::SymbolicObject, x::SymbolicObject, y) = subs(ex, x, y)
-## curried version to use through |> as in
-## ex |> replace(x, 2)
-Base.replace(x::SymbolicObject, y) = ex -> subs(ex, x, y)
-Base.replace(ex::SymbolicObject; kwargs...) = subs(ex, kwargs...)
-
 
 # """
 #

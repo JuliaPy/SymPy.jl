@@ -5,9 +5,8 @@
 core_object_methods = (:as_poly, :atoms,
                        :compare, :compare_pretty,
                        :doit, :dummy_eq, # :count,
-                       :has, :match, ##:replace,
-                       :rewrite, :sort_key,
-                       :xreplace,
+                       :has, 
+                       :sort_key,
                        :args_cnc,
                        :as_coeff_Add, :as_coeff_Mul, :as_coeff_add,
                        :as_coeff_exponent, :as_coeff_factors, :as_coeff_mul,
@@ -69,7 +68,7 @@ export free_symbols
 
 
 ## From relational
-core_sympy_methods = (:Wild, :Dummy,
+core_sympy_methods = (:Dummy,
                       :Mod, :Rel,
                       :Eq, :Ne, :Lt, :Le, :Gt, :Ge,
                       :Equality, :Unequality,

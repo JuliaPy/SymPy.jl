@@ -123,11 +123,6 @@ Even when the value is numeric, the result of `subs` is a symbolic
 object. To bring into `julia`, one must coerce the value with `float`
 or `int`, say.
 
-As the role of `subs` is somewhat similar to julia's `replace` function for strings, we overload `replace` for symbolic objects to call `subs` and create a Curried version for use with pipelines:
-
-```
-x*y |> replace(y, 3)		# does subs(x*y, y, 3)
-```
 
 ### Conversion
 
@@ -138,7 +133,7 @@ Basic conversions from `SymPy` numeric types to the corresponding
 `convert(Rational, ex)`.
 
 ```
-x |> replace(x, 1) |> int
+x |> subs(x, 1) |> int
 convert(Rational, sympy.harmonic(30))
 ```
 
@@ -228,7 +223,7 @@ trigsimp(a)			# (x^2 + x) / x
 The `simplify` function has an argument `ratio` to determine how aggressive the simplification should be:
 
 ```
-root = 1/(sqrt(x) + 3) |> replace(x, 2) # want sqrt(2) to be symbolic
+root = 1/(sqrt(x) + 3) |> subs(x, 2) # want sqrt(2) to be symbolic
 simplify(root, ratio=1)		   # 1/(sqrt(2) + 3)
 simplify(root, ratio=oo)	   # -2/sqrt(7) + 3/sqrt(7)
 ```
@@ -357,7 +352,7 @@ We can make tangent lines:
 ```
 f(x) = x^x
 c = 2
-m = diff(f(x), x) |> replace(x, c)
+m = diff(f(x), x) |> subs(x, c)
 ```
 
 ```
