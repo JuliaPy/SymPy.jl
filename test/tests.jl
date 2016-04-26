@@ -73,11 +73,12 @@ ex = log(sin(x)) + tan(sin(x^2))
 @test replace(x*y, a*x, a) == y
             
 ## xreplace
+if VERSION >= v"0.4.0"            
 @test xreplace(1 + x*y, x => PI) == 1 + PI*y
 @test xreplace(x*y + z, x*y => PI) == z + PI
 @test xreplace(x*y * z, x*y => PI) == x* y * z
 @test xreplace(x +2 + exp(x + 2), x+2=>y) == x + exp(y) + 2
-
+end
             
 
 #Test subs for pars and dicts

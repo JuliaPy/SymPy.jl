@@ -174,10 +174,10 @@ is_Union(I::Sym) = I.x[:is_Union]
 function init_sets()
     S.init_set()
 
-    """
-`FiniteSet(1,2,3)`
+"""
+    `FiniteSet(1,2,3)`, `FiniteSet(1:10...)`: create a finite set
 
-Create a finite set
+See also `Interval` to create subsets of the real line.
 """
     "FiniteSet: http://docs.sympy.org/latest/modules/sets.html"
     global FiniteSet(args...) = sympy_meth(:FiniteSet, args...)
