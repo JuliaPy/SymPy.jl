@@ -65,13 +65,14 @@ d = match(pat, ex)
 @test xreplace(pat, d) == 4x^2
 
 ## replace
+if VERSION >= v"0.4.0"
 ex = log(sin(x)) + tan(sin(x^2))
 @test replace(ex, func(sin(x)), func(cos(x))) == log(cos(x)) + tan(cos(x^2))
 @test replace(ex, func(sin(x)), u ->  sin(2u)) == log(sin(2x)) + tan(sin(2*x^2))
 @test replace(ex, sin(a), tan(a)) ==  log(tan(x)) + tan(tan(x^2))
 @test replace(ex, sin(a), a) == log(x) + tan(x^2)
 @test replace(x*y, a*x, a) == y
-            
+end
 ## xreplace
 if VERSION >= v"0.4.0"            
 @test xreplace(1 + x*y, x => PI) == 1 + PI*y

@@ -5,6 +5,7 @@ VERSION >= v"0.4.0" && __precompile__(true)
 
 module SymPy
 
+using Compat
 
 """
 
@@ -210,7 +211,7 @@ for meth in union(core_object_methods,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(ex::Sym, args...; kwargs...) = object_meth(ex, symbol($meth_name), args...; kwargs...)
+        ($meth)(ex::SymbolicObject, args...; kwargs...) = object_meth(ex, symbol($meth_name), args...; kwargs...)
     end
     eval(Expr(:export, meth))
 end
@@ -301,7 +302,7 @@ function __init__()
     init_math()
     init_mpmath()
     init_sets()
-    init_lambdify()
+    VERSION >= v"0.4.0" && init_lambdify()
     VERSION <= v"0.5.0-" && init_plot()  
 end
 

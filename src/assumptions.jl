@@ -84,7 +84,7 @@ if VERSION < v"0.4.0"
     eval(parse("using Docile"))
     eval(parse("Docile.@document"))
 end
-import Base: complex, integer, real, zero
+#import Base: complex, integer, real #, zero
 ##http://docs.sympy.org/dev/_modules/sympy/assumptions/ask.html#ask
 Q_predicates = (:antihermitian,
                 :bounded, :finite, # bounded deprecated
@@ -140,6 +140,9 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
         end
     end
 end
+
+
+
 
 export Q
 

@@ -118,10 +118,12 @@ end
 symbols(x::Symbol; kwargs...) = symbols(string(x); kwargs...)
 
 function length(x::SymbolicObject)
+    haskey(project(x), :length) && return project(x)[:length]
     sz = size(x)
     length(sz) == 0 && return(0)
     *(sz...)
 end
+
 function size(x::SymbolicObject)
     return ()
 end
