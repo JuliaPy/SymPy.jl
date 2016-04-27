@@ -68,7 +68,8 @@ export free_symbols
 
 
 ## From relational
-core_sympy_methods = (:Dummy,
+core_sympy_methods = (:sympify,
+                      :Dummy,
                       :Mod, :Rel,
                       :Eq, :Ne, :Lt, :Le, :Gt, :Ge,
                       :Equality, :Unequality,
