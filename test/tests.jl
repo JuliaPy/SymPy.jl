@@ -390,7 +390,7 @@ end
 ## sets
 s = FiniteSet("H","T")
 s1 = powerset(s)
-@assert length(collect(convert(Set, s1))) == length(collect(s1.x))
+VERSION >= v"0.4.0" && @assert length(collect(convert(Set, s1))) == length(collect(s1.x))
 a, b = Interval(0,1), Interval(2,3)
 @assert is_disjoint(a, b) == true
 @assert measure(union(a, b)) == 2

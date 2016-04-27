@@ -210,10 +210,16 @@ function N(x::Sym, digits::Int)
         return N(numer(x)) / N(denom(x))
     elseif x.x[:is_real]
         p = round(Int,log2(10)*digits)
-        
-        out = setprecision(p) do 
-            convert(BigFloat, ex)
-        end
+
+        if VERSION >= v"0.4.0"          # compat should do this XXX
+            out = setprecision(p) do 
+                convert(BigFloat, ex)
+            end
+        else
+            out = with_bigfloat_precision(p) do 
+                convert(BigFloat, ex)
+            end
+        end            
         return(out)
     elseif x.x[:is_complex]
         r, i = ex[:re](), ex[:im]()
