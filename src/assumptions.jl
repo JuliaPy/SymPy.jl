@@ -139,7 +139,7 @@ for meth in Q_predicates
 `$($nm)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($nm)
 """ ->
-            ($meth)(x::SymPy.SymbolicObject) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
+            ($meth)(x) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
         end
     end
 end
