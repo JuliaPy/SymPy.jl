@@ -38,7 +38,7 @@ SymPy
 
 using Compat
 
-using PyCall, Conda
+using PyCall
 
 
 if VERSION < v"0.4.0"
@@ -237,7 +237,8 @@ function __init__()
     catch e
         if PyCall.conda
             info("Installing sympy via the Conda package...")
-            Conda.add("sympy")
+            PyCall.pyimport_conda("sympy", "sympy")
+            #Conda.add("sympy")
             copy!(sympy, pyimport("sympy"))
         else
             error("""Failed to pyimport("sympy"): SymPy will not work until you have a functioning sympy module.

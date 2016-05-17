@@ -54,7 +54,8 @@ function init_mpmath()
         catch e
             if PyCall.conda
                 info("Installing mpmath via the Conda package...")
-                Conda.add("mpmath")
+                #Conda.add("mpmath")
+                PyCall.pyimport_conta("mpmath", "mpmath")
                 copy!(mpmath, pyimport("mpmath"))
             else
                 error("""Failed to pyimport("mpmath"): SymPy will have less functionality.
