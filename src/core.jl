@@ -125,6 +125,6 @@ for meth in core_sympy_methods_base
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
         ($meth)(ex::Sym, args...; kwargs...) =
-            sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+            sympy_meth($meth_name, ex, args...; kwargs...)
     end
 end

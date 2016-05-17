@@ -23,7 +23,7 @@ val_map = Dict(
                )
 
 ## Mapping of Julia function names into julia ones
-## most are handled by symbol(fnname), this catches exceptions
+## most are handled by Symbol(fnname), this catches exceptions
 _heaviside(x) = 1//2 * (1 + sign(x))
 function _piecewise(args...)
     as = copy([args...])
@@ -59,7 +59,7 @@ fn_map = Dict(
               "Greater" => :(>) 
               )
               
-map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : symbol(key)              
+map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : @compat(Symbol(key))
               
               
 ## TODO? In SymPy, one can pass in dictionary keys to replace functions
@@ -72,7 +72,7 @@ function walk_expression(ex; values=Dict(), fns=Dict())
     fn = _funcname(ex)
     
     if fn == "Symbol"
-        return symbol(string(ex))
+        return @compat(Symbol(string(ex)))
     elseif fn in ["Integer" , "Float"]
         return N(ex)
     elseif fn == "Rational"

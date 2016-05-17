@@ -30,7 +30,8 @@ mpmath_fns = (:hyp0f1,
            )
 for fn in mpmath_fns
     meth = string(fn)
-    @eval ($fn)(xs::SymOrNumber...;kwargs...) = mpmath_meth(symbol($meth), xs...; kwargs...)
+    #    @eval ($fn)(xs::SymOrNumber...;kwargs...) = mpmath_meth(@compat(Symbol($meth)), xs...; kwargs...)
+    @eval ($fn)(xs::SymOrNumber...;kwargs...) = mpmath_meth($meth, xs...; kwargs...)
     eval(Expr(:export, fn))
 end
 
@@ -78,13 +79,13 @@ function init_mpmath()
     end
 
     ## Call a function in the mpmath module, giving warning and returning NaN if module is not found 
-    global mpmath_meth(meth::Symbol, args...; kwargs...) = begin
-        if isa(mpmath, Nothing)
+    global mpmath_meth(meth, args...; kwargs...) = begin
+        if isa(mpmath, Void)
             warn("The mpmath module of Python is not installed. http://docs.sympy.org/dev/modules/mpmath/setup.html#download-and-installation")
             return(Sym(NaN))
         end
 
-        fn = mpmath[meth]
+        fn = mpmath[@compat(Symbol(meth))]
         ans = call_sympy_fun(fn, args...; kwargs...)
         ## make nicer...
         if isa(ans, Vector)

@@ -82,7 +82,7 @@ for meth in (:norm,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(a::SymMatrix, args...; kwargs...) = object_meth(a, symbol($meth_name), args...;kwargs...)
+        ($meth)(a::SymMatrix, args...; kwargs...) = object_meth(a, $meth_name, args...;kwargs...)
         ($meth)(a::Array{Sym}, args...; kwargs...) = ($meth)(convert(SymMatrix, a), args...;kwargs...)
     end
     eval(Expr(:export, meth))
@@ -97,7 +97,7 @@ for meth in (
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(a::SymMatrix, args...; kwargs...) = object_meth(a, symbol($meth_name), args...;kwargs...)
+        ($meth)(a::SymMatrix, args...; kwargs...) = object_meth(a, $meth_name, args...;kwargs...)
         ($meth)(a::Matrix{Sym}, args...; kwargs...) = ($meth)(convert(SymMatrix, a), args...;kwargs...)
     end
     eval(Expr(:export, meth))
@@ -126,8 +126,8 @@ for meth in  (:is_anti_symmetric, :is_diagonal, :is_diagonalizable,:is_nilpotent
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(ex::SymMatrix, args...; kwargs...) = ex[symbol($meth_name)]()
-        ($meth)(ex::Matrix{Sym}, args...; kwargs...) = ex[symbol($meth_name)]()
+        ($meth)(ex::SymMatrix, args...; kwargs...) = ex[@compat(Symbol($meth_name))]()
+        ($meth)(ex::Matrix{Sym}, args...; kwargs...) = ex[@compat(Symbol($meth_name))]()
     end
     eval(Expr(:export, meth))
 end
@@ -148,8 +148,8 @@ for meth in matrix_operators
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(ex::SymMatrix, args...; kwargs...) = ex[symbol($meth_name)]
-        ($meth)(ex::Matrix{Sym}, args...; kwargs...) = ex[symbol($meth_name)]
+        ($meth)(ex::SymMatrix, args...; kwargs...) = ex[@compat(Symbol($meth_name))]
+        ($meth)(ex::Matrix{Sym}, args...; kwargs...) = ex[@compat(Symbol($meth_name))]
     end
     eval(Expr(:export, meth))
 end
@@ -191,8 +191,8 @@ for meth in map_matrix_methods
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(ex::SymMatrix, args...; kwargs...) = call_matrix_meth(ex, symbol($meth_name), args...; kwargs...)
-        ($meth)(ex::Matrix{Sym}, args...; kwargs...) = call_matrix_meth(convert(SymMatrix, ex), symbol($meth_name), args...; kwargs...)
+        ($meth)(ex::SymMatrix, args...; kwargs...) = call_matrix_meth(ex, @compat(Symbol($meth_name)), args...; kwargs...)
+        ($meth)(ex::Matrix{Sym}, args...; kwargs...) = call_matrix_meth(convert(SymMatrix, ex), @compat(Symbol($meth_name)), args...; kwargs...)
     end
     eval(Expr(:export, meth))
 end

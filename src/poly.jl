@@ -105,12 +105,16 @@ polynomial_sympy_methods = (
                             :construct_domain,
                             :minimal_polynomial,
                             :minpoly, :primitive_element,
-                            :field_isomorphism, :to_number_field,
-                            :numer, :denom
+                            :field_isomorphism, :to_number_field
+#                            :numer#, :denom
 #                            :roots ## conflict with Roots.roots and functionality provided by solve
                             )
 
 
+
+denom(x::Sym) = sympy_meth(:denom, x)
+numer(x::Sym) = sympy_meth(:numer, x)
+export denom
 
 polynomial_sympy_methods_import = (:expand,
                                    :factor #,
@@ -119,7 +123,7 @@ polynomial_sympy_methods_import = (:expand,
 
 for meth in polynomial_sympy_methods_import
     meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth($meth_name, ex, args...; kwargs...)
 end
 
 ## SymPy Poly class

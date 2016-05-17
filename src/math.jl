@@ -20,7 +20,7 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($fn)(x::Sym;kwargs...) = sympy_meth(symbol($meth_name), x; kwargs...)#sympy[symbol($meth)](project(x),[(k,project(v)) for (k,v) in kwargs]...)
+        ($fn)(x::Sym;kwargs...) = sympy_meth($meth_name, x; kwargs...)
     end
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
@@ -42,13 +42,13 @@ for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
           :acosd, :acotd, :acscd, :asecd, :asind, :atand)
 
     rad_fn = string(fn)[1:end-1]
-    @eval ($fn)(x::Sym) = sympy[symbol($rad_fn)](project(x * Sym(sympy[:pi]/180)))
+    @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](project(x * Sym(sympy[:pi]/180)))
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
                                            
 for fn in (:cospi, :sinpi)
     rad_fn = string(fn)[1:end-2]
-    @eval ($fn)(x::Sym) = sympy[symbol($rad_fn)](project(x * Sym(sympy[:pi])))
+    @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](project(x * Sym(sympy[:pi])))
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
@@ -79,7 +79,7 @@ for meth in sympy_math_methods
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+        ($meth)(ex::Sym, args...; kwargs...) = sympy_meth($meth_name, ex, args...; kwargs...)
     end
     eval(Expr(:export, meth))
 end
@@ -132,7 +132,7 @@ for meth in (:separate, :flatten,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(ex::Sym, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+        ($meth)(ex::Sym, args...; kwargs...) = sympy_meth($meth_name, ex, args...; kwargs...)
     end
     eval(Expr(:export, meth))
 end

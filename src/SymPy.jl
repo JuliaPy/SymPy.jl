@@ -193,7 +193,7 @@ for meth in union(core_sympy_methods,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth){T<:SymbolicObject}(ex::T, args...; kwargs...) = sympy_meth(symbol($meth_name), ex, args...; kwargs...)
+        ($meth){T<:SymbolicObject}(ex::T, args...; kwargs...) = sympy_meth($meth_name, ex, args...; kwargs...)
         
     end
     eval(Expr(:export, meth))
@@ -211,7 +211,7 @@ for meth in union(core_object_methods,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(ex::SymbolicObject, args...; kwargs...) = object_meth(ex, symbol($meth_name), args...; kwargs...)
+        ($meth)(ex::SymbolicObject, args...; kwargs...) = object_meth(ex, $meth_name, args...; kwargs...)
     end
     eval(Expr(:export, meth))
 end
@@ -223,7 +223,7 @@ for prop in union(core_object_properties,
                   polynomial_predicates)
 
     prop_name = string(prop)
-    @eval ($prop)(ex::Sym) = ex[symbol($prop_name)]
+    @eval ($prop)(ex::Sym) = ex[@compat(Symbol($prop_name))]
     eval(Expr(:export, prop))
 end
 
@@ -272,8 +272,8 @@ function __init__()
 
     ## Main interface to methods in sympy
     ## sympy_meth(:name, ars, kwars...)
-    global sympy_meth(meth::Symbol, args...; kwargs...) = begin
-        ans = call_sympy_fun(convert(Function, sympy[meth]), args...; kwargs...)
+    global sympy_meth(meth, args...; kwargs...) = begin
+        ans = call_sympy_fun(convert(Function, sympy[@compat(Symbol(meth))]), args...; kwargs...)
         ## make nicer...
         try
             if isa(ans, Vector)
@@ -283,10 +283,10 @@ function __init__()
         end
         ans
     end
-    global object_meth(object::SymbolicObject, meth::Symbol, args...; kwargs...)  =  begin
-        call_sympy_fun(project(object)[meth],  args...; kwargs...)
+    global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
+        call_sympy_fun(project(object)[@compat(Symbol(meth))],  args...; kwargs...)
     end
-    global call_matrix_meth(object::SymbolicObject, meth::Symbol, args...; kwargs...) = begin
+    global call_matrix_meth(object::SymbolicObject, meth, args...; kwargs...) = begin
         out = object_meth(object, meth, args...; kwargs...)
         if isa(out, SymMatrix) 
             convert(Array{Sym}, out)
