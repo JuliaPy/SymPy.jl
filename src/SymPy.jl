@@ -157,20 +157,22 @@ end
 
 
 ## Plotting
-if VERSION <= v"0.5.0-"  ## Plots and v0.5 has Requires issue right now
-    using Plots
-    import Plots: plot, plot!, backend
-    export plot, plot!, backend
+## temporarily disable plotting
+## to plot use plot(lambdify(ex), a, b)
+## if VERSION <= v"0.5.0-"  ## Plots and v0.5 has Requires issue right now
+##     using Plots
+##     import Plots: plot, plot!, backend
+##     export plot, plot!, backend
 
-    ## hang onto v"0.3.0" of julia by putting in conditional plot.jl files...
-    if VERSION <= v"0.5.0-"
-        if Pkg.installed("Plots") <= v"0.4.2"
-            include("plot_v0-4-2.jl")
-        else 
-            include("plot.jl")
-        end
-    end
-end
+##     ## hang onto v"0.3.0" of julia by putting in conditional plot.jl files...
+##     if VERSION <= v"0.5.0-"
+##         if Pkg.installed("Plots") <= v"0.4.2"
+##             include("plot_v0-4-2.jl")
+##         else 
+##             include("plot.jl")
+##         end
+##     end
+## end
     
 
 ## create some methods
@@ -304,7 +306,7 @@ function __init__()
     init_mpmath()
     init_sets()
     VERSION >= v"0.4.0" && init_lambdify()
-    VERSION <= v"0.5.0-" && init_plot()  
+#    VERSION <= v"0.5.0-" && init_plot()  
 end
 
 end
