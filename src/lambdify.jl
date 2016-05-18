@@ -146,7 +146,7 @@ function lambdify(ex::Sym, vars=free_symbols(ex); fns=Dict(), values=Dict())
     end
     try
         eval(Expr(:function,
-                  Expr(:call, gensym(), map(symbol,vars)...),
+                  Expr(:call, gensym(), map(Symbol,vars)...),
                   body))
     catch err
         throw(ArgumentError("Expression does not lambdify"))

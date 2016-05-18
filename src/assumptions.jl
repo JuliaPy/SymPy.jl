@@ -44,7 +44,7 @@ Q_predicates = (:even, :odd, :prime, :nonzero,
                 :integer, :irrational, :real,
                 :positive, :negative,
                 :bounded, :commutative)
-Q_nms = [symbol("Q" * string(i)) for i in Q_predicates]
+Q_nms = [@compat(Symbol("Q" * string(i))) for i in Q_predicates]
 
 for (fn, meth) in zip(Q_nms, Q_predicates)
     nm = string(meth)

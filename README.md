@@ -127,6 +127,6 @@ methods, not `Julia` methods that have been ported. (Hence,
 
 ## TODO
 
-- Try `@doc` for documentation links back to SymPy's documentation.
+- Reintegrate the `Plots` package through `RecipesBase`
 
 
