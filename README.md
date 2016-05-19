@@ -1,6 +1,7 @@
-[![SymPy](http://pkg.julialang.org/badges/SymPy_0.3.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=0.3)
 [![SymPy](http://pkg.julialang.org/badges/SymPy_0.4.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=0.4)
 &nbsp;
+[![SymPy](http://pkg.julialang.org/badges/SymPy_0.5.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=0.5) 
+
 Linux: [![Build Status](https://travis-ci.org/jverzani/SymPy.jl.svg?branch=master)](https://travis-ci.org/jverzani/SymPy.jl)
 &nbsp;
 Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/jverzani/SymPy.jl?branch=master&svg=true)](https://ci.appveyor.com/project/jverzani/sympy-jl)
@@ -128,5 +129,6 @@ methods, not `Julia` methods that have been ported. (Hence,
 ## TODO
 
 - Reintegrate the `Plots` package through `RecipesBase`
+
 
 
