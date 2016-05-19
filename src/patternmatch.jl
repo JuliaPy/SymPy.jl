@@ -145,7 +145,6 @@ function xreplace(ex::Sym, rule::Dict, args...; kwargs...)
     d = [project(k) => project(v) for (k,v) in rule]
     ex[:xreplace](d, args...; kwargs...)
 end
-if VERSION >= v"0.4.0"
-    xreplace(ex::Sym, xs::Pair...; kwargs...) = xreplace(ex, Dict(xs...); kwargs...)
-end
+xreplace(ex::Sym, xs::Pair...; kwargs...) = xreplace(ex, Dict(xs...); kwargs...)
+
 export xreplace

@@ -84,8 +84,7 @@ end
 
 #Test subs for pars and dicts
 ex = 1
-#dict1 = Dict{ASCIIString,Any}()
-dict1 = Dict{String,Any}()
+dict1 = Dict{Compat.String,Any}()
 dict2 = Dict{Any,Any}()
 #test subs
 for i=1:4

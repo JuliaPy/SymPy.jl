@@ -31,11 +31,8 @@ log(x::Sym) = sympy_meth(:log, x)
 log(b::Sym, x::Sym) = sympy_meth(:log, x, b)
 
 ### Trigonometry
-
-if VERSION >= v"0.4.0-dev"
-    Base.rad2deg(x::Sym) = radians2degrees(x)
-    Base.deg2rad(x::Sym) = degrees2radians(x)
-end
+Base.rad2deg(x::Sym) = radians2degrees(x)
+Base.deg2rad(x::Sym) = degrees2radians(x)
 
 ## degree functions   
 for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
@@ -169,15 +166,13 @@ end
 ## ```
 ## """
 
-if VERSION >= v"0.4.0"
-    limit(ex::Sym, d::Pair; kwargs...) = limit(ex, d.first, d.second;kwargs...)
-    ## XXX why can I not have dir="+" as keyword argument?
-    function limit(ex::Sym, d::Pair...)
-        for p in d
-            ex = limit(ex, p)
-        end
-        ex
+limit(ex::Sym, d::Pair; kwargs...) = limit(ex, d.first, d.second;kwargs...)
+## XXX why can I not have dir="+" as keyword argument?
+function limit(ex::Sym, d::Pair...)
+    for p in d
+        ex = limit(ex, p)
     end
+    ex
 end
 
 limit(ex::Sym, x::Sym, c; kwargs...) = sympy_meth(:limit, ex, x, Sym(c); kwargs...)

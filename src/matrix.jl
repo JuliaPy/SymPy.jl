@@ -109,11 +109,6 @@ inverse(ex::Matrix{Sym}) = call_matrix_meth(convert(SymMatrix, ex),:inv)
 export inverse
 
 
-if VERSION < v"0.4.0-dev"
-    det(x::Matrix{Sym}) = det(lufact(x, pivot=false))
-    inv(x::Matrix{Sym}) = inverse(x)
-end
-
 ## But
 ## is_symmetric <-> issym
 ## istriu, istril,
@@ -256,10 +251,8 @@ function rref(a::SymMatrix)
   convert(Array{Sym}, d[1]) ## return Array{Sym}, not SymMatrix
 end
 
-if VERSION >= v"0.4.0"
-    rref{T <: Integer}(a::Matrix{T}) = N(rref(convert(Matrix{Sym}, a)))
-    rref{T <: Integer}(a::Matrix{Rational{T}}) = N(rref(convert(Matrix{Sym}, a)))
-end
+rref{T <: Integer}(a::Matrix{T}) = N(rref(convert(Matrix{Sym}, a)))
+rref{T <: Integer}(a::Matrix{Rational{T}}) = N(rref(convert(Matrix{Sym}, a)))
 
 ## call with a (A,b), return array
 for fn in (:cross,

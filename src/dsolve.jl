@@ -1,17 +1,12 @@
 ## dsolve
 
-## Make a function argument, but munge arguments from Sym -> PyObject class
-if VERSION < v"0.4.0"
-    SymFunction(nm::SymOrString) = (args...) -> Sym(sympy[:Function](nm)(project(args)...))
-    symfunction(x) = SymFunction(x)
-else
-    ## A type akin to SymFunction but with the ability to keep track of derivative
-    type SymFunction <: SymPy.SymbolicObject
-        u::PyCall.PyObject
-        n::Int
-    end
+## A type akin to SymFunction but with the ability to keep track of derivative
+type SymFunction <: SymPy.SymbolicObject
+    u::PyCall.PyObject
+    n::Int
+end
     
-    """
+"""
 
 Create a symbolic function. These can be used for specifying differential equations.
 For these objects we can specify derivatives with the transpose
@@ -32,41 +27,38 @@ F, G = symbols("F,G", cls=symfunction)
 ```
 
 """
-    function SymFunction{T<:AbstractString}(x::T)
-        u = sympy[:Function](x)
-        SymFunction(u, 0)
-    end
+function SymFunction{T<:AbstractString}(x::T)
+    u = sympy[:Function](x)
+    SymFunction(u, 0)
+end
 
-    IVPSolution{T<:AbstractString}(x::T) = SymFunction(x)
-    export IVPSolution
-    ## Need to deprecate this...
-    @deprecate IVPSolution(x::AbstractString) SymFunction(x)
+IVPSolution{T<:AbstractString}(x::T) = SymFunction(x)
+export IVPSolution
+## Need to deprecate this...
+@deprecate IVPSolution(x::AbstractString) SymFunction(x)
 
-    symfunction(x) = SymFunction(x) # for use with symbols("F", cls=symfunction)
-    
-    # some display of objects
-    Base.display(u::SymFunction) = println("$(string(Sym(u.u)))" * repeat("'", u.n))
-    
-    ## override call
-    Base.call(u::SymFunction, x::Base.Dict) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
-    Base.call(u::SymFunction, x::Base.Pair) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
-    function Base.call(u::SymFunction, x) 
+symfunction(x) = SymFunction(x) # for use with symbols("F", cls=symfunction)
+
+# some display of objects
+Base.display(u::SymFunction) = println("$(string(Sym(u.u)))" * repeat("'", u.n))
+
+## override call
+Base.call(u::SymFunction, x::Base.Dict) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
+Base.call(u::SymFunction, x::Base.Pair) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
+function Base.call(u::SymFunction, x) 
         if u.n == 0
             u.u(SymPy.project(x))
         else
             __x = Sym("__x")
             diff(u.u(__x.x), __x, u.n)(__x => x)
         end
-    end
-    
+end
 
 
-    ## rather than use `diff(u(x),x,1)` we can use `u'(x)`
-    function Base.ctranspose(x::SymFunction)
-        SymFunction(x.u, x.n + 1)
-    end
-    
-    
+
+## rather than use `diff(u(x),x,1)` we can use `u'(x)`
+function Base.ctranspose(x::SymFunction)
+    SymFunction(x.u, x.n + 1)
 end
 
 

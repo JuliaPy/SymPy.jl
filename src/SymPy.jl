@@ -1,4 +1,4 @@
-VERSION >= v"0.4.0" && __precompile__(true) 
+__precompile__(true) 
 
 ## TODO:
 ## * tidy up code
@@ -26,6 +26,7 @@ are not generated automatically though, rather added by hand.
 To find documentation on SymPy functions, one should refer to
 SymPy's [website](http://docs.sympy.org/latest/index.html).
 
+(This is temporarily not the case)
 Plotting is provided through the `Plots` package interface. For more detail, see
 the help page for `sympy_plotting`.
 
@@ -39,12 +40,6 @@ SymPy
 using Compat
 
 using PyCall
-
-
-if VERSION < v"0.4.0"
-    eval(parse("using Docile"))
-    eval(parse("Docile.@document"))
-end
 
 import Base: show, writemime
 import Base: convert, promote_rule
@@ -86,15 +81,7 @@ import Base: trunc
 import Base: isinf, isnan
 import Base: real, imag
 import Base: expm
-
-
-## conditional imports
-if VERSION < v"0.4.0"
-    import Base: rref, det
-    import Base: radians2degrees, degrees2radians
-else
-    import Base: nullspace
-end
+import Base: nullspace
 
 
 
@@ -151,9 +138,7 @@ include("matrix.jl")
 include("ntheory.jl")
 include("sets.jl")
 include("display.jl")
-if VERSION >= v"0.4.0"
-    include("lambdify.jl")
-end
+include("lambdify.jl")
 
 
 ## Plotting
@@ -305,7 +290,7 @@ function __init__()
     init_math()
     init_mpmath()
     init_sets()
-    VERSION >= v"0.4.0" && init_lambdify()
+    init_lambdify()
 #    VERSION <= v"0.5.0-" && init_plot()  
 end
 

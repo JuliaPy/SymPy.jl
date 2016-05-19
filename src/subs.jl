@@ -51,9 +51,8 @@ subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any})) =
 subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any}), args...) = subs(subs(ex, y), args...)
 subs{T <: SymbolicObject, S<:SymbolicObject}(ex::T, y::S, val) = subs(ex, (y,val))
 subs{T <: SymbolicObject}(ex::T, dict::Dict) = subs(ex, dict...)
-if VERSION >= v"0.4.0"
-    subs{T <: SymbolicObject}(ex::T, d::Pair...) = subs(ex, [(p.first, p.second) for p in d]...)
-end
+subs{T <: SymbolicObject}(ex::T, d::Pair...) = subs(ex, [(p.first, p.second) for p in d]...)
+
 function subs{T <: SymbolicObject, S <: Symbol}(ex::T, y::S, val)
     warn("Calling subs with a symbol and not a symbolic variable is deprecated")
     subs(ex, (y,val))
@@ -63,9 +62,8 @@ end
 subs(x::SymbolicObject, y) = ex -> subs(ex, x, y)
 subs(;kwargs...) = ex -> subs(ex; kwargs...)
 subs(dict::Dict) = ex -> subs(ex, dict...)
-if VERSION >= v"0.4.0"
-    subs(d::Pair...) = ex -> subs(ex, [(p.first, p.second) for p in d]...)
-end
+subs(d::Pair...) = ex -> subs(ex, [(p.first, p.second) for p in d]...)
+
 function subs(x::Symbol, y)
     warn("Calling `subs` with a symbol and not a symbolic variable is deprecated")
     ex -> subs(ex, Sym(x), y)
@@ -211,15 +209,9 @@ function N(x::Sym, digits::Int)
     elseif x.x[:is_real]
         p = round(Int,log2(10)*digits)
 
-        if VERSION >= v"0.4.0"          # compat should do this XXX
-            out = setprecision(p) do 
-                convert(BigFloat, ex)
-            end
-        else
-            out = with_bigfloat_precision(p) do 
-                convert(BigFloat, ex)
-            end
-        end            
+        out = setprecision(p) do 
+            convert(BigFloat, ex)
+        end
         return(out)
     elseif x.x[:is_complex]
         r, i = ex[:re](), ex[:im]()
