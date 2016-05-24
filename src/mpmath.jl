@@ -46,32 +46,8 @@ function init_mpmath()
         return()
     end
     ## try to load mpmath module
-    try
-        copy!(mpmath, pyimport("sympy.mpmath"))
-    catch e
-        try
-	    copy!(mpmath, pyimport("mpmath"))			
-        catch e
-            if PyCall.conda
-                info("Installing mpmath via the Conda package...")
-                #Conda.add("mpmath")
-                PyCall.pyimport_conta("mpmath", "mpmath")
-                copy!(mpmath, pyimport("mpmath"))
-            else
-                error("""Failed to pyimport("mpmath"): SymPy will have less functionality.
-
-                      For automated mpmath installation, try configuring PyCall to use the Conda Python distribution within Julia.  Relaunch Julia and run:
-                            ENV["PYTHON"]=""
-                            Pkg.build("PyCall")
-                            using SymPy
-
-                      pyimport exception was: """, e)
-            end
-        end
-    end
+    copy!(mpmath, PyCall.pyimport_conda("mpmath", "mpmath"))
     if mpmath != PyCall.PyNULL()
-        
-        
         ## ignore warnings for now...
         mpftype = mpmath["mpf"]
         pytype_mapping(mpftype, BigFloat) ## Raises warning!!!

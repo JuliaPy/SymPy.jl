@@ -1,4 +1,4 @@
-__precompile__(true) 
+__precompile__() 
 
 ## TODO:
 ## * tidy up code
@@ -30,7 +30,7 @@ SymPy's [website](http://docs.sympy.org/latest/index.html).
 Plotting is provided through the `Plots` package interface. For more detail, see
 the help page for `sympy_plotting`.
 
-The package tutorial provides many examples. This can be read 
+The package tutorial provides many examples. This can be read on
 [GitHub](https://github.com/jverzani/SymPy.jl/blob/master/examples/tutorial.ipynb).
 
 """
@@ -219,25 +219,7 @@ end
 function __init__()
     
     ## Define sympy, mpmath, ...
-    try
-        copy!(sympy, pyimport("sympy"))
-    catch e
-        if PyCall.conda
-            info("Installing sympy via the Conda package...")
-            PyCall.pyimport_conda("sympy", "sympy")
-            #Conda.add("sympy")
-            copy!(sympy, pyimport("sympy"))
-        else
-            error("""Failed to pyimport("sympy"): SymPy will not work until you have a functioning sympy module.
-
-                  For automated SymPy installation, try configuring PyCall to use the Conda Python distribution within Julia.  Relaunch Julia and run:
-                        ENV["PYTHON"]=""
-                        Pkg.build("PyCall")
-                        using SymPy
-
-                  pyimport exception was: """, e)
-        end
-    end
+    copy!(sympy, PyCall.pyimport_conda("sympy", "sympy"))
 
     ## mappings from PyObjects to types.
     basictype = sympy[:basic]["Basic"]
