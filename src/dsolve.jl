@@ -80,18 +80,7 @@ end
 # some display of objects
 Base.display(u::SymFunction) = println("$(string(Sym(u.u)))" * repeat("'", u.n))
 
-## override call
-Base.call(u::SymFunction, x::Base.Dict) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
-Base.call(u::SymFunction, x::Base.Pair) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
-function Base.call(u::SymFunction, x) 
-        if u.n == 0
-            u.u(SymPy.project(x))
-        else
-            __x = Sym("__x")
-            diff(u.u(__x.x), __x, u.n)(__x => x)
-        end
-end
-
+## override call is in call.jl
 
 
 ## rather than use `diff(u(x),x,1)` we can use `u'(x)`

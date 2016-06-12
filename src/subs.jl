@@ -93,10 +93,6 @@ end
 # ```
 #     """
 
-## add call interface depends on version
-VERSION >= v"0.5.0-" && include("call.jl")
-v"0.4.0" <= VERSION < v"0.5.0-" && include("call-0.4.jl")
-
 
 ## different conversions
 

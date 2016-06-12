@@ -39,9 +39,10 @@ rather ther function `Eq` is used. Here we use the unicode
 (≪)(a::Sym, b::Number) = Lt(a,Sym(b))  # \ll<tab>
 (≪)(a::Number, b::Sym) = Lt(Sym(a),b)  # \ll<tab>
 
-Base.(:≤)(a::Sym, b::Sym) = Le(a,b)  # \le<tab>
-Base.(:≤)(a::Sym, b::Number) = Le(a,Sym(b))  # \le<tab>
-Base.(:≤)(a::Number, b::Sym) = Le(Sym(a),b)  # \le<tab>
+## compat for v0.4
+@compat Base.:≤(a::Sym, b::Sym) = Le(a,b)  # \le<tab>
+@compat Base.:≤(a::Sym, b::Number) = Le(a,Sym(b))  # \le<tab>
+@compat Base.:≤(a::Number, b::Sym) = Le(Sym(a),b)  # \le<tab>
 
 "For hashing, we use equality at the python level."
 ## Base.isequal(x::Sym, y::Sym) = x.x == y.x
@@ -53,9 +54,10 @@ Base.(:≤)(a::Number, b::Sym) = Le(Sym(a),b)  # \le<tab>
 (⩵)(a::Number, b::Sym) = Eq(Sym(a),b)  # \Equal<tab>
 
 
-Base.(:>=)(a::Sym, b::Sym) = Ge(a,b)
-Base.(:>=)(a::Sym, b::Number) = Ge(a,Sym(b))
-Base.(:>=)(a::Number, b::Sym) = Ge(Sym(a),b)
+# compat for v0.4
+@compat Base.:>=(a::Sym, b::Sym) = Ge(a,b)
+@compat Base.:>=(a::Sym, b::Number) = Ge(a,Sym(b))
+@compat Base.:>=(a::Number, b::Sym) = Ge(Sym(a),b)
 
 
 (≫)(a::Sym, b::Sym) = Gt(a,b)
