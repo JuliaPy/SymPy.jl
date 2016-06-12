@@ -128,7 +128,6 @@ methods, not `Julia` methods that have been ported. (Hence,
 
 ## TODO
 
-- Reintegrate the `Plots` package through `RecipesBase`
 
 
 

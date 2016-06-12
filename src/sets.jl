@@ -37,9 +37,10 @@ as_relational(a, x)  #  0 ≤ x ∧ x ≤ 1
 
 s = FiniteSet(1,2)
 powerset(s) # {∅, {1}, {2}, {1, 2}}
+elements(s)   # collect(args(s))
 ```
 
-SymPy `FiniteSet`s are not iterable, but can be collected with `collect(s.x)`
+SymPy `FiniteSet`s are not iterable, but can be collected with `collect(args(u))`.
 
 SymPy `Union`s are not iterable, but can be collected after calling `args` via `collect(args(s))`.
 
@@ -102,6 +103,9 @@ powerset(s::Sym) = s[:powerset]()
 Base.contains(I::Sym, x) = (I[:contains](x) == Sym(true))
 Base.in(x::Number, I::Sym) = contains(I, x)
 
+"Elements of finite set"
+elements(x::Sym) = PyCall.pyeval("[i for i in s]", s=project(x))
+export elements
 
 
 "Complement of set within the universe"

@@ -20,7 +20,9 @@ Sym(args...) = map(Sym, args)
 ## Thanks to vtjnash for this!
 """
 
-Macro to create many symbolic objects at once. (Written by `@vtjnash`.)
+Macro to create many symbolic objects at once. (Written by `@vtjnash`. Augmented by `@alhirzel`
+The `@syms` macros creates the variables and assigns them into the
+module `Main`.
 
 Example:
 
@@ -28,8 +30,19 @@ Example:
 @syms a b c
 ```
 
-The `@syms` macros creates the variables and assigns them into the
-module `Main`. The `@vars` macro is identical, but this is
+Additionally you can pass assumptions on using keyword arguments:
+
+```
+@syms a positive=true b real=true c
+```
+
+Additionally you can rename arguments using pairs notation:
+
+```
+@syms   Ld=>"L_d" Lq=>"L_q"
+```
+
+ The `@vars` macro is identical, but this is
 transitional and `@syms` should be used. (This is the name used in
 MATLAB.). The old behaviour of `@syms` was to create the symbols and
 return them for assignment through the left hand side.  The `symbols`
@@ -38,21 +51,47 @@ assumptions to be made. Hence, `@syms` is repurposed. The old behavior
 is kept, for now, through `@osyms`. A name clearly to be replaced,
 perhaps with `@vars`.
 
-Original macro magic contributed by @vtjnash.
+Original macro magic contributed by @vtjnash and extended by @alhirzel
 """
 macro syms(x...)
-    q=Expr(:block)
-    if length(x) == 1 && isa(x[1],Expr)
-        @assert x[1].head === :tuple "@syms expected a list of symbols"
-        x = x[1].args
+    q = Expr(:block)
+    as = []    # running list of assumptions to be applied
+    ss = []    # running list of symbols created
+    for s in reverse(x)
+        if isa(s, Expr)    # either an assumption or a named variable
+            if s.head == :(=)
+                s.head = :kw
+                push!(as, s)
+            elseif s.head == :(=>)
+                push!(ss, s.args[1])
+                push!(q.args, Expr(:(=), s.args[1], Expr(:call, :symbols, s.args[2], as...)))
+            end
+        elseif isa(s, Symbol)   # raw symbol to be created
+            push!(ss, s)
+            push!(q.args, Expr(:(=), s, Expr(:call, :symbols, Expr(:quote, s), as...)))
+        else
+            throw(AssertionError("@syms expected a list of symbols and assumptions"))
+        end
     end
-    for s in x
-        @assert isa(s,Symbol) "@syms expected a list of symbols"
-        push!(q.args, Expr(:(=), s, Expr(:call, :symbols, Expr(:quote, s))))
-    end
-    push!(q.args, Expr(:tuple, x...))
+    push!(q.args, Expr(:tuple, reverse(ss)...)) # return all of the symbols we created
     eval(Main, q)
 end
+
+
+
+## macro syms(x...)
+##     q=Expr(:block)
+##     if length(x) == 1 && isa(x[1],Expr)
+##         @assert x[1].head === :tuple "@syms expected a list of symbols"
+##         x = x[1].args
+##     end
+##     for s in x
+##         @assert isa(s,Symbol) "@syms expected a list of symbols"
+##         push!(q.args, Expr(:(=), s, Expr(:call, :symbols, Expr(:quote, s))))
+##     end
+##     push!(q.args, Expr(:tuple, x...))
+##     eval(Main, q)
+## end
 
 
 """

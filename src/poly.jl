@@ -114,7 +114,7 @@ polynomial_sympy_methods = (
 
 denom(x::Sym) = sympy_meth(:denom, x)
 numer(x::Sym) = sympy_meth(:numer, x)
-export denom
+export denom, numer
 
 polynomial_sympy_methods_import = (:expand,
                                    :factor #,

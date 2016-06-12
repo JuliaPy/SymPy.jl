@@ -161,7 +161,7 @@ function solveset{T<:Sym}(exs::(@compat Union{T,Vector{T}}), x::Sym; kwargs...)
 end
 
 function solveset{T<:Sym,S<:Sym}(exs::(@compat Union{T,Vector{T}}), xs::Vector{S}; kwargs...)
-    a = sympy_meth(:solveset, exs, xs;  kwargs...)
+    a = sympy_meth(:solveset, convert(SymMatrix, exs), xs;  kwargs...)
     ## finesse output
     a
 end
@@ -178,3 +178,9 @@ function solveset_complex{T<:Sym}(ex::T, x::Sym; kwargs...)
     a
 end
 export solveset, solveset_real, solveset_complex
+
+## these are due for generation
+domain_check(ex::Sym, x::Sym, p) = sympy_meth(:domain_check, ex, x, p)
+linsolve{T<:Sym}(exs::(@compat Union{T,Vector{T}}), args...; kwargs...) = sympy_meth(:linsolve, exs, args...; kwargs...)
+
+export domain_check, linsolve

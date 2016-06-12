@@ -234,12 +234,10 @@ The default  is $1.7$.
 
 ### Plotting
 
-There is some experimental support for plotting of symbolic expressions. As there are many different backends for plotting with `Julia`, the available features depend on which backend. There is code for the `Plots`, `PyPlot`, `Gadfly`, and `Winston` packages. `PyPlot` provides many more graphics, including 3D graphics.
-
-Basic symbolic expressions can be plotted with `plot`. For example, the following should work with any of the above packages loaded, such as `Gadfly`:
+Plotting is provided through the `Plots` package. Where a function can be used in `Plots`, a symbolic expression can be used.
 
 ```
-using Gadfly
+using Plots
 ```
 
 ```

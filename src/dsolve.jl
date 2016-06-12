@@ -39,6 +39,44 @@ export IVPSolution
 
 symfunction(x) = SymFunction(x) # for use with symbols("F", cls=symfunction)
 
+## macro to create functions
+"""
+
+Macro to create multiple symbolic functions in the Main workspace.
+
+Example:
+```
+@symfuns Vd Vq id iq
+@syms Rs Lq=>"\lambda_q"  Ld=>"lambda_d" FLq FLd We Wm Np FLf t
+
+basicDQEquations = [
+    -Vq(t) + Rs*iq(t) + We*Ld*id(t) + We*FLf + Lq*iq'(t)
+    -Vd(t) + Rs*id(t) - We*Lq*iq(t) + Ld*id'(t) ]
+```
+
+
+Thanks to `@alhirzel` for the contribution.
+"""
+macro symfuns(x...)
+    q = Expr(:block)
+    fs = []    # running list of functions created
+    for s in x
+        if isa(s, Expr) && s.head == :(=>) # named function
+            push!(fs, s.args[1])
+            push!(q.args, Expr(:(=), s.args[1], Expr(:call, :SymFunction, s.args[2])))
+        elseif isa(s, Symbol)
+            push!(fs, s)
+            push!(q.args, Expr(:(=), s, Expr(:call, :SymFunction, string(s))))
+        else
+            throw(AssertionError("@fns expected a list of symbols"))
+        end
+    end
+    push!(q.args, Expr(:tuple, fs...)) # return all of the functions we created
+    eval(Main, q)
+end
+
+
+
 # some display of objects
 Base.display(u::SymFunction) = println("$(string(Sym(u.u)))" * repeat("'", u.n))
 

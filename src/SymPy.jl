@@ -26,9 +26,7 @@ are not generated automatically though, rather added by hand.
 To find documentation on SymPy functions, one should refer to
 SymPy's [website](http://docs.sympy.org/latest/index.html).
 
-(This is temporarily not the case)
-Plotting is provided through the `Plots` package interface. For more detail, see
-the help page for `sympy_plotting`.
+Plotting is provided through the `Plots` interface. For details, see the help page for `sympy_plotting`.
 
 The package tutorial provides many examples. This can be read on
 [GitHub](https://github.com/jverzani/SymPy.jl/blob/master/examples/tutorial.ipynb).
@@ -88,7 +86,8 @@ import Base: nullspace
 export sympy, sympy_meth, object_meth, call_matrix_meth
 export Sym, @syms, @vars, @osyms, symbols
 export pprint,  jprint
-export SymFunction, SymMatrix,
+export SymFunction, @symfuns,
+       SymMatrix,
        evalf, N,  subs,
        simplify, nsimplify,
        expand, factor, trunc,
@@ -140,25 +139,7 @@ include("sets.jl")
 include("display.jl")
 include("lambdify.jl")
 
-
-## Plotting
-## temporarily disable plotting
-## to plot use plot(lambdify(ex), a, b)
-## if VERSION <= v"0.5.0-"  ## Plots and v0.5 has Requires issue right now
-##     using Plots
-##     import Plots: plot, plot!, backend
-##     export plot, plot!, backend
-
-##     ## hang onto v"0.3.0" of julia by putting in conditional plot.jl files...
-##     if VERSION <= v"0.5.0-"
-##         if Pkg.installed("Plots") <= v"0.4.2"
-##             include("plot_v0-4-2.jl")
-##         else 
-##             include("plot.jl")
-##         end
-##     end
-## end
-    
+include("plot_recipes.jl") # hook into Plots
 
 ## create some methods
 
@@ -273,7 +254,6 @@ function __init__()
     init_mpmath()
     init_sets()
     init_lambdify()
-#    VERSION <= v"0.5.0-" && init_plot()  
 end
 
 end

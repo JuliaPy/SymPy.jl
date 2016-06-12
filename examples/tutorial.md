@@ -117,7 +117,7 @@ ex = x + y + z
 subs(ex, (x,1), (y,pi))      
 ```
 
-For version 0.4 and greater, pairs can be used for substitution with:
+Pairs can be used for substitution with:
 
 ```
 subs(ex, x=>1, y=>pi)
@@ -407,7 +407,7 @@ p(x=>0)
 Though one could use some trick like this to find all the coefficients:
 
 ```
-Sym[[coeff(p, x^i) for i in N(degree(p)):-1:1]; p(0)]
+Sym[[coeff(p, x^i) for i in N(degree(p)):-1:1]; p(x=>0)]
 ```
 
 that is cumbersome, at best. SymPy has a function `coeffs`, but it is defined for polynomial types, so will fail on `p`:
@@ -521,7 +521,29 @@ solve(cos(x) - sin(x))
 
 Though there are infinitely many correct solutions, these are within a certain range.
 
-The `solve` function has limits. For example, there is no symbolic solution here:
+The
+[solveset](http://docs.sympy.org/latest/modules/solvers/solveset.html)
+function appears in version 1.0 of SymPy and is an intended
+replacement for `solve`. Here we see it gives all solutions:
+
+```
+u = solveset(cos(x) - sin(x))
+```
+
+The output of `solveset` is a set, rather than a vector or
+dictionary. To get the values requires some work. For *finite sets* we collect the elements
+with `elements`:
+
+```
+v = solveset(x^2 - 4)
+elements(v)       
+```
+
+The `elements` function does not work for more complicated sets, such as `u`. For these, the `contains` method may be useful.
+
+
+
+Solving within Sympy has limits. For example, there is no symbolic solution here:
 
 ```
 solve(cos(x) - x)
@@ -540,9 +562,17 @@ solve(p, x)
 ```
 
 The extra argument `x` is passed to `solve` so that `solve` knows
-which variable to solve for. If not given, `solve` tries to find a
-solution with all the free variables, which in this case is not
-helpful:
+which variable to solve for.
+
+The `solveset` function is similar:
+
+```
+solveset(p, x)
+```
+
+
+If the `x` value is not given, `solveset` will complain and  `solve` tries to find a
+solution with all the free variables:
 
 ```
 solve(p)
@@ -634,9 +664,7 @@ d = solve(exs)
 ## Plotting
 
 The `Plots` package allows many 2-dimensional plots of `SymPy` objects
-to be agnostic as to a backend plotting package.  `SymPy` loads the
-`Plots` package and extends it a bit to allow symbolic expressions to
-be used in the same manner as functions are.
+to be agnostic as to a backend plotting package.  `SymPy` provides recipes that allow symbolic expressions to be used where functions are part of the `Plots` interface.
 [See the help page for `sympy_plotting`.]
 
 In particular, the following methods of `plot` are defined:
@@ -644,9 +672,9 @@ In particular, the following methods of `plot` are defined:
 * `plot(ex::Sym, a, b)` will plot the expression of single variable over the interval `[a,b]`
 * `plot!(ex::Sym, a, b)` will add to the current plot a plot of  the expression of single variable over the interval `[a,b]`
 * `plot(exs::Vector{Sym}, a, b)` will plot each expression over `[a,b]`
-* `plot(ex1, ex2, a, b)` will plot a parametric plot of the two expressions over the interval `[a,b]`. There is the equivalent, but perhaps more memorable, `parametricplot(ex1, ex2, a, b)`.
-* `plot(xs, ys, ex::Sym)` will make a contour plot of the expression of two variables over the grid specifed by the `xs` and `ys`.  There is the similar, but perhaps more memorable, `contourplot(ex, (xvar,a,b), (yvar,c,d))`.
-* `vectorfieldplot([ex1, ex2], (x, x0, x1), (y, y0, y1))` will plot a vectorfield.
+* `plot(ex1, ex2, a, b)` will plot a parametric plot of the two expressions over the interval `[a,b]`.
+* `contour(xs, ys, ex::Sym)` will make a contour plot of the expression of two variables over the grid specifed by the `xs` and `ys`.
+* `surface(xs, ys, ex::Sym)` will make a surface plot of the expression of two variables over the grid specifed by the `xs` and `ys`.
 
 
 For example:
@@ -654,7 +682,7 @@ For example:
 ```
 x = symbols("x")
 using Plots
-gadfly()
+pyplot()
 #
 plot(x^2 - 2, -2,2)
 ```
@@ -665,51 +693,11 @@ Or a parametric plot:
 plot(sin(2x), cos(3x), 0, 4pi)
 ```
 
-
-Behind the scenes, plotting works by generating many points. The
-`lamdify` function, which turns a SymPy expression into a Julia
-function is used (when possible) to speed this up, as
-`map(lambdify(ex), xs)` is much faster than `map(x -> N(ex(x)), xs)`,
-as less needs to be done in `SymPy` and more in `Julia`.
-
+For plotting with other plotting packages, it is generally faster to first call `lambify` on the expression and then generate `y` values with the resulting `Julia` function.
 
 ----
 
-In addition, within Python, SymPy has several plotting features that
-work with Matplotlib. Many of these are available when the `pyplot`
-backend end for `Plots` is used (`Plots.pyplot()`). These methods
-are only available *after* `PyPlot` is loaded. If this done through
-`Plots`, then this happens after an initial call to `plot`. If this is
-done through `using PyPlot`, then the `plot` method will be ambiguous
-with `PyPlot`'s and must be qualified, as in `SymPy.plot`.
-
-
-* `plot(ex1, ex2, ex3, a, b)` --  plot a 3D parametric plot of the expressions over `[a,b]`. (Also `parametricplot`.)
-
-* `contour(ex, (xvar, a0, b0), (yvar, a1, b1))` -- make a contour plot
-  of the expression of two variables over the region `[a0,b0] x
-  [a1,b1]`. The default region is `[-5,5]x[-5,5]` where the ordering
-  of the variables is given by `free_symbols(ex)`. This is an
-  alternative to the means of specifying contour plots with `Plots`,
-  that is more in line with the `PyPlot` usage. There is also
-  `contour3D` to add a third dimension to the plot.
-
-* `quiver(exs::Vector{Sym}, (xvar, a0, b0), (yvar, a1, b1))` -- make a
-vector plot of the expressions over a grid within `[a0,b0] x
-[a1,b1]`. The default region is `[-5,5]x[-5,5]` where the ordering of
-the variables is given by `free_symbols(ex)`.  This name may change
-if `Plots` adds vector field plots. Currently, there is a
-`vectorplot` alias in anticipation of that.
-
-There are also 3 dimesional plots avaiable
-
-* `plot_surface(ex::Sym, (xvar, a0, b0), (yvar, a1, b1))` -- make a
-  surface plot of the expressions over a grid within `[a0,b0] x
-  [a1,b1]`. The default region is `[-5,5]x[-5,5]` where the ordering
-  of the variables is given by `free_symbols(ex)`.
-
-The plotting features of SymPy add some functions to Matplotlib and we
-copy these over:
+In addition, with `PyPlots` a few other plotting functions from `SymPy` are available from its interface to `MatplotLib`:
 
 * `plot_parametric_surface(ex1::Sym, ex2::Sym, ex3::Sym), (uvar, a0,
   b0), (vvar, a1, b1))` -- make a surface plot of the expressions
