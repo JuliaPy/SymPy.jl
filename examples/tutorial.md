@@ -697,7 +697,7 @@ For plotting with other plotting packages, it is generally faster to first call 
 
 ----
 
-In addition, with `PyPlots` a few other plotting functions from `SymPy` are available from its interface to `MatplotLib`:
+In addition, with `PyPlot` a few other plotting functions from `SymPy` are available from its interface to `MatplotLib`:
 
 * `plot_parametric_surface(ex1::Sym, ex2::Sym, ex3::Sym), (uvar, a0,
   b0), (vvar, a1, b1))` -- make a surface plot of the expressions

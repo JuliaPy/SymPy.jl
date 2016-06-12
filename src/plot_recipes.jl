@@ -67,7 +67,7 @@ surface(-5:5, -5:5, 25 - x^2 - y^2)
 
 ----
 
-Some graphics provided by `SymPy` are available if `PyPlots` is installed.
+Some graphics provided by `SymPy` are available if `PyPlot` is installed.
 
 
 * `plot_parametric_surface(exs::Tuple, (uvar,a0,b0), (vvar,a1,b1);
