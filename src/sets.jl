@@ -108,14 +108,18 @@ elements(x::Sym) = PyCall.pyeval("[i for i in s]", s=project(x))
 export elements
 
 
+VERSION < v"0.5.0-" && eval(Expr(:import, :Base, :complement))
 "Complement of set within the universe"
-Base.complement(I::Sym, U::Sym=S.Reals) = I[:complement](U)
-
+complement(I::Sym, U::Sym=S.Reals) = I[:complement](U)
+export complement
+    
 "boundary, returnsa set"
 boundary(I::Sym) = I.x[:boundary]
 
+VERSION < v"0.5.0-" && eval(Expr(:import, :Base, :inf))
 "Infinum of I"
-Base.inf(I::Sym) = I.x[:inf]
+inf(I::Sym) = I.x[:inf]
+export inf
 
 "Intersection of two intervals"
 Base.intersect(I::Sym, J::Sym) = I[:intersect](J)
