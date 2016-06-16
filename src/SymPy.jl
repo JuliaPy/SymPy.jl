@@ -216,6 +216,7 @@ function __init__()
     try
         matrixtype = sympy[:matrices]["MatrixBase"]
         pytype_mapping(matrixtype, SymMatrix)
+        pytype_mapping(sympy[:Matrix], SymMatrix)
     catch e
     end
 

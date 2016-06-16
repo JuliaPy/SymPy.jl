@@ -3,11 +3,10 @@
 Plotting of symbolic objects.
 
 The `Plots` package provide a uniform interface to many of `Julia`'s
-plotting packages. `SymPy` plugs into `Plots` "recipes."
+plotting packages. `SymPy` plugs into `Plots`' "recipes."
 
 The basic goal is that when `Plots` provides an interface for function
-objects, this package extends the interface to symbolic
-expressions.
+objects, this package extends the interface to symbolic expressions.
 
 In particular:
 
@@ -64,6 +63,25 @@ plot(linspace(0,5), linspace(0,5), x*y)
 surface(-5:5, -5:5, 25 - x^2 - y^2)
 ```
 
+* a vectorfield plot can (inefficiently but directly) be produced following this example:
+
+```
+function vfieldplot(fx, fy; xlim=(-5,5), ylim=(-5,5), n=7)
+    xs = linspace(xlim..., n)
+    ys = linspace(ylim..., n)
+
+    us = vec([x for x in xs, y in ys])
+    vs = vec([y for x in xs, y in ys])
+    fxs = vec([fx(x,y) for x in xs, y in ys])
+    fys = vec([fy(x,y) for x in xs, y in ys])
+
+    quiver(us, vs, quiver=(fxs, fys))
+end
+fx = (x + y) / sqrt(x^2 + y^2)
+fy = (x - y) / sqrt(x^2 + y^2)
+vfieldplot(fx, fy)
+```
+
 
 ----
 
@@ -111,17 +129,7 @@ using RecipesBase
 ## for vectors of expressions
 @recipe f{S<:AbstractVector{Sym}}(::Type{S}, ss::S) = Function[lambdify(s) for s in ss]
 
-## these are not necessary with v"0.7.0+", but are with v"0.7.0"
-@recipe function f(ex1::Sym, ex2::Sym,  a::Real, b::Real) # for 2, 3D parametric plots
-    ts = linspace(a, b, 251)
-    map(lambdify(ex1), ts), map(lambdify(ex2), ts)
-end
-
-@recipe function f(ex1::Sym, ex2::Sym,  ex3::Sym, a::Real, b::Real)
-    ts = linspace(a, b, 251)
-    map(lambdify(ex1), ts), map(lambdify(ex2), ts), map(lambdify(ex3), ts)
-end
-
+## ---------------------
 
 
 ## These functions give acces to SymPy's plotting module. They will work if PyPlot is installed, but may otherwise cause an error

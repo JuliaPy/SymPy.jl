@@ -1,4 +1,4 @@
 julia 0.4
 Compat 0.7.18
 PyCall 1.6.0
-RecipesBase
+RecipesBase 0.0.4
