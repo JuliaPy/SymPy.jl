@@ -16,13 +16,42 @@ Sym{T <: Number}(x::T) = convert(Sym, x)
 "vectorized version of `Sym`"
 Sym(args...) = map(Sym, args)
 
+
+
+## define one or more symbols directly
+## a,b,c = symbols("a,b,c", commutative=false)
+"""
+
+Function to create one or more symbolic objects. These are specified with a string,
+with commas separating different variables.
+
+This function allows the passing of assumptions about the variables
+such as `positive=true`, `real=true` or `commutative=true`. See [SymPy
+Docs](http://docs.sympy.org/dev/modules/core.html#module-sympy.core.assumptions)
+for a complete list.
+
+Example:
+
+```
+x,y,z = symbols("x, y, z", real=true)
+```
+
+"""
+
+function symbols(x::AbstractString; kwargs...) 
+    out = sympy_meth(:symbols, x; kwargs...)
+end
+symbols(x::Symbol; kwargs...) = symbols(string(x); kwargs...)
+
+
 ## @syms a b c --- no commas on right hand side!
 ## Thanks to vtjnash for this!
 """
 
-Macro to create many symbolic objects at once. (Written by `@vtjnash`. Augmented by `@alhirzel`
+Macro to create many symbolic objects at once.
+
 The `@syms` macros creates the variables and assigns them into the
-module `Main`.
+local scope.
 
 Example:
 
@@ -42,16 +71,15 @@ Additionally you can rename arguments using pairs notation:
 @syms   Ld=>"L_d" Lq=>"L_q"
 ```
 
- The `@vars` macro is identical, but this is
+The `@vars` macro is similar, but this is
 transitional and `@syms` should be used. (This is the name used in
-MATLAB.). The old behaviour of `@syms` was to create the symbols and
+MATLAB.). The original behaviour of `@syms` was to create the symbols and
 return them for assignment through the left hand side.  The `symbols`
 function does this with just few more keystrokes and allows
-assumptions to be made. Hence, `@syms` is repurposed. The old behavior
-is kept, for now, through `@osyms`. A name clearly to be replaced,
-perhaps with `@vars`.
+assumptions to be made. Hence, `@syms` is repurposed.
 
-Original macro magic contributed by @vtjnash and extended by @alhirzel
+Original macro magic contributed by @vtjnash and extended by @alhirzel and
+@spencerlyon2
 """
 macro syms(x...)
     q = Expr(:block)
@@ -64,22 +92,56 @@ macro syms(x...)
                 push!(as, s)
             elseif s.head == :(=>)
                 push!(ss, s.args[1])
-                push!(q.args, Expr(:(=), s.args[1], Expr(:call, :symbols, s.args[2], as...)))
+                push!(q.args, Expr(:(=), esc(s.args[1]), Expr(:call, :symbols, s.args[2], map(esc,as)...)))
             end
         elseif isa(s, Symbol)   # raw symbol to be created
             push!(ss, s)
-            push!(q.args, Expr(:(=), s, Expr(:call, :symbols, Expr(:quote, s), as...)))
+            push!(q.args, Expr(:(=), esc(s), Expr(:call, :symbols, Expr(:quote, s), map(esc,as)...)))
         else
             throw(AssertionError("@syms expected a list of symbols and assumptions"))
         end
     end
-    push!(q.args, Expr(:tuple, reverse(ss)...)) # return all of the symbols we created
-    eval(Main, q)
+    push!(q.args, Expr(:tuple, map(esc,reverse(ss))...)) # return all of the symbols we created
+    q
 end
 
 
 
-## macro syms(x...)
+"""
+
+The `vars` macro is identical to  `@syms`. This name will likely be deprecated.
+
+"""
+macro vars(x...)
+    q = Expr(:block)
+    as = []    # running list of assumptions to be applied
+    ss = []    # running list of symbols created
+    for s in reverse(x)
+        if isa(s, Expr)    # either an assumption or a named variable
+            if s.head == :(=)
+                s.head = :kw
+                push!(as, s)
+            elseif s.head == :(=>)
+                push!(ss, s.args[1])
+                push!(q.args, Expr(:(=), esc(s.args[1]), Expr(:call, :symbols, s.args[2], map(esc,as)...)))
+            end
+        elseif isa(s, Symbol)   # raw symbol to be created
+            push!(ss, s)
+            push!(q.args, Expr(:(=), esc(s), Expr(:call, :symbols, Expr(:quote, s), map(esc,as)...)))
+        else
+            throw(AssertionError("@syms expected a list of symbols and assumptions"))
+        end
+    end
+    push!(q.args, Expr(:tuple, map(esc,reverse(ss))...)) # return all of the symbols we created
+    q
+end
+
+## """
+## DEPRECATED: use `symbols` instead
+##
+## Macro to create an assign variables. Similar to `symbols`.
+## """
+## macro osyms(x...)
 ##     q=Expr(:block)
 ##     if length(x) == 1 && isa(x[1],Expr)
 ##         @assert x[1].head === :tuple "@syms expected a list of symbols"
@@ -88,74 +150,12 @@ end
 ##     for s in x
 ##         @assert isa(s,Symbol) "@syms expected a list of symbols"
 ##         push!(q.args, Expr(:(=), s, Expr(:call, :symbols, Expr(:quote, s))))
-##     end
+##            end
 ##     push!(q.args, Expr(:tuple, x...))
-##     eval(Main, q)
+##     q
 ## end
 
-
-"""
-
-The `vars` macro is identical to  `@syms`. This name will be deprecated.
-
-"""
-macro vars(x...)
-    q=Expr(:block)
-    if length(x) == 1 && isa(x[1],Expr)
-        @assert x[1].head === :tuple "@vars expected a list of symbols"
-        x = x[1].args
-    end
-    for s in x
-        @assert isa(s,Symbol) "@vars expected a list of symbols"
-        push!(q.args, Expr(:(=), s, Expr(:call, :symbols, Expr(:quote, s))))
-    end
-    push!(q.args, Expr(:tuple, x...))
-    eval(Main, q)
-end
-
-"""
-
-Macro to create an assign variables. Similar to `symbols`.
-
-"""
-macro osyms(x...)
-    q=Expr(:block)
-    if length(x) == 1 && isa(x[1],Expr)
-        @assert x[1].head === :tuple "@syms expected a list of symbols"
-        x = x[1].args
-    end
-    for s in x
-        @assert isa(s,Symbol) "@syms expected a list of symbols"
-        push!(q.args, Expr(:(=), s, Expr(:call, :symbols, Expr(:quote, s))))
-           end
-    push!(q.args, Expr(:tuple, x...))
-    q
-end
-
-
-## define one or more symbols directly
-## a,b,c = symbols("a,b,c", commutative=false)
-"""
-
-Function to create one or more symbolic objects. These are specified with a string,
-with commas separating different variables.
-
-This function allows the passing of assumptions about the variables
-such as `positive=true`, `real=true` or `commutative=true`. See [SymPy Docs](http://docs.sympy.org/dev/modules/core.html#module-sympy.core.assumptions) for a complete list.
-
-Example:
-
-```
-x,y,z = symbols("x, y, z", real=true)
-```
-
-"""
-
-function symbols(x::AbstractString; kwargs...) 
-    out = sympy_meth(:symbols, x; kwargs...)
-end
-symbols(x::Symbol; kwargs...) = symbols(string(x); kwargs...)
-
+## length of object
 function length(x::SymbolicObject)
     haskey(project(x), :length) && return project(x)[:length]
     sz = size(x)
@@ -163,9 +163,11 @@ function length(x::SymbolicObject)
     *(sz...)
 end
 
+## size
 function size(x::SymbolicObject)
     return ()
 end
+
 function size(x::SymbolicObject, dim::Integer)
     if dim <= 0
         error("dimension out of range")
@@ -174,6 +176,7 @@ function size(x::SymbolicObject, dim::Integer)
         return 1
     end
 end
+
 
 ## pull out x property of Sym objects or leave alone
 project(x::Any) = x

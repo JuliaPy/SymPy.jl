@@ -34,7 +34,10 @@ x = Sym("x")
 This creates a symbolic object `x`, which can be manipulated through further function calls.
 
 
-There is the `@syms`  macro that makes creating multiple variables a bit less typing. It creates variables in the *Main workspace*, so no assignment is necessary. Compare these similar ways to create symbolic variables:
+There is the `@syms` macro that makes creating multiple variables a
+bit less typing, as it creates variables in the local scope -- no
+assignment is necessary. Compare these similar ways to create symbolic
+variables:
 
 ```
 @syms a b c
@@ -69,6 +72,14 @@ solve(x^2 + 1)   # ±i are not real
 solve(y1 + 1)    # -1 is not positive
 ```
 
+The `@syms` macro can also have assumptions passed in as follows:
+
+```
+@syms u1 positive=true u2 positive=true
+solve(u1 + u2)  # empty, though solving u1 - u2 is not.
+```
+
+
 As can be seen, there are several ways to create symbolic values. One
 caveat is that one can't use `Syms` to create a variable from a
 function name in Base.
@@ -96,7 +107,7 @@ function, the second to `SymPy`'s:
 SymPy provides a means to substitute values in for the symbolic expressions. The specification requires an expression, a variable in the expression to substitute in for, and a new value. For example, this is one way to make a polynomial in a new variable:
 
 ```
-x, y = symbols("x,y")
+@syms x y
 ex = x^2 + 2x + 1
 subs(ex, x, y)
 ```
@@ -206,7 +217,7 @@ but the latter two expressions do not.
 `SymPy` makes it very easy to work with polynomial and rational expressions. First we create some variables:
 
 ```
-x,y,z = symbols("x, y, z")
+@syms x y z
 ```
 
 ### The expand, factor, collect, and simplify functions
@@ -336,8 +347,7 @@ The SymPy [tutorial](http://docs.sympy.org/dev/tutorial/simplification.html#powe
 We see that with assumptions, the following expression does simplify to $0$:
 
 ```
-x,y = symbols("x,y", nonnegative=true)
-a = symbols("a", real=true)
+@syms x y nonnegative=true a real=true
 simplify(x^a * y^a - (x*y)^a)
 ```
 
@@ -664,7 +674,9 @@ d = solve(exs)
 ## Plotting
 
 The `Plots` package allows many 2-dimensional plots of `SymPy` objects
-to be agnostic as to a backend plotting package.  `SymPy` provides recipes that allow symbolic expressions to be used where functions are part of the `Plots` interface.
+to be agnostic as to a backend plotting package.  `SymPy` provides
+recipes that allow symbolic expressions to be used where functions are
+part of the `Plots` interface.
 [See the help page for `sympy_plotting`.]
 
 In particular, the following methods of `plot` are defined:
@@ -682,7 +694,7 @@ For example:
 ```
 x = symbols("x")
 using Plots
-pyplot()
+plotly()
 #
 plot(x^2 - 2, -2,2)
 ```
@@ -693,7 +705,9 @@ Or a parametric plot:
 plot(sin(2x), cos(3x), 0, 4pi)
 ```
 
-For plotting with other plotting packages, it is generally faster to first call `lambify` on the expression and then generate `y` values with the resulting `Julia` function.
+For plotting with other plotting packages, it is generally faster to
+first call `lambdify` on the expression and then generate `y` values
+with the resulting `Julia` function.
 
 ----
 

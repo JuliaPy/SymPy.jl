@@ -2,14 +2,22 @@ using SymPy
 using Base.Test
 using Compat
 
-## syms
+## Symbol creation
 x = Sym("x")
 #x = sym"x" # deprecated
 x = Sym(:x)
-@syms x
 x,y = Sym(:x, :y)
-x,y = @osyms x y
 x,y = symbols("x,y")
+
+@syms u1 u2 u3
+@syms u positive=true
+@test length(solve(u+1)) == 0
+# make sure @syms defines in a local scope
+let
+    @syms w
+end
+@test_throws UndefVarError isdefined(w)
+
 
 ## extract symbols
 ex = x*y

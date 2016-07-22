@@ -274,16 +274,16 @@ export Indicator, Χ
 ## special numbers are initialized after compilation
 function init_math()
     "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors." 
-    global const PI = sympy[:pi]
+    global const PI = Sym(sympy[:pi])
 
     "E is a symbolic  `e`. Using `julia`'s `e` will give round off errors." 
-    global const E = sympy[:exp](1)
+    global const E = Sym(sympy[:exp](1))
     
     "IM is a symbolic `im`" 
-    global const IM = sympy[:I]
+    global const IM = Sym(sympy[:I])
 
     "oo is a symbolic infinity. Example: `integrate(exp(-x), x, 0, oo)`." 
-    global const oo = sympy[:oo]
+    global const oo = Sym(sympy[:oo])
 
 
     ## math constants
