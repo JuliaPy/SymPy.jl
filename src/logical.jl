@@ -2,8 +2,8 @@
 
 ## XXX Experimental! Not sure these are such a good idea ...
 ## but used with piecewise
-Base.&(x::Sym, y::Sym) = Sym(PyCall.pyeval("x & y", x=project(x), y=project(y)))
-Base.|(x::Sym, y::Sym) = Sym(PyCall.pyeval("x | y", x=project(x), y=project(y)))
+@compat Base.:&(x::Sym, y::Sym) = PyCall.pyeval("x & y", x=project(x), y=project(y))
+@compat Base.:|(x::Sym, y::Sym) = PyCall.pyeval("x | y", x=project(x), y=project(y))
 !(x::Sym)         =      Sym( PyCall.pyeval("~x",    x=project(x)))
 
 ## use ∨, ∧, ¬ for |,&,! (\vee<tab>, \wedge<tab>, \neg<tab>)
