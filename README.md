@@ -89,6 +89,13 @@ prints as `0` and not `PyObject 0`. To convert it into a numeric value
 within `Julia`, the `N` function may be used, which acts like the
 `float` call, only attempts to preserve the variable type.
 
+(There is a subtlety, the value of `pi` here is converted to the
+symbolic `PI`, but in general won't be if the math constant is coerced
+to a floating point value before it encounters a symbolic object. It
+is better to just use the symbolic value `PI`, an alias for `sympy.pi`
+used above. A similar comment applies for `e`, where `E` should be
+used.)
+
 However, for some tasks the `PyCall` interface is still needed, as
 only a portion of the `SymPy` interface is exposed. To call an
 underlying SymPy method, the `getindex` method is overloaded for
