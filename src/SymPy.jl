@@ -39,7 +39,7 @@ using Compat
 
 using PyCall
 
-import Base: show, writemime
+import Base: show
 import Base: convert, promote_rule
 import Base: getindex
 import Base: start, next, done

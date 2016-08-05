@@ -33,14 +33,14 @@ jprint(x::Array) = map(jprint, x)
 Base.show(io::IO, s::Sym) = print(io, jprint(s))
 Base.show(io::IO, s::Array{Sym}) = print(io, "\n", sympy[:pretty](project(convert(SymMatrix, s))))
 
-## We add writemime methods for the REPL (text/plain) and IJulia (text/latex)
+## We add display methods for the REPL (text/plain) and IJulia (text/latex)
 
 ## text/plain
-writemime(io::IO, ::MIME"text/plain", s::Array{Sym}) =  print(io, summary(s), "\n", sympy[:pretty](project(convert(SymMatrix, s))))
-writemime(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy[:pretty](project(s)))
+@compat display(io::IO, ::MIME"text/plain", s::Array{Sym}) =  print(io, summary(s), "\n", sympy[:pretty](project(convert(SymMatrix, s))))
+@compat display(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy[:pretty](project(s)))
 
-writemime(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
-function writemime(io::IO, ::MIME"text/latex", x::Array{Sym})
+@compat display(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
+@compat function  display(io::IO, ::MIME"text/latex", x::Array{Sym})
     function toeqnarray(x::Vector{Sym})
         a = join([latex(x[i]) for i in 1:length(x)], "\\\\")
         "\\begin{bmatrix}$a\\end{bmatrix}"
@@ -54,7 +54,7 @@ function writemime(io::IO, ::MIME"text/latex", x::Array{Sym})
 end
 
 ## Pretty print dicts
-function writemime{T<:Any, S<:Any}(io::IO, ::MIME"text/latex", d::Dict{T,S})
+@compat function display{T<:Any, S<:Any}(io::IO, ::MIME"text/latex", d::Dict{T,S})
     Latex(x::Sym) = latex(x)
     Latex(x) = sprint(Base.showlimited, x)
 

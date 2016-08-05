@@ -187,11 +187,11 @@ function _solve_ivp(out, var, args, o)
         if length(sols) == 1
             sols = sols[1]
         else
-            return [out([k=>v for (k,v) in sol]...) for sol in sols]
+            return [out([Pair(k,v) for (k,v) in sol]...) for sol in sols] 
         end
     end
 
-    out([k=>v for (k,v) in sols]...)
+    out([Pair(k,v) for (k,v) in sols]...) 
 end
 
 export SymFunction, symfunction, dsolve

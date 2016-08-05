@@ -142,7 +142,10 @@ xreplace(Integral(sin(x), x), x=> y) # bound and unbound are replaced
 ```
 """
 function xreplace(ex::Sym, rule::Dict, args...; kwargs...)
-    d = [project(k) => project(v) for (k,v) in rule]
+    d = Dict()
+    for (k,v) in rule
+        d[project(k)] = project(v)
+    end
     ex[:xreplace](d, args...; kwargs...)
 end
 xreplace(ex::Sym, xs::Pair...; kwargs...) = xreplace(ex, Dict(xs...); kwargs...)
