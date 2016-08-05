@@ -129,7 +129,84 @@ using RecipesBase
 ## for vectors of expressions
 @recipe f{S<:AbstractVector{Sym}}(::Type{S}, ss::S) = Function[lambdify(s) for s in ss]
 
+## vectorfieldplot is an addon as we avoid quiver
+## Not ready yet!
+## @recipe function f(::Type{Val{:vectorfieldplot}}, fx, fy, xlim=(-5,5), ylim=(-5,5); n=15)
+
+    
+##     x₀, x₁ = xlim
+##     y₀, y₁ = ylim
+##     Δx = (x₁ - x₀) / (n-1)
+##     Δy = (y₁ - y₀) / (n-1)
+
+##     xs = x₀:Δx:x₁
+##     ys = y₀:Δy:y₁
+
+##     mx, my = 0.0, 0.0
+
+##     ## two loops, first to identify scaling factor so
+##     ## lines stay within box of width Δx by Δy
+##     for x in xs, y in ys
+##         mx = max(mx, abs(fx(x,y)))
+##         my = max(my, abs(fy(x,y)))
+##     end
+
+##     ## we want all lines to be in the box, so we scale
+##     λ = .95 *  min(Δx/mx, Δy/my)
+
+##     XS = Float64[]
+##     YS = Float64[]
+    
+##     for x in xs, y in ys
+##         append!(XS, [x, x + λ * fx(x,y), NaN])
+##         append!(YS, [y, y + λ * fy(x,y), NaN])
+##     end
+##     pop!(XS); pop!(YS)
+
+    
+##     seriestype := :path
+##     xlims := xlim
+##     ylims := ylim
+##     legend := false
+
+
+##     x := XS
+##     y := YS
+
+##     ()
+## end
+
+## function vectorfieldplot(fx::Sym, fy::Sym, xlim=(-5,5), ylim=(-5,5); n::Int=15, kwargs...)
+##     xs = free_symbols([fx, fy])
+##     vectorfieldplot(lambdify(fx, xs) , lambdify(fy, xs), xlim, ylim; n=n, kwargs...)
+## end
+
+## function vectorfieldplot!(fx::Sym, fy::Sym, xlim=(-5,5), ylim=(-5,5); n::Int=15, kwargs...)
+##     xs = free_symbols([fx, fy])
+##     vectorfieldplot!(lambdify(fx, xs), lambdify(fy, xs), xlim, ylim; n=n, kwargs...)
+## end
+
+## function vectorfieldplot(fx, fy, xlim=(-5,5), ylim=(-5,5); n::Int=15, kwargs...)
+##     try
+##         eval(Expr(:using, :Plots)) # XXX Super hacky way to do this
+##     catch err
+##         warn("Can't plot without the `Plots` package.")
+##     end
+##     plot(Val{:vectorfieldplot}, fx, fy, xlim, ylim; n=n, kwargs...)
+## end
+
+## function vectorfieldplot!(fx, fy, xlim=(-5,5), ylim=(-5,5); n::Int=15, kwargs...)
+##     try
+##         eval(Expr(:using, :Plots)) # XXX Super hacky way to do this
+##     catch err
+##         warn("Can't plot without the `Plots` package.")
+##     end
+##     plot!(Val{:vectorfieldplot}, fx, fy, xlim, ylim; n=n, kwargs...)
+## end
+## export vectorfieldplot, vectorfieldplot!
+
 ## ---------------------
+
 
 
 ## These functions give acces to SymPy's plotting module. They will work if PyPlot is installed, but may otherwise cause an error
