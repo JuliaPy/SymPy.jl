@@ -136,7 +136,7 @@ the same thing. (We keep `Poly`, as it is named like a constructor.)
 
 Examples:
 ```
-p = Poly(x^2 + 2x + 1)  #  a poly in x over Z
+p = Poly(x^2 + 2x + 1, x)  #  a poly in x over Z
 coeffs(p)  # [1, 2, 1]
 p = Poly(a*x^2 + b*x + c, x)  # must specify variable that polynomial is over.
 coeffs(p)  ## [a,b,c]
