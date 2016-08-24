@@ -17,7 +17,7 @@ Base.call(ex::SymbolicObject, x::Pair...) = subs(ex, x...)
 ## for symbolic functinos (dsolve)
 Base.call(u::SymFunction, x::Base.Dict) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
 Base.call(u::SymFunction, x::Base.Pair) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
-function Base.call(u::SymFunction, x) 
+function Base.call(u::SymFunction, x::Sym) 
     if u.n == 0
         u.u(SymPy.project(x))
     else
