@@ -5,8 +5,16 @@ type SymFunction <: SymPy.SymbolicObject
     u::PyCall.PyObject
     n::Int
 end
-    
+
+function PyCall.PyObject(f::SymFunction)
+    f.n == 0 && return f.u
+    __x__ = symbols("__x__")
+    diff(f(__x__), __x__, f.n).x
+end
+
 """
+
+
 
 Create a symbolic function. These can be used for specifying differential equations.
 For these objects we can specify derivatives with the transpose

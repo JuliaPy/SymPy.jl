@@ -44,6 +44,7 @@ typealias SymOrNumber @compat Union{Sym, Number}
 typealias SymOrString @compat Union{Sym, AbstractString}
 typealias SymbolicTypes  @compat Union{AbstractString, Symbol, SymbolicObject}
 
+PyCall.PyObject(x::SymbolicObject) = x.x
 
 ## Promotion 
 ## promote up to symbolic so that math ops work
@@ -64,14 +65,14 @@ function convert(::Type{Tuple}, o::PyCall.PyObject)
 end
 
 ## rational
-convert{T<:SymbolicObject}(::Type{T}, x::Rational) = sympy_meth(:Rational, x.num, x.den)
+convert{T<:SymbolicObject}(::Type{T}, x::Rational) = sympy_meth(:Rational, x.num, x.den)::T
 
 ## big. Need mpmath installed separately -- not as a SymPy module as that is how it is called in PyCall
-convert{T<:SymbolicObject}(::Type{T}, x::BigFloat) = Sym(PyCall.PyObject(x))
-convert(::Type{Sym}, x::Complex{BigFloat}) = Sym(PyCall.PyObject(x))
+convert{T<:SymbolicObject}(::Type{T}, x::BigFloat) = Sym(PyCall.PyObject(x))::T
+convert(::Type{Sym}, x::Complex{BigFloat}) = Sym(PyCall.PyObject(x))::Sym
 
 ## real
-convert{S<:SymbolicObject, T <: Real}(::Type{S}, x::T) = sympy_meth(:sympify, x)
+convert{S<:SymbolicObject, T <: Real}(::Type{S}, x::T) = sympy_meth(:sympify, x)::S
 convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 
 
@@ -80,9 +81,9 @@ convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 ## Sym(PyCall.PyObject(im)) which gives 1j.
 function convert(::Type{Sym}, x::Complex)
     y = ifelse(isa(x, Complex{Bool}), real(x) + imag(x) * im, x)
-    real(y) + imag(y) * IM
+    convert(Sym, real(y) + imag(y) * IM)
 end
-convert(::Type{Complex}, x::Sym) = complex(map(x -> convert(Float64, x), x[:as_real_imag]())...)
+convert(::Type{Complex}, x::Sym) = complex(map(x -> convert(Float64, x), x[:as_real_imag]())...)::Sym
 complex(x::Sym) = convert(Complex, x)
 complex(xs::Array{Sym}) = map(complex, xs)
 

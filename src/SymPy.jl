@@ -223,7 +223,7 @@ function __init__()
 
     ## Makes it possible to call in a sympy method, witout worrying about Sym objects
 
-    global call_sympy_fun(fn::Function, args...; kwargs...) = fn(map(project, args)...; [(k,project(v)) for (k,v) in kwargs]...)
+    global call_sympy_fun(fn::Function, args...; kwargs...) = fn(args...; kwargs...) # [(k,project(v)) for (k,v) in kwargs]...) #fn(map(project, args)...; [(k,project(v)) for (k,v) in kwargs]...)
     global call_sympy_fun(fn::PyCall.PyObject, args...; kwargs...) = call_sympy_fun(convert(Function, fn), args...; kwargs...)
 
     ## Main interface to methods in sympy
