@@ -31,12 +31,12 @@ jprint(x::Array) = map(jprint, x)
 ## show is called in printing tuples, ...
 ## we would like to use pprint here, but it does a poor job on complicated multi-line expressions
 Base.show(io::IO, s::Sym) = print(io, jprint(s))
-Base.show(io::IO, s::Array{Sym}) = print(io, "\n", sympy[:pretty](project(convert(SymMatrix, s))))
+Base.show(io::IO, s::Array{Sym}) = print(io, "\n", sympy[:pretty](convert(SymMatrix, s)))
 
 ## We add display methods for the REPL (text/plain) and IJulia (text/latex)
 
 ## text/plain
-@compat display(io::IO, ::MIME"text/plain", s::Array{Sym}) =  print(io, summary(s), "\n", sympy[:pretty](project(convert(SymMatrix, s))))
+@compat display(io::IO, ::MIME"text/plain", s::Array{Sym}) =  print(io, summary(s), "\n", sympy[:pretty](convert(SymMatrix, s)))
 @compat display(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy[:pretty](project(s)))
 
 @compat display(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))

@@ -53,7 +53,7 @@ for (fn, meth) in zip(Q_nms, Q_predicates)
 `$($nm)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($nm)
 """ ->
-        ($fn)(x::SymbolicObject) = PyCall.pyeval("f(x)", f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
+        ($fn)(x::SymbolicObject) = PyCall.pyeval("f(x)", Sym, f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))
     end
     eval(Expr(:export, fn))
 end

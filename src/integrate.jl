@@ -47,7 +47,7 @@ Dirac delta for integration
 
 [SymPy Documentation](http://docs.sympy.org/dev/modules/functions/special.html)
 """
-DiracDelta(x::Number) = convert(Function, sympy[:DiracDelta])(project(x))
+DiracDelta(x::Number) = convert(Function, sympy[:DiracDelta])(x)
 export DiracDelta
 
 """
@@ -57,7 +57,7 @@ Heaviside function for integration.
 
 [SymPy Documentation](http://docs.sympy.org/dev/modules/functions/special.html)
 """
-Heaviside(x::Number) = convert(Function, sympy[:Heaviside])(project(x))
+Heaviside(x::Number) = convert(Function, sympy[:Heaviside])(x)
 export Heaviside
 
 

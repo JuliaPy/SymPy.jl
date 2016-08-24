@@ -10,10 +10,9 @@ end
 
 
 
-getindex(s::SymMatrix, i::Integer...) = pyeval("x[i]", x=s.x, i= tuple(([i...].-1)...))
-getindex(s::SymMatrix, i::Integer) = pyeval("x[i]", x=project(s), i=map(x->x-1, ind2sub(size(s), i)))
+getindex(s::SymMatrix, i::Integer...) = pyeval("x[i]", Sym, x=s.x, i= tuple(([i...].-1)...))
+getindex(s::SymMatrix, i::Integer) = pyeval("x[i]", Sym, x=project(s), i=map(x->x-1, ind2sub(size(s), i)))
 getindex(s::SymMatrix, i::Symbol) = project(s)[i] # is_nilpotent, ... many such predicates
-
 getindex(s::Array{Sym}, i::Symbol) = project(s)[i] # digaonalize..
 
 ## size
@@ -33,8 +32,8 @@ end
 ## we want our matrices to be arrays of Sym objects, not symbolic matrices
 ## so that julia manages them
 ## it is convenient (for printing, say) to convert to a sympy matrix
-convert(::Type{SymMatrix}, a::Array{Sym}) = Sym(sympy[:Matrix](map(project, a)))
-convert(::Type{Sym}, a::Array{Sym}) = Sym(sympy[:Matrix](map(project, a)))
+convert(::Type{SymMatrix}, a::Array{Sym}) = Sym(sympy[:Matrix](a))
+convert(::Type{Sym}, a::Array{Sym}) = Sym(sympy[:Matrix](a))
 function convert(::Type{Array{Sym}}, a::SymMatrix)
     sz = size(a)
     ndims = length(sz)
@@ -67,7 +66,7 @@ for meth in (:condition_number,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(a::SymMatrix) = Sym(pyeval(($cmd), x=project(a)))
+        ($meth)(a::SymMatrix) = pycall(a[($cmd)], Sym, x) #pyeval(($cmd), x=project(a)))
         ($meth)(a::Matrix{Sym}) = ($meth)(convert(SymMatrix, a))
     end
     eval(Expr(:export, meth))

@@ -2,9 +2,9 @@
 
 ## XXX Experimental! Not sure these are such a good idea ...
 ## but used with piecewise
-@compat Base.:&(x::Sym, y::Sym) = PyCall.pyeval("x & y", x=project(x), y=project(y))
-@compat Base.:|(x::Sym, y::Sym) = PyCall.pyeval("x | y", x=project(x), y=project(y))
-!(x::Sym)         =      Sym( PyCall.pyeval("~x",    x=project(x)))
+@compat Base.:&(x::Sym, y::Sym) = PyCall.pycall(x.x["__and__"], Sym, y) #PyCall.pyeval("x & y", Sym, x=project(x), y=project(y))::Sym
+@compat Base.:|(x::Sym, y::Sym) =  PyCall.pycall(x.x["__or__"], Sym, y) #PyCall.pyeval("x | y", Sym, x=project(x), y=project(y))::Sym
+!(x::Sym)         =       PyCall.pycall(x.x["__invert__"], Sym)::Sym #Sym( PyCall.pyeval("~x",  Sym,  x=project(x)))::Sym
 
 ## use ∨, ∧, ¬ for |,&,! (\vee<tab>, \wedge<tab>, \neg<tab>)
 ∨(x::Sym, y::Sym) = x | y

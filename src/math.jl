@@ -215,8 +215,8 @@ Base.isinf(x::Sym) = try isinf(convert(Float64, x)) catch e false end
 Base.isnan(x::Sym) = try isnan(convert(Float64, x)) catch e false end
 
 ## we rename sympy.div -> polydiv
-Base.div(x::Sym, y::SymOrNumber) = convert(Sym, sympy[:floor](project(x/convert(Sym,y))))
-Base.rem(x::Sym, y::SymOrNumber) = x-Sym(y)*Sym(sympy[:floor](project(x/y)))
+Base.div(x::Sym, y::SymOrNumber) = convert(Sym, sympy[:floor](x/convert(Sym,y)))
+Base.rem(x::Sym, y::SymOrNumber) = x-Sym(y)*Sym(sympy[:floor](x/y))
 
 ## zero and one (zeros?)
 Base.zero(x::Sym) = Sym(0)

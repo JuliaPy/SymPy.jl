@@ -28,7 +28,7 @@ end
 
 function Base.call(u::SymFunction, x::Sym, y...)
     if u.n== 0
-        u.u(map(SymPy.project, vcat(x, y...))...)
+        u.u(vcat(x, y...)...)
     else
         error("Need to implement derivatives of symbolic functions of two or more variables")
     end
