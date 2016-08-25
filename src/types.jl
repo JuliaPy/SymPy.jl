@@ -81,7 +81,7 @@ convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 ## Sym(PyCall.PyObject(im)) which gives 1j.
 function convert(::Type{Sym}, x::Complex)
     y = ifelse(isa(x, Complex{Bool}), real(x) + imag(x) * im, x)
-    convert(Sym, real(y) + imag(y) * IM)
+    real(y) + imag(y) * IM
 end
 convert(::Type{Complex}, x::Sym) = complex(map(x -> convert(Float64, x), x[:as_real_imag]())...)::Sym
 complex(x::Sym) = convert(Complex, x)
