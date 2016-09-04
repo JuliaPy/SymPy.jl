@@ -18,13 +18,12 @@ latex(s::SymbolicObject, args...; kwargs...)  = sympy_meth(:latex, s, args...; k
 
 "create basic printed output"
 function jprint(x::SymbolicObject)
-  out = PyCall.pyeval("str(x)", x = x.x)
+    out = PyCall.pyeval("str(x)", x = x.x)
 
-  if ismatch(r"\*\*", out)
-    return replace(out, "**", "^")
-  else
-    return out
-  end
+    if ismatch(r"\*\*", out)
+        out = replace(out, "**", "^")
+    end
+    out
 end
 jprint(x::Array) = map(jprint, x)
 

@@ -10,7 +10,7 @@ end
 
 
 
-getindex(s::SymMatrix, i::Integer...) = pyeval("x[i]", Sym, x=s.x, i= tuple(([i...].-1)...))
+getindex(s::SymMatrix, i::Integer...) = pyeval("x[i]", Sym, x=project(s), i= tuple(([i...].-1)...))
 getindex(s::SymMatrix, i::Integer) = pyeval("x[i]", Sym, x=project(s), i=map(x->x-1, ind2sub(size(s), i)))
 getindex(s::SymMatrix, i::Symbol) = project(s)[i] # is_nilpotent, ... many such predicates
 getindex(s::Array{Sym}, i::Symbol) = project(s)[i] # digaonalize..
@@ -263,7 +263,7 @@ for fn in (:cross,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($fn)(A::SymMatrix, b::Sym) = convert(Array{Sym}, pyeval(($cmd), A=project(A), b=project(b)))
+        ($fn)(A::SymMatrix, b::Sym) = object_meth(A, fn, b) #convert(Array{Sym}, pyeval(($cmd), A=project(A), b=project(b)))
         ($fn)(A::Array{Sym, 2}, b::Vector{Sym}) = $(fn)(convert(SymMatrix,A), convert(SymMatrix, b))
     end
 end

@@ -76,7 +76,7 @@ for meth in sympy_math_methods
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(ex::Sym, args...; kwargs...) = sympy_meth($meth_name, ex, args...; kwargs...)
+        ($meth)(ex, args...; kwargs...) = sympy_meth($meth_name, ex, args...; kwargs...) # no ::Sym
     end
     eval(Expr(:export, meth))
 end
@@ -129,7 +129,7 @@ for meth in (:separate, :flatten,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(ex::Sym, args...; kwargs...) = sympy_meth($meth_name, ex, args...; kwargs...)
+        ($meth)(ex, args...; kwargs...) = sympy_meth($meth_name, ex, args...; kwargs...) # was ex::Sym
     end
     eval(Expr(:export, meth))
 end
