@@ -6,6 +6,7 @@
 -(x::SymbolicObject)                    =  (-1) * x 
 /(x::Sym, y::Sym) = x * pycall(sympy[:Pow], Sym, y, -1)::Sym ## not SymbolicObject. Not sure why.
 ^(x::SymbolicObject, y::Rational) = x^convert(Sym,y)
+^(x::SymbolicObject, y::Integer) = x^convert(Sym, y)
 ^(x::Sym, y::Sym) = pycall(sympy[:Pow], Sym, x, y)::Sym      ## not SymbolicObject. Not sure why.
 //(x::SymbolicObject, y::Int) = x / Sym(y)
 //(x::SymbolicObject, y::Rational) = x / Sym(y)
