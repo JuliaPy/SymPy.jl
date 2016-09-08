@@ -2,7 +2,7 @@
 &nbsp;
 [![SymPy](http://pkg.julialang.org/badges/SymPy_0.5.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=0.5) 
 
-Linux: [![Build Status](https://travis-ci.org/jverzani/SymPy.jl.svg?branch=master)](https://travis-ci.org/jverzani/SymPy.jl)
+Linux: [![Build Status](https://travis-ci.org/JuliaPy/SymPy.jl.svg?branch=master)](https://travis-ci.org/JuliaPy/SymPy.jl)
 &nbsp;
 Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/jverzani/SymPy.jl?branch=master&svg=true)](https://ci.appveyor.com/project/jverzani/sympy-jl)
 
