@@ -3,10 +3,7 @@
 ## requires conversion from SymMatrix -> Array{Sym} in outputs, as appropriate
 
 ## covert back to Array{Sym}
-function subs(ex::Array{Sym}, args...; kwargs...)
-    u = convert(SymMatrix, ex)
-    convert(Array{Sym}, subs(u, args...; kwargs...))
-end
+subs(ex::Array{Sym}, args...; kwargs...) = Sym[subs(u, args...; kwargs...) for u in ex]
 
 
 
