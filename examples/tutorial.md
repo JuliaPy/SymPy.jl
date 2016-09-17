@@ -60,7 +60,7 @@ y1, y2 = symbols("y1, y2", positive=true)
 alpha = symbols("alpha", integer=true, positive=true)
 ```
 
-As seen, the `symbols` function can be used to make one or more variables with zero, one or more assumptions.
+As seen, the `symbols` function can be used to make one or more variables with zero, one or more assumptions. 
 
 We jump ahead for a second to illustrate, but here we see that `solve` will respect these assumptions, by failing to find solutions to these equations:
 
@@ -81,7 +81,7 @@ solve(u1 + u2)  # empty, though solving u1 - u2 is not.
 
 
 As can be seen, there are several ways to create symbolic values. One
-caveat is that one can't use `Syms` to create a variable from a
+caveat is that one can't use `Sym` to create a variable from a
 function name in Base.
 
 ### Special constants
@@ -440,7 +440,7 @@ coeffs(q)
 SymPy provides functions to find the roots of a polynomial. In
 general, a polynomial with real coefficients of degree $n$ will have
 $n$ roots when multiplicities and complex roots are accounted for. The
-number or real roots is consequently between $0$ and $n$.
+number of real roots is consequently between $0$ and $n$.
 
 For a *univariate* polynomial expression (a single variable), the real
 roots, when available, are returned by `real_roots`. For example,
@@ -1130,6 +1130,12 @@ The tutorial gives the following example:
 
 ```
 f(x) = (x^4 + x^2 * exp(x) - x^2 - 2x*exp(x) - 2x - exp(x)) * exp(x) / ( (x-1)^2 * (x+1)^2 * (exp(x) + 1) )
+f(x)
+```
+
+With indefinite integral:
+
+```
 integrate(f(x), x)
 ```
 
