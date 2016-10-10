@@ -86,7 +86,7 @@ end
 
 
 # some display of objects
-Base.display(u::SymFunction) = println("$(string(Sym(u.u)))" * repeat("'", u.n))
+Base.show(io::IO, u::SymFunction) = println("$(string(Sym(u.u)))" * repeat("'", u.n))
 
 ## override call is in call.jl
 

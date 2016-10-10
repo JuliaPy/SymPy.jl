@@ -35,8 +35,8 @@ Base.show(io::IO, s::Array{Sym}) = print(io, "\n", sympy[:pretty](convert(SymMat
 ## We add show methods for the REPL (text/plain) and IJulia (text/latex)
 
 ## text/plain
-@compat show(io::IO, ::MIME"text/plain", s::Array{Sym}) =  print(io, summary(s), "\n", sympy[:pretty](convert(SymMatrix, s)))
 @compat show(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy[:pretty](project(s)))
+@compat show(io::IO, ::MIME"text/plain", s::Array{Sym}) =  print(io, summary(s), "\n", sympy[:pretty](convert(SymMatrix, s)))
 
 @compat show(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
 @compat function  show(io::IO, ::MIME"text/latex", x::Array{Sym})
