@@ -55,7 +55,7 @@ end
 ## Pretty print dicts
 @compat function show{T<:Any, S<:Any}(io::IO, ::MIME"text/latex", d::Dict{T,S})
     Latex(x::Sym) = latex(x)
-    Latex(x) = sprint(Base.showlimited, x)
+    Latex(x) = sprint(Base.showcompact, x)
 
     out = "\\begin{equation*}\\begin{cases}"
     for (k,v) in d
