@@ -204,13 +204,14 @@ end
 
 
 ## Comparisons Real, Sym
-Base.isless(a::Real, b::Sym) = isless(a, convert(Float64, b))
-Base.isless(a::Sym, b::Real) = isless(b, a)
-Base.isfinite(x::Sym) = isfinite(convert(Float64, x))
+#Base.isless(a::Real, b::Sym) = isless(a, convert(Float64, b))
+#Base.isless(a::Sym, b::Real) = isless(b, a)
+
 
 
 
 ## Handle ininf, and isnan by coercion to float
+Base.isfinite(x::Sym) = isfinite(convert(Float64, x))
 Base.isinf(x::Sym) = try isinf(convert(Float64, x)) catch e false end
 Base.isnan(x::Sym) = try isnan(convert(Float64, x)) catch e false end
 
@@ -233,7 +234,7 @@ Base.one(::Type{Sym}) = Sym(1)
 Create a piecewise defined function.
 
 To create conditions on the variable, the functions `Lt`, `Le`, `Eq`, `Ge`, and `Gt` can be used. For infix notation,
-unicode operators can be used: `\ll<tab>`, `\le<tab>`, `\Equal<tab>`, `\ge<tab>`, and `\gg<tab>`.
+unicode operators can be used: `\ll<tab>`, `\leqq<tab>`, `\Equal<tab>`, `\geqq<tab>`, and `\gg<tab>` (but *not* `\ge<tab>` or `\le<tab>`).
 
 To combine terms, the unicode `\vee<tab>` (for "or"), `\wedge<tab>` (for "and") can be used
 
@@ -241,9 +242,9 @@ To combine terms, the unicode `\vee<tab>` (for "or"), `\wedge<tab>` (for "and") 
 Examples:
 ```
 x,a = symbols("x,a")
-p = piecewise((1, x ≪ 1), (2, (1 ≤ x) ∨ (x ≤ 2)), (3, x ≫ 2)) ## using ∨ and ∧ for & and or
+p = piecewise((1, x ≪ 1), (2, (Lt(1,x)) ∨ Lt(x,2)), (3, x ≫ 2)) ## using ∨ and ∧ for & and or
 subs(p, x, 2) ## 2
-p = piecewise((1, Lt(x, a)), (2, Ge(x,a)))  # same as piecewise((1,  x ≪ a), (2, x ≥ a))
+p = piecewise((1, Lt(x, a)), (2, Ge(x,a)))  # same as piecewise((1,  x ≪ a), (2, x ≧ a))
 subs(p, x, a - 1)
 ```
 
@@ -265,7 +266,7 @@ Indicator function
 `Χ(x, a, b)` is `1` on `[a,b]` and 0 otherwise.
 
 """
-Χ(x, a=-oo, b=oo) = piecewise((1, (a <= x) ∧ (x <= b)), (0,true))
+Χ(x, a=-oo, b=oo) = piecewise((1, Gt(x, a) ∧ Le(x, b)), (0,true))
 Indicator(x, a=-oo, b=oo) = Χ(x, a, b) 
 export Indicator, Χ
 

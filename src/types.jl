@@ -123,44 +123,49 @@ end
 ## may be confusing when more than one in ex.
 ## Output is symbolic. Conversion is necessary to use output as Julia values.
 ## SymPy has `lamdify` for this task too.
-function convert(::Type{Function}, ex::Sym)
-    vars = free_symbols(ex)
-    len = length(vars)
-    if len == 0
-        return x -> ex
-    end
-    local out
-    (args...) -> begin
-        out = ex
-        for i in 1:len
-            out = object_meth(out, :subs, vars[i], args[i]) #convert(Function, out[:subs])(project(vars[i]), args[i])
-        end
-        out
-    end
-end
+## function convert(::Type{Function}, ex::Sym)
+##     vars = free_symbols(ex)
+##     len = length(vars)
+##     if len == 0
+##         return x -> ex
+##     end
+##     local out
+##     (args...) -> begin
+##         out = ex
+##         for i in 1:len
+##             out = object_meth(out, :subs, vars[i], args[i]) #convert(Function, out[:subs])(project(vars[i]), args[i])
+##         end
+##         out
+##     end
+## end
 
-## For plotting we need to know if a function has 1, 2, or 3 free variables
-function as_nfunction(ex::Sym, nvars=1)
-    free = free_symbols(ex)
-    vars = [free[:pop]()]
-    for i in 1:free[:__len__]()
-        push!(vars, free[:pop]())
-    end
-    len = length(vars)
+## ## For plotting we need to know if a function has 1, 2, or 3 free variables
+## function as_nfunction(ex::Sym, nvars=1)
+##     free = free_symbols(ex)
+##     vars = [free[:pop]()]
+##     for i in 1:free[:__len__]()
+##         push!(vars, free[:pop]())
+##     end
+##     len = length(vars)
 
-    if len == nvars
-        convert(Function, ex)
-    else
-        throw(DimensionMismatch("Expecting $nvars free variables and found $len"))
-    end
-end
+##     if len == nvars
+##         convert(Function, ex)
+##     else
+##         throw(DimensionMismatch("Expecting $nvars free variables and found $len"))
+##     end
+## end
 
-"""
-Convert to a julia-valued function from R -> R::Float64
-"""
-type ScalarFunction; end
-function Base.convert(::Type{ScalarFunction}, ex::Sym)
-    vars = free_symbols(ex)
-    length(vars) == 1 || error("Scalar function conversion is for expression of one variable")
-    u -> convert(Float64, N(subs(ex, vars[1], u)))
-end
+## """
+## Convert to a julia-valued function from R -> R::Float64
+## """
+## type ScalarFunction; end
+## function Base.convert(::Type{ScalarFunction}, ex::Sym)
+##     vars = free_symbols(ex)
+##     length(vars) == 1 || error("Scalar function conversion is for expression of one variable")
+##     u -> convert(Float64, N(subs(ex, vars[1], u)))
+## end
+
+convert(::Type{Function}, ex::Sym) = lambdify(ex)
+## we usually promote to Sym objects, but here we want to promote to functions
+## so [x, sin] -> will be plottable as two functions
+Base.promote_rule{T<:SymbolicObject, S<:Function}(::Type{T}, ::Type{S} ) = S
