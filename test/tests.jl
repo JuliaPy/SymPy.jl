@@ -361,15 +361,17 @@ q,r = polydiv(f1,g1, domain="QQ") # not div, as can't disambiguate div(Sym(7), 5
 x = Sym("x")
 p = piecewise((x, Ge(x,0)), (0, Lt(x,0)), (1, Eq(x,0)))
 ## using infix \ll<tab>, \gt<tab>, \Equal<tab>
-p = piecewise((x, x ≥ 0), (0, x ≪ 0), (1, x ⩵ 0))
-@assert @compat Int(subs(p,x,2)) == 2
-@assert @compat Int(subs(p,x,-1)) == 0
-@assert @compat Int(subs(p,x,0)) == 0
+p = piecewise((x, (x ≫ 0)), (0, x ≪ 0), (1, x ⩵ 0))
+@assert subs(p,x,2) == 2
+@assert subs(p,x,-1) == 0
+@assert subs(p,x,0) == 1
 
 u = ifelse(Lt(x, 0), "neg", ifelse(Gt(x, 0), "pos", "zero"))
 @assert subs(u,x,-1) == Sym("neg")
 @assert subs(u,x, 0) == Sym("zero")
 @assert subs(u,x, 1) == Sym("pos")
+
+p = piecewise((-x, x ≪ 0), (x, x ≧ 0))
 
 
 ## relations
