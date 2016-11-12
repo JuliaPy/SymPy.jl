@@ -654,7 +654,7 @@ gives 1, as expected from solving `x == 1`.
 
 In addition to `Eq`, there are `Lt`, `Le`, `Ge`, `Gt`. The Unicode
 operators are not aliased to these, but there are alternatives
-`\ll[tab]`, `\le[tab]`, `\Equal[tab]`, `\ge[tab]`, `\gg[tab]` and
+`\ll[tab]`, `\leqq[tab]`, `\Equal[tab]`, `\geqq[tab]`, `\gg[tab]` and
 `\neg[tab]` to negate.
 
 So, the above could have been written with the following nearly identical expression, though it is entered with `\Equal[tab]`. 
@@ -694,7 +694,6 @@ For example:
 ```
 x = symbols("x")
 using Plots
-plotly()
 #
 plot(x^2 - 2, -2,2)
 ```
@@ -725,7 +724,7 @@ x [a1,b1]`. The default region is `[-5,5]x[-5,5]` where the ordering
 of the variables is given by `free_symbols(ex)`.  To create predicates
 from the variable, the functions `Lt`, `Le`, `Eq`, `Ge`, and `Gt` can
 be used, as with `Lt(x*y, 1)`. For infix notation, unicode operators
-can be used: `\ll<tab>`, `\le<tab>`, `\Equal<tab>`, `\ge<tab>`, and
+can be used: `\ll<tab>`, `\leqq<tab>`, `\Equal<tab>`, `\geqq<tab>`, and
 `\gg<tab>`. For example, `x*y ≪ 1`.  To combine terms, the unicode
 `\vee<tab>` (for "or"), `\wedge<tab>` (for "and") can be used.
 
