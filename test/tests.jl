@@ -440,3 +440,10 @@ end
 
 ## issue #71
 @test log(Sym(3), Sym(4)) == log(Sym(4)) / log(Sym(3))
+
+## issue #103
+@vars x y z
+ex = sin(x)
+@test func(ex)(args(ex)...) == ex
+ex = x*y^2 * z
+func(ex)(args(ex)...) == sin(x)

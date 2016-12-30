@@ -20,7 +20,7 @@ end
 ## how to do from any symbolic object?
 function (ex::Sym)(args...)
     xs = free_symbols(ex)
-    length(xs) >= 1 ? subs(ex, collect(zip(xs, args))...) : ex
+    length(xs) >= 1 ? subs(ex, collect(zip(xs, args))...) : convert(Function, project(ex))(args...)
 end
 (ex::Sym)(x::Dict) = subs(ex, x)
 (ex::Sym)(x::Pair...) = subs(ex, x...)

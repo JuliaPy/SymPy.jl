@@ -226,6 +226,9 @@ Base.zero(::Type{Sym}) = Sym(0)
 Base.one(x::Sym) = Sym(1)
 Base.one(::Type{Sym}) = Sym(1)
 
+## useful at times
+Base.typemax(::Type{Sym}) = oo
+Base.typemin(::Type{Sym}) = -oo
 
 #### Piecewise functions
 
