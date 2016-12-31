@@ -42,9 +42,8 @@ Return a vector of free symbols in an expression
 function free_symbols(ex::Sym)
     fs = ex.x[:free_symbols]
     ## are these a set?
-    _a_set = Sym(1).x[:free_symbols][:__class__] # hacky
-    if PyCall.pyeval("isinstance(a, b)", a = project(fs), b=project(_a_set))
-        convert(Vector{Sym}, collect(ex.x[:free_symbols]))
+    if fs[:__class__][:__name__] == "set"
+        convert(Vector{Sym}, collect(fs))
     else
         Sym[]
     end

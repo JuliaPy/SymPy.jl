@@ -8,7 +8,15 @@ end
 
 function Base.call{T <: SymbolicObject}(ex::T, args...)
     xs = free_symbols(ex)
-    length(xs) >= 1 ? subs(ex, collect(zip(xs, args))...) : convert(Function, project(ex))(args...)    
+      if length(xs) >= 1
+        subs(ex, collect(zip(xs, args))...)
+    else
+        if classname(ex) == "Symbol"
+            ex
+        else
+            convert(Function, project(ex))(args...)
+        end
+    end
 end
 Base.call(ex::SymbolicObject, x::Dict) = subs(ex, x)
 Base.call(ex::SymbolicObject, x::Pair...) = subs(ex, x...)

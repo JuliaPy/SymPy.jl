@@ -283,4 +283,5 @@ function members(o::@compat Union{PyObject, Sym})
     AbstractString[a for (a,b) in out]
 end
 
-
+" Return class name as a string "
+classname(ex::Sym) = ex.x[:__class__][:__name__]
