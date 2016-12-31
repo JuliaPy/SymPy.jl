@@ -1,14 +1,8 @@
-function Base.call{T <: SymbolicObject}(ex::T; kwargs...)
-    warn("""
-Calling an expression with keyword arguments will be deprecated. From v0.4 onward, the use of pairs, as in
-var1=>val1, var2=>val2)` is suggested.
-""")
-    subs(ex, kwargs...)
-end
-
+Base.call{T <: SymbolicObject}(ex::T) = ex
 function Base.call{T <: SymbolicObject}(ex::T, args...)
     xs = free_symbols(ex)
-      if length(xs) >= 1
+
+    if length(xs) >= 1
         subs(ex, collect(zip(xs, args))...)
     else
         if classname(ex) == "Symbol"

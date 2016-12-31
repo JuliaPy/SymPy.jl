@@ -71,13 +71,13 @@ end
 
 ## Convenience method for keyword arguments
 ## Will deprecate this
-function subs{T <: SymbolicObject}(ex::T; kwargs...)
-    warn("""
-Calling `subs` with keyword arguments will be deprecated. From v0.4 onward, the use of pairs, as in
-`subs(ex, var1=>val1, var2=>val2)` is suggested.
-""")
-    subs(ex, kwargs...)
-end
+# function subs{T <: SymbolicObject}(ex::T; kwargs...)
+#     warn("""
+# Calling `subs` with keyword arguments will be deprecated. From v0.4 onward, the use of pairs, as in
+# `subs(ex, var1=>val1, var2=>val2)` is suggested.
+# """)
+#     subs(ex, kwargs...)
+# end
 
 # """
 #

@@ -18,6 +18,7 @@ end
 ## Call symbolic object with natural syntax
 ## ex(x=>val)
 ## how to do from any symbolic object?
+(ex::Sym)() = ex
 function (ex::Sym)(args...)
     xs = free_symbols(ex)
     if length(xs) >= 1
