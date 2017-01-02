@@ -1,14 +1,23 @@
+#module SpecialFuncs
+
+#using PyCall
+#using SymPy
+
 ## simple (x::Union(Sym, Number;...) signature, export
 for fn in (
-           :hankel1, :hankel2,             # hankel function of second kind H_n^2(x) = J_n(x) - iY_n(x)
-           :legendre,
-           :jacobi, 
+           :jacobi,
            :gegenbauer,
+           :chebyshevt, :chebyshevu,
+           :legendre, :assoc_legendre,
            :hermite,
-           :laguerre
+           :laguerre, :assoc_laguerre,
+           :Ynm,
+           :hankel1, :hankel2,
+           :jn, :yn
            )
     meth = string(fn)
-    @eval ($fn)(xs::SymOrNumber...;kwargs...) = sympy_meth($meth, xs...; kwargs...)
+    #@eval ($fn)(xs::SymOrNumber...;kwargs...) = sympy_meth($meth, xs...; kwargs...)
+    @eval ($fn)(xs...;kwargs...) = sympy_meth($meth, xs...; kwargs...)
     eval(Expr(:export, fn))
 end
 
@@ -48,3 +57,4 @@ function meijerg{T<:Number, S<:Number}(a1s::Vector{T}, a2s::Vector{T}, b1s::Vect
 end
 export meijerg
 
+#end
