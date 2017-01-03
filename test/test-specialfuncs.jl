@@ -1,8 +1,11 @@
-#using SymPy.SpecialFuncs
-using SymPy
+using SymPy.SpecialFuncs
+using SymPy: Sym, sqrt, conjugate, symbols, PI, simplify, expand_func, rewrite, N
 using Base.Test
 
-a, b, n, x = symbols("a, b, n, x")
+a, b, x, y = symbols("a, b, x, y")
+n, m, θ, ϕ = symbols("n, m, θ, ϕ")
+ν = symbols("ν", integer=true)
+
 @test jacobi(0, a, b, x) == 1
 @test jacobi(1, a, b, x) == a/2 - b/2 + x*(a/2 + b/2 + 1)
 @test jacobi(n, 0, 0, x) == legendre(n, x)
@@ -63,34 +66,73 @@ a, b, n, x = symbols("a, b, n, x")
 @test assoc_laguerre(n, 0, x) == laguerre(n, x)
 @test diff(assoc_laguerre(n, a, x), x) == -assoc_laguerre(n - 1, a + 1, x)
 
-n, m = symbols("n, m")
-θ, ϕ = symbols("θ, ϕ")
+
 @test Ynm(n, m, θ, ϕ) == Ynm(n, m, θ, ϕ)
 @test Ynm(n, -m, θ, ϕ) == (-1)^m*exp(-2im*m*ϕ)*Ynm(n, m, θ, ϕ)
 @test Ynm(n, m, -θ, ϕ) == Ynm(n, m, θ, ϕ)
 @test Ynm(n, m, θ, -ϕ) == exp(-2im*m*ϕ)*Ynm(n, m, θ, ϕ)
 @test expand(simplify(Ynm(0, 0, θ, ϕ)), func=true) == 1/(2*sqrt(PI))
 
+
 @test diff(hankel1(n, x), x) == hankel1(n - 1, x)/2 - hankel1(n + 1, x)/2
 @test diff(hankel2(n, x), x) == hankel2(n - 1, x)/2 - hankel2(n + 1, x)/2
 
 
-ν = symbols("ν", integer=true)
 @test expand_func(jn(0, x)) == sin(x)/x
 @test expand_func(jn(1, x)) == sin(x)/x^2 - cos(x)/x
-
-@test rewrite(jn(ν, x), "besselj") == sqrt(Sym(2)π/x)*besselj(ν + Sym(1)/2, x)/2
-#>>> jn(nu, z).rewrite(bessely)
-#(-1)**nu*sqrt(2)*sqrt(pi)*sqrt(1/z)*bessely(-nu - 1/2, z)/2
-
+@test rewrite(jn(ν, x), "besselj") == sqrt(2PI/x)*besselj(ν + Sym(1)/2, x)/2
+@test rewrite(jn(ν, x), "bessely") == (-1)^ν*sqrt(2PI/x)*bessely(-ν - Sym(1)/2, x)/2
 @test N(jn(2, 5.2+0.3im), 20) ≈ 0.099419756723640344491 - 0.054525080242173562897im
+
 
 @test expand_func(yn(0, x)) == -cos(x)/x
 @test expand_func(yn(1, x)) == -cos(x)/x^2-sin(x)/x
-#>>> yn(nu, z).rewrite(besselj)
-#(-1)**(nu + 1)*sqrt(2)*sqrt(pi)*sqrt(1/z)*besselj(-nu - 1/2, z)/2
-#>>> yn(nu, z).rewrite(bessely)
-#sqrt(2)*sqrt(pi)*sqrt(1/z)*bessely(nu + 1/2, z)/2
-#>>> yn(2, 5.2+0.3j).evalf(20)
-#0.18525034196069722536 + 0.014895573969924817587*I
+@test rewrite(yn(ν, x), "besselj") == (-1)^(ν + 1)*sqrt(2PI/x)*besselj(-ν - Sym(1)/2, x)/2
+@test rewrite(yn(ν, x), "bessely") == sqrt(2PI/x)*bessely(ν + Sym(1)/2, x)/2
+@test N(yn(2, 5.2+0.3im)) ≈ 0.18525034196069722536 + 0.014895573969924817587im
 
+
+# gamma, beta and related functions
+@test gamma(Sym(1)) == 1
+@test gamma(Sym(3)/2) == sqrt(PI)/2
+
+
+@test diff(polygamma(Sym(0), x), x) == polygamma(Sym(1), x)
+@test diff(polygamma(Sym(0), x), x, 2) == polygamma(Sym(2), x)
+
+
+@test diff(beta(x, y), x) == (polygamma(Sym(0), x) - polygamma(Sym(0), x + y)) * beta(x, y)
+@test diff(beta(x, y), y) == (polygamma(Sym(0), y) - polygamma(Sym(0), x + y)) * beta(x, y)
+
+
+# test numerical consistency with Julia functions
+@test N(gamma(Sym(4.1))) ≈ gamma(4.1)
+@test N(polygamma(Sym(2), Sym(3.2))) ≈ polygamma(2, 3.2)
+@test N(beta(Sym(1)+1im, Sym(1)+1im)) ≈ beta(1.0+1im, 1.0+1im)
+
+
+
+
+# Bessel-type functions
+@test diff(besselj(n, x), x) == (besselj(n - 1, x) - besselj(n + 1, x))/2
+@test rewrite(besselj(n, x), "jn") == sqrt(2x/PI)*jn(n - 1/2, x)
+
+
+@test diff(bessely(n, x), x) == (bessely(n - 1, x) - bessely(n + 1, x))/2
+@test rewrite(bessely(n, x), "yn") == sqrt(2x/PI)*yn(n - 1/2, x)
+
+
+@test diff(besseli(n, x), x) == (besseli(n - 1, x) + besseli(n + 1, x))/2
+
+
+@test diff(besselk(n, x), x) == -(besselk(n - 1, x) + besselk(n + 1, x))/2
+
+
+# test numerical consistency with Julia functions
+@test N(besselj(3.2, Sym(1.5))) ≈ besselj(3.2, 1.5)
+@test N(bessely(3.2, Sym(1.5))) ≈ bessely(3.2, 1.5)
+@test N(besseli(3.2, Sym(1.5))) ≈ besseli(3.2, 1.5)
+@test N(besselk(3.2, Sym(1.5))) ≈ besselk(3.2, 1.5)
+
+
+@test expand_func(x*hyper([1, 1], [2], -x)) == log(x + 1)
