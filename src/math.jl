@@ -65,9 +65,9 @@ cosc(as::Array{Sym}) = map(cosc, as)
 
 ## (x:Sym, ...) , export
 sympy_math_methods = (:Prod,
-                      :Ylm,
-                      :assoc_legendre,
-                      :chebyshevt
+#                      :Ylm,
+#                      :assoc_legendre,
+#                      :chebyshevt
                       )
 for meth in sympy_math_methods
     meth_name = string(meth)

@@ -56,13 +56,13 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        trunc, round, significand,
        abs, max, min, maximum, minimum,
        sign, dot,
-       besseli, besselj, besselk, bessely,
+#       besseli, besselj, besselk, bessely,
        airyai, airybi,
        zero, one
 import Base: transpose
 import Base: diff
 import Base: factorial, gcd, lcm, isqrt
-import Base: gamma, beta
+#import Base: gamma, beta
 import Base: length,  size
 import Base: factor, expand, collect
 import Base: !=, ==
@@ -138,6 +138,7 @@ include("ntheory.jl")
 include("sets.jl")
 include("display.jl")
 include("lambdify.jl")
+include("physics.jl")
 
 ## add call interface depends on version
 VERSION >= v"0.5.0-" && include("call.jl")
@@ -259,6 +260,7 @@ function __init__()
     init_mpmath()
     init_sets()
     init_lambdify()
+    init_physics()
 end
 
 end

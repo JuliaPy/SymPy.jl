@@ -1,15 +1,31 @@
-## simple (x::Union(Sym, Number;...) signature, export
-for fn in (
-           :hankel1, :hankel2,             # hankel function of second kind H_n^2(x) = J_n(x) - iY_n(x)
-           :legendre,
-           :jacobi, 
-           :gegenbauer,
-           :hermite,
-           :laguerre
-           )
-    meth = string(fn)
-    @eval ($fn)(xs::SymOrNumber...;kwargs...) = sympy_meth($meth, xs...; kwargs...)
-    eval(Expr(:export, fn))
+module SpecialFuncs
+
+using PyCall
+using SymPy
+
+import Base: gamma, polygamma, beta,
+       besseli, besselj, besselk, bessely
+
+for meth in (
+             :jacobi,
+             :gegenbauer,
+             :chebyshevt, :chebyshevu,
+             :legendre, :assoc_legendre,
+             :hermite,
+             :laguerre, :assoc_laguerre,
+             :Ynm,
+             :hankel1, :hankel2,
+             :jn, :yn
+             )
+    meth_name = string(meth)
+    @eval begin
+        @doc """
+            `$($meth_name)`: a SymPy function.
+                The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+                """ ->
+        ($meth)(xs...;kwargs...) = sympy_meth($meth_name, xs...; kwargs...)
+    end
+    eval(Expr(:export, meth))
 end
 
 
@@ -18,14 +34,16 @@ end
 ## should dispatch to julia version.
 for fn in (:besselj, :bessely, :besseli, :besselk)
     meth = string(fn)
-    @eval ($fn)(nu::SymOrNumber, x::Sym;kwargs...) = sympy_meth($meth, nu, x; kwargs...)
-    @eval ($fn)(nu::SymOrNumber, a::Array{Sym}) = map(x ->$fn(nu, x), a)
+    eval(Expr(:import, :Base, fn))
+    @eval ($fn)(nu::Number, x::Sym; kwargs...) = sympy_meth($meth, nu, x; kwargs...)
+    @eval ($fn)(nu::Number, a::Array{Sym}) = map(x ->$fn(nu, x), a)
 end
 
 
-## :gamma, :beta, # need import
+## :gamma, :beta... # need import
 beta(x::Sym, y::Sym) = sympy_meth(:beta, x, y)
 gamma(x::Sym) = sympy_meth(:gamma, x)
+polygamma(nu::Sym, x::Sym) = sympy_meth(:polygamma, nu, x)
 
 
 ## Hyper and friends don't really have symbolic use...
@@ -48,3 +66,4 @@ function meijerg{T<:Number, S<:Number}(a1s::Vector{T}, a2s::Vector{T}, b1s::Vect
 end
 export meijerg
 
+end
