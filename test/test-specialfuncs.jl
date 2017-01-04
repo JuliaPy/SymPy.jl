@@ -81,14 +81,14 @@ n, m, θ, ϕ = symbols("n, m, theta, phi")
 @test expand_func(jn(0, x)) == sin(x)/x
 @test expand_func(jn(1, x)) == sin(x)/x^2 - cos(x)/x
 @test rewrite(jn(ν, x), "besselj") == sqrt(2PI/x)*besselj(ν + Sym(1)/2, x)/2
-@test rewrite(jn(ν, x), "bessely") == (-1)^ν*sqrt(2PI/x)*bessely(-ν - Sym(1)/2, x)/2
+VERSION < v"0.6.0-dev" && @test rewrite(jn(ν, x), "bessely") == (-1)^ν*sqrt(2PI/x)*bessely(-ν - Sym(1)/2, x)/2
 u = N(jn(2, 5.2+0.3im), 20)
 @test norm(real(u) - 0.099419756723640344491) <= 1e-15 && norm(imag(u) + 0.054525080242173562897) <= 1e-15
 
 
 @test expand_func(yn(0, x)) == -cos(x)/x
 @test expand_func(yn(1, x)) == -cos(x)/x^2-sin(x)/x
-@test rewrite(yn(ν, x), "besselj") == (-1)^(ν + 1)*sqrt(2PI/x)*besselj(-ν - Sym(1)/2, x)/2
+VERSION < v"0.6.0-dev" && @test rewrite(yn(ν, x), "besselj") == (-1)^(ν + 1)*sqrt(2PI/x)*besselj(-ν - Sym(1)/2, x)/2
 @test rewrite(yn(ν, x), "bessely") == sqrt(2PI/x)*bessely(ν + Sym(1)/2, x)/2
 @test N(yn(2, 5.2+0.3im)) ≈ 0.18525034196069722536 + 0.014895573969924817587im
 

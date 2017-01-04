@@ -81,12 +81,25 @@ core_sympy_methods = (:sympify,
                       :Mod, :Rel,
                       :Eq, :Ne, :Lt, :Le, :Gt, :Ge,
                       :Equality, :Unequality,
-                      :GreaterThan, :LessThan, :StrictGreaterThan, :StrictLessThan,
                       :PoleError,
                       :count_ops,
                       :gcdex, :half_gcdex,
                       :igcd, :ilcm
                       )
+
+## these are defined for Reals, not Sym, Real... Necessary to lambdify Indicators as of v0.6.0-dev
+for meth in (:GreaterThan, :LessThan, :StrictGreaterThan, :StrictLessThan)
+    meth_name = string(meth)
+    @eval begin
+        @doc """
+`$($meth_name)`: a SymPy function.
+    The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($meth)(a::Real, b::Real) = sympy_meth($meth_name,a, b)
+    end
+    eval(Expr(:export, meth))
+end
+
 
 """
 Extract left and right hand side of a relation, parts of a relation.

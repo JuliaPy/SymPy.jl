@@ -2,12 +2,12 @@
 
 ## A type akin to SymFunction but with the ability to keep track of derivative
 type SymFunction <: SymPy.SymbolicObject
-    u::PyCall.PyObject
+    x::PyCall.PyObject
     n::Int
 end
 
 function PyCall.PyObject(f::SymFunction)
-    f.n == 0 && return f.u
+    f.n == 0 && return f.x
     __x__ = symbols("__x__")
     diff(f(__x__), __x__, f.n).x
 end
@@ -26,18 +26,23 @@ u = SymFunction("u")
 u'
 ```
 
-Alternatively, we can pass `symfunction` to the `cls` argument of
-`symbols`. This provides a convenient way to create more than one
-symbolic function per call.
+Alternatively, we can pass a comma separated string of variable names to create
+more than one at a time. (The `cls=symfunction` is no longer supported):
 
 ```
-F, G = symbols("F,G", cls=symfunction)
+F,G,H = SymFunction("F, G, H")
 ```
 
 """
 function SymFunction{T<:AbstractString}(x::T)
-    u = sympy[:Function](x)
-    SymFunction(u, 0)
+    us = split(x, r",\s*")
+    if length(us) > 1
+        map(u -> SymFunction(sympy[:Function](u), 0), us)
+    else
+        SymFunction(sympy[:Function](x), 0)
+    end
+#    u = sympy[:Function](x)
+#    SymFunction(u, 0)
 end
 
 IVPSolution{T<:AbstractString}(x::T) = SymFunction(x)
@@ -86,14 +91,14 @@ end
 
 
 # some display of objects
-Base.show(io::IO, u::SymFunction) = println("$(string(Sym(u.u)))" * repeat("'", u.n))
+Base.show(io::IO, u::SymFunction) = println("$(string(Sym(u.x)))" * repeat("'", u.n))
 
 ## override call is in call.jl
 
 
 ## rather than use `diff(u(x),x,1)` we can use `u'(x)`
 function Base.ctranspose(x::SymFunction)
-    SymFunction(x.u, x.n + 1)
+    SymFunction(x.x, x.n + 1)
 end
 
 

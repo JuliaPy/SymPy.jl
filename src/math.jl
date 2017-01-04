@@ -270,7 +270,12 @@ Indicator function
 
 """
 Χ(x, a=-oo, b=oo) = piecewise((1, Gt(x, a) ∧ Le(x, b)), (0,true))
-Indicator(x, a=-oo, b=oo) = Χ(x, a, b) 
+Indicator(x, a=-oo, b=oo) = Χ(x, a, b)
+
+import Base: &, |
+(&)(a::Bool, b::Sym) = a & (b == SympyTRUE)
+(|)(a::Bool, b::Sym) = a | (b == SympyTRUE)
+
 export Indicator, Χ
 
 
