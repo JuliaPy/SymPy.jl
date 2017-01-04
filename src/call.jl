@@ -5,14 +5,14 @@
 (u::SymFunction)(x::Base.Pair) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
 function (u::SymFunction)(x) 
     if u.n == 0
-        u.u(SymPy.project(x))
+        u.x(SymPy.project(x))
     else
         __x = Sym("__x")
-        diff(u.u(__x.x), __x, u.n)(__x => x)
+        diff(u.x(__x.x), __x, u.n)(__x => x)
     end
 end
 
-(u::SymFunction)(x, y...) = u.n== 0 ? u.u(map(SymPy.project, vcat(x, y...))...) : error("Need to implement derivatives of symbolic functions of two or more variables")
+(u::SymFunction)(x, y...) = u.n== 0 ? u.x(map(SymPy.project, vcat(x, y...))...) : error("Need to implement derivatives of symbolic functions of two or more variables")
 
 
 ## Call symbolic object with natural syntax

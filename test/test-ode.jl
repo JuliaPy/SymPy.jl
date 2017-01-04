@@ -28,7 +28,7 @@ dsolve(x*u'(x) + x*u(x) + 1, x, (u, 1, 1))
 dsolve((u'(x))^2 - a*u(x), x, (u, 0, 1))
 dsolve(u''(x) - a * u(x), x, (u, 0, 1), (u', 0, 0))
 
-F, G, K = symbols("F, G, K", cls = symfunction)
+F, G, K = SymFunction("F, G, K")
 eqn = F(x)*u'(y)*y + G(x)*u(y) + K(x)
 dsolve(eqn, y, (u, 1, 0))
 

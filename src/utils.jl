@@ -38,7 +38,7 @@ x,y,z = symbols("x, y, z", real=true)
 
 """
 
-function symbols(x::AbstractString; kwargs...) 
+function symbols(x::AbstractString; kwargs...)
     out = sympy_meth(:symbols, x; kwargs...)
 end
 symbols(x::Symbol; kwargs...) = symbols(string(x); kwargs...)

@@ -65,9 +65,9 @@ cosc(as::Array{Sym}) = map(cosc, as)
 
 ## (x:Sym, ...) , export
 sympy_math_methods = (:Prod,
-                      :Ylm,
-                      :assoc_legendre,
-                      :chebyshevt
+#                      :Ylm,
+#                      :assoc_legendre,
+#                      :chebyshevt
                       )
 for meth in sympy_math_methods
     meth_name = string(meth)
@@ -270,7 +270,12 @@ Indicator function
 
 """
 Χ(x, a=-oo, b=oo) = piecewise((1, Gt(x, a) ∧ Le(x, b)), (0,true))
-Indicator(x, a=-oo, b=oo) = Χ(x, a, b) 
+Indicator(x, a=-oo, b=oo) = Χ(x, a, b)
+
+import Base: &, |
+(&)(a::Bool, b::Sym) = a & (b == SympyTRUE)
+(|)(a::Bool, b::Sym) = a | (b == SympyTRUE)
+
 export Indicator, Χ
 
 

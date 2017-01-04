@@ -56,13 +56,13 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        trunc, round, significand,
        abs, max, min, maximum, minimum,
        sign, dot,
-       besseli, besselj, besselk, bessely,
+#       besseli, besselj, besselk, bessely,
        airyai, airybi,
        zero, one
 import Base: transpose
 import Base: diff
 import Base: factorial, gcd, lcm, isqrt
-import Base: gamma, beta
+#import Base: gamma, beta
 import Base: length,  size
 import Base: factor, expand, collect
 import Base: !=, ==
@@ -138,6 +138,7 @@ include("ntheory.jl")
 include("sets.jl")
 include("display.jl")
 include("lambdify.jl")
+include("physics.jl")
 
 ## add call interface depends on version
 VERSION >= v"0.5.0-" && include("call.jl")
@@ -200,6 +201,40 @@ for prop in union(core_object_properties,
 end
 
 
+
+## Makes it possible to call in a sympy method, witout worrying about Sym objects
+
+global call_sympy_fun(fn::Function, args...; kwargs...) = fn(args...; kwargs...) 
+global call_sympy_fun(fn::PyCall.PyObject, args...; kwargs...) = call_sympy_fun(convert(Function, fn), args...; kwargs...)
+
+## Main interface to methods in sympy
+## sympy_meth(:name, ars, kwars...)
+global sympy_meth(meth, args...; kwargs...) = begin
+    ans = call_sympy_fun(convert(Function, sympy[@compat(Symbol(meth))]), args...; kwargs...)
+    ## make nicer...
+    try
+        if isa(ans, Vector)
+            ans = Sym[i for i in ans]
+        end
+    catch err
+    end
+    ans
+end
+global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
+    call_sympy_fun(project(object)[@compat(Symbol(meth))],  args...; kwargs...)
+end
+global call_matrix_meth(object::SymbolicObject, meth, args...; kwargs...) = begin
+    out = object_meth(object, meth, args...; kwargs...)
+    if isa(out, SymMatrix) 
+        convert(Array{Sym}, out)
+    elseif  length(out) == 1
+        out 
+    else
+        map(u -> isa(u, SymMatrix) ? convert(Array{Sym}, u) : u, out)
+    end
+end
+
+
 ## For precompilation we must put PyCall instances in __init__:
 function __init__()
     
@@ -220,45 +255,13 @@ function __init__()
     catch e
     end
 
-
-    ## Makes it possible to call in a sympy method, witout worrying about Sym objects
-
-    global call_sympy_fun(fn::Function, args...; kwargs...) = fn(args...; kwargs...) 
-    global call_sympy_fun(fn::PyCall.PyObject, args...; kwargs...) = call_sympy_fun(convert(Function, fn), args...; kwargs...)
-
-    ## Main interface to methods in sympy
-    ## sympy_meth(:name, ars, kwars...)
-    global sympy_meth(meth, args...; kwargs...) = begin
-        ans = call_sympy_fun(convert(Function, sympy[@compat(Symbol(meth))]), args...; kwargs...)
-        ## make nicer...
-        try
-            if isa(ans, Vector)
-                ans = Sym[i for i in ans]
-            end
-        catch err
-        end
-        ans
-    end
-    global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
-        call_sympy_fun(project(object)[@compat(Symbol(meth))],  args...; kwargs...)
-    end
-    global call_matrix_meth(object::SymbolicObject, meth, args...; kwargs...) = begin
-        out = object_meth(object, meth, args...; kwargs...)
-        if isa(out, SymMatrix) 
-            convert(Array{Sym}, out)
-        elseif  length(out) == 1
-            out 
-        else
-            map(u -> isa(u, SymMatrix) ? convert(Array{Sym}, u) : u, out)
-        end
-    end
-
     ##
     init_logical()
     init_math()
     init_mpmath()
     init_sets()
     init_lambdify()
+    init_physics()
 end
 
 end
