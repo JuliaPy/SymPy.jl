@@ -133,7 +133,7 @@ z = subs(x,x,1)
 @assert isa(evalf(p), Sym)
 @assert isa(N(q), Rational)
 @assert isa(N(r), Float64)
-@assert isa(N(z), BigInt)
+@assert isa(N(z), Integer)
 
 ## method calls via getindex
 p = (x-1)*(x-2)

@@ -3,8 +3,8 @@ using SymPy: Sym, sqrt, conjugate, symbols, PI, simplify, expand_func, rewrite, 
 using Base.Test
 
 a, b, x, y = symbols("a, b, x, y")
-n, m, θ, ϕ = symbols("n, m, θ, ϕ")
-ν = symbols("ν", integer=true)
+n, m, θ, ϕ = symbols("n, m, theta, phi")
+ν = symbols("nu", integer=true)
 
 @test jacobi(0, a, b, x) == 1
 @test jacobi(1, a, b, x) == a/2 - b/2 + x*(a/2 + b/2 + 1)
@@ -82,7 +82,8 @@ n, m, θ, ϕ = symbols("n, m, θ, ϕ")
 @test expand_func(jn(1, x)) == sin(x)/x^2 - cos(x)/x
 @test rewrite(jn(ν, x), "besselj") == sqrt(2PI/x)*besselj(ν + Sym(1)/2, x)/2
 @test rewrite(jn(ν, x), "bessely") == (-1)^ν*sqrt(2PI/x)*bessely(-ν - Sym(1)/2, x)/2
-@test N(jn(2, 5.2+0.3im), 20) ≈ 0.099419756723640344491 - 0.054525080242173562897im
+u = N(jn(2, 5.2+0.3im), 20)
+@test norm(real(u) - 0.099419756723640344491) <= 1e-15 && norm(imag(u) + 0.054525080242173562897) <= 1e-15
 
 
 @test expand_func(yn(0, x)) == -cos(x)/x
@@ -108,7 +109,7 @@ n, m, θ, ϕ = symbols("n, m, θ, ϕ")
 # test numerical consistency with Julia functions
 @test N(gamma(Sym(4.1))) ≈ gamma(4.1)
 @test N(polygamma(Sym(2), Sym(3.2))) ≈ polygamma(2, 3.2)
-@test N(beta(Sym(1)+1im, Sym(1)+1im)) ≈ beta(1.0+1im, 1.0+1im)
+VERSION >= v"0.5.0" && @test N(beta(Sym(1)+1im, Sym(1)+1im)) ≈ beta(1.0+1im, 1.0+1im)
 
 
 
