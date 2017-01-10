@@ -4,17 +4,16 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
            :asinh, :acosh, :atanh, :sec, :csc, :cot, :asec, :acsc, :acot,
            :sech, :csch,
            :coth, :acoth,
-           :atan2,
            :radians2degrees, :degrees2radians,
            :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
            :sqrt, :square, :erf, :erfc, :erfcx, :erfi, :erfinv, :erfcinv, :dawson,
-           :fresnels, :fresnelc, :Ei, :Si, :Ci, 
+           :fresnels, :fresnelc, :Ei, :Si, :Ci,
            :ceiling, :floor, :trunc, :round, :significand,
            :factorial2,
            :airyai, :airybi
            )
     meth_name = string(fn)
-    
+
     @eval begin
         @doc """
 `$($meth_name)`: a SymPy function.
@@ -26,6 +25,10 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
 end
 
 
+# hypot and atan2
+hypot(x::Sym, y::Sym) = sqrt(x^2 + y^2)
+atan2(y::Sym, x::Sym) = sympy_meth(:atan2, y, x)
+
 ## Log function handles arguments differently
 log(x::Sym) = sympy_meth(:log, x)
 log(b::Sym, x::Sym) = sympy_meth(:log, x, b)
@@ -34,7 +37,7 @@ log(b::Sym, x::Sym) = sympy_meth(:log, x, b)
 Base.rad2deg(x::Sym) = radians2degrees(x)
 Base.deg2rad(x::Sym) = degrees2radians(x)
 
-## degree functions   
+## degree functions
 for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
           :acosd, :acotd, :acscd, :asecd, :asind, :atand)
 
@@ -42,7 +45,7 @@ for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
     @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](project(x * Sym(sympy[:pi]/180)))
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
-                                           
+
 for fn in (:cospi, :sinpi)
     rad_fn = string(fn)[1:end-2]
     @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](project(x * Sym(sympy[:pi])))
@@ -63,29 +66,11 @@ cosc(x::Sym) = diff(sinc(x))
 cosc(as::Array{Sym}) = map(cosc, as)
 
 
-## (x:Sym, ...) , export
-sympy_math_methods = (:Prod,
-#                      :Ylm,
-#                      :assoc_legendre,
-#                      :chebyshevt
-                      )
-for meth in sympy_math_methods
-    meth_name = string(meth)
-    @eval begin
-           @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
-        ($meth)(ex, args...; kwargs...) = sympy_meth($meth_name, ex, args...; kwargs...) # no ::Sym
-    end
-    eval(Expr(:export, meth))
-end
-
 
 ## in julia, not SymPy
 cbrt(x::Sym) = x^(1//3)
 Base.ceil(x::Sym) = ceiling(x)
- 
+
 functions_sympy_methods = (
                            :arg,
                            :conjugate,
@@ -179,7 +164,7 @@ limit(ex::Sym, x::Sym, c; kwargs...) = sympy_meth(:limit, ex, x, Sym(c); kwargs.
 limit(ex::Sym, args...; kwargs...) = sympy_meth(:limit, ex, args...; kwargs...)
 export limit
 
-    
+
 function Base.diff(ex::Sym, args...; kwargs...)
     if ex.x[:is_Equality]
         Eq(diff(lhs(ex), args...; kwargs...), diff(rhs(ex), args...; kwargs...))
@@ -188,7 +173,7 @@ function Base.diff(ex::Sym, args...; kwargs...)
     end
 end
 
-## 
+##
 
 
 ## diff for matrix doesn't handle vectors well, so we vectorize here
@@ -282,16 +267,16 @@ export Indicator, Χ
 ##################################################
 ## special numbers are initialized after compilation
 function init_math()
-    "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors." 
+    "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors."
     global const PI = Sym(sympy[:pi])
 
-    "E is a symbolic  `e`. Using `julia`'s `e` will give round off errors." 
+    "E is a symbolic  `e`. Using `julia`'s `e` will give round off errors."
     global const E = Sym(sympy[:exp](1))
-    
-    "IM is a symbolic `im`" 
+
+    "IM is a symbolic `im`"
     global const IM = Sym(sympy[:I])
 
-    "oo is a symbolic infinity. Example: `integrate(exp(-x), x, 0, oo)`." 
+    "oo is a symbolic infinity. Example: `integrate(exp(-x), x, 0, oo)`."
     global const oo = Sym(sympy[:oo])
 
 

@@ -1,4 +1,4 @@
-__precompile__() 
+__precompile__()
 
 ## TODO:
 ## * tidy up code
@@ -56,13 +56,12 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        trunc, round, significand,
        abs, max, min, maximum, minimum,
        sign, dot,
-#       besseli, besselj, besselk, bessely,
        airyai, airybi,
-       zero, one
+       zero, one,
+       hypot
 import Base: transpose
 import Base: diff
 import Base: factorial, gcd, lcm, isqrt
-#import Base: gamma, beta
 import Base: length,  size
 import Base: factor, expand, collect
 import Base: !=, ==
@@ -167,7 +166,7 @@ for meth in union(core_sympy_methods,
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
         ($meth){T<:SymbolicObject}(ex::T, args...; kwargs...) = sympy_meth($meth_name, ex, args...; kwargs...)
-        
+
     end
     eval(Expr(:export, meth))
 end
@@ -204,7 +203,7 @@ end
 
 ## Makes it possible to call in a sympy method, witout worrying about Sym objects
 
-global call_sympy_fun(fn::Function, args...; kwargs...) = fn(args...; kwargs...) 
+global call_sympy_fun(fn::Function, args...; kwargs...) = fn(args...; kwargs...)
 global call_sympy_fun(fn::PyCall.PyObject, args...; kwargs...) = call_sympy_fun(convert(Function, fn), args...; kwargs...)
 
 ## Main interface to methods in sympy
@@ -225,10 +224,10 @@ global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
 end
 global call_matrix_meth(object::SymbolicObject, meth, args...; kwargs...) = begin
     out = object_meth(object, meth, args...; kwargs...)
-    if isa(out, SymMatrix) 
+    if isa(out, SymMatrix)
         convert(Array{Sym}, out)
     elseif  length(out) == 1
-        out 
+        out
     else
         map(u -> isa(u, SymMatrix) ? convert(Array{Sym}, u) : u, out)
     end
@@ -237,7 +236,7 @@ end
 
 ## For precompilation we must put PyCall instances in __init__:
 function __init__()
-    
+
     ## Define sympy, mpmath, ...
     copy!(sympy, PyCall.pyimport_conda("sympy", "sympy"))
 
