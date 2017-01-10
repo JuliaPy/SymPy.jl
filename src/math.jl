@@ -26,8 +26,8 @@ end
 
 
 # hypot and atan2
-hypot(x::Sym, y::Sym) = sqrt(x^2 + y^2)
-atan2(y::Sym, x::Sym) = sympy_meth(:atan2, y, x)
+hypot(x::Sym, y::Number) = sqrt(x^2 + y^2)
+atan2(y::Sym, x::Number) = sympy_meth(:atan2, y, x)
 
 ## Log function handles arguments differently
 log(x::Sym) = sympy_meth(:log, x)
