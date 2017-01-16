@@ -23,9 +23,7 @@ end
 
 ## Export SymPy math functions and vectorize them
 for fn in (:radians2degrees, :degrees2radians,
-           :square, :factorial2,
-           #:fresnels, :fresnelc, :Ei, :Si, :Ci,
-           #:airyai, :airybi
+           :factorial2,
            )
     meth_name = string(fn)
 
@@ -76,7 +74,7 @@ asech(as::Array{Sym}) = map(asech, as)
 ## http://mathworld.wolfram.com/InverseHyperbolicCosecant.html
 acsch(z::Sym) = log(sqrt(1+1/z^2) + 1/z)
 acsch(as::Array{Sym}) = map(acsch, as)
-sinc(x::Sym) = sin(Sym(PI*x))/(PI*x)
+sinc(x::Sym) = sin(PI*x)/(PI*x)
 sinc(as::Array{Sym}) = map(sinc, as)
 cosc(x::Sym) = diff(sinc(x))
 cosc(as::Array{Sym}) = map(cosc, as)

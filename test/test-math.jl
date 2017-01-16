@@ -19,3 +19,8 @@ using Base.Test
 @test erf(Sym(0)) == 0
 @test erf(Sym(oo)) == 1
 @test diff(erf(x), x) == 2*exp(-x^2)/sqrt(PI)
+
+
+#@test sinc(Sym(0)) == 1
+#@test diff(sinc(x), x) == (x*cos(x) - sin(x))/x^2
+#@test rewrite(sinc(x), "jn") == jn(0, x)

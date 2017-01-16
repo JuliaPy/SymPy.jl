@@ -11,7 +11,7 @@ n, m, θ, ϕ = symbols("n, m, theta, phi")
 @test fresnels(Sym(0)) == 0
 @test fresnels(Sym(oo)) == Sym(1)/2
 @test diff(fresnels(x), x) == sin(PI*x^2/2)
-#@test evalf(fresnels(Sym(2)), 30) == Sym(0.343415678363698242195300815958)
+#@test evalf(fresnels(Sym(2)), 30) == Sym(parse(BigFloat, "0.343415678363698242195300815958"))
 
 
 @test  diff(fresnelc(x), x) == cos(PI*x^2/2)
