@@ -104,7 +104,8 @@ Base.contains(I::Sym, x) = (I[:contains](x) == Sym(true))
 Base.in(x::Number, I::Sym) = contains(I, x)
 
 "Elements of finite set"
-elements(x::Sym) = PyCall.pyeval("[i for i in s]", s=project(x))
+#elements(x::Sym) = (s = project(x); PyCall.py"[i for i in $s]o")
+elements(x::Sym) = (s = project(x); PyCall.pyeval("[i for i in s]", s=s))
 export elements
 
 

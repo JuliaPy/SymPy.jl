@@ -7,8 +7,18 @@ subs(ex::Array{Sym}, args...; kwargs...) = Sym[subs(u, args...; kwargs...) for u
 
 
 
-getindex(s::SymMatrix, i::Integer...) = pyeval("x[i]", Sym, x=project(s), i= tuple(([i...].-1)...))
-getindex(s::SymMatrix, i::Integer) = pyeval("x[i]", Sym, x=project(s), i=map(x->x-1, ind2sub(size(s), i)))
+function getindex(s::SymMatrix, i::Integer...)
+    ind = tuple(([i...].-1)...)
+    x = project(s)
+#    py"($(s))[$ind]"o # needs to bump PyCall to 1.8.0
+    pyeval("x[i]", Sym, x=x, i=ind)
+end
+function getindex(s::SymMatrix, i::Integer)
+    ind = map(x->x-1, ind2sub(size(s), i))
+    x = project(s)
+    # py"($s)[$i]"o  # need PyCall 1.8.0. 
+    pyeval("x[i]", Sym, x=x, i=ind)
+end
 getindex(s::SymMatrix, i::Symbol) = project(s)[i] # is_nilpotent, ... many such predicates
 getindex(s::Array{Sym}, i::Symbol) = project(s)[i] # digaonalize..
 

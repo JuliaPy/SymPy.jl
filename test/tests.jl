@@ -225,7 +225,7 @@ a = [x 1; 1 x]
 b = [x 1 2; 1 2 x]
 
 const DIMERROR = VERSION < v"0.4.0-dev" ? ErrorException : DimensionMismatch
-
+const DimensionOrMethodError =  Union{MethodError, DimensionMismatch}  
 ## scalar, [vector, matrix]
 s + v
 v + s
@@ -269,7 +269,7 @@ s \ a
 
 @test_throws MethodError  s ^ v ## error
 s .^ v
-@test_throws MethodError  v ^ s ## error
+@test_throws DimensionOrMethodError v ^ s ## error
 v .^ s
 @test_throws MethodError  s ^ rv ## error
 s .^ rv
@@ -286,10 +286,14 @@ v .+ v
 ##@test_throws MethodError  v .+ rv ##  no longer an error, broadcase
 v .- v
 @test_throws DIMERROR  v - rv
-@test_throws MethodError  v * v ## error
+@test_throws DimensionOrMethodError   v * v ## error
 v .* v
 dot(v, v)
-v * rv ## 2x1 1x2 == 2x2
+if VERSION >= v"0.6.0-dev"
+    @test_throws DimensionMismatch v * rv ## 2x1 1x2 == 2x2
+else
+    v * rv
+end
 rv * v ## 1x2 2 x 1 == 1x1
 v .* rv ## XXX ?? should be what? -- not 2 x 2
 rv .* v ## XXX ditto

@@ -18,6 +18,7 @@ latex(s::SymbolicObject, args...; kwargs...)  = sympy_meth(:latex, s, args...; k
 
 "create basic printed output"
 function jprint(x::SymbolicObject)
+#    out = py"str($(x.x))"  # 1.8.0 of PyCall is needed in REQUIRE
     out = PyCall.pyeval("str(x)", x = x.x)
 
     if ismatch(r"\*\*", out)
