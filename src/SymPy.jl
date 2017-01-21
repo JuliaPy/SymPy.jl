@@ -62,7 +62,7 @@ import Base: transpose
 import Base: diff
 import Base: factorial, gcd, lcm, isqrt
 import Base: length,  size
-import Base: factor, expand, collect
+import Base: expand, collect
 import Base: !=, ==
 import Base:  inv, conj,
               cross, eigvals, eigvecs, trace, norm
@@ -79,7 +79,9 @@ import Base: real, imag
 import Base: expm
 import Base: nullspace
 
-
+if VERSION < v"0.6.0-dev"
+    import Base: factor, isprime
+end
 
 export sympy, sympy_meth, object_meth, call_matrix_meth
 export Sym, @syms, @vars, @osyms, symbols

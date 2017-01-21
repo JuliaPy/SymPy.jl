@@ -1,8 +1,8 @@
 ## evaluate binary operations of symbolic objects
 ## XXX -- this may prove too narryw with the use of ::Sym
-+{T<:SymbolicObject}(x::T, y::SymbolicObject) = pycall(sympy[:Add], Sym, x, y)::T
-*{T<:SymbolicObject, S<:SymbolicObject}(x::T, y::S) = pycall(sympy[:Mul], Sym, x, y)::T
--{T<:SymbolicObject, S<:SymbolicObject}(x::T, y::S) = x + (-y)
++(x::SymbolicObject, y::SymbolicObject) = pycall(sympy[:Add], Sym, x, y)
+*(x::SymbolicObject, y::SymbolicObject) = pycall(sympy[:Mul], Sym, x, y)
+-(x::SymbolicObject, y::SymbolicObject) = x + (-y)
 -(x::SymbolicObject)                    =  (-1) * x 
 /(x::Sym, y::Sym) = x * pycall(sympy[:Pow], Sym, y, -1)::Sym 
 ^(x::SymbolicObject, y::Rational) = x^convert(Sym,y)

@@ -36,43 +36,21 @@ logic_sympy_methods = (
                      :satisfiable
                      )
 
-
-## This is a bit messed up, as we use Qeven in place of Q.even, ...
-## This is now deprecated. See below
-Q_predicates = (:even, :odd, :prime, :nonzero,
-                :complex, :extended_real, :imaginary, :infinitesimal,
-                :integer, :irrational, :real,
-                :positive, :negative,
-                :bounded, :commutative)
-Q_nms = [@compat(Symbol("Q" * string(i))) for i in Q_predicates]
-
-for (fn, meth) in zip(Q_nms, Q_predicates)
-    nm = string(meth)
-    @eval begin
-        @doc """
-`$($nm)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($nm)
-""" ->
-        ($fn)(x::SymbolicObject) = PyCall.pyeval("f(x)", Sym, f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))::Sym
-    end
-    eval(Expr(:export, fn))
-end
-
-@deprecate Qeven(x) Q.even(x)
-@deprecate Qodd(x) Q.odd(x)
-@deprecate Qprime(x) Q.prime(x)
-@deprecate Qnonzero(x) Q.nonzero(x)
-@deprecate Qcomplex(x) Q.complex(x)
-@deprecate Qextended_real(x) Q.extended_real(x)
-@deprecate Qimaginary(x) Q.imaginary(x)
-@deprecate Qinfinitesimal(x) Q.infinitesimal(x)
-@deprecate Qinteger(x) Q.integer(x)
-@deprecate Qirrational(x) Q.irrational(x)
-@deprecate Qreal(x) Q.real(x)
-@deprecate Qpositive(x) Q.positive(x)
-@deprecate Qnegative(x) Q.negative(x)
-@deprecate Qbounded(x) Q.bounded(x)
-@deprecate Qcommutative(x) Q.commutative(x)
+# @deprecate Qeven(x) Q.even(x)
+# @deprecate Qodd(x) Q.odd(x)
+# @deprecate Qprime(x) Q.prime(x)
+# @deprecate Qnonzero(x) Q.nonzero(x)
+# @deprecate Qcomplex(x) Q.complex(x)
+# @deprecate Qextended_real(x) Q.extended_real(x)
+# @deprecate Qimaginary(x) Q.imaginary(x)
+# @deprecate Qinfinitesimal(x) Q.infinitesimal(x)
+# @deprecate Qinteger(x) Q.integer(x)
+# @deprecate Qirrational(x) Q.irrational(x)
+# @deprecate Qreal(x) Q.real(x)
+# @deprecate Qpositive(x) Q.positive(x)
+# @deprecate Qnegative(x) Q.negative(x)
+# @deprecate Qbounded(x) Q.bounded(x)
+# @deprecate Qcommutative(x) Q.commutative(x)
 
 
 ## We make a module Q to hold the assumptions
@@ -132,7 +110,8 @@ for meth in Q_predicates
 `$($nm)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($nm)
 """ ->
-            ($meth)(x) = PyCall.pyeval("f(x)", SymPy.Sym, f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))::SymPy.Sym
+            ($meth)(x) = convert(SymPy.Sym, convert(Function, SymPy.sympy[:Q][($nm)])(SymPy.project(x)))
+#            ($meth)(x) = PyCall.pyeval("f(x)", SymPy.Sym, f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))::SymPy.Sym
         end
     end
 end

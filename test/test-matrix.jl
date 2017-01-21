@@ -36,7 +36,7 @@ eigvals(A)
 
 a = [1 0 0; 0 1 0; 0 0 x]
 evecs = eigvecs(a)
-@assert float(evecs) == eye(3)
+@assert float(rref(evecs)) == eye(3)
 
 eh = convert(SymMatrix, a)
 eh[9]

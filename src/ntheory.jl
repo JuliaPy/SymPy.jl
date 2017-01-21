@@ -1,6 +1,3 @@
-
-import Base: isprime
-
 ## http://docs.sympy.org/dev/modules/ntheory.html?highlight=ntheory#sympy.ntheory.factor_
 ntheory_sympy_methods = (
                          :sieve,

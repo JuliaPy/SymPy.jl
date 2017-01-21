@@ -45,13 +45,9 @@ function SymFunction{T<:AbstractString}(x::T)
 #    SymFunction(u, 0)
 end
 
-IVPSolution{T<:AbstractString}(x::T) = SymFunction(x)
-export IVPSolution
-## Need to deprecate this...
-@deprecate IVPSolution(x::AbstractString) SymFunction(x)
 
-symfunction(x) = SymFunction(x) # for use with symbols("F", cls=symfunction)
-
+#symfunction(x) = SymFunction(x) # for use with symbols("F", cls=symfunction)
+@deprecate symfunction(x) SymFunction(x)
 ## macro to create functions
 """
 

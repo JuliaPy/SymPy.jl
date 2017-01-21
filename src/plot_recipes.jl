@@ -124,10 +124,11 @@ export sympy_plotting
 using RecipesBase
 
 ##
-@recipe f{T<:Sym}(::Type{T}, v::T) = lambdify(v)
+_lambdify(ex) = x -> N(ex(x))
+@recipe f{T<:Sym}(::Type{T}, v::T) = _lambdify(v)
 
 ## for vectors of expressions
-@recipe f{S<:AbstractVector{Sym}}(::Type{S}, ss::S) = Function[lambdify(s) for s in ss]
+@recipe f{S<:AbstractVector{Sym}}(::Type{S}, ss::S) = Function[_lambdify(s) for s in ss]
 
 ## vectorfieldplot is an addon as we avoid quiver
 ## Not ready yet!

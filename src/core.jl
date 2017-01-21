@@ -16,7 +16,7 @@ core_object_methods = (:as_poly, :atoms,
                        :as_ordered_terms, :as_powers_dicts, :as_real_imag,
                        :as_terms,
                        :coeff, :compute_leading_term, :could_extract_minus_sign,
-                       :count_ops, :equals,  :extract_additively,
+                       :equals,  :extract_additively,
                        :extract_branch_factor, :extract_multiplicatively,
                        :getO, :getn,
                        ## :is_integer called as x[:is_integer]
@@ -24,8 +24,7 @@ core_object_methods = (:as_poly, :atoms,
                        :integer_nthroot,
                        :leadterm,
                        :primitive,
-                       :removeO,
-                       :series
+                       :removeO
                        )
 
 
