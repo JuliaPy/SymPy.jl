@@ -7,6 +7,7 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
            :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
            :sqrt, :erf, :erfc, :erfcx, :erfi, :erfinv, :erfcinv, :dawson,
            :ceiling, :floor, :trunc, :round, :significand,
+           :sinc,
            )
     meth_name = string(fn)
 
@@ -66,7 +67,7 @@ for fn in (:cospi, :sinpi)
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
-## :asech, :acsch, :sinc, :cosc,
+## :asech, :acsch, :cosc,
 ## These fail, so define from definitions
 ## http://mathworld.wolfram.com/InverseHyperbolicSecant.html
 asech(z::Sym) = log(sqrt(1/z-1)*sqrt(1/z+1) + 1/z)
@@ -74,8 +75,6 @@ asech(as::Array{Sym}) = map(asech, as)
 ## http://mathworld.wolfram.com/InverseHyperbolicCosecant.html
 acsch(z::Sym) = log(sqrt(1+1/z^2) + 1/z)
 acsch(as::Array{Sym}) = map(acsch, as)
-sinc(x::Sym) = sin(PI*x)/(PI*x)
-sinc(as::Array{Sym}) = map(sinc, as)
 cosc(x::Sym) = diff(sinc(x))
 cosc(as::Array{Sym}) = map(cosc, as)
 

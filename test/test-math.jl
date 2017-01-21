@@ -1,8 +1,10 @@
 using SymPy
+using SymPy.SpecialFuncs: jn
 using Base.Test
 
 ρ = symbols("rho", positive=true)
 ϕ = symbols("phi", real=true)
+x = symbols("x")
 
 @test simplify(hypot(ρ*cos(ϕ), ρ * sin(ϕ))) == ρ
 @test hypot(ρ*cos(ϕ), 3) == sqrt(ρ^2*cos(ϕ)^2 + 9)
@@ -21,6 +23,6 @@ using Base.Test
 @test diff(erf(x), x) == 2*exp(-x^2)/sqrt(PI)
 
 
-#@test sinc(Sym(0)) == 1
-#@test diff(sinc(x), x) == (x*cos(x) - sin(x))/x^2
-#@test rewrite(sinc(x), "jn") == jn(0, x)
+@test sinc(Sym(0)) == 1
+@test diff(sinc(x), x) == (x*cos(x) - sin(x))/x^2
+@test rewrite(sinc(x), "jn") == jn(0, x)
