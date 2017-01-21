@@ -1,10 +1,31 @@
 using SymPy.SpecialFuncs
-using SymPy: Sym, sqrt, conjugate, symbols, PI, simplify, expand_func, rewrite, N
+using SymPy: Sym, sqrt, conjugate, symbols, PI, simplify,
+             expand_func, rewrite, N, gamma
 using Base.Test
 
 a, b, x, y = symbols("a, b, x, y")
 n, m, θ, ϕ = symbols("n, m, theta, phi")
 ν = symbols("nu", integer=true)
+
+
+@test fresnels(Sym(0)) == 0
+@test fresnels(Sym(oo)) == Sym(1)/2
+@test diff(fresnels(x), x) == sin(PI*x^2/2)
+#@test evalf(fresnels(Sym(2)), 30) == Sym(parse(BigFloat, "0.343415678363698242195300815958"))
+
+
+@test  diff(fresnelc(x), x) == cos(PI*x^2/2)
+
+
+@test Ei(Sym(-1)) == Ei(exp(1im*PI))
+@test diff(Ei(x), x) == exp(x)/x
+@test diff(Si(x), x) == sin(x)/x
+@test diff(Ci(x), x) == cos(x)/x
+
+
+@test airyai(Sym(0)) == 3^(Sym(1)/3)/(3*gamma(Sym(2)/3))
+@test airybi(Sym(0)) == 3^(Sym(5)/6)/(3*gamma(Sym(2)/3))
+
 
 @test jacobi(0, a, b, x) == 1
 @test jacobi(1, a, b, x) == a/2 - b/2 + x*(a/2 + b/2 + 1)

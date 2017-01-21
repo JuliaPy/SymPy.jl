@@ -4,13 +4,9 @@ for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
            :asinh, :acosh, :atanh, :sec, :csc, :cot, :asec, :acsc, :acot,
            :sech, :csch,
            :coth, :acoth,
-           :radians2degrees, :degrees2radians,
            :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
-           :sqrt, :square, :erf, :erfc, :erfcx, :erfi, :erfinv, :erfcinv, :dawson,
-           :fresnels, :fresnelc, :Ei, :Si, :Ci,
+           :sqrt, :erf, :erfc, :erfcx, :erfi, :erfinv, :erfcinv, :dawson,
            :ceiling, :floor, :trunc, :round, :significand,
-           :factorial2,
-           :airyai, :airybi
            )
     meth_name = string(fn)
 
@@ -22,6 +18,24 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
         ($fn)(x::Sym;kwargs...) = sympy_meth($meth_name, x; kwargs...)
     end
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
+end
+
+
+## Export SymPy math functions and vectorize them
+for fn in (:radians2degrees, :degrees2radians,
+           :factorial2,
+           )
+    meth_name = string(fn)
+
+    @eval begin
+        @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($fn)(x::Sym;kwargs...) = sympy_meth($meth_name, x; kwargs...)
+    end
+    @eval ($fn)(a::Array{Sym}) = map($fn, a)
+    eval(Expr(:export, fn))
 end
 
 
@@ -60,7 +74,7 @@ asech(as::Array{Sym}) = map(asech, as)
 ## http://mathworld.wolfram.com/InverseHyperbolicCosecant.html
 acsch(z::Sym) = log(sqrt(1+1/z^2) + 1/z)
 acsch(as::Array{Sym}) = map(acsch, as)
-sinc(x::Sym) = sin(Sym(PI*x))/(PI*x)
+sinc(x::Sym) = sin(PI*x)/(PI*x)
 sinc(as::Array{Sym}) = map(sinc, as)
 cosc(x::Sym) = diff(sinc(x))
 cosc(as::Array{Sym}) = map(cosc, as)

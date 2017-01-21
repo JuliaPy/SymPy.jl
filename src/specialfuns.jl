@@ -4,7 +4,8 @@ using PyCall
 using SymPy
 
 import Base: gamma, polygamma, beta,
-       besseli, besselj, besselk, bessely
+             airyai, airybi,
+             besseli, besselj, besselk, bessely
 
 for meth in (
              :jacobi,
@@ -29,7 +30,6 @@ for meth in (
 end
 
 
-
 ## these have (parameter, x) signature. Use symbolic x to call sympy version, othewise
 ## should dispatch to julia version.
 for fn in (:besselj, :bessely, :besseli, :besselk)
@@ -37,6 +37,23 @@ for fn in (:besselj, :bessely, :besseli, :besselk)
 #    eval(Expr(:import, :Base, fn))
     @eval ($fn)(nu::Number, x::Sym; kwargs...) = sympy_meth($meth, nu, x; kwargs...)
     @eval ($fn)(nu::Number, a::Array{Sym}) = map(x ->$fn(nu, x), a)
+end
+
+
+for meth in (:fresnels, :fresnelc, :Ei, :Si, :Ci,
+             :airyai, :airybi
+           )
+    meth_name = string(meth)
+
+    @eval begin
+        @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($meth)(x::Sym;kwargs...) = sympy_meth($meth_name, x; kwargs...)
+    end
+    @eval ($meth)(a::Array{Sym}) = map($meth, a)
+    eval(Expr(:export, meth))
 end
 
 
