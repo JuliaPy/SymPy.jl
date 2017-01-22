@@ -14,7 +14,7 @@ for meth in (
              :legendre, :assoc_legendre,
              :hermite,
              :laguerre, :assoc_laguerre,
-             :Ynm,
+             :Ynm, :Ynm_c,
              :hankel1, :hankel2,
              :jn, :yn
              )

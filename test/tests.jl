@@ -1,7 +1,16 @@
 using SymPy
-using Base.Test
 using Compat
+if VERSION >= v"0.5.0-dev+7720"
+    using Base.Test
+else
+    using BaseTestNext
+    const Test = BaseTestNext
+end
+#using Base.Test
 
+
+
+@testset "Core" begin
 ## Symbol creation
 x = Sym("x")
 #x = sym"x" # deprecated
@@ -451,4 +460,6 @@ end
 @vars x y z
 for ex in (sin(x), x*y^2*x, sqrt(x^2 - 2y))
     @test func(ex)(args(ex)...) == ex
+end
+
 end
