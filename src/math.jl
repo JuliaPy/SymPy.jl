@@ -56,13 +56,13 @@ for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
           :acosd, :acotd, :acscd, :asecd, :asind, :atand)
 
     rad_fn = string(fn)[1:end-1]
-    @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](project(x * Sym(sympy[:pi]/180)))
+    @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](project(x * Sym(sympy["pi"])/180))
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
 for fn in (:cospi, :sinpi)
     rad_fn = string(fn)[1:end-2]
-    @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](project(x * Sym(sympy[:pi])))
+    @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](project(x * Sym(sympy["pi"])))
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
@@ -216,8 +216,8 @@ Base.isinf(x::Sym) = try isinf(convert(Float64, x)) catch e false end
 Base.isnan(x::Sym) = try isnan(convert(Float64, x)) catch e false end
 
 ## we rename sympy.div -> polydiv
-Base.div(x::Sym, y::SymOrNumber) = convert(Sym, sympy[:floor](x/convert(Sym,y)))
-Base.rem(x::Sym, y::SymOrNumber) = x-Sym(y)*Sym(sympy[:floor](x/y))
+Base.div(x::Sym, y::SymOrNumber) = convert(Sym, sympy["floor"](x/convert(Sym,y)))
+Base.rem(x::Sym, y::SymOrNumber) = x-Sym(y)*Sym(sympy["floor"](x/y))
 
 ## zero and one (zeros?)
 Base.zero(x::Sym) = Sym(0)
@@ -283,22 +283,22 @@ export Indicator, Χ
 ## special numbers are initialized after compilation
 function init_math()
     "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors."
-    global const PI = Sym(sympy[:pi])
+    global const PI = Sym(sympy["pi"])
 
     "E is a symbolic  `e`. Using `julia`'s `e` will give round off errors."
-    global const E = Sym(sympy[:exp](1))
+    global const E = Sym(sympy["exp"](1))
 
     "IM is a symbolic `im`"
-    global const IM = Sym(sympy[:I])
+    global const IM = Sym(sympy["I"])
 
     "oo is a symbolic infinity. Example: `integrate(exp(-x), x, 0, oo)`."
-    global const oo = Sym(sympy[:oo])
+    global const oo = Sym(sympy["oo"])
 
 
     ## math constants
     Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
     Base.convert(::Type{Sym}, x::Irrational{:e}) = E
-    Base.convert(::Type{Sym}, x::Irrational{:γ}) = sympy[:EulerGamma]
-    Base.convert(::Type{Sym}, x::Irrational{:catalan}) = sympy[:Catalan]
+    Base.convert(::Type{Sym}, x::Irrational{:γ}) = sympy["EulerGamma"]
+    Base.convert(::Type{Sym}, x::Irrational{:catalan}) = sympy["Catalan"]
     Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
 end

@@ -46,7 +46,7 @@ typealias SymbolicTypes  @compat Union{AbstractString, Symbol, SymbolicObject}
 
 PyCall.PyObject(x::SymbolicObject) = x.x
 
-## Promotion 
+## Promotion
 ## promote up to symbolic so that math ops work
 promote_rule{T<:SymbolicObject, S<:Number}(::Type{T}, ::Type{S} ) = T
 
@@ -77,7 +77,7 @@ convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
 
 
 ## complex
-## IM is SymPy's "i" (sympy[:I], not Python's
+## IM is SymPy's "i" (sympy["I"], not Python's
 ## Sym(PyCall.PyObject(im)) which gives 1j.
 function convert(::Type{Sym}, x::Complex)
     y = ifelse(isa(x, Complex{Bool}), real(x) + imag(x) * im, x)
@@ -102,7 +102,7 @@ convert(::Type{Sym}, o::Symbol) = sympy_meth(:sympify, string(o))
 Get the free symbols in a more convenient form than as returned by `free_symbols`.
 
 Just `free_symbols` now does the same thing. This function will be deprecated.
-"""    
+"""
 function get_free_symbols(ex::Sym)
     free = free_symbols(ex)
     n = free[:__len__]()

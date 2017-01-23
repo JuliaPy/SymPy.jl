@@ -205,12 +205,12 @@ end
 ## Makes it possible to call in a sympy method, witout worrying about Sym objects
 
 global call_sympy_fun(fn::Function, args...; kwargs...) = fn(args...; kwargs...)
-global call_sympy_fun(fn::PyCall.PyObject, args...; kwargs...) = call_sympy_fun(convert(Function, fn), args...; kwargs...)
+global call_sympy_fun(fn::PyCall.PyObject, args...; kwargs...) = PyCall.pycall(fn, PyAny, args...; kwargs...)
 
 ## Main interface to methods in sympy
 ## sympy_meth(:name, ars, kwars...)
 global sympy_meth(meth, args...; kwargs...) = begin
-    ans = call_sympy_fun(convert(Function, sympy[@compat(Symbol(meth))]), args...; kwargs...)
+    ans = call_sympy_fun(sympy[string(meth)], args...; kwargs...)
     ## make nicer...
     try
         if isa(ans, Vector)
@@ -242,16 +242,16 @@ function __init__()
     copy!(sympy, PyCall.pyimport_conda("sympy", "sympy"))
 
     ## mappings from PyObjects to types.
-    basictype = sympy[:basic]["Basic"]
+    basictype = sympy["basic"]["Basic"]
     pytype_mapping(basictype, Sym)
 
-    polytype = sympy[:polys]["polytools"]["Poly"]
+    polytype = sympy["polys"]["polytools"]["Poly"]
     pytype_mapping(polytype, Sym)
 
     try
-        matrixtype = sympy[:matrices]["MatrixBase"]
+        matrixtype = sympy["matrices"]["MatrixBase"]
         pytype_mapping(matrixtype, SymMatrix)
-        pytype_mapping(sympy[:Matrix], SymMatrix)
+        pytype_mapping(sympy["Matrix"], SymMatrix)
     catch e
     end
 

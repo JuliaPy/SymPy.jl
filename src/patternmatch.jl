@@ -3,14 +3,14 @@
 """
     `Wild(:x)`: create a "wild card" for pattern matching
 """
-Wild(x::AbstractString) = convert(Function, sympy[:Wild])(x)
+Wild(x::AbstractString) = pycall(sympy["Wild"], PyAny, x)
 Wild(x::Symbol) = Wild(string(x))
 export Wild
 
 """
     `match(pattern, expression, ...)` match pattern against expression
 
-returns a dictionary of matches. 
+returns a dictionary of matches.
 
 If a match is unsuccesful, returns an *empty* dictionary. (SymPy returns "nothing")
 

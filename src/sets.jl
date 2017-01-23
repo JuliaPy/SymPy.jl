@@ -51,13 +51,13 @@ sypmy_sets = nothing
 module S
 using SymPy
 function init_set()
-    S = sympy[:S]
-    global Reals = S[:Reals]
-    global UniversalSet = S[:UniversalSet]
-    global Naturals = S[:Naturals]
-    global Naturals0 = S[:Naturals0]
-    global Integers = S[:Integers]
-    global EmptySet = S[:EmptySet]
+    S = sympy["S"]
+    global Reals = S["Reals"]
+    global UniversalSet = S["UniversalSet"]
+    global Naturals = S["Naturals"]
+    global Naturals0 = S["Naturals0"]
+    global Integers = S["Integers"]
+    global EmptySet = S["EmptySet"]
 end
 end
 
@@ -91,7 +91,7 @@ function _union_to_intervals(s::Sym)
     is_Union(s) || throw(ArgumentError("`s` must be a Union of Intervals"))
     collect(args(s))
 end
-                         
+
 
 
 "Find power set of set"
@@ -104,8 +104,7 @@ Base.contains(I::Sym, x) = (I[:contains](x) == Sym(true))
 Base.in(x::Number, I::Sym) = contains(I, x)
 
 "Elements of finite set"
-#elements(x::Sym) = (s = project(x); PyCall.py"[i for i in $s]o")
-elements(x::Sym) = (s = project(x); PyCall.pyeval("[i for i in s]", s=s))
+elements(x::Sym) = collect(project(x))
 export elements
 
 
@@ -113,7 +112,7 @@ VERSION < v"0.5.0-" && eval(Expr(:import, :Base, :complement))
 "Complement of set within the universe"
 complement(I::Sym, U::Sym=S.Reals) = I[:complement](U)
 export complement
-    
+
 "boundary, returnsa set"
 boundary(I::Sym) = I.x[:boundary]
 
@@ -209,7 +208,7 @@ See also `Interval` to create subsets of the real line.
     """
     Represent a ComplexRegion.
     working?
-```    
+```
     I, J = Interval(0,1), Interval(0,2)
     R = ComplexRegion(I * J)
     1 in R        # true
@@ -217,7 +216,7 @@ See also `Interval` to create subsets of the real line.
 ```
 """
     ComplexRegion(IJ::Sym; kwargs...) = sympy_meth(:ComplexRegion, IJ; kwargs...)
-    
+
     "imageset: http://docs.sympy.org/latest/modules/sets.html"
     global imageset(fn::Function, args...) = begin
         x = Sym("x")
@@ -225,9 +224,9 @@ See also `Interval` to create subsets of the real line.
     end
     global imageset(args...) = sympy_meth(:imageset, args...)
 
-    
+
     ## Interval
-    
+
 """
 Create an interval object
 
@@ -239,5 +238,5 @@ Interval(0,1,true, false) # (0,1]
 """
     global Interval(l,r,left_open=false, right_open=false) = sympy_meth(:Interval, Sym(l), Sym(r), left_open ,right_open)
 
-    
+
 end

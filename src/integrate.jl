@@ -47,7 +47,7 @@ Dirac delta for integration
 
 [SymPy Documentation](http://docs.sympy.org/dev/modules/functions/special.html)
 """
-DiracDelta(x::Number) = convert(Function, sympy[:DiracDelta])(x)
+DiracDelta(x::Number) = pycall(sympy["DiracDelta"], PyAny, x)
 export DiracDelta
 
 """
@@ -57,7 +57,7 @@ Heaviside function for integration.
 
 [SymPy Documentation](http://docs.sympy.org/dev/modules/functions/special.html)
 """
-Heaviside(x::Number) = convert(Function, sympy[:Heaviside])(x)
+Heaviside(x::Number) = pycall(sympy["Heaviside"], PyAny, x)
 export Heaviside
 
 
@@ -93,4 +93,3 @@ summations_instance_methods  = (
                                 :euler_maclaurin,
                                 )
 summations_object_properties  = (:is_zero, :is_number)
-

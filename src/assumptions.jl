@@ -102,7 +102,7 @@ Q_predicates = (:antihermitian,
                 :real_elements,
                 :complex_elements,
                 :integer_elements)
-                
+
 for meth in Q_predicates
         nm = string(meth)
         @eval begin
@@ -110,8 +110,7 @@ for meth in Q_predicates
 `$($nm)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($nm)
 """ ->
-            ($meth)(x) = convert(SymPy.Sym, convert(Function, SymPy.sympy[:Q][($nm)])(SymPy.project(x)))
-#            ($meth)(x) = PyCall.pyeval("f(x)", SymPy.Sym, f=SymPy.sympy[:Q][($nm)], x=SymPy.project(x))::SymPy.Sym
+            ($meth)(x) = PyCall.pycall(SymPy.sympy["Q"][$nm], SymPy.Sym, SymPy.project(x))::SymPy.Sym
         end
     end
 end
@@ -120,4 +119,3 @@ end
 
 
 export Q
-

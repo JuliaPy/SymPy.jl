@@ -34,7 +34,7 @@ for (m, meths) in physics
             `$($meth_name)`: a SymPy function.
                 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
                 """ ->
-            ($meth)(args...;kwargs...) = convert(Function, getindex($m, $meth_name))(map(Sym, args)..., map(Sym, kwargs)...)
+            ($meth)(args...;kwargs...) = pycall(getindex($m, $meth_name), PyAny, map(Sym, args)..., map(Sym, kwargs)...)
         end
         eval(Expr(:export, meth))
     end

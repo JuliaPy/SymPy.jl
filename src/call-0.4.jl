@@ -8,7 +8,7 @@ function Base.call{T <: SymbolicObject}(ex::T, args...)
         if classname(ex) == "Symbol"
             ex
         else
-            convert(Function, project(ex))(args...)
+            pycall(project(ex), PyAny, args...)
         end
     end
 end
@@ -19,7 +19,7 @@ Base.call(ex::SymbolicObject, x::Pair...) = subs(ex, x...)
 ## for symbolic functinos (dsolve)
 Base.call(u::SymFunction, x::Base.Dict) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
 Base.call(u::SymFunction, x::Base.Pair) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
-function Base.call(u::SymFunction, x::Sym) 
+function Base.call(u::SymFunction, x::Sym)
     if u.n == 0
         u.x(SymPy.project(x))
     else
