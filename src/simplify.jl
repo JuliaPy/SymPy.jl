@@ -25,7 +25,7 @@ expand_sympy_meths = (:expand_trig,
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=cse
 """ ->
 cse{T<:SymbolicObject}(ex::T, args...; kwargs...) = sympy_meth(:cse, ex, args...; kwargs...)
-cse{T<:SymbolicObject}(ex::Vector{T}, args...; kwargs...) = sympy_meth(:cse, map(project,ex), args...; kwargs...)
+cse{T<:SymbolicObject}(ex::Vector{T}, args...; kwargs...) = sympy_meth(:cse, ex, args...; kwargs...)
         
 function cse{T<:SymbolicObject, N}(ex::Array{T, N}, args...; kwargs...)
     a,b = cse(ex[:], args...; kwargs...)

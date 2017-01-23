@@ -67,7 +67,7 @@ need to evaluate python code. Here is one solution:
 
 ```
 x = sympy.Symbol("x")
-y = pyeval("k*x", k=sympy.pi, x=x)     
+y = pycall(sympy.Mul, PyAny, sympy.pi, x)
 z = sympy.sin(y)		
 z[:subs](x, 1) |> float
 ```
@@ -104,9 +104,8 @@ SymPy's `ex.meth_name(...)` or `meth_name(ex, ...)`, as possible. Any
 `Sym` objects are projected down onto the underlying `PyObject` for
 use within `PyCall`. Otherwise, to dig the `PyObject` out of a `Sym`
 object, you access its property `x`, as in `y.x`. To find a SymPy
-method, a call like `sympy.meth_name(...)` is possible,
-e.g. `sympy.harmonic(10)`. Any `Sym`-type arguments must be projected
-into `PyObject`s or an error will be thrown.
+method, a call like `sympy[:meth_name](...)` is possible,
+e.g. `sympy[:harmonic](10)`. 
 
 ## Notes
 

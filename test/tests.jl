@@ -81,6 +81,7 @@ ex = log(sin(x)) + tan(sin(x^2))
 @test replace(ex, sin(a), a) == log(x) + tan(x^2)
 @test replace(x*y, a*x, a) == y
 end
+
 ## xreplace
 if VERSION >= v"0.4.0"            
 @test xreplace(1 + x*y, x => PI) == 1 + PI*y

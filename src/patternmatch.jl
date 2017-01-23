@@ -76,30 +76,28 @@ replace(ex, sin(a), cos(a^2))  # cos(x^2)
 
 Some patterns allow for functions, but there are subtleties.
 
-The replacement pattern [type -> function](http://docs.sympy.org/dev/modules/core.html#sympy.core.basic.Basic.replace) is case 1.2 and works as expected:
+The replacement pattern [type -> function](http://docs.sympy.org/dev/modules/core.html#sympy.core.basic.Basic.replace) is case 1.2 and **is not working** (no longer works) as expected:
 
 ```
 ex = log(sin(x)) + tan(sin(x^2))
-replace(ex, func(sin(x)), a -> sin(2a))  # log(sin(2x)) + tan(sin(2*x^2))
-replace(x*y, func(x*y), (args...) -> sin(2*prod(args)))  # sin(2xy)
+replace(ex, func(sin(x)), a -> sin(2a))  # log(sin(2x)) + tan(sin(2*x^2)) # fails now
+replace(x*y, func(x*y), (args...) -> sin(2*prod(args)))  # sin(2xy) # fails now
 ```
 
-The pattern "pattern -> func" style requires two things: the function
-uses keyword arguments to match the values in the pattern and *the*
-return value must be wrapped in `SymPy.project` and the function
-wrapped as a `PyObject`. (Yes, this should be better but for now
-isn't)
+The pattern "pattern -> pattern" style works as  expected
 
 ```
 a = Wild("a")
-s2(;a=0) = SymPy.project(sin(2a))
-replace(ex, sin(a), PyCall.PyObject(s2))
+@vars x
+ex = cos(sin(x) + sin(2x))
+replace(ex, sin(a), sin(2a))
 ```
 
 
 """
 function Base.replace(ex::Sym, query::Sym, fn::Function; kwargs...)
-    replace(ex, query, PyCall.PyObject((args...) -> map(SymPy.project,fn(args...))); kwargs...)
+    ## XXX this is failing!
+    replace(ex, query, PyCall.PyObject((args...) ->fn(args...)); kwargs...)
 end
 
 function Base.replace(ex::Sym, query::Sym, value; kwargs...)
@@ -142,11 +140,7 @@ xreplace(Integral(sin(x), x), x=> y) # bound and unbound are replaced
 ```
 """
 function xreplace(ex::Sym, rule::Dict, args...; kwargs...)
-    d = Dict()
-    for (k,v) in rule
-        d[project(k)] = project(v)
-    end
-    ex[:xreplace](d, args...; kwargs...)
+    ex[:xreplace](rule, args...; kwargs...)
 end
 xreplace(ex::Sym, xs::Pair...; kwargs...) = xreplace(ex, Dict(xs...); kwargs...)
 
