@@ -18,9 +18,7 @@ latex(s::SymbolicObject, args...; kwargs...)  = sympy_meth(:latex, s, args...; k
 
 "create basic printed output"
 function jprint(x::SymbolicObject)
-#    out = py"str($(x.x))"  # 1.8.0 of PyCall is needed in REQUIRE
-    out = PyCall.pyeval("str(x)", x = x.x)
-
+    out = PyCall.pycall(pybuiltin("str"), Compat.UTF8String, x.x)
     if ismatch(r"\*\*", out)
         out = replace(out, "**", "^")
     end
@@ -31,13 +29,13 @@ jprint(x::Array) = map(jprint, x)
 ## show is called in printing tuples, ...
 ## we would like to use pprint here, but it does a poor job on complicated multi-line expressions
 Base.show(io::IO, s::Sym) = print(io, jprint(s))
-Base.show(io::IO, s::Array{Sym}) = print(io, "\n", sympy[:pretty](convert(SymMatrix, s)))
+Base.show(io::IO, s::Array{Sym}) = print(io, "\n", sympy["pretty"](convert(SymMatrix, s)))
 
 ## We add show methods for the REPL (text/plain) and IJulia (text/latex)
 
 ## text/plain
-@compat show(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy[:pretty](project(s)))
-@compat show(io::IO, ::MIME"text/plain", s::Array{Sym}) =  print(io, summary(s), "\n", sympy[:pretty](convert(SymMatrix, s)))
+@compat show(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy["pretty"](project(s)))
+@compat show(io::IO, ::MIME"text/plain", s::Array{Sym}) =  print(io, summary(s), "\n", sympy["pretty"](convert(SymMatrix, s)))
 
 @compat show(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
 @compat function  show(io::IO, ::MIME"text/latex", x::Array{Sym})

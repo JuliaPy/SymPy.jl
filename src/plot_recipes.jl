@@ -31,13 +31,13 @@ Example:
 plot([sin(x), cos(x)], 0, 2pi)
 ```
 
-* `plot(ex1, ex2, a, b; kwargs...)` will plot the two expressions in a parametric plot over the interval `[a,b]`.   
+* `plot(ex1, ex2, a, b; kwargs...)` will plot the two expressions in a parametric plot over the interval `[a,b]`.
 
 Example:
 
 ```
 @vars x
-plot(sin(2x), cos(3x), 0, 4pi) ## also 
+plot(sin(2x), cos(3x), 0, 4pi) ## also
 ```
 
 For a few backends (those that support `:path3d`) a third symbolic
@@ -134,7 +134,7 @@ _lambdify(ex) = x -> N(ex(x))
 ## Not ready yet!
 ## @recipe function f(::Type{Val{:vectorfieldplot}}, fx, fy, xlim=(-5,5), ylim=(-5,5); n=15)
 
-    
+
 ##     x₀, x₁ = xlim
 ##     y₀, y₁ = ylim
 ##     Δx = (x₁ - x₀) / (n-1)
@@ -157,14 +157,14 @@ _lambdify(ex) = x -> N(ex(x))
 
 ##     XS = Float64[]
 ##     YS = Float64[]
-    
+
 ##     for x in xs, y in ys
 ##         append!(XS, [x, x + λ * fx(x,y), NaN])
 ##         append!(YS, [y, y + λ * fy(x,y), NaN])
 ##     end
 ##     pop!(XS); pop!(YS)
 
-    
+
 ##     seriestype := :path
 ##     xlims := xlim
 ##     ylims := ylim
@@ -232,8 +232,8 @@ function plot_parametric_surface(exs::(@compat Tuple{Sym,Sym,Sym}),
                                  args...;
                                  kwargs...)
 
-    SymPy.call_sympy_fun(sympy[:plotting][:plot3d_parametric_surface], exs..., args...; kwargs...)
-    
+    SymPy.call_sympy_fun(sympy["plotting"]["plot3d_parametric_surface"], exs..., args...; kwargs...)
+
 end
 export plot_parametric_surface
 
@@ -250,5 +250,5 @@ plot_implicit(Eq(x^2+ y^2,3), (x, -2, 2), (y, -2, 2))
 ```
 
 """
-plot_implicit(ex, args...; kwargs...) = SymPy.call_sympy_fun(sympy[:plotting][:plot_implicit], ex, args...; kwargs...)
+plot_implicit(ex, args...; kwargs...) = SymPy.call_sympy_fun(sympy["plotting"]["plot_implicit"], ex, args...; kwargs...)
 export plot_implicit

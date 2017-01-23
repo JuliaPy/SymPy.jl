@@ -32,7 +32,7 @@ polydiv(ex::Sym, args...; kwargs...) = sympy_meth(:div, ex, args...; kwargs...)
 
 """
 
-Polynomial division remainer. 
+Polynomial division remainer.
 
 """
 
@@ -141,7 +141,7 @@ coeffs(p)  ## [a,b,c]
 ```
 
 """
-Poly(x::Sym) = sympy[:Poly](x)
+Poly(x::Sym) = sympy["Poly"](x)
 Poly(x::Sym, args...; kwargs...) = sympy_meth(:Poly, x, args...; kwargs...)
 export Poly
 

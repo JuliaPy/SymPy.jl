@@ -37,11 +37,11 @@ F,G,H = SymFunction("F, G, H")
 function SymFunction{T<:AbstractString}(x::T)
     us = split(x, r",\s*")
     if length(us) > 1
-        map(u -> SymFunction(sympy[:Function](u), 0), us)
+        map(u -> SymFunction(sympy["Function"](u), 0), us)
     else
-        SymFunction(sympy[:Function](x), 0)
+        SymFunction(sympy["Function"](x), 0)
     end
-#    u = sympy[:Function](x)
+#    u = sympy["Function"](x)
 #    SymFunction(u, 0)
 end
 
@@ -139,7 +139,7 @@ initial conditions 2) calling `solve` for the constants `C1`, `C2`,
 approach breaks down, then those steps can be done manually starting
 with the output of `dsolve` without the initial conditions.
 
-"""             
+"""
 
 dsolve(ex::Sym;kwargs...) = sympy_meth(:dsolve, ex; kwargs...)
 dsolve(exs::Vector{Sym};kwargs...) = sympy_meth(:dsolve, exs; kwargs...)
@@ -161,7 +161,7 @@ Specifying the function, as in `dsolve(ex, f(x))`, is deprecated.
 Use `sympy_meth(:dsolve, ex, f(x); kwargs...)` directly for that underlying interface.
 """))
     end
-    
+
     out = dsolve(eqn; kwargs...)
     ord = sympy_meth(:ode_order, eqn, var)
 
@@ -196,11 +196,11 @@ function _solve_ivp(out, var, args, o)
         if length(sols) == 1
             sols = sols[1]
         else
-            return [out([Pair(k,v) for (k,v) in sol]...) for sol in sols] 
+            return [out([Pair(k,v) for (k,v) in sol]...) for sol in sols]
         end
     end
 
-    out([Pair(k,v) for (k,v) in sols]...) 
+    out([Pair(k,v) for (k,v) in sols]...)
 end
 
 export SymFunction, symfunction, dsolve

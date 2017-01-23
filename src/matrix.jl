@@ -7,20 +7,11 @@ subs(ex::Array{Sym}, args...; kwargs...) = Sym[subs(u, args...; kwargs...) for u
 
 
 
-function getindex(s::SymMatrix, i::Integer...)
-    ind = tuple(([i...].-1)...)
-    x = project(s)
-#    py"($(s))[$ind]"o # needs to bump PyCall to 1.8.0
-    pyeval("x[i]", Sym, x=x, i=ind)
-end
-function getindex(s::SymMatrix, i::Integer)
-    ind = map(x->x-1, ind2sub(size(s), i))
-    x = project(s)
-    # py"($s)[$i]"o  # need PyCall 1.8.0. 
-    pyeval("x[i]", Sym, x=x, i=ind)
-end
+
+getindex(s::SymMatrix, i::Integer...) = get(project(s), Sym, ntuple(k -> i[k]-1, length(i)))
+getindex(s::SymMatrix, i::Integer) = get(project(s), Sym, map(x->x-1, ind2sub(size(s), i)))
 getindex(s::SymMatrix, i::Symbol) = project(s)[i] # is_nilpotent, ... many such predicates
-getindex(s::Array{Sym}, i::Symbol) = project(s)[i] # digaonalize..
+getindex(s::Array{Sym}, i::Symbol) = project(s)[i] # diagonalize..
 
 ## size
 function size(x::SymMatrix)
@@ -39,8 +30,8 @@ end
 ## we want our matrices to be arrays of Sym objects, not symbolic matrices
 ## so that julia manages them
 ## it is convenient (for printing, say) to convert to a sympy matrix
-convert(::Type{SymMatrix}, a::Array{Sym}) = Sym(sympy[:Matrix](a))
-convert(::Type{Sym}, a::Array{Sym}) = Sym(sympy[:Matrix](a))
+convert(::Type{SymMatrix}, a::Array{Sym}) = Sym(sympy["Matrix"](a))
+convert(::Type{Sym}, a::Array{Sym}) = Sym(sympy["Matrix"](a))
 function convert(::Type{Array{Sym}}, a::SymMatrix)
     sz = size(a)
     ndims = length(sz)
@@ -325,11 +316,3 @@ function hessian(f::Sym, x::Vector{Sym})
     convert(SymMatrix, out) |> u -> convert(Array{Sym}, u)
 end
 hessian(ex::Sym) = hessian(ex, free_symbols(ex))
-
-
-
-
-
-
-
-

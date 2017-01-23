@@ -3,7 +3,7 @@
 ## for symbolic functions (dsolve.jl)
 (u::SymFunction)(x::Base.Dict) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
 (u::SymFunction)(x::Base.Pair) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
-function (u::SymFunction)(x) 
+function (u::SymFunction)(x)
     if u.n == 0
         u.x(SymPy.project(x))
     else
@@ -27,7 +27,7 @@ function (ex::Sym)(args...)
         if classname(ex) == "Symbol"
             ex
         else
-            convert(Function, project(ex))(args...)
+            pycall(project(ex), PyAny, args...)
         end
     end
 end

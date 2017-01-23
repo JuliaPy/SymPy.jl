@@ -2,7 +2,7 @@
 
 Solve an expression for any zeros or a system of expressions passed a vector.
 
-Examples: 
+Examples:
 
 ```
 x,y, a,b,c = symbols("x, y, a, b, c", real=true)
@@ -28,18 +28,18 @@ The `SymPy` docs say this about `solve`:
 > cannot be represented symbolically. For example, the equation
 > `x=cos(x)` has a solution, but it cannot be represented
 > symbolically using standard functions.
-> 
+>
 > In fact, solve makes no guarantees whatsoever about the completeness
 > of the solutions it finds. Much of solve is heuristics, which may find
 > some solutions to an equation or system of equations, but not all of
 > them.
-        
+
 
 The return value depends on the inputs:
 
 * If there is one equation with one specified variable (either explicit, or because `free_symbols` returns only one variable), the return value is an array of solutions.
 
-* Otherwise, if there is a unique solution found a dictionary is returned. 
+* Otherwise, if there is a unique solution found a dictionary is returned.
 
 * Otherwise, if there is 0 or more than one solution found, an array of dictionaries is returned.
 
@@ -49,11 +49,11 @@ Note: The individual components of the array display more nicely than the array.
 
 Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html#algebraic-equations)
 
-"""  
+"""
 function solve{T<:Sym}(ex::(@compat Union{T,Vector{T}});  kwargs...)
     ## No symbols specified? Find them
     xs = free_symbols(ex)
-    if length(xs) ==0 
+    if length(xs) ==0
         error("The expression has non free variables")
     elseif length(xs) == 1
         xs = xs[1]
@@ -64,7 +64,7 @@ end
 ## solve for a single variable, Return Sym[]
 function solve(ex::Sym, x::Sym; kwargs...)
     a = sympy_meth(:solve, ex, x;  kwargs...)
-    
+
     ## Way too much work here to finesse into a nice enough output
     ## (Issue comes from solving without specifying variable when 2 or more variables in the expression
     isa(a, Dict) && return(a)
@@ -114,7 +114,7 @@ end
 """
 Numerically solve for a zero of an expression.
 
-Examples: 
+Examples:
 ```
 solve(x^5 - x -1) # inconclusive
 nsolve(x^5 - x - 1, 1)
@@ -123,13 +123,13 @@ nsolve(x^5 - x - 1, 1)
 Returns symbolic values. Use `N`, or some other means, to convert to floating point.
 
 Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html#algebraic-equations)
-"""              
+"""
 nsolve(ex::Sym, x::Sym, x0::Number) = sympy_meth(:nsolve, project(ex), project(x), x0)
 nsolve(ex::Sym, x0::Number) =  sympy_meth(:nsolve, project(ex), x0) |> x -> convert(Float64, x)
 function nsolve{T <: Number}(ex::Vector{Sym}, x::Vector{Sym}, x0::Vector{T}; kwargs...)
     out = sympy_meth(:nsolve, tuple(map(project,ex)...), tuple(map(project,x)...), tuple(x0...); kwargs...)
     ## ans is matrix object -- convert
-    convert(Array{Sym}, sympy[:Matrix](out))
+    convert(Array{Sym}, sympy["Matrix"](out))
 end
 export nsolve
 
@@ -140,7 +140,7 @@ export nsolve
 function solveset{T<:Sym}(ex::(@compat Union{T,Vector{T}});  kwargs...)
     ## No symbols specified? Find them
     xs = free_symbols(ex)
-    if length(xs) ==0 
+    if length(xs) ==0
         error("The expression has non free variables")
     elseif length(xs) == 1
         xs = xs[1]
