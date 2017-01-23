@@ -79,7 +79,7 @@ export hyper
 
 """
 function meijerg{T<:Number, S<:Number}(a1s::Vector{T}, a2s::Vector{T}, b1s::Vector{S}, b2s::Vector{S}, z::Number, r=1;kwargs...)
-    sympy_meth(:meijerg, a1s, a2s, b1s, b2s, z;  kwargs...) # [(k,project(v)) for (k,v) in kwargs]...)
+    sympy_meth(:meijerg, a1s, a2s, b1s, b2s, z;  kwargs...) 
 end
 export meijerg
 

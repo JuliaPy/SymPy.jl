@@ -56,13 +56,13 @@ for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
           :acosd, :acotd, :acscd, :asecd, :asind, :atand)
 
     rad_fn = string(fn)[1:end-1]
-    @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](project(x * Sym(sympy["pi"])/180))
+    @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](x * Sym(sympy["pi"])/180)
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
 for fn in (:cospi, :sinpi)
     rad_fn = string(fn)[1:end-2]
-    @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](project(x * Sym(sympy["pi"])))
+    @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](x * Sym(sympy["pi"]))
     @eval ($fn)(a::Array{Sym}) = map($fn, a)
 end
 
@@ -254,7 +254,6 @@ subs(p, x, a - 1)
 [Note: there is also an alias `Piecewise` for copy-n-pasting from python code, but despite the capital letter, this is not a constructor for a type.]
 """
 function piecewise(args...)
-    args = [map(project, x) for x in args]
     sympy_meth(:Piecewise, args...)
 end
 const Piecewise = piecewise

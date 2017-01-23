@@ -221,7 +221,7 @@ global sympy_meth(meth, args...; kwargs...) = begin
     ans
 end
 global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
-    call_sympy_fun(project(object)[@compat(Symbol(meth))],  args...; kwargs...)
+    call_sympy_fun(PyObject(object)[@compat(Symbol(meth))],  args...; kwargs...)
 end
 global call_matrix_meth(object::SymbolicObject, meth, args...; kwargs...) = begin
     out = object_meth(object, meth, args...; kwargs...)

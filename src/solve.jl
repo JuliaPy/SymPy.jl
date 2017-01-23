@@ -124,10 +124,10 @@ Returns symbolic values. Use `N`, or some other means, to convert to floating po
 
 Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html#algebraic-equations)
 """
-nsolve(ex::Sym, x::Sym, x0::Number) = sympy_meth(:nsolve, project(ex), project(x), x0)
-nsolve(ex::Sym, x0::Number) =  sympy_meth(:nsolve, project(ex), x0) |> x -> convert(Float64, x)
+nsolve(ex::Sym, x::Sym, x0::Number) = sympy_meth(:nsolve, ex, x, x0)
+nsolve(ex::Sym, x0::Number) =  sympy_meth(:nsolve, ex, x0) 
 function nsolve{T <: Number}(ex::Vector{Sym}, x::Vector{Sym}, x0::Vector{T}; kwargs...)
-    out = sympy_meth(:nsolve, tuple(map(project,ex)...), tuple(map(project,x)...), tuple(x0...); kwargs...)
+    out = sympy_meth(:nsolve, tuple(ex...), tuple(x...), tuple(x0...); kwargs...)
     ## ans is matrix object -- convert
     convert(Array{Sym}, sympy["Matrix"](out))
 end

@@ -8,10 +8,10 @@ subs(ex::Array{Sym}, args...; kwargs...) = Sym[subs(u, args...; kwargs...) for u
 
 
 
-getindex(s::SymMatrix, i::Integer...) = get(project(s), Sym, ntuple(k -> i[k]-1, length(i)))
-getindex(s::SymMatrix, i::Integer) = get(project(s), Sym, map(x->x-1, ind2sub(size(s), i)))
-getindex(s::SymMatrix, i::Symbol) = project(s)[i] # is_nilpotent, ... many such predicates
-getindex(s::Array{Sym}, i::Symbol) = project(s)[i] # diagonalize..
+getindex(s::SymMatrix, i::Integer...) = get(PyObject(s), Sym, ntuple(k -> i[k]-1, length(i)))
+getindex(s::SymMatrix, i::Integer) = get(PyObject(s), Sym, map(x->x-1, ind2sub(size(s), i)))
+getindex(s::SymMatrix, i::Symbol) = PyObject(s)[i] # is_nilpotent, ... many such predicates
+getindex(s::Array{Sym}, i::Symbol) = PyObject(s)[i] # diagonalize..
 
 ## size
 function size(x::SymMatrix)
@@ -48,8 +48,6 @@ function convert(::Type{Array{Sym}}, a::SymMatrix)
     end
 end
 
-## when projecting, we convert to a symbolic matrix then project
-project(x::Array{Sym}) = convert(SymMatrix, x) |> project
 
 
 ## linear algebra functions that are methods of sympy.Matrix
@@ -64,7 +62,7 @@ for meth in (:condition_number,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(a::SymMatrix) = pycall(a[($cmd)], Sym, x) #pyeval(($cmd), x=project(a)))
+        ($meth)(a::SymMatrix) = pycall(a[($cmd)], Sym, x) 
         ($meth)(a::Matrix{Sym}) = ($meth)(convert(SymMatrix, a))
     end
     eval(Expr(:export, meth))
@@ -202,12 +200,12 @@ Base.conj(a::Sym) = conjugate(a)
 
 ## :eigenvals, returns {val => mult, val=> mult}
 ## we return an array of eigen values, as eigvals does
-function eigvals(a::Matrix{Sym})
+function eigvals(a::SymMatrix)
     ## this is a hack, as  d = a[:eigenvals]() may not convert to a Julia dict (Ubuntu...)
-    ds = a[:eigenvects]()
+    ds = object_meth(a, :eigenvects)
     [d[1] for d in ds]
 end
-eigvals(a::SymMatrix) = eigvals(convert(Array{Sym}, a))
+eigvals(a::Matrix{Sym}) = eigvals(convert(SymMatrix, a))
 
 ## :eigenvects ## returns list of triples (eigenval, multiplicity, basis).
 """
@@ -215,13 +213,11 @@ eigvals(a::SymMatrix) = eigvals(convert(Array{Sym}, a))
 The `eigvecs` function returns a list of triples (eigenval, multiplicity, basis) for an `Matrix{Sym}`.
 
 """
-function eigvecs(a::Matrix{Sym})
-    ds = a[:eigenvects]()
-
+function eigvecs(a::SymMatrix)
+    ds =  object_meth(a, :eigenvects)
     hcat([hcat([convert(Array{Sym}, v) for v in d[3]]...) for d in ds]...)
-
 end
-eigvecs(a::SymMatrix) = eigvecs(convert(Array{Sym}, a))
+eigvecs(a::Matrix{Sym}) = eigvecs(convert(SymMatrix, a))
 
 ## Take any matrix and return reduced row-echelon form and indices of pivot vars
 ## To simplify elements before finding nonzero pivots set simplified=True
@@ -261,17 +257,10 @@ for fn in (:cross,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($fn)(A::SymMatrix, b::Sym) = object_meth(A, fn, b) #convert(Array{Sym}, pyeval(($cmd), A=project(A), b=project(b)))
+        ($fn)(A::SymMatrix, b::Sym) = object_meth(A, fn, b)
         ($fn)(A::Array{Sym, 2}, b::Vector{Sym}) = $(fn)(convert(SymMatrix,A), convert(SymMatrix, b))
     end
 end
-
-## GramSchmidt -- how to call?
-## call with a (A,b), return scalar
-# for fn in ()
-#     @eval ($fn)(A::Sym, b::Sym) = convert(Array{Sym}, pyeval("A.($fn)(b)", A=project(A), b=project(b)))
-#     @eval ($fn)(A::Array{Sym, 2}, b::Vector{Sym}) = ($fn)(convert(SymMatrix, A), convert(SymMatrix, b))
-# end
 
 
 ### Higher dimensional derivatives

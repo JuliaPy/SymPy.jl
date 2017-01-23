@@ -197,7 +197,3 @@ polynomial_predicates = (
 
 
 
-## special cases due to output
-
-## {Sym => val} dictionary
-#roots(p::Sym, args...; kwargs...) = sympy.roots(project(p), args...; kwargs...)

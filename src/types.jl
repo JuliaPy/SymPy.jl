@@ -44,6 +44,7 @@ typealias SymOrNumber @compat Union{Sym, Number}
 typealias SymOrString @compat Union{Sym, AbstractString}
 typealias SymbolicTypes  @compat Union{AbstractString, Symbol, SymbolicObject}
 
+## in #83, @stevengj suggests using
 PyCall.PyObject(x::SymbolicObject) = x.x
 
 ## Promotion
@@ -73,7 +74,7 @@ convert(::Type{Sym}, x::Complex{BigFloat}) = Sym(PyCall.PyObject(x))::Sym
 
 ## real
 convert{S<:SymbolicObject, T <: Real}(::Type{S}, x::T) = sympy_meth(:sympify, x)::S
-convert{T <: Real}(::Type{T}, x::Sym) = convert(T, project(x))
+convert{T <: Real}(::Type{T}, x::Sym) = convert(T, PyObject(x))
 
 
 ## complex
@@ -133,7 +134,7 @@ end
 ##     (args...) -> begin
 ##         out = ex
 ##         for i in 1:len
-##             out = object_meth(out, :subs, vars[i], args[i]) #convert(Function, out[:subs])(project(vars[i]), args[i])
+##             out = object_meth(out, :subs, vars[i], args[i]) 
 ##         end
 ##         out
 ##     end

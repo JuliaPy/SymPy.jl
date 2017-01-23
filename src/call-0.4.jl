@@ -8,7 +8,7 @@ function Base.call{T <: SymbolicObject}(ex::T, args...)
         if classname(ex) == "Symbol"
             ex
         else
-            pycall(project(ex), PyAny, args...)
+            pycall(PyObject(ex), PyAny, args...)
         end
     end
 end
@@ -21,7 +21,7 @@ Base.call(u::SymFunction, x::Base.Dict) = throw(ArgumentError("IVPsolutions can 
 Base.call(u::SymFunction, x::Base.Pair) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
 function Base.call(u::SymFunction, x::Sym)
     if u.n == 0
-        u.x(SymPy.project(x))
+        u.x(PyObject(x))
     else
         __x = Sym("__x")
         diff(u.x(__x.x), __x, u.n)(__x => x)

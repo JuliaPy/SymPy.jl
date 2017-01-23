@@ -157,7 +157,7 @@ end
 
 ## length of object
 function length(x::SymbolicObject)
-    haskey(project(x), :length) && return project(x)[:length]
+    haskey(PyObject(x), :length) && return PyObject(x)[:length]
     sz = size(x)
     length(sz) == 0 && return(0)
     *(sz...)
@@ -176,25 +176,6 @@ function size(x::SymbolicObject, dim::Integer)
         return 1
     end
 end
-
-
-## pull out x property of Sym objects or leave alone
-project(x::Any) = x
-project(x::SymbolicObject) = x.x
-project(x::Symbol) = project(Sym(x)) # can use :x instead of Sym(x)
-project(x::Tuple) = map(project, x)
-function project{T <: Any}(x::Dict{Sym,T})
-    D = Dict()
-    for (k,v) in x
-        D[project(k)] = v
-    end
-    D
-end
-project(x::Irrational{:π}) = project(convert(Sym, x))
-project(x::Irrational{:e}) = project(convert(Sym, x))
-project(x::Irrational{:γ}) = project(convert(Sym, x))
-project(x::Irrational{:catalan}) = project(convert(Sym, x))
-project(x::Irrational{:φ}) = project(convert(Sym, x))
 
 
 ## Iterator for Sym
@@ -230,7 +211,7 @@ x = Sym("x")
 
 """
 function getindex(x::SymbolicObject, i::Symbol)
-    if haskey(project(x), i)
+    if haskey(PyObject(x), i)
         function __XXxxXX__(args...;kwargs...) # replace with generated name
             object_meth(x, i, args...; kwargs...)
         end
@@ -245,36 +226,8 @@ function getindex(x::SymbolicObject, i::Symbol)
     end
 end 
 
-## deprecate trying to access both a property or a method...        
-function getindexOLD(x::SymbolicObject, i::Symbol)
-    ## find method
-    if haskey(project(x), i)
-        out = project(x)[i]
-        if isa(out, Function)
-            function _f1(args...;kwargs...)
-                object_meth(x, i, args...; kwargs...)
-            end
-            return _f1
-        else
-            return out
-        end
-    elseif haskey(sympy, i)
-        out = sympy[i]
-        if isa(out, Function)
-            function _f2(args...;kwargs...)
-                sympy_meth(i, x, args...; kwargs...)
-            end
-            return _f2
-        else
-            return out
-        end
-    else
-        MethodError()
-    end
-end
-
 ## Override this so that using symbols as keys in a dict works
-Base.hash(x::Sym) = hash(project(x))
+Base.hash(x::Sym) = hash(PyObject(x))
 
 
 ## Helper function from PyCall.pywrap:
