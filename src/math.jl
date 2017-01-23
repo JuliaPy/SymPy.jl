@@ -74,7 +74,8 @@ asech(as::Array{Sym}) = map(asech, as)
 ## http://mathworld.wolfram.com/InverseHyperbolicCosecant.html
 acsch(z::Sym) = log(sqrt(1+1/z^2) + 1/z)
 acsch(as::Array{Sym}) = map(acsch, as)
-sinc(x::Sym) = sin(PI*x)/(PI*x)
+# Julia's sinc is defined to be zero at x=1
+sinc(x::Sym) = piecewise((Sym(1), Eq(x, 0)), (sin(PI*x)/(PI*x), Gt(abs(x), 0)))
 sinc(as::Array{Sym}) = map(sinc, as)
 cosc(x::Sym) = diff(sinc(x))
 cosc(as::Array{Sym}) = map(cosc, as)

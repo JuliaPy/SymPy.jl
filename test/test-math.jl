@@ -21,6 +21,11 @@ using Base.Test
 @test diff(erf(x), x) == 2*exp(-x^2)/sqrt(PI)
 
 
-#@test sinc(Sym(0)) == 1
-#@test diff(sinc(x), x) == (x*cos(x) - sin(x))/x^2
-#@test rewrite(sinc(x), "jn") == jn(0, x)
+@test sinc(Sym(0)) == 1
+# test consistency with Julia's sinc
+@test sinc(Sym(1)) == 0
+@test N(sinc(Sym(0.2))) ≈ sinc(0.2)
+
+@test diff(sinc(x), x) == piecewise((Sym(0), Eq(x, 0)), (cos(PI*x)/x - sin(PI*x)/(PI*x^2), Gt(abs(x), 0)))
+#@test rewrite(sinc(x), "jn") == jn(0, PI * x)
+
