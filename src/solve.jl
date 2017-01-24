@@ -54,7 +54,7 @@ function solve{T<:Sym}(ex::(@compat Union{T,Vector{T}});  kwargs...)
     ## No symbols specified? Find them
     xs = free_symbols(ex)
     if length(xs) ==0
-        error("The expression has non free variables")
+        error("The expression has no free variables")
     elseif length(xs) == 1
         xs = xs[1]
     end
@@ -116,7 +116,7 @@ Numerically solve for a zero of an expression.
 
 Examples:
 ```
-solve(x^5 - x -1) # inconclusive
+solve(x^5 - x -1) # inconclusive, though `N.(solve(x^5 - x - 1))` works
 nsolve(x^5 - x - 1, 1)
 ```
 
@@ -135,8 +135,25 @@ export nsolve
 
 
 
-## SymPy is moving to solveset to replace solve (with 1.0)
-## http://omg.readthedocs.org/en/cleanup/modules/solvers/solveset.html
+"""
+`solveset(ex, sym, ...)`     
+
+    SymPy is moving to solveset to replace solve (with 1.0)
+    http://docs.sympy.org/latest/modules/solvers/solveset.html
+
+The `solveset` function has the advantage of a consistent return type, a set.
+
+The main interface is `solveset(eqn(s), variable(s); domain=...)`
+    
+Example
+```
+out = solveset(x^5 - x - 1)    # set of `CRootof`
+as = elements(out)             # An array of same
+N.(as)                         # numeric estimates, as would be `N.(solve(x^5 - x - 1))`
+solveset(x^2 + 1, x)           # +/- i
+solveset(x^2 + 1, x, domain=S.Reals)  # empty set
+```
+"""    
 function solveset{T<:Sym}(ex::(@compat Union{T,Vector{T}});  kwargs...)
     ## No symbols specified? Find them
     xs = free_symbols(ex)
@@ -148,39 +165,35 @@ function solveset{T<:Sym}(ex::(@compat Union{T,Vector{T}});  kwargs...)
     solveset(ex, xs; kwargs...)
 end
 
-## solve for a single variable, Return Sym[]
-function solveset(ex::Sym, x::Sym; kwargs...)
-    a = sympy_meth(:solveset, ex, x;  kwargs...)
-    ## massage output
-    a
-end
+solveset_sympy_methods = (:solveset,
+                          :solveset_real, :solveset_complex,
+                          :domain_check)
 
+
+## solveset does not currently allow simulataneous equations
 ## Solve for a single variable from equations. Return Dict{Sym,Sym}
-function solveset{T<:Sym}(exs::(@compat Union{T,Vector{T}}), x::Sym; kwargs...)
-    solveset(exs, [x;]; kwargs...)
-end
+# function solveset{T<:Sym}(exs::(@compat Union{T,Vector{T}}), x::Sym; kwargs...)
+#     solveset(exs, [x;]; kwargs...)
+# end
 
-function solveset{T<:Sym,S<:Sym}(exs::(@compat Union{T,Vector{T}}), xs::Vector{S}; kwargs...)
-    a = sympy_meth(:solveset, convert(SymMatrix, exs), xs;  kwargs...)
-    ## finesse output
-    a
-end
+# function solveset{T<:Sym,S<:Sym}(exs::(@compat Union{T,Vector{T}}), xs::Vector{S}; kwargs...)
+#     a = sympy_meth(:solveset, convert(SymMatrix, exs), xs;  kwargs...)
+#     ## finesse output
+#     a
+# end
 
-function solveset_real{T<:Sym}(ex::T, x::Sym; kwargs...)
-    a = sympy_meth(:solveset_real, ex, x;  kwargs...)
-    ## finesse output
-    a
-end
 
-function solveset_complex{T<:Sym}(ex::T, x::Sym; kwargs...)
-    a = sympy_meth(:solveset_complex, ex, x;  kwargs...)
-    ## finesse output
-    a
-end
-export solveset, solveset_real, solveset_complex
+"""
 
-## these are due for generation
-domain_check(ex::Sym, x::Sym, p) = sympy_meth(:domain_check, ex, x, p)
-linsolve{T<:Sym}(exs::(@compat Union{T,Vector{T}}), args...; kwargs...) = sympy_meth(:linsolve, exs, args...; kwargs...)
+`linsolve`: solve linear system of equations, return a set
 
-export domain_check, linsolve
+`nonlinsolve`: solve non-linear system of equations, return a set (may not be defined)
+
+[cf.](http://docs.sympy.org/dev/modules/solvers/solvers.html)
+"""
+linsolve{T<:Sym}(exs::Vector{T}, args...; kwargs...) = sympy_meth(:linsolve, exs, args...; kwargs...)
+
+## may not be there    
+nonlinsolve{T<:Sym}(exs::Vector{T}, args...; kwargs...) = sympy_meth(:nonlinsolve, exs, args...; kwargs...)
+
+export linsolve, nonlinsolve

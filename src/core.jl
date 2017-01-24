@@ -1,7 +1,4 @@
 ## methods for core
-
-
-
 core_object_methods = (:as_poly, :atoms,
                        :compare, :compare_pretty,
                        :doit, :dummy_eq, # :count,
@@ -35,47 +32,8 @@ core_object_properties = (:assumptions0,
                           )
 
 
-"""
-Return a vector of free symbols in an expression
-"""
-function free_symbols(ex::Sym)
-    fs = ex.x[:free_symbols]
-    ## are these a set?
-    if fs[:__class__][:__name__] == "set"
-        convert(Vector{Sym}, collect(fs))
-    else
-        Sym[]
-    end
-end
-function free_symbols{T<:SymbolicObject}(exs::Vector{T})
-    as = map(free_symbols, exs)
-    out = as[1]
-    if length(as) > 1
-        for j in 2:length(as)
-            for u in as[j]
-                u in out || push!(out, u)
-            end
-        end
-    end
-    out
-end
-function free_symbols(exs::Tuple)
-    as = map(free_symbols, exs)
-    out = as[1]
-    if length(as) > 1
-        for j in 2:length(as)
-            for u in as[j]
-                u in out || push!(out, u)
-            end
-        end
-    end
-    out
-end
-export free_symbols
-
-
 ## From relational
-core_sympy_methods = (:sympify,
+core_sympy_methods = (:sympify, :flatten,
                       :Dummy,
                       :Mod, :Rel,
                       :Eq, :Ne, :Lt, :Le, :Gt, :Ge,
@@ -112,39 +70,47 @@ x = Sym("x")
 Eq(x, sin(x)) |> rhs  ## sin(x)
 ```
 """
-rhs(ex::Sym, args...; kwargs...) = ex.x[:rhs]
-lhs(ex::Sym, args...; kwargs...) = ex.x[:lhs]
+rhs(ex::Sym, args...; kwargs...) = PyObject(ex)[:rhs]
+lhs(ex::Sym, args...; kwargs...) = PyObject(ex)[:lhs]
+
+
+
 
 """
-
-Returns a tuple of arguments
-
-cf. [args](http://docs.sympy.org/latest/modules/core.html#sympy.core.basic.Basic.args)
-
-(args is a property in SymPy, a function call in SymPy.jl.)
-
-Examples
-```
-Eq(x, x^2) |> args ## (x, x^2)
-sin(x) |> args ## (x,)
-```
+Return a vector of free symbols in an expression
 """
-args(ex::Sym) = ex.x[:args]
-
-
-## need to import these
-core_sympy_methods_base = (:factorial,
-                           :gcd, :lcm,
-                           :isqrt
-                           )
-for meth in core_sympy_methods_base
-    meth_name = string(meth)
-    @eval begin
-                @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
-        ($meth)(ex::Sym, args...; kwargs...) =
-            sympy_meth($meth_name, ex, args...; kwargs...)
+function free_symbols(ex::Sym)
+    fs = PyObject(ex)[:free_symbols]
+    ## are these a set?
+    if fs[:__class__][:__name__] == "set"
+        convert(Vector{Sym}, collect(fs))
+    else
+        Sym[]
     end
 end
+function free_symbols{T<:SymbolicObject}(exs::Vector{T})
+    as = map(free_symbols, exs)
+    out = as[1]
+    if length(as) > 1
+        for j in 2:length(as)
+            for u in as[j]
+                u in out || push!(out, u)
+            end
+        end
+    end
+    out
+end
+function free_symbols(exs::Tuple)
+    as = map(free_symbols, exs)
+    out = as[1]
+    if length(as) > 1
+        for j in 2:length(as)
+            for u in as[j]
+                u in out || push!(out, u)
+            end
+        end
+    end
+    out
+end
+export free_symbols
+

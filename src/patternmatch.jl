@@ -1,5 +1,41 @@
 ## http://docs.sympy.org/dev/modules/core.html
 
+
+"""
+     `func(ex)`: Return function head from an expression
+
+```
+func(sin(x))  # sin
+func(x*y)     # Mul
+func(x+y)     # Add
+```
+"""
+func(ex::Sym) = Sym(PyObject(ex)[:func])
+export func
+
+
+"""
+
+Returns a tuple of arguments
+
+cf. [args](http://docs.sympy.org/latest/modules/core.html#sympy.core.basic.Basic.args)
+
+(args is a property in SymPy, a function call in SymPy.jl.)
+
+Examples
+```
+Eq(x, x^2) |> args ## (x, x^2)
+sin(x) |> args ## (x,)
+```
+
+[Invariant:](http://docs.sympy.org/dev/tutorial/manipulation.html)
+
+Every well-formed SymPy expression `ex` must either have `length(args(ex)) == 0` or
+`func(ex)(args(ex)...) = ex`.         
+"""
+args(ex::Sym) = PyObject(ex)[:args]
+
+
 """
     `Wild(:x)`: create a "wild card" for pattern matching
 """
@@ -21,18 +57,6 @@ function Base.match(pat::Sym, ex::Sym, args...; kwargs...)
     out == nothing && return Dict()
     out
 end
-
-"""
-     `func(ex)`: Return function head from an expression
-
-```
-func(sin(x))  # sin
-func(x*y)     # Mul
-func(x+y)     # Add
-```
-"""
-func(ex::Sym) = Sym(ex.x[:func])
-export func
 
 """
     `replace(expression, pattern, value, ...)`

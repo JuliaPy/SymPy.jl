@@ -24,7 +24,7 @@ There is a curried form of `subs` to use with the chaining `|>` operator
 ex |> subs(x,e)
 ```
 
-Since version 0.4, the use of pairs gives a convenient alternative:
+The use of pairs gives a convenient alternative:
 
 ```
 subs(ex, x=>1, y=>2)
@@ -39,7 +39,6 @@ subs(ex, x=1, y=pi)
 ## or
 ex |> subs(:x, e)   
 ex |> subs(x=e)     
-## or as of version 0.4:
 ex(x=2, y=3)     
 ```
 
@@ -53,46 +52,11 @@ subs{T <: SymbolicObject, S<:SymbolicObject}(ex::T, y::S, val) = subs(ex, (y,val
 subs{T <: SymbolicObject}(ex::T, dict::Dict) = subs(ex, dict...)
 subs{T <: SymbolicObject}(ex::T, d::Pair...) = subs(ex, [(p.first, p.second) for p in d]...)
 
-function subs{T <: SymbolicObject, S <: Symbol}(ex::T, y::S, val)
-    warn("Calling subs with a symbol and not a symbolic variable is deprecated")
-    subs(ex, (y,val))
-end
-
 ## curried versions to use with |>
 subs(x::SymbolicObject, y) = ex -> subs(ex, x, y)
 subs(;kwargs...) = ex -> subs(ex; kwargs...)
 subs(dict::Dict) = ex -> subs(ex, dict...)
 subs(d::Pair...) = ex -> subs(ex, [(p.first, p.second) for p in d]...)
-
-function subs(x::Symbol, y)
-    warn("Calling `subs` with a symbol and not a symbolic variable is deprecated")
-    ex -> subs(ex, Sym(x), y)
-end
-
-## Convenience method for keyword arguments
-## Will deprecate this
-# function subs{T <: SymbolicObject}(ex::T; kwargs...)
-#     warn("""
-# Calling `subs` with keyword arguments will be deprecated. From v0.4 onward, the use of pairs, as in
-# `subs(ex, var1=>val1, var2=>val2)` is suggested.
-# """)
-#     subs(ex, kwargs...)
-# end
-
-# """
-#
-# As of version 0.4, expressions are callable. The following works
-# using pairs, a dictionary or, one can not specify the variables and
-# use the order of the free symbols;
-
-# ```
-# ex = (x-3)*(y^2
-# ex(x=>1, y=>2)
-# ex(Dict(x=>1, y=>2))
-# ex(1,2)  ## uses order of free_symbols
-# ```
-#     """
-
 
 ## different conversions
 
@@ -229,10 +193,7 @@ x = Sym("x")
 evalf(x, subs=Dict([(x,1/2)])) 
 ```
 """
-
-function evalf(x::Sym, args...; kwargs...)
-    x[:evalf](args...; kwargs...)
-end
+evalf(x::Sym, args...; kwargs...) = object_meth(x, :evalf, args...; kwargs...)
 
 
 

@@ -3,8 +3,8 @@
 
 ## XXX Experimental! Not sure these are such a good idea ...
 ## but used with piecewise
-@compat Base.:&(x::Sym, y::Sym) = PyCall.pycall(x.x["__and__"], Sym, y) 
-@compat Base.:|(x::Sym, y::Sym) =  PyCall.pycall(x.x["__or__"], Sym, y) 
+@compat Base.:&(x::Sym, y::Sym) = PyCall.pycall(PyObject(x)["__and__"], Sym, y) 
+@compat Base.:|(x::Sym, y::Sym) =  PyCall.pycall(PyObject(x)["__or__"], Sym, y) 
 !(x::Sym)         =       PyCall.pycall(x.x["__invert__"], Sym)::Sym 
 
 ## use ∨, ∧, ¬ for |,&,! (\vee<tab>, \wedge<tab>, \neg<tab>)
@@ -27,7 +27,7 @@
 
 "For hashing, we use equality at the python level."
 ## Base.isequal(x::Sym, y::Sym) = x.x == y.x
-==(x::Sym, y::Sym) = x.x == y.x
+==(x::Sym, y::Sym) = PyObject(x) == PyObject(y)
 
 #export ⩵
 ## Instead we have: 

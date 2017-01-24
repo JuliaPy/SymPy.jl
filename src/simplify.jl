@@ -2,7 +2,8 @@
 ## from http://docs.sympy.org/0.7.2/modules/simplify/simplify.html
 
 ## simple methods (x, args) -> y (y coercion happens via PyCall)
-simplify_sympy_meths = (:collect, :rcollect, :separatevars,
+simplify_sympy_meths = (:collect, :rcollect, :separate, 
+                        :separatevars,
                         :radsimp, :ratsimp, :trigsimp, :besselsimp,
                         :powsimp, :combsimp, :hypersimp,
                         :fraction,

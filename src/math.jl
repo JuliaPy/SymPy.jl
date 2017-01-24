@@ -1,42 +1,23 @@
 ## Imported math functions
-## make vectorized version while we are at it
-for fn in (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
-           :asinh, :acosh, :atanh, :sec, :csc, :cot, :asec, :acsc, :acot,
-           :sech, :csch,
-           :coth, :acoth,
-           :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
-           :sqrt, :erf, :erfc, :erfcx, :erfi, :erfinv, :erfcinv, :dawson,
-           :ceiling, :floor, :trunc, :round, :significand,
-           )
-    meth_name = string(fn)
 
-    @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
-        ($fn)(x::Sym;kwargs...) = sympy_meth($meth_name, x; kwargs...)
-    end
-    @eval ($fn)(a::Array{Sym}) = map($fn, a)
-end
+## need to import these
+math_sympy_methods_base = (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, :atan,
+                           :asinh, :acosh, :atanh, :sec, :csc, :cot, :asec, :acsc, :acot,
+                           :sech, :csch,
+                           :coth, :acoth,
+                           :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
+                           :sqrt, :erf, :erfc, :erfcx, :erfi, :erfinv, :erfcinv, :dawson,
+:ceiling, :floor, :trunc, :round, :significand,
+:factorial,
+:gcd, :lcm,
+:isqrt
+)
 
 
 ## Export SymPy math functions and vectorize them
-for fn in (:radians2degrees, :degrees2radians,
-           :factorial2,
-           )
-    meth_name = string(fn)
-
-    @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
-        ($fn)(x::Sym;kwargs...) = sympy_meth($meth_name, x; kwargs...)
-    end
-    @eval ($fn)(a::Array{Sym}) = map($fn, a)
-    eval(Expr(:export, fn))
-end
+math_sympy_methods = (:radians2degrees, :degrees2radians,
+                      :factorial2,
+                      )
 
 
 # hypot and atan2
@@ -96,14 +77,12 @@ functions_sympy_methods = (
 
 ## map Abs->abs, Max->max, Min->min
 abs(ex::Sym, args...; kwargs...) = sympy_meth(:Abs, ex, args...; kwargs...)
-Base.real(x::Sym) = sympy_meth(:re, x)
-Base.imag(x::Sym) = sympy_meth(:im, x)
-
-## sign-related functions
-abs(x::Sym) = sympy_meth(:Abs, x)
 abs(a::Array{Sym}) = map(abs, a)
 Base.abs2(x::Sym) = re(x*conj(x))
 Base.copysign(x::Sym, y::Sym) = abs(x)*sign(y)
+Base.real(x::Sym) = sympy_meth(:re, x)
+Base.imag(x::Sym) = sympy_meth(:im, x)
+
 
 #minimum(ex::Sym,x::NAtype) = x
 #minimum(ex::Sym, args...; kwargs...) = sympy_meth(:Min, ex, args...; kwargs...)
@@ -111,28 +90,15 @@ Base.copysign(x::Sym, y::Sym) = abs(x)*sign(y)
 #maximum(ex::Sym, args...; kwargs...) = sympy_meth(:Max, ex, args...; kwargs...)
 
 ## use SymPy Names here...
+Base.min(ex::Sym, exs...) = reduce((x,y)->sympy_meth(:Min, x, y), ex, exs)
+Base.max(ex::Sym, exs...) = reduce((x,y)->sympy_meth(:Max, x, y), ex, exs)
+
+
 Min(ex::Sym, ex1::Sym) = sympy_meth(:Min, ex, ex1)
 Max(ex::Sym, ex1::Sym) = sympy_meth(:Max, ex, ex1)
 
 
 
-
-for meth in (:separate, :flatten,
-             :igcd, :ilcm,
-             :sqf,
-             :together,
-             :Derivative
-             )
-    meth_name = string(meth)
-    @eval begin
-           @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
-        ($meth)(ex, args...; kwargs...) = sympy_meth($meth_name, ex, args...; kwargs...) # was ex::Sym
-    end
-    eval(Expr(:export, meth))
-end
 
 ## Calculus functions
 
@@ -181,7 +147,7 @@ export limit
 
 
 function Base.diff(ex::Sym, args...; kwargs...)
-    if ex.x[:is_Equality]
+    if PyObject(ex)[:is_Equality]
         Eq(diff(lhs(ex), args...; kwargs...), diff(rhs(ex), args...; kwargs...))
     else
         sympy_meth(:diff, ex, args...; kwargs...)
@@ -200,35 +166,8 @@ function diff(f::Function, k::Int=1; kwargs...)
     diff(f(x), x, k; kwargs...)
 end
 
-
-
-
-## Comparisons Real, Sym
-#Base.isless(a::Real, b::Sym) = isless(a, convert(Float64, b))
-#Base.isless(a::Sym, b::Real) = isless(b, a)
-
-
-
-
-## Handle ininf, and isnan by coercion to float
-Base.isfinite(x::Sym) = isfinite(convert(Float64, x))
-Base.isinf(x::Sym) = try isinf(convert(Float64, x)) catch e false end
-Base.isnan(x::Sym) = try isnan(convert(Float64, x)) catch e false end
-
-## we rename sympy.div -> polydiv
-Base.div(x::Sym, y::SymOrNumber) = convert(Sym, sympy["floor"](x/convert(Sym,y)))
-Base.rem(x::Sym, y::SymOrNumber) = x-Sym(y)*Sym(sympy["floor"](x/y))
-
-## zero and one (zeros?)
-Base.zero(x::Sym) = Sym(0)
-Base.zero(::Type{Sym}) = Sym(0)
-
-Base.one(x::Sym) = Sym(1)
-Base.one(::Type{Sym}) = Sym(1)
-
-## useful at times
-Base.typemax(::Type{Sym}) = oo
-Base.typemin(::Type{Sym}) = -oo
+# set up derivative, call doit to implement
+Derivative(ex::Sym, args...) = sympy_meth(:Derivative, ex, args...)
 
 #### Piecewise functions
 
@@ -276,6 +215,30 @@ import Base: &, |
 (|)(a::Bool, b::Sym) = a | (b == SympyTRUE)
 
 export Indicator, Χ
+
+
+
+### generic programming interface
+
+## Handle ininf, and isnan by coercion to float
+Base.isfinite(x::Sym) = isfinite(convert(Float64, x))
+Base.isinf(x::Sym) = try isinf(convert(Float64, x)) catch e false end
+Base.isnan(x::Sym) = try isnan(convert(Float64, x)) catch e false end
+
+## we rename sympy.div -> polydiv
+Base.div(x::Sym, y::SymOrNumber) = convert(Sym, sympy["floor"](x/convert(Sym,y)))
+Base.rem(x::Sym, y::SymOrNumber) = x-Sym(y)*Sym(sympy["floor"](x/y))
+
+## zero and one (zeros?)
+Base.zero(x::Sym) = Sym(0)
+Base.zero(::Type{Sym}) = Sym(0)
+
+Base.one(x::Sym) = Sym(1)
+Base.one(::Type{Sym}) = Sym(1)
+
+## useful at times
+Base.typemax(::Type{Sym}) = oo
+Base.typemin(::Type{Sym}) = -oo
 
 
 ##################################################

@@ -136,25 +136,6 @@ macro vars(x...)
     q
 end
 
-## """
-## DEPRECATED: use `symbols` instead
-##
-## Macro to create an assign variables. Similar to `symbols`.
-## """
-## macro osyms(x...)
-##     q=Expr(:block)
-##     if length(x) == 1 && isa(x[1],Expr)
-##         @assert x[1].head === :tuple "@syms expected a list of symbols"
-##         x = x[1].args
-##     end
-##     for s in x
-##         @assert isa(s,Symbol) "@syms expected a list of symbols"
-##         push!(q.args, Expr(:(=), s, Expr(:call, :symbols, Expr(:quote, s))))
-##            end
-##     push!(q.args, Expr(:tuple, x...))
-##     q
-## end
-
 ## length of object
 function length(x::SymbolicObject)
     haskey(PyObject(x), :length) && return PyObject(x)[:length]
@@ -237,4 +218,4 @@ function members(o::@compat Union{PyObject, Sym})
 end
 
 " Return class name as a string "
-classname(ex::Sym) = ex.x[:__class__][:__name__]
+classname(ex::Sym) = PyObject(ex)[:__class__][:__name__]

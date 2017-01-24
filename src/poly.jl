@@ -45,10 +45,6 @@ Polynomial division with remainder. Renamed from `divrem` in SymPy to avoid conf
 """
 polydivrem(ex::Sym, args...; kwargs...) = sympy_meth(:div, ex, args...; kwargs...)
 
-## deprecate these
-Base.@deprecate polydivrem(p::Sym, q::Sym) divrem(p::Sym, q::Sym)
-Base.@deprecate polydiv(p::Sym, q::Sym) divrem(p::Sym, q::Sym)
-Base.@deprecate polyrem(p::Sym, q::Sym) rem(p::Sym, q::Sym)
 
 """
 
@@ -62,7 +58,6 @@ export polydiv, polyrem, polydivrem, polyroots
 
 
 polynomial_sympy_methods = (
-                            :sqf_list,
                             :groebner,
                             :solve_poly_system,
                             :resultant,
@@ -114,15 +109,11 @@ denom(x::Sym) = sympy_meth(:denom, x)
 numer(x::Sym) = sympy_meth(:numer, x)
 export denom, numer
 
-polynomial_sympy_methods_import = (:expand,
-                                   :factor #,
-                                   #:trunc
-                                   )
+polynomial_sympy_methods_base = (:expand,
+                                 :factor #,
+                                    #:trunc
+                                    )
 
-for meth in polynomial_sympy_methods_import
-    meth_name = string(meth)
-    @eval ($meth)(ex::Sym, args...; kwargs...) = sympy_meth($meth_name, ex, args...; kwargs...)
-end
 
 ## SymPy Poly class
 
