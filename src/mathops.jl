@@ -15,4 +15,4 @@
 \(x::SymbolicObject, y::SymbolicObject) = (y'/x')' # ?
 
 
-inv(x::SymbolicObject) = x\one(x)
+inv(x::Sym) = x\one(x)

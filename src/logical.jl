@@ -1,10 +1,32 @@
 ## Logical operators for (Sym,Sym)
 
+# http://docs.sympy.org/dev/_modules/sympy/core/relational.html
+logical_sympy_methods = (:Eq, :Ne, :Lt, :Le, :Gt, :Ge)
+
+## these are defined for Reals, not Sym, Real...
+## Necessary to lambdify Indicators as of v0.6.0-dev
+## not exported
+const relational_sympy_values = (:GreaterThan, :LessThan,
+                                 :StrictGreaterThan, :StrictLessThan,
+                                 :Equality, :Unequality)  
+for meth in relational_sympy_values           
+    meth_name = string(meth)
+    @eval begin
+        @doc """
+`$($meth_name)`: a SymPy function. [cf.](http://docs.sympy.org/dev/_modules/sympy/core/relational.html)
+""" ->
+        ($meth)(a::Real, b::Real) = sympy_meth($meth_name,a, b)
+    end
+#    eval(Expr(:export, meth))
+end
+
+
+
 
 ## XXX Experimental! Not sure these are such a good idea ...
 ## but used with piecewise
-@compat Base.:&(x::Sym, y::Sym) = PyCall.pycall(x.x["__and__"], Sym, y) 
-@compat Base.:|(x::Sym, y::Sym) =  PyCall.pycall(x.x["__or__"], Sym, y) 
+@compat Base.:&(x::Sym, y::Sym) = PyCall.pycall(PyObject(x)["__and__"], Sym, y) 
+@compat Base.:|(x::Sym, y::Sym) =  PyCall.pycall(PyObject(x)["__or__"], Sym, y) 
 !(x::Sym)         =       PyCall.pycall(x.x["__invert__"], Sym)::Sym 
 
 ## use ∨, ∧, ¬ for |,&,! (\vee<tab>, \wedge<tab>, \neg<tab>)
@@ -18,18 +40,13 @@
 ## rather ther function `Eq` is used. Here we use the unicode
 ## `\Equal<tab>` for an infix operator. There are also unicode values to represent analogs of `<`, `<=`, `>=`. `>`. These are
 
-## * `<` is `\ll<tab>`
+## * `<`  is `\ll<tab>`
 ## * `<=` is `\leqq<tab>
 ## * `==` is `\Equal<tab>`
 ## * `>=` is `\geqq<tab>`
-## * `>` is `\gg<tab>`
+## * `>`  is `\gg<tab>`
 
 
-"For hashing, we use equality at the python level."
-## Base.isequal(x::Sym, y::Sym) = x.x == y.x
-==(x::Sym, y::Sym) = x.x == y.x
-
-#export ⩵
 ## Instead we have: 
 ## We use unicode for visual appeal of infix operators, but the Lt, Le, Eq, Ge, Gt are the proper way:
 
@@ -37,6 +54,7 @@
 (≪)(a::Sym, b::Sym) = Lt(a,b)  # \ll<tab>
 (≪)(a::Sym, b::Number) = Lt(a,Sym(b))  # \ll<tab>
 (≪)(a::Number, b::Sym) = Lt(Sym(a),b)  # \ll<tab>
+
 ## could just do this, but it would interfere with other uses outside of SymPy
 ## (≪)(a::Number, b::Number) = Lt(promote(a,b)...)  # \ll<tab>
 
@@ -64,15 +82,21 @@
 export ≪,≦,⩵,≧,≫
 
 
+
+
+"For hashing, we use equality at the python level."
+==(x::Sym, y::Sym) = PyObject(x) == PyObject(y)  # but isequal is not the same!
+
+
 ## Question: what to do with comparisons between Sym and Sym which *can* be answered true or false?
-## Here we throw and error when that is not the case in hopes that generic code can be called
+## Here we throw an error when that is not the case in hopes that generic code can be called
 ## when decisions are possible.
 ## This is experimental
 
 function asBool(x::Sym)
     x == SympyTRUE && return true
     x == !SympyTRUE && return false
-    _funcname(x) == "Equality" && return ==(_args(x)...)
+    funcname(x) == "Equality" && return ==(args(x)...)
     
     throw(DomainError())
 end

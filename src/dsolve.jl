@@ -8,12 +8,11 @@ end
 
 function PyCall.PyObject(f::SymFunction)
     f.n == 0 && return f.x
-    __x__ = symbols("__x__")
-    diff(f(__x__), __x__, f.n).x
+    z = symbols(gensym())
+    f(z).x  #  diff(f(__x__), __x__, f.n).x
 end
 
 """
-
 
 
 Create a symbolic function. These can be used for specifying differential equations.

@@ -148,6 +148,13 @@ x1 = (x + 1)*(x+2)
 expand(x1)
 expand_trig(sin(2x))
 
+## math functions
+u = abs(x^2 - 2)
+@test u(x=>0) == 2
+u = min(x, x^2, x^3, x^4)
+@test u(x=>2) == 2
+@test u(x=>1//2) == 1//2^4
+
 ## solve
 x,y,a = symbols("x,y,a", real=true)
 solve(x^2 - 2x)

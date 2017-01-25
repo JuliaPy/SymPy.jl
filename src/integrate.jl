@@ -32,6 +32,7 @@ integrals_instance_methods = (:as_sum,
 """
 Create a parameterized curve for line integrals
 
+[SymPy Documentation](http://docs.sympy.org/dev/modules/integrals/integrals.html#sympy.integrals.line_integrate)    
 ```
 @vars t x y
 C = Curve([exp(t)+1, exp(t)-1], (t, 0, log(Sym(2))))
@@ -68,7 +69,7 @@ The `integrate` function has its limits specified with tuples of the type `(var,
 profides a simpler interface for one-dimensional integrals: `integrate(ex, var, a, b)`
 
 """
-integrate(s::Sym, x::Sym, from::SymOrReal, to::SymOrReal) = integrate(s, (x, convert(Sym,from), convert(Sym,to)))
+integrate(s::Sym, x::Sym, from::Number, to::Number) = integrate(s, (x, convert(Sym,from), convert(Sym,to)))
 
 "Symbolically integrate a function"
 function integrate(f::Function)
@@ -77,9 +78,9 @@ function integrate(f::Function)
 end
 
 "Symbolically integrate a function over `[a,b]`"
-function integrate(f::Function, from::SymOrReal, to::SymOrReal)
+function integrate(f::Function, from::Number, to::Number)
     x = Sym("x")
-    integrate(f(x), x, from, to)
+    integrate(f(x), x, Sym(from), Sym(to))
 end
 
 

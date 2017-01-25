@@ -24,7 +24,7 @@ function Base.call(u::SymFunction, x::Sym)
         u.x(PyObject(x))
     else
         __x = Sym("__x")
-        diff(u.x(__x.x), __x, u.n)(__x => x)
+        diff(u.x(PyObject(__x)), __x, u.n)(__x => x)
     end
 end
 

@@ -84,7 +84,7 @@ if VERSION < v"0.6.0-dev"
 end
 
 export sympy, sympy_meth, object_meth, call_matrix_meth
-export Sym, @syms, @vars, @osyms, symbols
+export Sym, @syms, @vars, symbols
 export pprint,  jprint
 export SymFunction, @symfuns,
        SymMatrix,
@@ -148,16 +148,40 @@ include("plot_recipes.jl") # hook into Plots
 
 ## create some methods
 
+## These are base methods, so imported. Important  that first argument is Sym class for dispatch
+for meth in union(
+                  math_sympy_methods_base,
+                  polynomial_sympy_methods_base
+
+                  )
+    
+    meth_name = string(meth)
+#    eval(Expr(:import, :Base, meth)) # (kept in import list above)
+    @eval begin
+                @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+    """ ->
+        
+        ($meth)(ex::Sym, args...; kwargs...) =
+            sympy_meth($meth_name, ex, args...; kwargs...)
+    end
+end
+
+## These are *added*, so exported
 for meth in union(core_sympy_methods,
+                  math_sympy_methods,
                   simplify_sympy_meths,
                   expand_sympy_meths,
                   functions_sympy_methods,
                   series_sympy_meths,
                   integrals_sympy_methods,
+                  logical_sympy_methods,
                   summations_sympy_methods,
                   logic_sympy_methods,
                   polynomial_sympy_methods,
-                  ntheory_sympy_methods
+                  ntheory_sympy_methods,
+                  solveset_sympy_methods
                   )
 
     meth_name = string(meth)
@@ -172,10 +196,27 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
     eval(Expr(:export, meth))
 end
 
+
+## Thse are object methods that need importing
+for meth in union(series_object_meths_base
+                  )
+
+    meth_name = string(meth)
+    @eval begin
+        @doc """
+`$($meth_name)`: a SymPy function.
+The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+""" ->
+        ($meth)(ex::SymbolicObject, args...; kwargs...) = object_meth(ex, $meth_name, args...; kwargs...)
+    end
+end
+
+## Thse are object methods that need exporting
 for meth in union(core_object_methods,
                   integrals_instance_methods,
                   summations_instance_methods,
-                  polynomial_instance_methods
+                  polynomial_instance_methods,
+                  series_object_meths
                   )
 
     meth_name = string(meth)
@@ -190,13 +231,13 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
 end
 
 
-
+# These are object properties
 for prop in union(core_object_properties,
                   summations_object_properties,
                   polynomial_predicates)
 
     prop_name = string(prop)
-    @eval ($prop)(ex::Sym) = ex[@compat(Symbol($prop_name))]
+    @eval ($prop)(ex::Sym) = PyObject(ex)[@compat(Symbol($prop_name))]
     eval(Expr(:export, prop))
 end
 
@@ -205,6 +246,7 @@ end
 ## Makes it possible to call in a sympy method, witout worrying about Sym objects
 
 global call_sympy_fun(fn::Function, args...; kwargs...) = fn(args...; kwargs...)
+
 global call_sympy_fun(fn::PyCall.PyObject, args...; kwargs...) = PyCall.pycall(fn, PyAny, args...; kwargs...)
 
 ## Main interface to methods in sympy
@@ -220,8 +262,10 @@ global sympy_meth(meth, args...; kwargs...) = begin
     end
     ans
 end
+
 global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
     call_sympy_fun(PyObject(object)[@compat(Symbol(meth))],  args...; kwargs...)
+
 end
 global call_matrix_meth(object::SymbolicObject, meth, args...; kwargs...) = begin
     out = object_meth(object, meth, args...; kwargs...)

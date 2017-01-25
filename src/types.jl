@@ -97,76 +97,9 @@ convert(::Type{SymMatrix}, o::Sym) = SymMatrix(o.x)
 convert(::Type{Sym}, o::AbstractString) = sympy_meth(:sympify, o)
 convert(::Type{Sym}, o::Symbol) = sympy_meth(:sympify, string(o))
 
-
-"""
-
-Get the free symbols in a more convenient form than as returned by `free_symbols`.
-
-Just `free_symbols` now does the same thing. This function will be deprecated.
-"""
-function get_free_symbols(ex::Sym)
-    free = free_symbols(ex)
-    n = free[:__len__]()
-    n == 0 && return(Sym[])
-
-    vars = [free[:pop]()]
-    if n > 1
-        for i in 1:(n-1)
-            push!(vars, free[:pop]())
-        end
-    end
-    vars
-end
-
-## Conversion to function a bit hacky
-## we use free_symbols to get the free symbols, then create a function
-## with arguments in this order. No problem with only one variable, but
-## may be confusing when more than one in ex.
-## Output is symbolic. Conversion is necessary to use output as Julia values.
-## SymPy has `lamdify` for this task too.
-## function convert(::Type{Function}, ex::Sym)
-##     vars = free_symbols(ex)
-##     len = length(vars)
-##     if len == 0
-##         return x -> ex
-##     end
-##     local out
-##     (args...) -> begin
-##         out = ex
-##         for i in 1:len
-##             out = object_meth(out, :subs, vars[i], args[i]) 
-##         end
-##         out
-##     end
-## end
-
-## ## For plotting we need to know if a function has 1, 2, or 3 free variables
-## function as_nfunction(ex::Sym, nvars=1)
-##     free = free_symbols(ex)
-##     vars = [free[:pop]()]
-##     for i in 1:free[:__len__]()
-##         push!(vars, free[:pop]())
-##     end
-##     len = length(vars)
-
-##     if len == nvars
-##         convert(Function, ex)
-##     else
-##         throw(DimensionMismatch("Expecting $nvars free variables and found $len"))
-##     end
-## end
-
-## """
-## Convert to a julia-valued function from R -> R::Float64
-## """
-## type ScalarFunction; end
-## function Base.convert(::Type{ScalarFunction}, ex::Sym)
-##     vars = free_symbols(ex)
-##     length(vars) == 1 || error("Scalar function conversion is for expression of one variable")
-##     u -> convert(Float64, N(subs(ex, vars[1], u)))
-## end
-
+## function
 convert(::Type{Function}, ex::Sym) = lambdify(ex)
+
 ## we usually promote to Sym objects, but here we want to promote to functions
 ## so [x, sin] -> will be plottable as two functions
 Base.promote_rule{T<:SymbolicObject, S<:Function}(::Type{T}, ::Type{S} ) = S

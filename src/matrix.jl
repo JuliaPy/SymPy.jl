@@ -1,12 +1,9 @@
 ## matrix class stuff
-## Work with Array{Sym}, not python array objects
+## Work with Array{Sym}, not python array objects, as possible
 ## requires conversion from SymMatrix -> Array{Sym} in outputs, as appropriate
 
 ## covert back to Array{Sym}
 subs(ex::Array{Sym}, args...; kwargs...) = Sym[subs(u, args...; kwargs...) for u in ex]
-
-
-
 
 getindex(s::SymMatrix, i::Integer...) = get(PyObject(s), Sym, ntuple(k -> i[k]-1, length(i)))
 getindex(s::SymMatrix, i::Integer) = get(PyObject(s), Sym, map(x->x-1, ind2sub(size(s), i)))
@@ -20,7 +17,7 @@ function size(x::SymMatrix)
 end
 
 function size(x::SymMatrix, dim::Integer)
-    if dim <= 2 && pyisinstance(x.x, matrixtype)
+    if dim <= 2 && pyisinstance(PyObject(x), matrixtype)
         return x[:shape][dim]
     else
         return 1
@@ -98,9 +95,12 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
     eval(Expr(:export, meth))
 end
 
-## dont' define inv -- it has amiguity with base inv
-inverse(ex::SymMatrix) = call_matrix_meth(ex, :inv)
+## dont' define inv for Matrix{Sym}, we use base inv there
+## gives similar -- but different answers:
+## e.g. a = [x 1; 1 x]; inv(a) and `inv(convert(SymMatrix,a))` have different simplification
 inverse(ex::Matrix{Sym}) = call_matrix_meth(convert(SymMatrix, ex),:inv)
+inverse(ex::SymMatrix) = call_matrix_meth(ex, :inv)
+Base.inv(ex::SymMatrix) = inverse(ex)
 export inverse
 
 
@@ -191,8 +191,9 @@ end
 ### Some special functions
 Base.chol(a::Matrix{Sym}) = cholesky(a)
 
-expm(ex::Matrix{Sym}) = convert(Array{Sym}, object_meth(convert(SymMatrix, ex), :exp))
 expm(a::SymMatrix) = a[:exp]()
+expm(ex::Matrix{Sym}) = convert(Array{Sym}, expm(convert(SymMatrix, ex)))
+
 
 Base.conj(a::SymMatrix) = conjugate(a)
 Base.conj(a::Sym) = conjugate(a)
@@ -234,16 +235,12 @@ will be `Matrix{Int}` if possible, otherwise a matrix of type
 rational.
 
 """
-function rref(a::Matrix{Sym}; kwargs...)
-    rref(convert(SymMatrix, a); kwargs...)
-end
-
-## rref. The sympy method returns
 function rref(a::SymMatrix)
   d = a[:rref]()
   convert(Array{Sym}, d[1]) ## return Array{Sym}, not SymMatrix
 end
-
+rref(a::Matrix{Sym}; kwargs...) =rref(convert(SymMatrix, a); kwargs...)
+# extend for wider use:
 rref{T <: Integer}(a::Matrix{T}) = N(rref(convert(Matrix{Sym}, a)))
 rref{T <: Integer}(a::Matrix{Rational{T}}) = N(rref(convert(Matrix{Sym}, a)))
 

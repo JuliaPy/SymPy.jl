@@ -114,11 +114,11 @@ complement(I::Sym, U::Sym=S.Reals) = I[:complement](U)
 export complement
 
 "boundary, returnsa set"
-boundary(I::Sym) = I.x[:boundary]
+boundary(I::Sym) = PyObject(I)[:boundary]
 
 VERSION < v"0.5.0-" && eval(Expr(:import, :Base, :inf))
 "Infinum of I"
-inf(I::Sym) = I.x[:inf]
+inf(I::Sym) = PyObject(I)[:inf]
 export inf
 
 "Intersection of two intervals"
@@ -137,13 +137,13 @@ is_subset(I::Sym, J::Sym) = I[:is_subset](J) == Sym(true)
 is_superset(I::Sym, J::Sym) = I[:is_superset](J) == Sym(true)
 
 "Lebesgue mesuare of an interval"
-measure(I::Sym) = I.x[:measure]
+measure(I::Sym) = PyObject(I)[:measure]
 
 
 
 
 "Supremum of a set"
-sup(I::Sym) = I.x[:sup]
+sup(I::Sym) = PyObject(I)[:sup]
 
 
 "Union of two intervals"
@@ -158,26 +158,26 @@ as_relational(I::Sym, x::Sym) = I[:as_relational](x)
 # not implemented: `end` => `sup`, `left` =>
 
 "Looks like (-oo, a)?"
-is_left_unbounded(I::Sym) = I.x[:is_left_unbounded] == Sym(true)
+is_left_unbounded(I::Sym) = PyObject(I)[:is_left_unbounded] == Sym(true)
 
 "Looks like (a, oo)?"
-is_right_unbounded(I::Sym) = I.x[:is_right_unbounded] == Sym(true)
+is_right_unbounded(I::Sym) = PyObject(I)[:is_right_unbounded] == Sym(true)
 
 "Looks like (a, b...?"
-left_open(I::Sym) = I.x[:left_open] == Sym(true)
+left_open(I::Sym) = PyObject(I)[:left_open] == Sym(true)
 
 "Looks like ..., b)?"
-right_open(I::Sym) = I.x[:right_open] == Sym(true)
+right_open(I::Sym) = PyObject(I)[:right_open] == Sym(true)
 
 
 "Is `I` a finite set?"
-is_FiniteSet(I::Sym) = I.x[:is_FiniteSet]
+is_FiniteSet(I::Sym) = PyObject(I)[:is_FiniteSet]
 
 "Is `I` an interval?"
-is_Interval(I::Sym) = I.x[:is_Interval]
+is_Interval(I::Sym) = PyObject(I)[:is_Interval]
 
 "Is `I` a union?"
-is_Union(I::Sym) = I.x[:is_Union]
+is_Union(I::Sym) = PyObject(I)[:is_Union]
 
 function init_sets()
     S.init_set()

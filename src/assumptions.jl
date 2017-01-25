@@ -1,9 +1,6 @@
 ## Assumptions
 ## http://docs.sympy.org/0.7.2/modules/assumptions/index.html
 
-## TODO: Deprecate Qeven, etc. in favor of Q.even
-
-
 """
 refine: http://docs.sympy.org/dev/modules/assumptions/refine.html
 """
@@ -12,11 +9,15 @@ export refine
 
 """
 
-ask. Returns true, false or nothing
+`ask`. Returns true, false or nothing
 
+Example:
+
+```
 ask(Qinteger(x*y), And(Qinteger(x), Qinteger(y)))
 ## really slow isprime:
 filter(x -> ask(Qprime(x)), [1:1000])
+```
 
 """
 ask(x::Sym, args...) = sympy_meth(:ask, x, args...)
@@ -35,22 +36,6 @@ logic_sympy_methods = (
                      :Equivalent,
                      :satisfiable
                      )
-
-# @deprecate Qeven(x) Q.even(x)
-# @deprecate Qodd(x) Q.odd(x)
-# @deprecate Qprime(x) Q.prime(x)
-# @deprecate Qnonzero(x) Q.nonzero(x)
-# @deprecate Qcomplex(x) Q.complex(x)
-# @deprecate Qextended_real(x) Q.extended_real(x)
-# @deprecate Qimaginary(x) Q.imaginary(x)
-# @deprecate Qinfinitesimal(x) Q.infinitesimal(x)
-# @deprecate Qinteger(x) Q.integer(x)
-# @deprecate Qirrational(x) Q.irrational(x)
-# @deprecate Qreal(x) Q.real(x)
-# @deprecate Qpositive(x) Q.positive(x)
-# @deprecate Qnegative(x) Q.negative(x)
-# @deprecate Qbounded(x) Q.bounded(x)
-# @deprecate Qcommutative(x) Q.commutative(x)
 
 
 ## We make a module Q to hold the assumptions
