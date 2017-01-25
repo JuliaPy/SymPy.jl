@@ -36,26 +36,11 @@ core_object_properties = (:assumptions0,
 core_sympy_methods = (:sympify, :flatten,
                       :Dummy,
                       :Mod, :Rel,
-                      :Eq, :Ne, :Lt, :Le, :Gt, :Ge,
-                      :Equality, :Unequality,
                       :PoleError,
                       :count_ops,
                       :gcdex, :half_gcdex,
                       :igcd, :ilcm
                       )
-
-## these are defined for Reals, not Sym, Real... Necessary to lambdify Indicators as of v0.6.0-dev
-for meth in (:GreaterThan, :LessThan, :StrictGreaterThan, :StrictLessThan)
-    meth_name = string(meth)
-    @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function.
-    The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
-        ($meth)(a::Real, b::Real) = sympy_meth($meth_name,a, b)
-    end
-    eval(Expr(:export, meth))
-end
 
 
 """

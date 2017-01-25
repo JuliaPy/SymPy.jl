@@ -121,21 +121,22 @@ Throws a `DomainError` if no conversion is possible, such as when the expression
 """
 function N(ex::Sym)
     ## more work than I'd like
-    if ex.x[:is_integer] == nothing
+    ## XXX consolidate this and N(ex, digits)
+    if is_integer(ex) == nothing
         return(N(ex[:evalf]()))
     end
-    if ex.x[:is_integer]
+    if is_integer(ex)
         for T in [Int, BigInt]
             try (return(convert(T, ex))) catch e end
         end
     elseif _is_rational(ex)
         return N(numer(ex)) // N(denom(ex))
         ## `convert(Rational, ex)))` fails on `Sym(4//3)`
-    elseif ex.x[:is_real]
+    elseif is_real(ex) == true
         for T in [Irrational, Float64] ## BigFloat???
               try (return(convert(T, ex))) catch e end
         end
-    elseif ex.x[:is_complex]
+    elseif is_complex(ex) == true
         try
             r, i = ex[:re](), ex[:im]()
             r, i = promote(N(r), N(i))
@@ -156,24 +157,24 @@ When given as an integer greater than 16, we try to match the digits of accuracy
 function N(x::Sym, digits::Int)
     ## check
     digits <= 16 && return(N(x))
-    if x.x[:is_integer] == nothing
+    if is_integer(x) == nothing
         out = x[:evalf](digits)
         return( N(out, digits) )
     end
     
     ex = evalf(x, digits)
-    if x.x[:is_integer]
+    if is_integer(x)
         return(convert(BigInt, x))
     elseif _is_rational(x)
         return N(numer(x)) / N(denom(x))
-    elseif x.x[:is_real]
+    elseif is_real(x) == true
         p = round(Int,log2(10)*digits)
 
         out = setprecision(p) do 
             convert(BigFloat, ex)
         end
         return(out)
-    elseif x.x[:is_complex]
+    elseif is_complex(x) == true
         r, i = ex[:re](), ex[:im]()
         u, v = promote(N(r, digits), N(i, digits))
         return(Complex(u, v))

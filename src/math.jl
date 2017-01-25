@@ -7,11 +7,11 @@ math_sympy_methods_base = (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, 
                            :coth, :acoth,
                            :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
                            :sqrt, :erf, :erfc, :erfcx, :erfi, :erfinv, :erfcinv, :dawson,
-:ceiling, :floor, :trunc, :round, :significand,
-:factorial,
-:gcd, :lcm,
-:isqrt
-)
+                           :ceiling, :floor, :trunc, :round, :significand,
+                           :factorial,
+                           :gcd, :lcm,
+                           :isqrt
+                           )
 
 
 ## Export SymPy math functions and vectorize them
@@ -51,19 +51,20 @@ end
 ## These fail, so define from definitions
 ## http://mathworld.wolfram.com/InverseHyperbolicSecant.html
 asech(z::Sym) = log(sqrt(1/z-1)*sqrt(1/z+1) + 1/z)
-asech(as::Array{Sym}) = map(asech, as)
 ## http://mathworld.wolfram.com/InverseHyperbolicCosecant.html
 acsch(z::Sym) = log(sqrt(1+1/z^2) + 1/z)
-acsch(as::Array{Sym}) = map(acsch, as)
 # Julia's sinc is defined to be zero at x=1
 sinc(x::Sym) = piecewise((Sym(1), Eq(x, 0)), (sin(PI*x)/(PI*x), Gt(abs(x), 0)))
-sinc(as::Array{Sym}) = map(sinc, as)
 cosc(x::Sym) = diff(sinc(x))
+
+# deprecate these when v0.4 support dropped in favor of `asech.(...)` form
+asech(as::Array{Sym}) = map(asech, as)
+acsch(as::Array{Sym}) = map(acsch, as)
+sinc(as::Array{Sym}) = map(sinc, as)
 cosc(as::Array{Sym}) = map(cosc, as)
 
 
-
-## in julia, not SymPy
+## in Julia, not SymPy
 cbrt(x::Sym) = x^(1//3)
 Base.ceil(x::Sym) = ceiling(x)
 
@@ -102,52 +103,40 @@ Max(ex::Sym, ex1::Sym) = sympy_meth(:Max, ex, ex1)
 
 ## Calculus functions
 
-## bring over for function calls (not expressions)
-## returns a symbolic expression
-## limit(f, c) or limit(f,c,dir="-") or limit(f, c, dir="-")
+## bring over for univariate function calls as well (not just expressions)
 
 """
 
-Compute symbolic limit of a function
+Compute a symbolic limit lim_{x->c+} f(x)
 
-Examples
+By default, *right* limits are returned. The keyword argument `dir="-"` needs to be
+specified for *left* limits.
+
+The function `f(x)` can be expressed as a symbolic expression, or a univariate function
+    
+The values `x` and `c` can be expressed by two arguments `x, c` or a pair `x=>c`.
+
 ```
-limit(x -> sin(x)/x, 0)
-limit(x -> x^x, 0, dir="+")
+@vars x y
+ex = 1/(x^2 - y^2)
+limit(ex, x=>3)
+limit(ex, x, 3)
+limit(ex, x=>3, y=>2)  # first x then y not (x,y) -> (3,2)
+
+fn(x) = x^x
+limit(fn, 0)    # symbol not needed
 ```
 """
-function limit(f::Function, c::Number=0; kwargs...)
-    x = Sym("x")
-    limit(f(x), x, c; kwargs...)
-end
-
-## """
-
-## Limit using pairs notation
-
-## ```
-## @vars x y
-## ex = 1/(x^2 - y^2)
-## limit(ex, x=>3)
-## ```
-## """
-
-limit(ex::Sym, d::Pair; kwargs...) = limit(ex, d.first, d.second;kwargs...)
-## XXX why can I not have dir="+" as keyword argument?
-function limit(ex::Sym, d::Pair...)
-    for p in d
-        ex = limit(ex, p)
-    end
-    ex
-end
-
-limit(ex::Sym, x::Sym, c; kwargs...) = sympy_meth(:limit, ex, x, Sym(c); kwargs...)
 limit(ex::Sym, args...; kwargs...) = sympy_meth(:limit, ex, args...; kwargs...)
+limit(ex::Sym, d::Pair; kwargs...) = limit(ex, d.first, d.second;kwargs...)
+limit(ex::Sym, ds::Pair...) = reduce(limit, ex, ds)
+limit(f::Function, c::Number=0; kwargs...) = (z = symbol(gensym()); limit(f(z),z=>c;kwargs...))
+
 export limit
 
 
 function Base.diff(ex::Sym, args...; kwargs...)
-    if PyObject(ex)[:is_Equality]
+    if funcname(ex) in map(string, relational_sympy_values) 
         Eq(diff(lhs(ex), args...; kwargs...), diff(rhs(ex), args...; kwargs...))
     else
         sympy_meth(:diff, ex, args...; kwargs...)
@@ -202,13 +191,16 @@ piecewise_fold(ex::Sym) = sympy_meth(:piecewise_fold, ex)
 Base.ifelse(ex::Sym, a, b) = piecewise((a, ex), (b, true))
 
 """
-Indicator function
+Indicator expression: (Either `\Chi[tab](x,a,b)` or `Indicator(x,a,b)`)
 
 `Χ(x, a, b)` is `1` on `[a,b]` and 0 otherwise.
 
+
+This is not a function taking `x`, but a symbolic expression of `x`.
+    
 """
-Χ(x, a=-oo, b=oo) = piecewise((1, Gt(x, a) ∧ Le(x, b)), (0,true))
-Indicator(x, a=-oo, b=oo) = Χ(x, a, b)
+Χ(x::Sym, a=-oo, b=oo) = piecewise((1, Gt(x, a) ∧ Le(x, b)), (0,true))
+Indicator(x::Sym, a=-oo, b=oo) = Χ(x, a, b)
 
 import Base: &, |
 (&)(a::Bool, b::Sym) = a & (b == SympyTRUE)
@@ -260,7 +252,7 @@ function init_math()
     ## math constants
     Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
     Base.convert(::Type{Sym}, x::Irrational{:e}) = E
-    Base.convert(::Type{Sym}, x::Irrational{:γ}) = sympy["EulerGamma"]
-    Base.convert(::Type{Sym}, x::Irrational{:catalan}) = sympy["Catalan"]
+    Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
+    Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
     Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
 end

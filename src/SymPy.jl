@@ -84,7 +84,7 @@ if VERSION < v"0.6.0-dev"
 end
 
 export sympy, sympy_meth, object_meth, call_matrix_meth
-export Sym, @syms, @vars, @osyms, symbols
+export Sym, @syms, @vars, symbols
 export pprint,  jprint
 export SymFunction, @symfuns,
        SymMatrix,
@@ -176,6 +176,7 @@ for meth in union(core_sympy_methods,
                   functions_sympy_methods,
                   series_sympy_meths,
                   integrals_sympy_methods,
+                  logical_sympy_methods,
                   summations_sympy_methods,
                   logic_sympy_methods,
                   polynomial_sympy_methods,
@@ -236,7 +237,7 @@ for prop in union(core_object_properties,
                   polynomial_predicates)
 
     prop_name = string(prop)
-    @eval ($prop)(ex::Sym) = ex[@compat(Symbol($prop_name))]
+    @eval ($prop)(ex::Sym) = PyObject(ex)[@compat(Symbol($prop_name))]
     eval(Expr(:export, prop))
 end
 

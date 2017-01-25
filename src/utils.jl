@@ -1,7 +1,7 @@
 ## Alternate constructors for symbolic objects
 ##
 ## Many (too many) ways to create symbolobjects
-## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y), @syms x y, symbols("x y")
+## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y), @syms x y, @vars x y, symbols("x y")
 
 "Create a symbolic object from a symbol or string"
 Sym(s::AbstractString) = sympy_meth(:sympify, s)

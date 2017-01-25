@@ -1,6 +1,5 @@
 ## http://docs.sympy.org/dev/modules/core.html
 
-
 """
      `func(ex)`: Return function head from an expression
 

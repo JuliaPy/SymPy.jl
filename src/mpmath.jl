@@ -30,7 +30,6 @@ mpmath_fns = (:hyp0f1,
            )
 for fn in mpmath_fns
     meth = string(fn)
-    #    @eval ($fn)(xs::SymOrNumber...;kwargs...) = mpmath_meth(@compat(Symbol($meth)), xs...; kwargs...)
     @eval ($fn)(xs::SymOrNumber...;kwargs...) = mpmath_meth($meth, xs...; kwargs...)
     eval(Expr(:export, fn))
 end
@@ -66,7 +65,7 @@ function init_mpmath()
         ans = call_sympy_fun(fn, args...; kwargs...)
         ## make nicer...
         if isa(ans, Vector)
-            ans = Sym[i for i in ans]
+            ans = convert(Vector{Sym}, ans)
         end
         ans
     end

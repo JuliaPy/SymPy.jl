@@ -1,10 +1,10 @@
 ## Lambidfy an expression
 ## https://github.com/jverzani/SymPy.jl/issues/60
 ## Hack until SymPy -> Julia converter written
-_func(x) = (x.x)[:func]
-_funcname(x) = _func(x)[:__name__]
-_args(x) = (x.x)[:args]
-_srepr(x) = sympy_meth(:srepr, x)
+
+## some tools, perhaps. Not exported for now.
+funcname(x) = PyObject(x)[:func][:__name__]
+srepr(x) = sympy_meth(:srepr, x)
 
 ## Mapping of SymPy Values into julia values
 val_map = Dict(
@@ -69,7 +69,7 @@ function walk_expression(ex; values=Dict(), fns=Dict())
     fns_map = merge(fn_map, fns)
     vals_map = merge(val_map, values)
     
-    fn = _funcname(ex)
+    fn = funcname(ex)
     
     if fn == "Symbol"
         return @compat(Symbol(string(ex)))
@@ -79,15 +79,15 @@ function walk_expression(ex; values=Dict(), fns=Dict())
         return convert(Int, numer(ex))//convert(Int, denom(ex))
         ## piecewise requires special treatment
     elseif fn == "Piecewise"
-        return _piecewise([walk_expression(cond) for cond in _args(ex)]...)
+        return _piecewise([walk_expression(cond) for cond in args(ex)]...)
     elseif fn == "ExprCondPair"
-        val, cond = _args(ex)
+        val, cond = args(ex)
         return (val, walk_expression(cond))
     elseif haskey(vals_map, fn)
         return vals_map[fn]
     end
 
-    as = _args(ex)
+    as = args(ex)
 
     Expr(:call, map_fn(fn, fns_map), [walk_expression(a) for a in as]...)
 end
@@ -130,7 +130,6 @@ xs = rand(1000)
 @vars x
 ex = sin(x)*cos(2x) * exp(x^2/2)
 map(u -> N(ex(u)), xs)   # 3.435850 seconds
-SymPy.mapsubs(ex, x, xs) # 0.008569 seconds (does calculuations in Python)
 map(lambdify(ex), xs)    # 0.007085 seconds
 ```
 

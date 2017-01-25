@@ -1,5 +1,5 @@
 ## matrix class stuff
-## Work with Array{Sym}, not python array objects
+## Work with Array{Sym}, not python array objects, as possible
 ## requires conversion from SymMatrix -> Array{Sym} in outputs, as appropriate
 
 ## covert back to Array{Sym}
@@ -95,9 +95,12 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
     eval(Expr(:export, meth))
 end
 
-## dont' define inv -- it has amiguity with base inv
-inverse(ex::SymMatrix) = call_matrix_meth(ex, :inv)
+## dont' define inv for Matrix{Sym}, we use base inv there
+## gives similar -- but different answers:
+## e.g. a = [x 1; 1 x]; inv(a) and `inv(convert(SymMatrix,a))` have different simplification
 inverse(ex::Matrix{Sym}) = call_matrix_meth(convert(SymMatrix, ex),:inv)
+inverse(ex::SymMatrix) = call_matrix_meth(ex, :inv)
+Base.inv(ex::SymMatrix) = inverse(ex)
 export inverse
 
 

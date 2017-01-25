@@ -97,10 +97,7 @@ convert(::Type{SymMatrix}, o::Sym) = SymMatrix(o.x)
 convert(::Type{Sym}, o::AbstractString) = sympy_meth(:sympify, o)
 convert(::Type{Sym}, o::Symbol) = sympy_meth(:sympify, string(o))
 
-
-
-@deprecate get_free_symbols(ex::Sym) free_symbols(ex)
-
+## function
 convert(::Type{Function}, ex::Sym) = lambdify(ex)
 
 ## we usually promote to Sym objects, but here we want to promote to functions
