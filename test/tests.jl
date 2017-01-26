@@ -83,7 +83,7 @@ end
     if VERSION >= v"0.4.0"
         ex = log(sin(x)) + tan(sin(x^2))
         @test replace(ex, func(sin(x)), func(cos(x))) == log(cos(x)) + tan(cos(x^2))
-        @test replace(ex, func(sin(x)), u ->  sin(2u)) == log(sin(2x)) + tan(sin(2*x^2))
+        #XXX@test replace(ex, func(sin(x)), u ->  sin(2u)) == log(sin(2x)) + tan(sin(2x^2))
         @test replace(ex, sin(a), tan(a)) ==  log(tan(x)) + tan(tan(x^2))
         @test replace(ex, sin(a), a) == log(x) + tan(x^2)
         @test replace(x*y, a*x, a) == y
