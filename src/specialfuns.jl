@@ -14,7 +14,7 @@ for meth in (
              :legendre, :assoc_legendre,
              :hermite,
              :laguerre, :assoc_laguerre,
-             :Ynm,
+             :Ynm, :Ynm_c,
              :hankel1, :hankel2,
              :jn, :yn
              )
@@ -79,7 +79,7 @@ export hyper
 
 """
 function meijerg{T<:Number, S<:Number}(a1s::Vector{T}, a2s::Vector{T}, b1s::Vector{S}, b2s::Vector{S}, z::Number, r=1;kwargs...)
-    sympy_meth(:meijerg, a1s, a2s, b1s, b2s, z;  kwargs...) 
+    sympy_meth(:meijerg, a1s, a2s, b1s, b2s, z;  kwargs...)
 end
 export meijerg
 
