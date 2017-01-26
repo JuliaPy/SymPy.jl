@@ -59,7 +59,7 @@ for meth in (:condition_number,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(a::SymMatrix) = pycall(a[($cmd)], Sym, x) 
+        ($meth)(a::SymMatrix) = pycall(a[($cmd)], Sym, x)
         ($meth)(a::Matrix{Sym}) = ($meth)(convert(SymMatrix, a))
     end
     eval(Expr(:export, meth))
@@ -95,13 +95,17 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
     eval(Expr(:export, meth))
 end
 
-## dont' define inv for Matrix{Sym}, we use base inv there
+## don't define inv for Matrix{Sym}, we use base inv there
 ## gives similar -- but different answers:
 ## e.g. a = [x 1; 1 x]; inv(a) and `inv(convert(SymMatrix,a))` have different simplification
 inverse(ex::Matrix{Sym}) = call_matrix_meth(convert(SymMatrix, ex),:inv)
 inverse(ex::SymMatrix) = call_matrix_meth(ex, :inv)
 Base.inv(ex::SymMatrix) = inverse(ex)
 export inverse
+
+
+# and overload det for SymMatrix
+Base.det(a::SymMatrix) = call_matrix_meth(a, :det)
 
 
 ## But
