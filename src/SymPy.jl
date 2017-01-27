@@ -64,7 +64,7 @@ import Base: factorial, gcd, lcm, isqrt
 import Base: length,  size
 import Base: expand, collect
 import Base: !=, ==
-import Base:  inv, conj,
+import Base:  inv, conj, det,
               cross, eigvals, eigvecs, trace, norm
 import Base: promote_rule
 import Base: match, replace, round
@@ -154,7 +154,7 @@ for meth in union(
                   polynomial_sympy_methods_base
 
                   )
-    
+
     meth_name = string(meth)
 #    eval(Expr(:import, :Base, meth)) # (kept in import list above)
     @eval begin
@@ -162,7 +162,7 @@ for meth in union(
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
     """ ->
-        
+
         ($meth)(ex::Sym, args...; kwargs...) =
             sympy_meth($meth_name, ex, args...; kwargs...)
     end
