@@ -208,7 +208,7 @@ end
     a, b, t = symbols("a, b, t")
     @test integrate(sin(x), (x, a, b)) == cos(a) - cos(b)
     @test integrate(sin(x), (x, a, b)) |> replace(a, 0) |> replace(b, pi) == 2.0
-    #@test integrate(sin(x) * DiracDelta(Sym(0))) == sin(Sym(0))
+    @test integrate(sin(x) * DiracDelta(x)) == sin(Sym(0))
     @test integrate(Heaviside(x), (x, -1, 1)) == 1
     C = Curve([exp(t)-1, exp(t)+1], (t, 0, log(Sym(2))))
     @test line_integrate(x + y, C, [x,y]) == 3 * sqrt(Sym(2))
