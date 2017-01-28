@@ -9,7 +9,7 @@ end
 
 @testset "Matrix" begin
     ## matrices
-    (x,) = @syms x
+    x, = @syms x
     A = [x 1; 1 x]
     b = [x, 2]
 
@@ -18,21 +18,30 @@ end
     @test simplify(det(A)) == x^2 - 1
 
     ## we use inverse for A[:inv]()
-    inv(A) # aliased to use inverse
-    @test simplify((A[:inv]() - inv(A))[1,1]) == 0
-    
-    adjoint(A)
+
+    # aliased to use inverse
+    @test @compat simplify.(inv(A) * A) ==  [1 0; 0 1]
+    @test @compat simplify.(A * inverse(A)) == [1 0 ; 0 1]
+    @test @compat simplify(A[:inv]() - inv(A)) == 0
+    a[:inv]() |> u -> convert(Array{Sym}, u)
+    a[:inv]("LU")                   # pass argument to function
+    @test adjoint(A) == [conj(x) 1; 1 conj(x)]
+    @test adjoint(A) == A'
     dual(A)
-    cholesky(A)
+
     ## other functions, could wrap
-    b = subs(A, x, 2)
-    QRdecomposition(b)
+    let
+        r = cholesky(A)
+        @test r*r.' == A
+        b = subs(A, x, 2)
+        q, r = QRdecomposition(b)
+        @test q * r == b
+    end
 
     # is_lower, is_square, is_symmetric much slower than julia only counterparts. May deprecate, but for now they are here
     @test is_lower(A) == istril(A)
     @test is_square(A) == true
-    test_symmetric = VERSION <= v"0.4" ? issym : issymmetric
-    @test is_symmetric(A) == test_symmetric(A)
+    @test is_symmetric(A) == issymmetric(A)
     @test Set(eigvals(A)) == Set([x-1, x+1])
 
 
@@ -53,5 +62,5 @@ end
     L, U, _ = LUdecomposition(A)
     @test L == Sym[1 0; 3//2 1]
 
-    
+
 end
