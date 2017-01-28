@@ -13,6 +13,7 @@ end
     A = [x 1; 1 x]
     b = [x, 2]
 
+    #@test a*a == A*A
 
     ## These fail for older installations of SymPy
     @test simplify(det(A)) == x^2 - 1
@@ -36,6 +37,7 @@ end
         b = subs(A, x, 2)
         q, r = QRdecomposition(b)
         @test q * r == b
+        @test det(q) == 1
     end
 
     # is_lower, is_square, is_symmetric much slower than julia only counterparts. May deprecate, but for now they are here
