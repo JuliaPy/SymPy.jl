@@ -2,13 +2,14 @@
 ## Work with Array{Sym}, not python array objects, as possible
 ## requires conversion from SymMatrix -> Array{Sym} in outputs, as appropriate
 
+
 ## covert back to Array{Sym}
 subs(ex::Array{Sym}, args...; kwargs...) = Sym[subs(u, args...; kwargs...) for u in ex]
 
 getindex(s::SymMatrix, i::Integer...) = get(PyObject(s), Sym, ntuple(k -> i[k]-1, length(i)))
 getindex(s::SymMatrix, i::Integer) = get(PyObject(s), Sym, map(x->x-1, ind2sub(size(s), i)))
-getindex(s::SymMatrix, i::Symbol) = PyObject(s)[i] # is_nilpotent, ... many such predicates
-getindex(s::Array{Sym}, i::Symbol) = PyObject(s)[i] # diagonalize..
+getindex(s::SymMatrix, i::Symbol) = PyObject(s)[i]
+getindex(s::Array{Sym}, i::Symbol) = getindex(convert(SymMatrix,s),i) # diagonalize..
 
 ## size
 function size(x::SymMatrix)
@@ -27,8 +28,8 @@ end
 ## we want our matrices to be arrays of Sym objects, not symbolic matrices
 ## so that julia manages them
 ## it is convenient (for printing, say) to convert to a sympy matrix
-convert(::Type{SymMatrix}, a::Array{Sym}) = Sym(sympy["Matrix"](a))
-convert(::Type{Sym}, a::Array{Sym}) = Sym(sympy["Matrix"](a))
+convert(::Type{SymMatrix}, a::Array{Sym}) = sympy["Matrix"](a)
+convert(::Type{Sym}, a::Array{Sym}) = sympy["Matrix"](a)
 function convert(::Type{Array{Sym}}, a::SymMatrix)
     sz = size(a)
     ndims = length(sz)
@@ -121,7 +122,7 @@ for meth in  (:is_anti_symmetric, :is_diagonal, :is_diagonalizable,:is_nilpotent
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
         ($meth)(ex::SymMatrix, args...; kwargs...) = ex[@compat(Symbol($meth_name))]()
-        ($meth)(ex::Matrix{Sym}, args...; kwargs...) = ex[@compat(Symbol($meth_name))]()
+        ($meth)(ex::Matrix{Sym}, args...; kwargs...) =  ($meth)(convert(SymMatrix, ex), args...;kwargs...)
     end
     eval(Expr(:export, meth))
 end
@@ -143,7 +144,7 @@ for meth in matrix_operators
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
         ($meth)(ex::SymMatrix, args...; kwargs...) = ex[@compat(Symbol($meth_name))]
-        ($meth)(ex::Matrix{Sym}, args...; kwargs...) = ex[@compat(Symbol($meth_name))]
+        ($meth)(ex::Matrix{Sym}, args...; kwargs...) =  ($meth)(convert(SymMatrix, ex), args...;kwargs...)
     end
     eval(Expr(:export, meth))
 end
@@ -186,7 +187,7 @@ for meth in map_matrix_methods
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
         ($meth)(ex::SymMatrix, args...; kwargs...) = call_matrix_meth(ex, @compat(Symbol($meth_name)), args...; kwargs...)
-        ($meth)(ex::Matrix{Sym}, args...; kwargs...) = call_matrix_meth(convert(SymMatrix, ex), @compat(Symbol($meth_name)), args...; kwargs...)
+        ($meth)(ex::Matrix{Sym}, args...; kwargs...) =  ($meth)(convert(SymMatrix, ex), args...;kwargs...)
     end
     eval(Expr(:export, meth))
 end

@@ -267,7 +267,7 @@ global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
     call_sympy_fun(PyObject(object)[@compat(Symbol(meth))],  args...; kwargs...)
 
 end
-global call_matrix_meth(object::SymbolicObject, meth, args...; kwargs...) = begin
+global call_matrix_meth(object, meth, args...; kwargs...) = begin
     out = object_meth(object, meth, args...; kwargs...)
     if isa(out, SymMatrix)
         convert(Array{Sym}, out)

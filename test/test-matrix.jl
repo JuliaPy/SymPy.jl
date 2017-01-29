@@ -31,9 +31,11 @@ end
     b = subs(a, x, 2)
     QRdecomposition(b)
 
-    @test is_square(a) == true
-    @test is_symmetric(a) == true
-
+    for m in (a, A)
+        @test is_lower(m) == istril(A)
+        @test is_square(m) == true
+        @test is_symmetric(m) == issymmetric(A)
+    end
 
     @test eigvals(A) == [x-1, x+1]
 
