@@ -267,8 +267,13 @@ global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
     call_sympy_fun(PyObject(object)[@compat(Symbol(meth))],  args...; kwargs...)
 
 end
+# like object_meth, but have some coercions SymMatrix <--> Array{Sym}
 global call_matrix_meth(object, meth, args...; kwargs...) = begin
+    ## may have Array arguments to converty and defining PyObject(Array{Sym}) has issues
+    args = map(x -> isa(x, Array{Sym}) ? convert(SymMatrix, x) : x,  args)
+
     out = object_meth(object, meth, args...; kwargs...)
+    
     if isa(out, SymMatrix)
         convert(Array{Sym}, out)
     elseif  length(out) == 1
@@ -296,6 +301,8 @@ function __init__()
         matrixtype = sympy["matrices"]["MatrixBase"]
         pytype_mapping(matrixtype, SymMatrix)
         pytype_mapping(sympy["Matrix"], SymMatrix)
+#        pytype_mapping(matrixtype, Array{Sym})
+#        pytype_mapping(sympy["Matrix"], Array{Sym})        
     catch e
     end
 

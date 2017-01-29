@@ -29,6 +29,7 @@ end
 ## so that julia manages them
 ## it is convenient (for printing, say) to convert to a sympy matrix
 convert(::Type{SymMatrix}, a::Array{Sym}) = sympy["Matrix"](a)
+
 convert(::Type{Sym}, a::Array{Sym}) = sympy["Matrix"](a)
 function convert(::Type{Array{Sym}}, a::SymMatrix)
     sz = size(a)
@@ -45,7 +46,6 @@ function convert(::Type{Array{Sym}}, a::SymMatrix)
         reshape(b, sz)
     end
 end
-
 
 
 ## linear algebra functions that are methods of sympy.Matrix
@@ -75,7 +75,7 @@ for meth in (:norm,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(a::SymMatrix, args...; kwargs...) = object_meth(a, $meth_name, args...;kwargs...)
+        ($meth)(a::SymMatrix, args...; kwargs...) = call_matrix_meth(a, $meth_name, args...;kwargs...)
         ($meth)(a::Array{Sym}, args...; kwargs...) = ($meth)(convert(SymMatrix, a), args...;kwargs...)
     end
     eval(Expr(:export, meth))
@@ -90,7 +90,7 @@ for meth in (
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(a::SymMatrix, args...; kwargs...) = object_meth(a, $meth_name, args...;kwargs...)
+        ($meth)(a::SymMatrix, args...; kwargs...) = call_matrix_meth(a, $meth_name, args...;kwargs...)
         ($meth)(a::Matrix{Sym}, args...; kwargs...) = ($meth)(convert(SymMatrix, a), args...;kwargs...)
     end
     eval(Expr(:export, meth))
@@ -177,7 +177,7 @@ map_matrix_methods = (:LDLsolve,
                       :singular_values,
                       :upper_triangular_solve,
                       :vech
-                      )
+)
 
 for meth in map_matrix_methods
     meth_name = string(meth)
@@ -208,7 +208,7 @@ Base.conj(a::Sym) = conjugate(a)
 ## we return an array of eigen values, as eigvals does
 function eigvals(a::SymMatrix)
     ## this is a hack, as  d = a[:eigenvals]() may not convert to a Julia dict (Ubuntu...)
-    ds = object_meth(a, :eigenvects)
+    ds = call_matrix_meth(a, :eigenvects)
     [d[1] for d in ds]
 end
 eigvals(a::Matrix{Sym}) = eigvals(convert(SymMatrix, a))
@@ -220,7 +220,7 @@ The `eigvecs` function returns a list of triples (eigenval, multiplicity, basis)
 
 """
 function eigvecs(a::SymMatrix)
-    ds =  object_meth(a, :eigenvects)
+    ds =  call_matrix_meth(a, :eigenvects)
     hcat([hcat([convert(Array{Sym}, v) for v in d[3]]...) for d in ds]...)
 end
 eigvecs(a::Matrix{Sym}) = eigvecs(convert(SymMatrix, a))
@@ -251,7 +251,7 @@ rref{T <: Integer}(a::Matrix{Rational{T}}) = N(rref(convert(Matrix{Sym}, a)))
 
 ## call with a (A,b), return array
 for fn in (:cross,
-           :LUSolve)
+           )
     cmd = "x." * string(fn) * "()"
     meth_name = string(fn)
     @eval begin
@@ -259,8 +259,8 @@ for fn in (:cross,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($fn)(A::SymMatrix, b::Sym) = object_meth(A, fn, b)
-        ($fn)(A::Array{Sym, 2}, b::Vector{Sym}) = $(fn)(convert(SymMatrix,A), convert(SymMatrix, b))
+        ($fn)(A::SymMatrix, b::Sym) = object_meth(A, fn, convert(SymMatrix,b))
+        ($fn)(A::Array{Sym, 2}, b::Vector{Sym}) = $(fn)(convert(SymMatrix,A), b)
     end
 end
 
