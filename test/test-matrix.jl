@@ -11,40 +11,45 @@ end
     ## matrices
     (x,) = @syms x
     A = [x 1; 1 x]
-    a = convert(SymMatrix, A)
     b = [x, 2]
 
 
     ## These fail for older installations of SymPy
     @test simplify(det(A)) == x^2 - 1
-    @test simplify(det(a)) == x^2 - 1
 
     ## we use inverse for A[:inv]()
     inv(A) # aliased to use inverse
-    inverse(A)
-    a[:inv]() |> u -> convert(Array{Sym}, u)
-    a[:inv]("LU")                   # pass argument to function
+    @test simplify((A[:inv]() - inv(A))[1,1]) == 0
+    
     adjoint(A)
     dual(A)
     cholesky(A)
     ## other functions, could wrap
-    b = subs(a, x, 2)
+    b = subs(A, x, 2)
     QRdecomposition(b)
 
-    for m in (a, A)
-        @test is_lower(m) == istril(A)
-        @test is_square(m) == true
-        @test is_symmetric(m) == issymmetric(A)
-    end
+    # is_lower, is_square, is_symmetric much slower than julia only counterparts. May deprecate, but for now they are here
+    @test is_lower(A) == istril(A)
+    @test is_square(A) == true
+    @test is_symmetric(A) == issymmetric(A)
 
     @test eigvals(A) == [x-1, x+1]
 
 
-    a = [1 0 0; 0 1 0; 0 0 x]
-    evecs = eigvecs(a)
-    @test float(rref(evecs)) == eye(3)
+    A = [1 0 0; 0 1 0; 0 0 x]
+    evecs = eigvecs(A)
+    @test evecs[1] == [1, 0, 0]
 
-    eh = convert(SymMatrix, a)
-    @test eh[9] == x
-    convert(SymMatrix, reshape([x, 1:23...], (2,3,4)))
+
+    ##
+    M = Sym[1 2 3; 3 6 2; 2 0 1]
+    q,r = QRdecomposition(M)
+    @test (q * r - M)[1,1] == 0
+    L = [Sym[2,3,5], Sym[3,6,2], Sym[8,3,6]]
+    out = GramSchmidt(L)
+    A = Sym[4 3; 6 3]
+    L, U, _ = LUdecomposition(A)
+    @test L == Sym[1 0; 3//2 1]
+
+    
 end
