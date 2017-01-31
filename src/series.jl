@@ -11,7 +11,7 @@ series_sympy_meths = (#:limit
 
 import Base: scale, truncate
 series_object_meths_base = (:truncate,
-                            :scale)
+                            )
 
 series_object_meths = (:shift, :shiftx, :scalex)
 

@@ -31,8 +31,8 @@ end
     # is_lower, is_square, is_symmetric much slower than julia only counterparts. May deprecate, but for now they are here
     @test is_lower(A) == istril(A)
     @test is_square(A) == true
-    @test is_symmetric(A) == issymmetric(A)
-
+    test_symmetric = VERSION <= v"0.4" ? issym : issymmetric
+    @test is_symmetric(A) == test_symmetric(A)
     @test eigvals(A) == [x-1, x+1]
 
 
@@ -45,8 +45,10 @@ end
     M = Sym[1 2 3; 3 6 2; 2 0 1]
     q,r = QRdecomposition(M)
     @test (q * r - M)[1,1] == 0
-    L = [Sym[2,3,5], Sym[3,6,2], Sym[8,3,6]]
-    out = GramSchmidt(L)
+    if VERSION >= v"0.5"
+        L = [Sym[2,3,5], Sym[3,6,2], Sym[8,3,6]]
+        out = GramSchmidt(L)
+    end
     A = Sym[4 3; 6 3]
     L, U, _ = LUdecomposition(A)
     @test L == Sym[1 0; 3//2 1]

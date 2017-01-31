@@ -84,7 +84,7 @@ end
 
 
 ## covert back to Array{Sym}. Could just use broadcast here once v0.4 support is dropped.
-subs(ex::Array{Sym}, args...; kwargs...) = Sym[subs(u, args...; kwargs...) for u in ex]
+subs(ex::Array{Sym}, args...; kwargs...) = map(u -> subs(u, args...; kwargs...), ex)
 
 
 ## Methods
