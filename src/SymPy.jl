@@ -65,7 +65,7 @@ import Base: length,  size
 import Base: expand, collect
 import Base: !=, ==
 import Base:  inv, conj, det,
-              cross, eigvals, eigvecs, trace, norm
+              cross, eigvals, eigvecs, trace, norm, chol
 import Base: promote_rule
 import Base: match, replace, round
 import Base: +, -, *, /, //, \
@@ -267,16 +267,7 @@ global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
     call_sympy_fun(PyObject(object)[@compat(Symbol(meth))],  args...; kwargs...)
 
 end
-global call_matrix_meth(object::SymbolicObject, meth, args...; kwargs...) = begin
-    out = object_meth(object, meth, args...; kwargs...)
-    if isa(out, SymMatrix)
-        convert(Array{Sym}, out)
-    elseif  length(out) == 1
-        out
-    else
-        map(u -> isa(u, SymMatrix) ? convert(Array{Sym}, u) : u, out)
-    end
-end
+
 
 
 ## For precompilation we must put PyCall instances in __init__:
@@ -294,8 +285,8 @@ function __init__()
 
     try
         matrixtype = sympy["matrices"]["MatrixBase"]
-        pytype_mapping(matrixtype, SymMatrix)
-        pytype_mapping(sympy["Matrix"], SymMatrix)
+        pytype_mapping(matrixtype, Array{Sym})
+        pytype_mapping(sympy["Matrix"], Array{Sym})        
     catch e
     end
 

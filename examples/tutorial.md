@@ -44,6 +44,7 @@ variables:
 a,b,c = Sym("a,b,c")
 ```
 
+(For now, `@vars` is also an alias for `@syms`.)
 
 ### Assumptions
 
@@ -476,7 +477,7 @@ This finds the complex roots, but does not account for the double
 root. The `roots` function of SymPy does.
 
 This particular function is not exported (as it conflicts with the
-`roots` function from `Polynomials` and `Roots`) but we can still
+`roots` function from the `Polynomials` package) but we can still
 access it using `p[:roots]()` or its alias `polyroots`.
 
 > Indexing with a symbol. When a symbolic expression is indexed by a
@@ -486,7 +487,7 @@ access it using `p[:roots]()` or its alias `polyroots`.
 > true, so if `roots` were a class method, then the call would resolve
 > to `p.roots(args...)`.
 
-The output of calling `roots` will be a dictionary whose keys are the roots and values the multiplicity.
+The output of calling `polyroots` will be a dictionary whose keys are the roots and values the multiplicity.
 
 ```
 polyroots(p)
@@ -559,7 +560,11 @@ Solving within Sympy has limits. For example, there is no symbolic solution here
 solve(cos(x) - x)
 ```
 
-For such, a numeric method would be needed.
+For such, a numeric method would be needed, say:
+
+```
+nsolve(cos(x) - x, 1)
+```
 
 Though it can't solve everything, the `solve` function can also solve
 equations of a more general type. For example, here it is used to
@@ -1289,8 +1294,7 @@ hessian(ex)
 SymPy has a special class to work with matrices, as does `Julia`. With
 `SymPy`, matrices are just `Julia`n matrices with symbolic
 entries. The conversion to matrices that SymPy knows about is
-primarily handled in the background, though, if need be,
-`convert(SymMatrix, M)` can be used.
+ handled in the background.
 
 Constructing matrices then follows `Julia`'s conventions:
 
@@ -1310,21 +1314,20 @@ det(M)
 Occasionally, the SymPy method has more content:
 
 ```
-rref(M)
+eigvecs(M)
 ```
 
-As compared to SymPy's [rref](http://docs.sympy.org/dev/tutorial/matrices.html#rref) which has a second list of indices used for pivoting:
+As compared to SymPy's `:egienvects` which yields:
 
 ```
-M[:rref]()
+M[:eigenvects]()
 ```
 
-(Similarly, `eigvecs(M)` is less informative than `M[:eigenvecs]()`.)
 
 This example from the tutorial shows the `nullspace` function:
 
 ```
-M = [one(Sym) 2 3 0 0; 4 10 0 0 1]
+M = Sym[1 2 3 0 0; 4 10 0 0 1]
 vs = nullspace(M)
 ```
 
@@ -1339,7 +1342,7 @@ Symbolic expressions can be included in the matrices:
 ```
 M = [1 x; x 1]
 P, D = diagonalize(M)  # M = PDP^-1
-D
+D, M - P*D*inv(P)
 ```
 
 

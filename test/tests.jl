@@ -24,6 +24,7 @@ end
         @syms w
     end
     @test_throws UndefVarError isdefined(w)
+    @vars a b c
 
 
     ## extract symbols
@@ -58,12 +59,10 @@ end
     @test subs(ex, (x,1)) == 0
     @test subs(ex, (x,2),(y,2)) == 0
 
-    if VERSION >= v"0.4.0"
-        @test subs(ex, x=>1) == 0
-        @test subs(ex, x=>2, y=>2) == 0
-        @test subs(ex, Dict(x=>1)) == 0
-        @test ex(x=>1) == 0
-    end
+    @test subs(ex, x=>1) == 0
+    @test subs(ex, x=>2, y=>2) == 0
+    @test subs(ex, Dict(x=>1)) == 0
+    @test ex(x=>1) == 0
 
     ## match, replace, xreplace, rewrite
     x,y,z = symbols("x, y, z")
@@ -80,22 +79,20 @@ end
     @test xreplace(pat, d) == 4x^2
 
     ## replace
-    if VERSION >= v"0.4.0"
-        ex = log(sin(x)) + tan(sin(x^2))
-        @test replace(ex, func(sin(x)), func(cos(x))) == log(cos(x)) + tan(cos(x^2))
-        #XXX@test replace(ex, func(sin(x)), u ->  sin(2u)) == log(sin(2x)) + tan(sin(2x^2))
-        @test replace(ex, sin(a), tan(a)) ==  log(tan(x)) + tan(tan(x^2))
-        @test replace(ex, sin(a), a) == log(x) + tan(x^2)
-        @test replace(x*y, a*x, a) == y
-    end
+    a = Wild("a")
+    ex = log(sin(x)) + tan(sin(x^2))
+    @test replace(ex, func(sin(x)), func(cos(x))) == log(cos(x)) + tan(cos(x^2))
+    #XXX@test replace(ex, func(sin(x)), u ->  sin(2u)) == log(sin(2x)) + tan(sin(2x^2))
+    @test replace(ex, sin(a), tan(a)) ==  log(tan(x)) + tan(tan(x^2))
+    @test replace(ex, sin(a), a) == log(x) + tan(x^2)
+    @test replace(x*y, a*x, a) == y
 
     ## xreplace
-    if VERSION >= v"0.4.0"
-        @test xreplace(1 + x*y, x => PI) == 1 + PI*y
-        @test xreplace(x*y + z, x*y => PI) == z + PI
-        @test xreplace(x*y * z, x*y => PI) == x* y * z
-        @test xreplace(x +2 + exp(x + 2), x+2=>y) == x + exp(y) + 2
-    end
+    @test xreplace(1 + x*y, x => PI) == 1 + PI*y
+    @test xreplace(x*y + z, x*y => PI) == z + PI
+    @test xreplace(x*y * z, x*y => PI) == x* y * z
+    @test xreplace(x +2 + exp(x + 2), x+2=>y) == x + exp(y) + 2
+
 
 
     #Test subs for pars and dicts
@@ -113,11 +110,9 @@ end
         @test ex |> subs(d) == factorial(4)
         @test subs(ex, d) == factorial(4)
         @test subs(ex, d...) == factorial(4)
-        if VERSION >= v"0.4.0"
-            @test ex |> subs(d...) == factorial(4)
-            @test ex(d) == factorial(4)
-            @test ex(d...) == factorial(4)
-        end
+        @test ex |> subs(d...) == factorial(4)
+        @test ex(d) == factorial(4)
+        @test ex(d...) == factorial(4)
     end
 
     a = Sym("a")
@@ -126,9 +121,7 @@ end
     sol = solve([line(0)-1, line(1)-2],[a,b])
     ex = line(10)
     @test ex |> subs(sol) == 11
-    if VERSION >= v"0.4.0"
-        @test ex(sol) == ex(sol...) == 11
-    end
+    @test ex(sol) == ex(sol...) == 11
 
     ## Conversion
     x = Sym("x")
@@ -210,8 +203,8 @@ end
     @test integrate(sin(x), (x, a, b)) |> replace(a, 0) |> replace(b, pi) == 2.0
     @test integrate(sin(x) * DiracDelta(x)) == sin(Sym(0))
     @test integrate(Heaviside(x), (x, -1, 1)) == 1
-    C = Curve([exp(t)-1, exp(t)+1], (t, 0, log(Sym(2))))
-    @test line_integrate(x + y, C, [x,y]) == 3 * sqrt(Sym(2))
+    curv = Curve([exp(t)-1, exp(t)+1], (t, 0, log(Sym(2))))
+    @test line_integrate(x + y, curv, [x,y]) == 3 * sqrt(Sym(2))
 
 
     ## summation
@@ -425,7 +418,7 @@ end
     ## Issue #59
     cse(sin(x)+sin(x)*cos(x))
     cse([sin(x), sin(x)*cos(x)])
-    cse([sin(x) sin(x)*cos(x); cos(x) sin(x)*cos(x)])
+    cse([sin(x), sin(x)*cos(x), cos(x), sin(x)*cos(x)])
 
     ## Issue #60, lambidfy
     if VERSION >= v"0.4.0"
