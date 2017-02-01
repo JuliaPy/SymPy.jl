@@ -130,7 +130,7 @@ limit(fn, 0)    # symbol not needed
 limit(ex::Sym, args...; kwargs...) = sympy_meth(:limit, ex, args...; kwargs...)
 limit(ex::Sym, d::Pair; kwargs...) = limit(ex, d.first, d.second;kwargs...)
 limit(ex::Sym, ds::Pair...) = reduce(limit, ex, ds)
-limit(f::Function, c::Number=0; kwargs...) = (z = symbol(gensym()); limit(f(z),z=>c;kwargs...))
+limit(f::Function, c::Number=0; kwargs...) = (z = (@compat Symbol(gensym())); limit(f(z),z=>c;kwargs...))
 
 export limit
 
@@ -157,7 +157,7 @@ end
 
 # set up derivative, call doit to implement
 Derivative(ex::Sym, args...) = sympy_meth(:Derivative, ex, args...)
-
+export(Derivative)
 #### Piecewise functions
 
 """
