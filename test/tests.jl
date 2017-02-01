@@ -418,7 +418,7 @@ end
     ## Issue #59
     cse(sin(x)+sin(x)*cos(x))
     cse([sin(x), sin(x)*cos(x)])
-    cse([sin(x) sin(x)*cos(x); cos(x) sin(x)*cos(x)])
+    cse([sin(x), sin(x)*cos(x), cos(x), sin(x)*cos(x)])
 
     ## Issue #60, lambidfy
     if VERSION >= v"0.4.0"

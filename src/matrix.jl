@@ -2,42 +2,26 @@
 ## Work with Array{Sym}, not python array objects, as possible
 
 ## The basic idea is: we use pytype mapping to make sympy matrices into Array{Sym}.
-## this is achieved with the convert(Array{Sym}, o::PyObject) method below
-## The only issue is (for some reason) we can't also define PyObject(s::Array{Sym}) without an infinite recursion
-## as such the methods call_matrix_sympy_meth and call_matrix_meth do some light conversion of their input
-## arguments beforehand via the following
+## this is achieved with the convert(Array{Sym}, o::PyObject) method below.
 
-symmatrix(a) = isa(a, Array) ? pycall(sympy[:Matrix], PyObject, a) : a 
+## Array{Sym} objects are converted into Python objects via
+PyCall.PyObject(a::Array{Sym}) = pycall(sympy[:Matrix], PyObject, PyCall.array2py(a))
 
 ## Matrix methods and objects
 
 
-## For calling methods we have `call_matrix_sympy_meth(M,...)` for methods of the type sympy[:meth](M, ...)
-## and call_matrix_meth(M, :meth, ...) for M.meth(...)
-## This helps with the latter grabbing the M.meth part
+## For calling methods we have  call_matrix_meth(M, :meth, ...) for M.meth(...)
+## This helps, grabbing the M.meth part
 function getindex(s::Array{Sym}, i::Symbol)
-    o = pycall(sympy[:Matrix], PyObject, s)
-    fn = getindex(o, i)
+    PyObject(s)[i]
 end
 
-## Call a sympy method with possible matrix or vector inputs. These are converted via symmatrix
-global call_matrix_sympy_meth(meth, args...; kwargs...) = begin
-    args = [symmatrix(a) for a in args]     # scrub any Array{Sym} -> pyobj then call
-    kwargs = [(k, symmatrix(v)) for (k,v) in kwargs]
-    
-    sympy_meth(meth, args...; kwargs...)
-end
 
 # call a matrix method M[:det](). Matrix or vector arguments are converted via symmatrix
 # though this may need to be done specially for some arguments that are passed in as collections
 global call_matrix_meth(object, meth, args...; kwargs...) = begin
-
-    fn = getindex(object, @compat(Symbol(meth)))
-    
-    args = [symmatrix(a) for a in args]      # scrub any Array{Sym} -> pyobj then call
-    kwargs = [(k, symmatrix(v)) for (k,v) in kwargs]    
-
-    pycall(fn, PyAny, args...; kwargs...)
+    o = PyObject(object)
+    o[meth](args...; kwargs...)
 end
 
 
@@ -81,9 +65,8 @@ end
 
 
 
-
-
-## covert back to Array{Sym}. Could just use broadcast here once v0.4 support is dropped.
+## covert back to Array{Sym}. Could just use broadcast (subs.(...)) here
+## once v0.4 support is dropped.
 subs(ex::Array{Sym}, args...; kwargs...) = map(u -> subs(u, args...; kwargs...), ex)
 
 
@@ -102,7 +85,7 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
 
 Specific docs may also be found at [SymPy Docs for matrices](http://docs.sympy.org/latest/modules/matrices/matrices.html#module-sympy.matrices.matrices)    
 """ ->
-         ($meth)(args...; kwargs...) = call_sympy_matrix_meth(@compat(Symbol($meth_name)), args...; kwargs...)
+         ($meth)(args...; kwargs...) = sympy_meth(@compat(Symbol($meth_name)), args...; kwargs...)
     end
     eval(Expr(:export, meth))
 end
@@ -110,30 +93,30 @@ end
 
 ## These are matrix methods that need exporting
 matrix_methods = (:LDLsolve,
-                      :LDLdecomposition, :LDLdecompositionFF,
-                      :LUdecomposition_Simple,
-                      :LUdecomposition,
-                      :LUsolve,
-                      :QRdecomposition, :QRsolve,
-                      :adjoint, :adjugate,
-                      :cholesky, :cholesky_solve, :cofactor, :conjugate,
-                      :diagaonal_solve, :diagonalize, :dual,
-                      :expand,
-                      :integrate,
-                      :is_symmetric,
-                      :inverse_ADJ, :inverse_GE, :inverse_LU,
-                      :jacobian,
-                      :jordan_form,
-                      :limit,
-                      :lower_triangular_solve,
-                      :minorEntry, :minorMatrix,
-                      :normalized, :nullspace,
-                      :permuteBkwd, :permuteFwd,
-                      :print_nonzero,
-                      :rref,
-                      :singular_values,
-                      :upper_triangular_solve,
-                      :vech
+                  :LDLdecomposition, :LDLdecompositionFF,
+                  :LUdecomposition_Simple,
+                  :LUdecomposition,
+                  :LUsolve,
+                  :QRdecomposition, :QRsolve,
+                  :adjoint, :adjugate,
+                  :cholesky, :cholesky_solve, :cofactor, :conjugate,
+                  :diagaonal_solve, :diagonalize, :dual,
+                  :expand,
+                  :integrate,
+                  :is_symmetric,
+                  :inverse_ADJ, :inverse_GE, :inverse_LU,
+                  :jacobian,
+                  :jordan_form,
+                  :limit,
+                  :lower_triangular_solve,
+                  :minorEntry, :minorMatrix,
+                  :normalized, :nullspace,
+                  :permuteBkwd, :permuteFwd,
+                  :print_nonzero,
+                  :rref,
+                  :singular_values,
+                  :upper_triangular_solve,
+                  :vech
 )
 
 for meth in matrix_methods
@@ -191,11 +174,11 @@ Return orthogonal basis from a set of vectors
 
 Example:
 ```
-L = [Sym[1,2,3], Sym[2,5,9], Sym[1,4,2]]
+L = [Sym[1,2,3], Sym[2,5,9], Sym[1,4,2]] # need Sym vectors.
 GramSchmidt(L, true)
 ```
 """
-GramSchmidt(vecs, args...; kwargs...) = sympy_meth(:GramSchmidt, broadcast(symmatrix, vecs), args...; kwargs...)
+GramSchmidt{T}(vecs::Vector{Vector{T}}, args...; kwargs...) = sympy_meth(:GramSchmidt, map(u->convert(Vector{Sym},u),vecs), args...; kwargs...)
 ## :cross?
 ## hessian, wronskian, GramSchmidt
 
