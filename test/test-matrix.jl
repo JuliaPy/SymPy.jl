@@ -33,7 +33,7 @@ end
     @test is_square(A) == true
     test_symmetric = VERSION <= v"0.4" ? issym : issymmetric
     @test is_symmetric(A) == test_symmetric(A)
-    @test eigvals(A) == [x-1, x+1]
+    @test Set(eigvals(A)) == Set([x-1, x+1])
 
 
     A = [1 0 0; 0 1 0; 0 0 x]
