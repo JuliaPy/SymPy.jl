@@ -2,7 +2,7 @@
 
 
 ## Symbol class for controlling dispatch
-abstract SymbolicObject <: Number
+@compat abstract type SymbolicObject <: Number end
 
 ## Basic types defined here
 """

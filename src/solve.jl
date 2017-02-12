@@ -104,7 +104,7 @@ function solve{T<:Sym,S<:Sym}(exs::(@compat Union{T,Vector{T}}), xs::Vector{S}; 
     if isa(a, Dict)
         _mapdict(a)              # XXX type unstable! should be array... Should we change? XXX
     else
-        [_mapdict(_,xs) for _ in a]
+        [_mapdict(_underscore,xs) for _underscore in a]
     end
 end
 

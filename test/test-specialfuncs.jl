@@ -159,11 +159,12 @@ end
 
 
     # test numerical consistency with Julia functions
-    @test N(besselj(3.2, Sym(1.5))) ≈ besselj(3.2, 1.5)
-    @test N(bessely(3.2, Sym(1.5))) ≈ bessely(3.2, 1.5)
-    @test N(besseli(3.2, Sym(1.5))) ≈ besseli(3.2, 1.5)
-    @test N(besselk(3.2, Sym(1.5))) ≈ besselk(3.2, 1.5)
-
+    if VERSION < v"0.6.0-dev"
+      @test N(besselj(3.2, Sym(1.5))) ≈ besselj(3.2, 1.5)
+      @test N(bessely(3.2, Sym(1.5))) ≈ bessely(3.2, 1.5)
+      @test N(besseli(3.2, Sym(1.5))) ≈ besseli(3.2, 1.5)
+      @test N(besselk(3.2, Sym(1.5))) ≈ besselk(3.2, 1.5)
+    end
 
     @test expand_func(x*hyper([1, 1], [2], -x)) == log(x + 1)
 end
