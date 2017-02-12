@@ -9,7 +9,13 @@ series_sympy_meths = (#:limit
                       :fourier_series
                       )
 
-import Base: scale, truncate
+import Base: truncate
+
+if VERSION < v"0.6.0-dev"
+    eval(Expr(:import, :Base, :scale))
+else
+     eval(Expr(:export, :scale))
+end
 series_object_meths_base = (:truncate,
                             )
 

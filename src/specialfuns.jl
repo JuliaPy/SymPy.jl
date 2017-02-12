@@ -3,9 +3,20 @@ module SpecialFuncs
 using PyCall
 using SymPy
 
-import Base: gamma, polygamma, beta,
-             airyai, airybi,
-             besseli, besselj, besselk, bessely
+if VERSION < v"0.6.0-dev"
+    import Base: gamma, polygamma, beta,
+           airyai, airybi,
+           besseli, besselj, besselk, bessely
+else
+    ## how to handlethis deprecation phase without SpecialFuncs.jl, as that
+    ## doesn't have v0.4 support?
+    ## Here we need to qualify usage, as in `SpecialFuns.airyai`.
+    for meth in  (:gamma, :polygamma, :beta,
+               :airyai, :airybi,
+               :besseli, :besselj, :besselk, :bessely)
+        eval(Expr(:export, meth))
+    end
+end
 
 for meth in (
              :jacobi,
