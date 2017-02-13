@@ -31,8 +31,7 @@ end
     # is_lower, is_square, is_symmetric much slower than julia only counterparts. May deprecate, but for now they are here
     @test is_lower(A) == istril(A)
     @test is_square(A) == true
-    test_symmetric = VERSION <= v"0.4" ? issym : issymmetric
-    @test is_symmetric(A) == test_symmetric(A)
+    @compat @test is_symmetric(A) == issymmetric(A)
     @test Set(eigvals(A)) == Set([x-1, x+1])
 
 
