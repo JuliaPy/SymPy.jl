@@ -104,7 +104,7 @@ function solve{T<:Sym,S<:Sym}(exs::(@compat Union{T,Vector{T}}), xs::Vector{S}; 
     if isa(a, Dict)
         _mapdict(a)              # XXX type unstable! should be array... Should we change? XXX
     else
-        [_mapdict(_,xs) for _ in a]
+        [_mapdict(u, xs) for u in a]
     end
 end
 
@@ -176,11 +176,6 @@ solveset_sympy_methods = (:solveset,
 #     solveset(exs, [x;]; kwargs...)
 # end
 
-# function solveset{T<:Sym,S<:Sym}(exs::(@compat Union{T,Vector{T}}), xs::Vector{S}; kwargs...)
-#     a = sympy_meth(:solveset, convert(SymMatrix, exs), xs;  kwargs...)
-#     ## finesse output
-#     a
-# end
 
 
 """

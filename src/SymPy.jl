@@ -87,7 +87,6 @@ export sympy, sympy_meth, object_meth, call_matrix_meth
 export Sym, @syms, @vars, symbols
 export pprint,  jprint
 export SymFunction, @symfuns,
-       SymMatrix,
        evalf, N,  subs,
        simplify, nsimplify,
        expand, factor, trunc,
@@ -139,10 +138,7 @@ include("sets.jl")
 include("display.jl")
 include("lambdify.jl")
 include("physics.jl")
-
-## add call interface depends on version
-VERSION >= v"0.5.0-" && include("call.jl")
-v"0.4.0" <= VERSION < v"0.5.0-" && include("call-0.4.jl")
+include("call.jl")
 
 include("plot_recipes.jl") # hook into Plots
 

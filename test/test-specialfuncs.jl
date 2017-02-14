@@ -1,13 +1,10 @@
 using SymPy.SpecialFuncs
 using SymPy: Sym, sqrt, conjugate, symbols, PI, simplify,
              expand_func, rewrite, N, gamma
-if VERSION >= v"0.5.0-dev+7720"
-    using Base.Test
-else
-    using BaseTestNext
-    const Test = BaseTestNext
+using Base.Test
+if VERSION >= v"0.6.0-dev"
+    using SpecialFunctions
 end
-
 
 @testset "SpecialFuns" begin
     a, b, x, y = symbols("a, b, x, y")

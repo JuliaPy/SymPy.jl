@@ -124,7 +124,7 @@ export sympy_plotting
 using RecipesBase
 
 ##
-_lambdify(ex) = x -> N(ex(x))
+_lambdify(ex) = x -> N(ex(x))  ## XXX temporary hack to work with v0.6.0-dev XXX
 @recipe f{T<:Sym}(::Type{T}, v::T) = _lambdify(v)
 
 ## for vectors of expressions

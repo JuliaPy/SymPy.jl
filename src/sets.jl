@@ -108,7 +108,6 @@ elements(x::Sym) = collect(PyObject(x))
 export elements
 
 
-VERSION < v"0.5.0-" && eval(Expr(:import, :Base, :complement))
 "Complement of set within the universe"
 complement(I::Sym, U::Sym=S.Reals) = I[:complement](U)
 export complement
@@ -116,7 +115,6 @@ export complement
 "boundary, returnsa set"
 boundary(I::Sym) = PyObject(I)[:boundary]
 
-VERSION < v"0.5.0-" && eval(Expr(:import, :Base, :inf))
 "Infinum of I"
 inf(I::Sym) = PyObject(I)[:inf]
 export inf
