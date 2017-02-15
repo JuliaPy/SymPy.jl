@@ -31,12 +31,29 @@ subs(ex, x=>1, y=>2)
 ex |> subs(x=>1, y=>2)
 ```
 
-There were some older convenience forms, but these will be deprecated, as they don't work as expected when a variable has assumptions. These are:
+The "`call`" syntax is also employed:
 
 ```
-subs(ex, :y, pi)    
-subs(ex, x=1, y=pi)
-## or
+ex = x^2 - 2
+ex(3)
+```
+
+It also works for 2 or more  variables, but the order of which variable is assigned which value is determined by `free_symbols`:
+
+```
+@vars x y z
+ex = z^y
+ex(2,3)  # 2^3 as free_symbols(z^y) is [z,y]
+```
+
+
+
+There were some older convenience forms, but these are now deprecated, as they don't work as expected when a variable has assumptions. These were:
+
+```
+subs(ex, :y, pi)    # using a symbol, not a symbolic object
+subs(ex, x=1, y=pi) # using keyword argument, and not pairs
+## or their curried or call forms
 ex |> subs(:x, e)   
 ex |> subs(x=e)     
 ex(x=2, y=3)     
