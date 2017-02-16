@@ -288,11 +288,7 @@ end
     @test_throws DimensionOrMethodError   v * v ## error
     @test v .* v == [x^2,1]
     @test dot(v, v) == 1 + conj(x)*x
-    if VERSION >= v"0.6.0-dev"
-        @test_throws DimensionMismatch v * rv ## 2x1 1x2 == 2x2
-    else
-        v * rv
-    end
+    v * rv
     rv * v ## 1x2 2 x 1 == 1x1
     v .* rv ## XXX ?? should be what? -- not 2 x 2
     rv .* v ## XXX ditto

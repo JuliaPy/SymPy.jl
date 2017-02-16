@@ -35,5 +35,12 @@ end
     @test N(sinc(Sym(0.2))) ≈ sinc(0.2)
 
     @test diff(sinc(x), x) == piecewise((Sym(0), Eq(x, 0)), (cos(PI*x)/x - sin(PI*x)/(PI*x^2), Gt(abs(x), 0)))
+
+    @test flipsign(Sym(3), 2.) == 3
+    @test flipsign(Sym(3), 0.) == 3
+    @test flipsign(Sym(3), -0.) == -3
+    @test flipsign(Sym(3), -2.) == -3
+
+    @test eps(Sym) == 0
     #@test rewrite(sinc(x), "jn") == jn(0, PI * x)
 end
