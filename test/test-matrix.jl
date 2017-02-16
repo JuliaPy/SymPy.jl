@@ -34,7 +34,7 @@ end
 
 
     s = LUsolve(A, v)
-    @test simplify.(A * s) == v
+    @test @compat simplify.(A * s) == v
 
 
     # is_lower, is_square, is_symmetric much slower than julia only counterparts. May deprecate, but for now they are here
