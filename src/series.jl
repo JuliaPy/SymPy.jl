@@ -9,7 +9,7 @@ series_sympy_meths = (#:limit
                       :fourier_series
                       )
 
-import Base: scale, truncate
+import Base: truncate
 series_object_meths_base = (:truncate,
                             )
 

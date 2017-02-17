@@ -2,12 +2,7 @@ using SymPy.Physics
 using SymPy: Sym, sqrt, symbols, doit, PI
 using SymPy.SpecialFuncs: Ynm
 using PyCall: PyError
-if VERSION >= v"0.5.0-dev+7720"
-    using Base.Test
-else
-    using BaseTestNext
-    const Test = BaseTestNext
-end
+using Base.Test
 
 
 @testset "Physics" begin

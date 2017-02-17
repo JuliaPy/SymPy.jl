@@ -1,11 +1,6 @@
 using SymPy
 using Compat
-if VERSION >= v"0.5.0-dev+7720"
-    using Base.Test
-else
-    using BaseTestNext
-    const Test = BaseTestNext
-end
+using Base.Test
 
 
 @testset "Core" begin
@@ -223,7 +218,7 @@ end
     a = [x 1; 1 x]
     b = [x 1 2; 1 2 x]
 
-    const DIMERROR = VERSION < v"0.4.0-dev" ? ErrorException : DimensionMismatch
+    const DIMERROR =  DimensionMismatch
     const DimensionOrMethodError =  Union{MethodError, DimensionMismatch}
     ## scalar, [vector, matrix]
     @test s + v == [x+3, 4]
@@ -417,7 +412,7 @@ end
     cse([sin(x), sin(x)*cos(x), cos(x), sin(x)*cos(x)])
 
     ## Issue #60, lambidfy
-    if VERSION >= v"0.4.0"
+
         #@vars x,y
         x, y = symbols("x, y")
         lambdify(sin(x)*cos(2x) * exp(x^2/2))
@@ -434,7 +429,7 @@ end
         u = lambdify(i)
         @test u(.5) == 1
         @test u(1.5) == 0
-    end
+  
 
     ## issue #67
     @test N(Sym(4//3)) == 4//3

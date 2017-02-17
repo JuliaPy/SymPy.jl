@@ -118,9 +118,9 @@ Some simple examples
 
 ```
 @vars x y
-lambdify(x^2)(2)       # 4
-lambdify(x*y^2)(2,3)   # 2*3^2 using default ordering
-lambdify(x*y^2, [y, x])(2,3) # 3*2^2, as function is (y,x) -> x*y^2 equivalent in Julia
+fn = lambdify(x^2); fn(2)       # 4
+fn = lambdify(x*y^2); fn(2,3)   # 2*3^2 using default ordering
+fn = lambdify(x*y^2, [y, x]); fn(2,3) # 3*2^2, as function is (y,x) -> x*y^2 equivalent in Julia
 ```
 
 
@@ -129,11 +129,14 @@ Compare times
 xs = rand(1000)
 @vars x
 ex = sin(x)*cos(2x) * exp(x^2/2)
-map(u -> N(ex(u)), xs)   # 3.435850 seconds
-map(lambdify(ex), xs)    # 0.007085 seconds
+fn = lambdify(ex)
+@time N.(ex.(xs))     # slow
+@time float.(ex.(xs)) # bit faster
+@time fn.(xs)         # many, many times faster
 ```
 
-This is a *temporary* solution. The proper fix is to do this in SymPy.
+Note: 
+In v0.6.0-dev, the calling of objects that are lamdified is a bit tricky, as this style won't work `lambidfy(ex)(val)`. In the examples above, the lambdified function was stored before being used. (This issue will hopefully go away with #19784.)
 
 """
 function lambdify(ex::Sym, vars=free_symbols(ex); fns=Dict(), values=Dict())
@@ -144,9 +147,10 @@ function lambdify(ex::Sym, vars=free_symbols(ex); fns=Dict(), values=Dict())
         body = walk_expression(ex, fns=fns, values=values)
     end
     try
-        eval(Expr(:function,
+        ex = Expr(:function,
                   Expr(:call, gensym(), map(Symbol,vars)...),
-                  body))
+                  body)
+        eval(ex)
     catch err
         throw(ArgumentError("Expression does not lambdify"))
     end

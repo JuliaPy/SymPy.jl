@@ -2,10 +2,16 @@ module SpecialFuncs
 
 using PyCall
 using SymPy
-
-import Base: gamma, polygamma, beta,
-             airyai, airybi,
-             besseli, besselj, besselk, bessely
+if VERSION < v"0.6.0-dev"
+    import Base: gamma, polygamma, beta,
+    airyai, airybi,
+    besseli, besselj, besselk, bessely
+else    
+    using SpecialFunctions
+    import SpecialFunctions: gamma, polygamma, beta,
+    airyai, airybi,
+    besseli, besselj, besselk, bessely
+end
 
 for meth in (
              :jacobi,

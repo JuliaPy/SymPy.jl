@@ -1,13 +1,13 @@
 environment:
   matrix:
 
-# 0.4
+# 0.5
     
-  - JULIAVERSION: "julialang/bin/winnt/x86/0.4/julia-0.4-latest-win32.exe"
+  - JULIAVERSION: "julialang/bin/winnt/x86/0.4/julia-0.5-latest-win32.exe"
     PYTHONDIR: "use_conda"
     PYTHON: "use_conda"
     
-  - JULIAVERSION: "julialang/bin/winnt/x64/0.4/julia-0.4-latest-win64.exe"
+  - JULIAVERSION: "julialang/bin/winnt/x64/0.4/julia-0.5-latest-win64.exe"
     PYTHONDIR: "use_conda"
     PYTHON: "use_conda"
 
