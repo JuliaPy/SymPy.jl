@@ -81,8 +81,11 @@ abs(ex::Sym, args...; kwargs...) = sympy_meth(:Abs, ex, args...; kwargs...)
 abs(a::Array{Sym}) = map(abs, a)
 Base.abs2(x::Sym) = re(x*conj(x))
 Base.copysign(x::Sym, y::Sym) = abs(x)*sign(y)
+Base.signbit(x::Sym) = x < 0
+Base.flipsign(x::Sym, y) = signbit(y) ? -x : x
 Base.real(x::Sym) = sympy_meth(:re, x)
 Base.imag(x::Sym) = sympy_meth(:im, x)
+Base.eps(::Type{Sym}) = zero(Sym)
 
 
 #minimum(ex::Sym,x::NAtype) = x
@@ -113,7 +116,7 @@ By default, *right* limits are returned. The keyword argument `dir="-"` needs to
 specified for *left* limits.
 
 The function `f(x)` can be expressed as a symbolic expression, or a univariate function
-    
+
 The values `x` and `c` can be expressed by two arguments `x, c` or a pair `x=>c`.
 
 ```
@@ -136,7 +139,7 @@ export limit
 
 
 function Base.diff(ex::Sym, args...; kwargs...)
-    if funcname(ex) in map(string, relational_sympy_values) 
+    if funcname(ex) in map(string, relational_sympy_values)
         Eq(diff(lhs(ex), args...; kwargs...), diff(rhs(ex), args...; kwargs...))
     else
         sympy_meth(:diff, ex, args...; kwargs...)

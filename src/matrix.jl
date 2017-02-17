@@ -38,7 +38,7 @@ function matrix_size(x::PyObject)
 end
 
 get_matrix_index(s::PyObject, i::Integer...) = get(s, Sym, ntuple(k -> i[k]-1, length(i)))
-function get_matrix_index(s::PyObject, i::Integer) 
+function get_matrix_index(s::PyObject, i::Integer)
     ind = ind2sub(matrix_size(s), i-1) # 0-base PyThon, 1 base Julia
     if length(ind) == 1
         get(s, Sym, ind[1])
@@ -83,7 +83,7 @@ for meth in sympy_matrix_methods
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 
-Specific docs may also be found at [SymPy Docs for matrices](http://docs.sympy.org/latest/modules/matrices/matrices.html#module-sympy.matrices.matrices)    
+Specific docs may also be found at [SymPy Docs for matrices](http://docs.sympy.org/latest/modules/matrices/matrices.html#module-sympy.matrices.matrices)
 """ ->
          ($meth)(args...; kwargs...) = sympy_meth(@compat(Symbol($meth_name)), args...; kwargs...)
     end
@@ -99,13 +99,12 @@ matrix_methods = (:LDLsolve,
                   :LUsolve,
                   :QRdecomposition, :QRsolve,
                   :adjoint, :adjugate,
-                  :cholesky, :cholesky_solve, :cofactor, :conjugate,
-                  :diagaonal_solve, :diagonalize, :dual,
+                  :cholesky, :cholesky_solve, :conjugate,
+                  :diagonal_solve, :diagonalize, :dual,
                   :expand,
                   :integrate,
                   :is_symmetric,
                   :inverse_ADJ, :inverse_GE, :inverse_LU,
-                  :jacobian,
                   :jordan_form,
                   :limit,
                   :lower_triangular_solve,
@@ -126,16 +125,23 @@ for meth in matrix_methods
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 
-Specific docs may also be found at [SymPy Docs for matrices](http://docs.sympy.org/latest/modules/matrices/matrices.html#module-sympy.matrices.matrices)    
+Specific docs may also be found at [SymPy Docs for matrices](http://docs.sympy.org/latest/modules/matrices/matrices.html#module-sympy.matrices.matrices)
 """ ->
         ($meth)(ex::Matrix{Sym}, args...; kwargs...) =  call_matrix_meth(ex, @compat(Symbol($meth_name)), args...;kwargs...)
     end
     eval(Expr(:export, meth))
 end
 
+
+cofactor(A::Matrix{Sym}, i, j) = call_matrix_meth(A, :cofactor, i-1, j-1)
+jacobian(X::Array{Sym}, Y::Array{Sym}) = call_matrix_meth(X, :jacobian, Y)
+
+export cofactor
+
 ## These are SymPy properties that we want to call as methods, exported
 matrix_properties = (:H, :C,
-                    :is_lower, :is_lower_hessenberg, :is_square, :is_upper,  :is_upper_hessenberg, :is_zero
+                    :is_lower, :is_lower_hessenberg, :is_square, :is_upper,
+                    :is_upper_hessenberg, :is_zero
                      )
 
 
@@ -208,8 +214,8 @@ u = SymFunction("u")(x)
 v = SymFunction("v")(x)
 wronskian([u,v], x)  # determinant of [u v; u' v']
 ```
-    
-"""    
+
+"""
 wronskian{T <: SymbolicObject}(fs::Vector{T}, x::Sym, args...; kwargs...) = sympy_meth(:wronskian, fs, x, args...; kwargs...)
 
 export GramSchmidt, hessian, wronskian
