@@ -78,6 +78,8 @@ end
     @test P == [-1 0 -1; 0 0 -1; 2 1  2]
     @test D == inv(P) * M * P
 
+    # test SymPy's expm against Julia's expm
+    @test @compat Float64.(expm(M)) ≈ expm(Float64.(M))
 
     M = [x y; 1 0]
     @test integrate(M, x) == [x^2/2 x*y; x 0]
