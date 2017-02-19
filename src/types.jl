@@ -22,11 +22,6 @@ immutable Sym <: SymbolicObject
 end
 Sym(s::SymbolicObject) = s
 
-## Matrix type
-immutable SymMatrix <: SymbolicObject
-    x::PyCall.PyObject
-end
-
 ## sets
 immutable SymSet <: SymbolicObject
     x::PyCall.PyObject
@@ -87,11 +82,6 @@ end
 convert(::Type{Complex}, x::Sym) = complex(map(x -> convert(Float64, x), x[:as_real_imag]())...)::Sym
 complex(x::Sym) = convert(Complex, x)
 complex(xs::Array{Sym}) = map(complex, xs)
-
-## matrices
-convert(::Type{SymMatrix}, o::PyCall.PyObject) = SymMatrix(o)
-convert(::Type{Sym}, o::SymMatrix) = Sym(o.x)
-convert(::Type{SymMatrix}, o::Sym) = SymMatrix(o.x)
 
 ## string
 convert(::Type{Sym}, o::AbstractString) = sympy_meth(:sympify, o)

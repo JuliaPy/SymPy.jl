@@ -161,7 +161,7 @@ end
 ## These are special cased
 norm(a::Array{Sym}, args...; kwargs...) = call_matrix_meth(a, :norm, args...; kwargs...)
 chol(a::Matrix{Sym}) = cholesky(a)
-expm(ex::Matrix{Sym}) = convert(Array{Sym}, expm(convert(SymMatrix, ex)))
+expm(a::Matrix{Sym}) = call_matrix_meth(a, :exp)
 conj(a::Sym) = conjugate(a)
 eigvals(a::Matrix{Sym}) = collect(keys(call_matrix_meth(a, :eigenvals))) # a[:eigevnals]() has multiplicity
 function eigvecs(a::Matrix{Sym})
