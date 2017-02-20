@@ -2,5 +2,4 @@ julia 0.5
 Compat 0.17.0
 PyCall 1.6.0
 RecipesBase 0.0.4
-BaseTestNext 0.2.2
-SpeicalFunctions 0.1.0
+SpecialFunctions 0.1.0
