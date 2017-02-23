@@ -35,7 +35,7 @@ cse(((w + x + y + z)*(w + y + z))/(w + x)^3), ([(x0, y + z), (x1, w + x)], [(w +
 cse{T<:SymbolicObject}(ex::T, args...; kwargs...) = sympy_meth(:cse, ex, args...; kwargs...)
 cse{T<:SymbolicObject}(ex::Vector{T}, args...; kwargs...) = sympy_meth(:cse, ex, args...; kwargs...)
         
-function cse{T<:SymbolicObject, N}(ex::Array{T, N}, args...; kwargs...)
+function cse{T<:SymbolicObject, N}(ex::AbstractArray{T, N}, args...; kwargs...)
     a,b = cse(ex[:], args...; kwargs...)
     bb = convert(Array{Sym},  reshape(b, size(ex)))
     a, bb

@@ -5,14 +5,14 @@
 ## this is achieved with the convert(Array{Sym}, o::PyObject) method below.
 
 ## Array{Sym} objects are converted into Python objects via
-PyCall.PyObject(a::Array{Sym}) = pycall(sympy[:Matrix], PyObject, PyCall.array2py(a))
+PyCall.PyObject(a::AbstractArray{Sym}) = pycall(sympy[:Matrix], PyObject, PyCall.array2py(a))
 
 ## Matrix methods and objects
 
 
 ## For calling methods we have  call_matrix_meth(M, :meth, ...) for M.meth(...)
 ## This helps, grabbing the M.meth part
-function getindex(s::Array{Sym}, i::Symbol)
+function getindex(s::AbstractArray{Sym}, i::Symbol)
     PyObject(s)[i]
 end
 
@@ -67,7 +67,7 @@ end
 
 ## covert back to Array{Sym}. Could just use broadcast (subs.(...)) here
 ## once v0.4 support is dropped.
-subs(ex::Array{Sym}, args...; kwargs...) = map(u -> subs(u, args...; kwargs...), ex)
+subs(ex::AbstractArray{Sym}, args...; kwargs...) = map(u -> subs(u, args...; kwargs...), ex)
 
 
 ## Methods
@@ -134,7 +134,7 @@ end
 
 
 cofactor(A::Matrix{Sym}, i, j) = call_matrix_meth(A, :cofactor, i-1, j-1)
-jacobian(X::Array{Sym}, Y::Array{Sym}) = call_matrix_meth(X, :jacobian, Y)
+jacobian(X::AbstractArray{Sym}, Y::AbstractArray{Sym}) = call_matrix_meth(X, :jacobian, Y)
 
 export cofactor
 
@@ -159,7 +159,8 @@ end
 
 
 ## These are special cased
-norm(a::Array{Sym}, args...; kwargs...) = call_matrix_meth(a, :norm, args...; kwargs...)
+norm(a::AbstractVector{Sym}, args...; kwargs...) = call_matrix_meth(a, :norm, args...; kwargs...)
+norm(a::AbstractMatrix{Sym}, args...; kwargs...) = call_matrix_meth(a, :norm, args...; kwargs...)
 chol(a::Matrix{Sym}) = cholesky(a)
 expm(a::Matrix{Sym}) = call_matrix_meth(a, :exp)
 conj(a::Sym) = conjugate(a)
@@ -202,7 +203,7 @@ u = SymFunction("u")(x,y)
 hessian(u, [x,y])
 ```
 """
-hessian(u::SymbolicObject, vars::Array{Sym}, args...) = sympy_meth(:hessian, u, vars, args...)
+hessian(u::SymbolicObject, vars::AbstractArray{Sym}, args...) = sympy_meth(:hessian, u, vars, args...)
 hessian(u::SymbolicObject) = hessian(u, free_symbols(u))
 
 

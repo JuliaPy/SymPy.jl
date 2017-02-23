@@ -38,13 +38,13 @@ for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
 
     rad_fn = string(fn)[1:end-1]
     @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](x * Sym(sympy["pi"])/180)
-    @eval ($fn)(a::Array{Sym}) = map($fn, a)
+    @eval ($fn)(a::AbstractArray{Sym}) = map($fn, a)
 end
 
 for fn in (:cospi, :sinpi)
     rad_fn = string(fn)[1:end-2]
     @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](x * Sym(sympy["pi"]))
-    @eval ($fn)(a::Array{Sym}) = map($fn, a)
+    @eval ($fn)(a::AbstractArray{Sym}) = map($fn, a)
 end
 
 ## :asech, :acsch, :sinc, :cosc,
@@ -58,10 +58,10 @@ sinc(x::Sym) = piecewise((Sym(1), Eq(x, 0)), (sin(PI*x)/(PI*x), Gt(abs(x), 0)))
 cosc(x::Sym) = diff(sinc(x))
 
 # deprecate these when v0.4 support dropped in favor of `asech.(...)` form
-asech(as::Array{Sym}) = map(asech, as)
-acsch(as::Array{Sym}) = map(acsch, as)
-sinc(as::Array{Sym}) = map(sinc, as)
-cosc(as::Array{Sym}) = map(cosc, as)
+asech(as::AbstractArray{Sym}) = map(asech, as)
+acsch(as::AbstractArray{Sym}) = map(acsch, as)
+sinc(as::AbstractArray{Sym}) = map(sinc, as)
+cosc(as::AbstractArray{Sym}) = map(cosc, as)
 
 
 ## in Julia, not SymPy
@@ -78,7 +78,7 @@ functions_sympy_methods = (
 
 ## map Abs->abs, Max->max, Min->min
 abs(ex::Sym, args...; kwargs...) = sympy_meth(:Abs, ex, args...; kwargs...)
-abs(a::Array{Sym}) = map(abs, a)
+abs(a::AbstractArray{Sym}) = map(abs, a)
 Base.abs2(x::Sym) = re(x*conj(x))
 Base.copysign(x::Sym, y::Sym) = abs(x)*sign(y)
 Base.signbit(x::Sym) = x < 0
@@ -150,7 +150,8 @@ end
 
 
 ## diff for matrix doesn't handle vectors well, so we vectorize here
-diff(exs::Array{Sym}, args...; kwargs...) = map(ex -> diff(ex, args...;kwargs...), exs)
+diff(exs::AbstractVector{Sym}, args...; kwargs...) = map(ex -> diff(ex, args...;kwargs...), exs)
+diff(exs::AbstractMatrix{Sym}, args...; kwargs...) = map(ex -> diff(ex, args...;kwargs...), exs)
 
 ## find symbolic derivatives from a function
 function diff(f::Function, k::Int=1; kwargs...)
@@ -200,7 +201,7 @@ Indicator expression: (Either `\Chi[tab](x,a,b)` or `Indicator(x,a,b)`)
 
 
 This is not a function taking `x`, but a symbolic expression of `x`.
-    
+
 """
 Χ(x::Sym, a=-oo, b=oo) = piecewise((1, Gt(x, a) ∧ Le(x, b)), (0,true))
 Indicator(x::Sym, a=-oo, b=oo) = Χ(x, a, b)

@@ -81,7 +81,7 @@ function convert(::Type{Sym}, x::Complex)
 end
 convert(::Type{Complex}, x::Sym) = complex(map(x -> convert(Float64, x), x[:as_real_imag]())...)::Sym
 complex(x::Sym) = convert(Complex, x)
-complex(xs::Array{Sym}) = map(complex, xs)
+complex(xs::AbstractArray{Sym}) = map(complex, xs)
 
 ## string
 convert(::Type{Sym}, o::AbstractString) = sympy_meth(:sympify, o)

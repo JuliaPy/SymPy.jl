@@ -36,7 +36,7 @@ for fn in (:besselj, :bessely, :besseli, :besselk)
     meth = string(fn)
 #    eval(Expr(:import, :Base, fn))
     @eval ($fn)(nu::Number, x::Sym; kwargs...) = sympy_meth($meth, nu, x; kwargs...)
-    @eval ($fn)(nu::Number, a::Array{Sym}) = map(x ->$fn(nu, x), a)
+    @eval ($fn)(nu::Number, a::AbstractArray{Sym}) = map(x ->$fn(nu, x), a)
 end
 
 
@@ -52,7 +52,7 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
 """ ->
         ($meth)(x::Sym;kwargs...) = sympy_meth($meth_name, x; kwargs...)
     end
-    @eval ($meth)(a::Array{Sym}) = map($meth, a)
+    @eval ($meth)(a::AbstractArray{Sym}) = map($meth, a)
     eval(Expr(:export, meth))
 end
 
