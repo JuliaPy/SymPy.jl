@@ -36,6 +36,12 @@ end
     s = LUsolve(A, v)
     @test @compat simplify.(A * s) == v
 
+    # test norm
+    @test norm(A) == sqrt(2 * abs(x)^2 + 2)
+
+    # test norm for different subtypes of AbstractArray
+    @test norm(A) == norm(Symmetric(A))
+    @test norm(A) == norm(view(A, :, :))
 
     # is_lower, is_square, is_symmetric much slower than julia only counterparts. May deprecate, but for now they are here
     @test is_lower(A) == istril(A)
