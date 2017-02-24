@@ -147,7 +147,7 @@ function N(ex::Sym)
     throw(DomainError())
 end
 N(x::Number) = x
-N(m::Array{Sym}) = map(N, m)
+N(m::AbstractArray{Sym}) = map(N, m)
 """
 `N` can take a precision argument. 
 

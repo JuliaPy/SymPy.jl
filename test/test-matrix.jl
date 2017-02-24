@@ -1,5 +1,6 @@
 using SymPy
 using Compat
+import Compat.view
 if VERSION >= v"0.5.0-dev+7720"
     using Base.Test
 else
@@ -36,6 +37,15 @@ end
     s = LUsolve(A, v)
     @test @compat simplify.(A * s) == v
 
+    # norm
+    @test norm(A) == sqrt(2 * abs(x)^2 + 2)
+    # test norm for different subtypes of AbstractArray
+    @test norm(A) == norm(Symmetric(A))
+    @test norm(A) == norm(view(A, :, :))
+
+    # abs
+    @test all(abs(A) .>= 0)
+    @test abs(A) == abs(view(A, :, :))
 
     # is_lower, is_square, is_symmetric much slower than julia only counterparts. May deprecate, but for now they are here
     @test is_lower(A) == istril(A)
@@ -114,6 +124,6 @@ end
     X = [ρ*cos(ϕ), ρ*sin(ϕ)]
     @test jacobian(X, Y) == [cos(ϕ) -ρ*sin(ϕ);
                              sin(ϕ)  ρ*cos(ϕ)]
-
+    @test jacobian(X, Y) == jacobian(view(X, :), view(Y, :))
 
 end
