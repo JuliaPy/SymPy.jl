@@ -45,9 +45,9 @@ ex(x=2, y=3)
 The `replace` function is related, but not identical to subs.
 
 """
-subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any})) =
+subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{Any, Any})) =
     object_meth(ex, :subs, Sym(y[1]), convert(Sym,y[2]))
-subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{SymbolicTypes, Any}), args...) = subs(subs(ex, y), args...)
+subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{Any, Any}), args...) = subs(subs(ex, y), args...)
 subs{T <: SymbolicObject, S<:SymbolicObject}(ex::T, y::S, val) = subs(ex, (y,val))
 subs{T <: SymbolicObject}(ex::T, dict::Dict) = subs(ex, dict...)
 subs{T <: SymbolicObject}(ex::T, d::Pair...) = subs(ex, [(p.first, p.second) for p in d]...)
