@@ -170,7 +170,9 @@ end
 
 
     ## limits
+    @test limit(x -> sin(x)/x, 0) == 1
     @test limit(sin(x)/x, x, 0) |> float == 1
+    @test limit(sin(x)/x, x => 0) == 1
     (x, h) = @syms x h
     out = limit((sin(x+h) - sin(x))/h, h, 0)
     @test (out |> replace(x, pi) |> float) == -1.0
