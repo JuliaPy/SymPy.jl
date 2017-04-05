@@ -1,7 +1,6 @@
 Base.call{T <: SymbolicObject}(ex::T) = ex
 function Base.call{T <: SymbolicObject}(ex::T, args...)
     xs = free_symbols(ex)
-
     if length(xs) >= 1
         subs(ex, collect(zip(xs, args))...)
     else
