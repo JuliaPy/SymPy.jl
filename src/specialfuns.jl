@@ -4,9 +4,11 @@ using PyCall
 using SymPy
 
 if VERSION < v"0.6.0-dev"
-    import Base: gamma, polygamma, beta,
-           airyai, airybi,
-           besseli, besselj, besselk, bessely
+    for meth in [:gamma, :polygamma, :beta,
+                 :airyai, :airybi,
+                 :besseli, :besselj, :besselk, :bessely]
+        eval(Expr(:import, :Base, meth))
+    end
 else
     ## how to handlethis deprecation phase without SpecialFuncs.jl, as that
     ## doesn't have v0.4 support?
@@ -57,13 +59,13 @@ for meth in (:fresnels, :fresnelc, :Ei, :Si, :Ci,
     meth_name = string(meth)
 
     @eval begin
-        @doc """
+        @doc """<
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
         ($meth)(x::Sym;kwargs...) = sympy_meth($meth_name, x; kwargs...)
     end
-    @eval ($meth)(a::AbstractArray{Sym}) = map($meth, a)
+#    @eval ($meth)(a::AbstractArray{Sym}) = map($meth, a)
     eval(Expr(:export, meth))
 end
 

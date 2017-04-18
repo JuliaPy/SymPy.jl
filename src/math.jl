@@ -38,13 +38,11 @@ for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
 
     rad_fn = string(fn)[1:end-1]
     @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](x * Sym(sympy["pi"])/180)
-    @eval ($fn)(a::AbstractArray{Sym}) = map($fn, a)
 end
 
 for fn in (:cospi, :sinpi)
     rad_fn = string(fn)[1:end-2]
     @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](x * Sym(sympy["pi"]))
-    @eval ($fn)(a::AbstractArray{Sym}) = map($fn, a)
 end
 
 ## :asech, :acsch, :sinc, :cosc,
@@ -60,8 +58,6 @@ cosc(x::Sym) = diff(sinc(x))
 # deprecate these when v0.4 support dropped in favor of `asech.(...)` form
 asech(as::AbstractArray{Sym}) = map(asech, as)
 acsch(as::AbstractArray{Sym}) = map(acsch, as)
-sinc(as::AbstractArray{Sym}) = map(sinc, as)
-cosc(as::AbstractArray{Sym}) = map(cosc, as)
 
 
 ## in Julia, not SymPy
@@ -78,7 +74,6 @@ functions_sympy_methods = (
 
 ## map Abs->abs, Max->max, Min->min
 abs(ex::Sym, args...; kwargs...) = sympy_meth(:Abs, ex, args...; kwargs...)
-abs(a::AbstractArray{Sym}) = map(abs, a)
 Base.abs2(x::Sym) = re(x*conj(x))
 Base.copysign(x::Sym, y::Sym) = abs(x)*sign(y)
 Base.signbit(x::Sym) = x < 0
