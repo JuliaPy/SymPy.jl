@@ -2,7 +2,7 @@
 
 
 ## Symbol class for controlling dispatch
-abstract SymbolicObject <: Number
+@compat abstract type SymbolicObject <: Number end
 
 ## Basic types defined here
 """
@@ -34,10 +34,11 @@ end
 #pytype_mapping(mpctype, Sym)
 
 ## some typealiases
-typealias SymOrReal @compat Union{Sym, Real}
-typealias SymOrNumber @compat Union{Sym, Number}
-typealias SymOrString @compat Union{Sym, AbstractString}
-typealias SymbolicTypes  @compat Union{AbstractString, Symbol, SymbolicObject}
+const SymOrReal = @compat Union{Sym,Real}
+const SymOrNumber = @compat Union{Sym,Number}
+const SymOrString = @compat Union{Sym,AbstractString}
+const SymbolicTypes = @compat Union{AbstractString,Symbol,SymbolicObject}
+
 
 ## in #83, @stevengj suggests using
 PyCall.PyObject(x::SymbolicObject) = x.x

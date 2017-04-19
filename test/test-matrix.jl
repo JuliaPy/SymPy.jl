@@ -44,8 +44,8 @@ end
     @test norm(A) == norm(view(A, :, :))
 
     # abs
-    @test all(abs(A) .>= 0)
-    @test abs(A) == abs(view(A, :, :))
+    @test @compat all(abs.(A) .>= 0)
+    @test @compat abs.(A) == abs.(view(A, :, :))
 
     # is_lower, is_square, is_symmetric much slower than julia only counterparts. May deprecate, but for now they are here
     @test is_lower(A) == istril(A)
