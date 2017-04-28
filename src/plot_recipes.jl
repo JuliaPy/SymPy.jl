@@ -124,11 +124,10 @@ export sympy_plotting
 using RecipesBase
 
 ##
-_lambdify(ex) = x -> N(ex(x))
-@recipe f{T<:Sym}(::Type{T}, v::T) = _lambdify(v)
+@recipe f{T<:Sym}(::Type{T}, v::T) = lambdify(v)
 
 ## for vectors of expressions
-@recipe f{S<:AbstractVector{Sym}}(::Type{S}, ss::S) = Function[_lambdify(s) for s in ss]
+@recipe f{S<:AbstractVector{Sym}}(::Type{S}, ss::S) = Function[lambdify(s) for s in ss]
 
 ## A vector field plot can be visualized as an n × n collection of arrows
 ## over the region xlims × ylims
