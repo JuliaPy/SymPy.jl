@@ -198,7 +198,8 @@ end
 
 
 ## Thse are object methods that need importing
-for meth in union(series_object_meths_base
+for meth in union(math_object_methods_base,
+                  series_object_meths_base
                   )
 
     meth_name = string(meth)
