@@ -453,4 +453,10 @@ end
     ## properties (Issue #119)
     @test is_odd(Sym(3)) == true
     @test is_monic(Poly(x^2 -2, x)) == true
+
+    ## test round (Issue #153)
+    y = Sym(eps())
+    @test round(y, 5) == 0
+    @test round(y, 16) != 0
+
 end
