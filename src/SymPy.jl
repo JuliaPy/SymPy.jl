@@ -6,6 +6,7 @@ __precompile__()
 module SymPy
 
 using Compat
+import Compat: @compat, invokelatest
 
 """
 

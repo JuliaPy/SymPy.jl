@@ -147,11 +147,7 @@ function lambdify(ex::Sym, vars=free_symbols(ex); fns=Dict(), values=Dict())
         fn = eval(Expr(:function,
                   Expr(:call, gensym(), map(Symbol,vars)...),
                        body))
-        if VERSION >= v"0.6.0-"
-            (args...) -> Base.invokelatest(fn, args...) # https://github.com/JuliaLang/julia/pull/19784
-        else
-            fn
-        end
+        (args...) -> invokelatest(fn, args...) # https://github.com/JuliaLang/julia/pull/19784
     catch err
         throw(ArgumentError("Expression does not lambdify"))
     end
