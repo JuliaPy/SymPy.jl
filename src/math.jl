@@ -7,11 +7,14 @@ math_sympy_methods_base = (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, 
                            :coth, :acoth,
                            :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
                            :sqrt, :erf, :erfc, :erfcx, :erfi, :erfinv, :erfcinv, :dawson,
-                           :ceiling, :floor, :trunc, :round, :significand,
+                           :ceiling, :floor, 
                            :factorial,
                            :gcd, :lcm,
                            :isqrt
-                           )
+)
+
+math_object_methods_base = (:round,
+                            )
 
 
 ## Export SymPy math functions and vectorize them

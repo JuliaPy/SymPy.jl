@@ -1,11 +1,13 @@
 [![SymPy](http://pkg.julialang.org/badges/SymPy_0.4.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=0.4)
 &nbsp;
 [![SymPy](http://pkg.julialang.org/badges/SymPy_0.5.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=0.5)
+&nbsp;
 [![SymPy](http://pkg.julialang.org/badges/SymPy_0.6.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=0.6) 
 
 Linux: [![Build Status](https://travis-ci.org/JuliaPy/SymPy.jl.svg?branch=master)](https://travis-ci.org/JuliaPy/SymPy.jl)
 &nbsp;
-Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/JuliaPy/SymPy.jl?branch=master&svg=true)](https://ci.appveyor.com/project/JuliaPy/sympy-jl)
+Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/JuliaPy/SymPy.jl?branch=master&svg=true)](https://ci.appveyor.com/project/jverzani/sympy-jl)
+
 
 
 # SymPy Package to bring Python's `Sympy` functionality into `Julia` via `PyCall`
