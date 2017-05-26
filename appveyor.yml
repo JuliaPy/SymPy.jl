@@ -1,7 +1,7 @@
 environment:
   matrix:
 
-# 0.4
+# 0.4 - 0.6
     
   - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x86/0.4/julia-0.4-latest-win32.exe"
     PYTHONDIR: "use_conda"
@@ -11,13 +11,19 @@ environment:
     PYTHONDIR: "use_conda"
     PYTHON: "use_conda"
 
-# Nightlies
-    
-  - JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/winnt/x86/julia-latest-win32.exe"
+  - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x86/0.5/julia-0.5-latest-win32.exe"
     PYTHONDIR: "use_conda"
     PYTHON: "use_conda"
     
-  - JULIA_URL: "https://julialangnightlies-s3.julialang.org/bin/winnt/x64/julia-latest-win64.exe"
+  - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x64/0.5/julia-0.5-latest-win64.exe"
+    PYTHONDIR: "use_conda"
+    PYTHON: "use_conda"
+    
+  - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x86/0.6/julia-0.6-latest-win32.exe"
+    PYTHONDIR: "use_conda"
+    PYTHON: "use_conda"
+    
+  - JULIA_URL: "https://julialang-s3.julialang.org/bin/winnt/x64/0.6/julia-0.6-latest-win64.exe"
     PYTHONDIR: "use_conda"
     PYTHON: "use_conda"
 
