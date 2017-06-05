@@ -141,6 +141,18 @@ end
     VERSION >= v"0.5.0" && @test N(beta(Sym(1)+1im, Sym(1)+1im)) ≈ beta(1.0+1im, 1.0+1im)
 
 
+    # Elliptic-type functions
+
+    @test elliptic_k(Sym(0)) == PI/2
+    @test N(elliptic_k(Sym(1.0 + im))) ≈ 1.50923695405127 + 0.625146415202697im
+
+    @test N(elliptic_f(Sym(3.0 + im/2), Sym(1.0 + im))) ≈ 2.909449841483 + 1.74720545502474im
+
+    @test elliptic_e(Sym(0)) == PI/2
+    @test N(elliptic_e(Sym(2.0 - im))) ≈ 0.991052601328069 + 0.81879421395609im
+
+    @test elliptic_pi(Sym(0), Sym(0)) == PI/2
+    @test N(elliptic_pi(Sym(1.0 - im/3), Sym(2.0 + im))) ≈ 3.29136443417283 + 0.32555634906645im
 
 
     # Bessel-type functions

@@ -29,7 +29,9 @@ for meth in (
              :laguerre, :assoc_laguerre,
              :Ynm, :Ynm_c,
              :hankel1, :hankel2,
-             :jn, :yn
+             :jn, :yn,
+             :elliptic_e, :elliptic_k,
+             :elliptic_f, :elliptic_pi
              )
     meth_name = string(meth)
     @eval begin
