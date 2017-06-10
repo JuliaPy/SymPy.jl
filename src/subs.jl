@@ -69,6 +69,8 @@ subs{T <: SymbolicObject, S<:SymbolicObject}(ex::T, y::S, val) = subs(ex, (y,val
 subs{T <: SymbolicObject}(ex::T, dict::Dict) = subs(ex, dict...)
 subs{T <: SymbolicObject}(ex::T, d::Pair...) = subs(ex, [(p.first, p.second) for p in d]...)
 
+subs(x::Number, args...) = x
+
 ## curried versions to use with |>
 subs(x::SymbolicObject, y) = ex -> subs(ex, x, y)
 subs(;kwargs...) = ex -> subs(ex; kwargs...)
