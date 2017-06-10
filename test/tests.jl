@@ -132,6 +132,7 @@ end
     @test isa(N(p), Float64)
     @test isa(N(p, 60), BigFloat)
     @test isa(evalf(p), Sym)
+    @test isa(N(x), Sym)
     @test isa(N(q), Rational)
     @test isa(N(r), Float64)
     @test isa(N(z), Integer)
