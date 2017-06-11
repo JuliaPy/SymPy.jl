@@ -65,10 +65,9 @@ end
 export S, FiniteSet, Interval, ProductSet, ConditionSet
 export powerset, imageset
 export contains,  boundary, sup, measure
+export as_relational
 export is_disjoint
 export is_proper_subset, is_subset, is_superset
-export Interval
-export as_relational
 export is_left_unbounded, is_right_unbounded, left_open, right_open
 export is_FiniteSet, is_Union, is_Interval
 
@@ -181,21 +180,20 @@ is_Union(I::Sym) = PyObject(I)[:is_Union]
 
 function init_sets()
     S.init_set()
-
+end  
 """
     `FiniteSet(1,2,3)`, `FiniteSet(1:10...)`: create a finite set
 
 See also `Interval` to create subsets of the real line.
 """
-    "FiniteSet: http://docs.sympy.org/latest/modules/sets.html"
-    global FiniteSet(args...) = sympy_meth(:FiniteSet, args...)
+FiniteSet(args...) = sympy_meth(:FiniteSet, args...)
 
-    "ProductSet: http://docs.sympy.org/latest/modules/sets.html"
-    global ProductSet(args...) = sympy_meth(:ProductSet, args...)
+"ProductSet: http://docs.sympy.org/latest/modules/sets.html"
+global ProductSet(args...) = sympy_meth(:ProductSet, args...)
 
-    """
+"""
     Means to filter a set to pull out elements by a condition.
-
+    
     ConditionSet:  A set of elements which satisfies a given condition.
 
     `ConditionSet(x, condition, S) = {x | condition(x) == true for x in S}`
@@ -215,17 +213,17 @@ See also `Interval` to create subsets of the real line.
     2 + 1im in R  # false
 ```
 """
-    ComplexRegion(IJ::Sym; kwargs...) = sympy_meth(:ComplexRegion, IJ; kwargs...)
+ComplexRegion(IJ::Sym; kwargs...) = sympy_meth(:ComplexRegion, IJ; kwargs...)
 
-    "imageset: http://docs.sympy.org/latest/modules/sets.html"
-    global imageset(fn::Function, args...) = begin
-        x = Sym("x")
-        imageset(x, fn(x), args...)
-    end
-    global imageset(args...) = sympy_meth(:imageset, args...)
+"imageset: http://docs.sympy.org/latest/modules/sets.html"
+global imageset(fn::Function, args...) = begin
+    x = Sym("x")
+    imageset(x, fn(x), args...)
+end
+global imageset(args...) = sympy_meth(:imageset, args...)
 
 
-    ## Interval
+## Interval
 
 """
 Create an interval object
@@ -236,7 +234,6 @@ Interval(0,1,true, false) # (0,1]
 ```
 
 """
-    global Interval(l,r,left_open=false, right_open=false) = sympy_meth(:Interval, Sym(l), Sym(r), left_open ,right_open)
+global Interval(l,r,left_open=false, right_open=false) = sympy_meth(:Interval, Sym(l), Sym(r), left_open ,right_open)
 
 
-end

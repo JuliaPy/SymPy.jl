@@ -34,6 +34,23 @@ for fn in mpmath_fns
     eval(Expr(:export, fn))
 end
 
+## Call a function in the mpmath module, giving warning and returning NaN if module is not found
+## (Doesn't need to be in init_mpmath?)
+global const mpmath_meth(meth, args...; kwargs...) = begin
+    if isa(mpmath, Void)
+        warn("The mpmath module of Python is not installed. http://docs.sympy.org/dev/modules/mpmath/setup.html#download-and-installation")
+        return(Sym(NaN))
+    end
+    
+    fn = mpmath[@compat(Symbol(meth))]
+    ans = call_sympy_fun(fn, args...; kwargs...)
+    ## make nicer...
+    if isa(ans, Vector)
+        ans = convert(Vector{Sym}, ans)
+    end
+    ans
+end
+
 ## Initialize mpmath
 ## includes trying to find the module!
 ## automatic mappings may throw warning about strings, though it is expected these
@@ -54,19 +71,5 @@ function init_mpmath()
         pytype_mapping(mpctype, Complex{BigFloat})
     end
 
-    ## Call a function in the mpmath module, giving warning and returning NaN if module is not found 
-    global mpmath_meth(meth, args...; kwargs...) = begin
-        if isa(mpmath, Void)
-            warn("The mpmath module of Python is not installed. http://docs.sympy.org/dev/modules/mpmath/setup.html#download-and-installation")
-            return(Sym(NaN))
-        end
-
-        fn = mpmath[@compat(Symbol(meth))]
-        ans = call_sympy_fun(fn, args...; kwargs...)
-        ## make nicer...
-        if isa(ans, Vector)
-            ans = convert(Vector{Sym}, ans)
-        end
-        ans
-    end
 end
+
