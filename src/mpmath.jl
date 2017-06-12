@@ -36,7 +36,7 @@ end
 
 ## Call a function in the mpmath module, giving warning and returning NaN if module is not found
 ## (Doesn't need to be in init_mpmath?)
-global const mpmath_meth(meth, args...; kwargs...) = begin
+function mpmath_meth(meth, args...; kwargs...) 
     if isa(mpmath, Void)
         warn("The mpmath module of Python is not installed. http://docs.sympy.org/dev/modules/mpmath/setup.html#download-and-installation")
         return(Sym(NaN))
