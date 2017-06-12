@@ -232,7 +232,7 @@ linsolve((M, B), x, y)
 """
 linsolve{T<:Sym}(exs::Matrix{T}, args...; kwargs...) = sympy_meth(:linsolve, exs, args...; kwargs...)
 linsolve{T<:Sym, N}(exs::Tuple{T, N}, args...; kwargs...) = sympy_meth(:linsolve, exs, args...; kwargs...)
-linsolve{T<:Sym}(exs::Vector{T}, args...; kwargs...) = sympy_meth(:linsolve, Tuple(exs), args...; kwargs...)
+linsolve{T<:Sym}(exs::Vector{T}, args...; kwargs...) = sympy_meth(:linsolve, tuple(exs...), args...; kwargs...)
 linsolve{T<:Sym, M, N}(exs::Tuple{Array{T,M}, N}, args...; kwargs...) = sympy_meth(:linsolve, exs, args...; kwargs...)
 
 ## may not be there
