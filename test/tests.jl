@@ -93,7 +93,9 @@ end
     @test xreplace(x*y * z, x*y => PI) == x* y * z
     @test xreplace(x +2 + exp(x + 2), x+2=>y) == x + exp(y) + 2
 
-
+    # Test subs on simple numbers
+    @syms x y
+    @test subs(2, x=>300, y=>1.2) == 2.0
 
     #Test subs for pars and dicts
     ex = 1
