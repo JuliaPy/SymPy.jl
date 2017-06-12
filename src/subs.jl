@@ -140,7 +140,12 @@ function N(ex::Sym)
     ## more work than I'd like
     ## XXX consolidate this and N(ex, digits)
     if is_integer(ex) == nothing
-        return(N(ex[:evalf]()))
+        evalf_ex = ex[:evalf]()
+        if ex == evalf_ex
+            return ex
+        else
+            return N(evalf_ex)
+        end
     end
     if is_integer(ex)
         for T in [Int, BigInt]
