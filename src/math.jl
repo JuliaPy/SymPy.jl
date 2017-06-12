@@ -237,24 +237,32 @@ Base.typemin(::Type{Sym}) = -oo
 
 ##################################################
 ## special numbers are initialized after compilation
+if isdefined(PyCall,:PyNULL)
+    pynull() = PyCall.PyNULL()
+else
+    pynull() = PyCall.PyObject()
+end
+global PI = Sym(pynull())
+global E = Sym(pynull())
+global IM = Sym(pynull())
+global oo = Sym(pynull())
+
+Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
+Base.convert(::Type{Sym}, x::Irrational{:e}) = E
+Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
+Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
+Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
+
 function init_math()
     "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors."
-    global const PI = Sym(sympy["pi"])
+    copy!(PI.x,  sympy["pi"])
 
     "E is a symbolic  `e`. Using `julia`'s `e` will give round off errors."
-    global const E = Sym(sympy["exp"](1))
+    copy!(E.x, Sym(sympy["exp"](1)).x)
 
     "IM is a symbolic `im`"
-    global const IM = Sym(sympy["I"])
+    copy!(IM.x, sympy["I"])
 
     "oo is a symbolic infinity. Example: `integrate(exp(-x), x, 0, oo)`."
-    global const oo = Sym(sympy["oo"])
-
-
-    ## math constants
-    Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
-    Base.convert(::Type{Sym}, x::Irrational{:e}) = E
-    Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
-    Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
-    Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
+    copy!(oo.x, sympy["oo"])
 end

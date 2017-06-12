@@ -156,8 +156,10 @@ end
 export(lambdify)
 
 function init_lambdify()
-    if haskey(sympy, :julia_code)
-        global julia_code(ex::Sym; assign_to=nothing, kwargs...) = sympy_meth(:julia_code, ex; assign_to=assign_to, kwargs...)
-        eval(Expr(:export, :julia_code))
-    end
+#    if haskey(sympy, :julia_code)
+#        global julia_code(ex::Sym; assign_to=nothing, kwargs...) = sympy_meth(:julia_code, ex; assign_to=assign_to, kwargs...)
+#        julia_code(ex::Sym; assign_to=nothing, kwargs...) = sympy_meth(:julia_code, ex; assign_to=assign_to, kwargs...)
+#        eval(Expr(:export, :julia_code))
+#    end
 end
+
