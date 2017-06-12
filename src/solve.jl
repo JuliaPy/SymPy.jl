@@ -201,7 +201,7 @@ linsolve(M, x, y)
 The matrix must be of `Matrix{Sym}`, so if used on a numeric problem, the matrix must be coerced, as in
 `Sym[1 2 3; 3 2 1]`.
     
-* A system of equations. The system is specified as a tuple. (For v0.6 this can also be a vector)
+* A system of equations. The system is specified as a tuple.
 
 Example
 ```
