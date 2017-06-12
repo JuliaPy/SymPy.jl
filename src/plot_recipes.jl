@@ -22,14 +22,6 @@ plot(x^2 - 2x, 0, 4)
 ```
 
 
-* `plot(exs::Vector{Sym}, a, b; kwargs...)` will plot the functions evaluating `exs` over [a,b]
-
-Example:
-
-```
-@vars x
-plot([sin(x), cos(x)], 0, 2pi)
-```
 
 * `plot(ex1, ex2, a, b; kwargs...)` will plot the two expressions in a parametric plot over the interval `[a,b]`.
 
@@ -83,6 +75,14 @@ vfieldplot(fx, fy)
 ```
 
 
+* To plot two or more functions at once, the style `plot([ex1, ex2], a, b)` does not work. Rather, use
+    `plot(ex1, a, b); plot!(ex2)`, as in:
+    
+```
+@vars x
+plot(sin(x), 0, 2pi)
+plot!(cos(x))
+```
 ----
 
 Some graphics provided by `SymPy` are available if `PyPlot` is installed.
@@ -127,7 +127,9 @@ using RecipesBase
 @recipe f{T<:Sym}(::Type{T}, v::T) = lambdify(v)
 
 ## for vectors of expressions
-@recipe f{S<:AbstractVector{Sym}}(::Type{S}, ss::S) = Function[lambdify(s) for s in ss]
+## This does not work. See: https://github.com/JuliaPlots/RecipesBase.jl/issues/19
+#@recipe f(ss::AbstractVector{Sym}) = lambdify.(ss)
+#@recipe  function f{T<:Array{Sym,1}}(::Type{T}, ss::T)  Function[lambdify(s) for s in ss]  end
 
 ## A vector field plot can be visualized as an n × n collection of arrows
 ## over the region xlims × ylims
