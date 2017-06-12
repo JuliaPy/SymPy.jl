@@ -171,7 +171,14 @@ end
     @test map(ex -> subs(ex, d), exs) == [0,0]
     solve([x-y-a, x+y], [x,y])
 
-
+    ## linsolve
+    M=Sym[1 2 3; 2 3 4]
+    as = linsolve(M, x, y)
+    @test length(elements(as)) == 1
+    @vars a b; eqs = (a*x+2y-3, 2b*x + 3y - 4)
+    as = linsolve(eqs, x, y)
+    @test length(elements(as)) == 1
+    
     ## limits
     @test limit(x -> sin(x)/x, 0) == 1
     @test limit(sin(x)/x, x, 0) |> float == 1

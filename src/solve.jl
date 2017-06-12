@@ -187,13 +187,60 @@ solveset_sympy_methods = (:solveset,
 
 `linsolve`: solve linear system of equations, return a set
 
+Linsolve can be used to solve:
+
+* An augmented matrix. Input the matrix:
+
+Example:
+```
+@vars x y a b
+M = [2a 1 3; 3b 2 1]   # 2ax + y = 3; 3bx+2y=1
+linsolve(M, x, y)
+```
+
+The matrix must be of `Matrix{Sym}`, so if used on a numeric problem, the matrix must be coerced, as in
+`Sym[1 2 3; 3 2 1]`.
+    
+* A system of equations. The system is specified as a tuple.
+
+Example
+```
+linsolve((2a*x+y-3, 3b*x+2y-1), x, y)
+linsolve([2a*x+y-3, 3b*x+2y-1], x, y)
+```
+
+To get arrays from the sets, the `elements` function is useful:
+
+```
+eqs = (2a*x+y-3, 3b*x+2y-1)    
+as = linsolve(eqs, x, y) # a FiniteSet
+bs = elements(as)        # Array{Any}, but really Array of FiniteSets
+cs = elements(bs[1])     # Array of symbolic objects
+map(simplify, subs(eqs, x => cs[1], y => cs[2]))  # [0,0]. If 
+
+    
+* A system `Ax=b`. A tuple is used to pass in `M` and `b`.
+
+Example
+```
+M = [2a 1; 3b 2]
+B = Sym[3;1]
+linsolve((M, B), x, y)
+```
+
+[cf.](http://docs.sympy.org/dev/modules/solvers/solveset.html#sympy.solvers.solveset.linsolve)
+"""
+linsolve{T<:Sym}(exs::Matrix{T}, args...; kwargs...) = sympy_meth(:linsolve, exs, args...; kwargs...)
+linsolve{T<:Sym, N}(exs::Tuple{T, N}, args...; kwargs...) = sympy_meth(:linsolve, exs, args...; kwargs...)
+linsolve{T<:Sym}(exs::Vector{T}, args...; kwargs...) = sympy_meth(:linsolve, tuple(exs...), args...; kwargs...)
+linsolve{T<:Sym, M, N}(exs::Tuple{Array{T,M}, N}, args...; kwargs...) = sympy_meth(:linsolve, exs, args...; kwargs...)
+
+## may not be there
+"""
 `nonlinsolve`: solve non-linear system of equations, return a set (may not be defined)
 
 [cf.](http://docs.sympy.org/dev/modules/solvers/solvers.html)
 """
-linsolve{T<:Sym}(exs::Vector{T}, args...; kwargs...) = sympy_meth(:linsolve, exs, args...; kwargs...)
-
-## may not be there    
 nonlinsolve{T<:Sym}(exs::Vector{T}, args...; kwargs...) = sympy_meth(:nonlinsolve, exs, args...; kwargs...)
 
 export linsolve, nonlinsolve
