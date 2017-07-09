@@ -367,7 +367,8 @@ end
     q,r = polydiv(f1,g1, domain="QQ") # not div, as can't disambiguate div(Sym(7), 5)) to do integer division
     @test r == Sym(-2)
     @test simplify(q*g1 + r - f1) == Sym(0)
-
+    @test interpolate([1,2,4], x) == interpolate([1,2,3], [1,2,4], x)
+    @test interpolate([-1,0,1], [0,1,0], x) == 1 - x^2
 
     ## piecewise
     x = Sym("x")
