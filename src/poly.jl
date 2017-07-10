@@ -203,5 +203,3 @@ interpolate([(1,2), (2,3), (3,2)], x)  # [(x1,y1), ..., (xn, yn)]
 interpolate(xsys::AbstractVector, x) = sympy_meth(:interpolate, xsys, x)
 interpolate(xs::AbstractVector, ys::AbstractVector, x::Sym) = interpolate(collect(zip(xs, ys)), x)
 export interpolate
-
-
