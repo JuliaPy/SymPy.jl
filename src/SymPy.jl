@@ -265,22 +265,34 @@ global sympy_meth(meth, args...; kwargs...) = begin
     ans
 end
 
-"""
 
-   sympy"fn_name"(args...; kwargs...)
+# """
 
-Call a SymPy method using a string macro. The value returned by `sympy"fn_name"` is a function
-that calls into SymPy via PyCall. This just wraps `sympy_meth`.
+#    sympy"fn_name"(args...; kwargs...)
 
-Examples:
-```
-@vars x
-sympy"integrate"(x^2, (x, 0, 1))
-```
-"""
+# Call a SymPy method using a string macro. The value returned by `sympy"fn_name"` is a function
+# that calls into SymPy via PyCall. This just wraps `sympy_meth`.
+
+# Examples:
+# ```
+# @vars x
+# sympy"integrate"(x^2, (x, 0, 1))
+# ```
+# """
+
+sympy_str_v0_5 = quote
 macro sympy_str(s)
     (args...; kwargs...) -> sympy_meth(Symbol(s), args...; kwargs...)
 end
+end
+sympy_str_v0_4 = quote
+macro sympy_str(s)
+    (args...) -> sympy_meth(Symbol(s), args...)
+end
+end    
+VERSION < v"0.5.0" ? eval(sympy_str_v0_4) : eval(sympy_str_v0_5)
+
+
 
 
 global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
