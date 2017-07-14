@@ -84,7 +84,7 @@ if VERSION < v"0.6.0-dev"
     import Base: factor, isprime
 end
 
-export sympy, sympy_meth, object_meth, call_matrix_meth
+export sympy, sympy_meth, @sympy_str, object_meth, call_matrix_meth
 export Sym, @syms, @vars, symbols
 export pprint,  jprint
 export SymFunction, @symfuns,
@@ -264,6 +264,36 @@ global sympy_meth(meth, args...; kwargs...) = begin
     end
     ans
 end
+
+
+# """
+
+#    sympy"fn_name"(args...; kwargs...)
+
+# Call a SymPy method using a string macro. The value returned by `sympy"fn_name"` is a function
+# that calls into SymPy via PyCall. This just wraps `sympy_meth`.
+
+# Examples:
+# ```
+# @vars x
+# sympy"integrate"(x^2, (x, 0, 1))
+# ```
+# """
+
+sympy_str_v0_5 = quote
+macro sympy_str(s)
+    (args...; kwargs...) -> sympy_meth(Symbol(s), args...; kwargs...)
+end
+end
+sympy_str_v0_4 = quote
+macro sympy_str(s)
+    (args...) -> sympy_meth(Symbol(s), args...)
+end
+end    
+VERSION < v"0.5.0" ? eval(sympy_str_v0_4) : eval(sympy_str_v0_5)
+
+
+
 
 global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
     call_sympy_fun(PyObject(object)[@compat(Symbol(meth))],  args...; kwargs...)

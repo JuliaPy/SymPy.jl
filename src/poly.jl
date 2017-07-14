@@ -93,7 +93,6 @@ polynomial_sympy_methods = (
                             :is_zero_dimensional,
                             :symmetrize,
                             :horner,
-                            :interpolate,
                             :viete,
                             :construct_domain,
                             :minimal_polynomial,
@@ -186,5 +185,21 @@ polynomial_predicates = (
 
 
 
+##
+"""
 
+    interpolate([xs], ys, x)
 
+Find interpolating polynomial in the variable x through the points (xs[1], ys[1]), ..., (xs[n], ys[n])
+
+Examples
+```jltest
+@vars x
+interpolate(sin.(1:4), x)          # uses xs = 1:length(ys(
+interpolate(1:4, sin.(1:4), x)     # xs, ys
+interpolate([(1,2), (2,3), (3,2)], x)  # [(x1,y1), ..., (xn, yn)]
+```
+"""
+interpolate(xsys::AbstractVector, x) = sympy_meth(:interpolate, xsys, x)
+interpolate(xs::AbstractVector, ys::AbstractVector, x::Sym) = interpolate(collect(zip(xs, ys)), x)
+export interpolate
