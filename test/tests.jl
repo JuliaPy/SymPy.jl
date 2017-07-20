@@ -470,4 +470,10 @@ end
     @test round(y, 5) == 0
     @test round(y, 16) != 0
 
+## sympy"..."(...)
+@vars x
+@test sympy"sin"(1) == sin(Sym(1))
+@test sympy"removeO"(series(sin(x))) == removeO(series(sin(x)))
+@test sympy"rref"([x 1; 1 x])[1] == rref([x 1; 1 x])[1]
+
 end

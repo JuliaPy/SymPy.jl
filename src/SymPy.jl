@@ -282,17 +282,46 @@ end
 
 sympy_str_v0_5 = quote
 macro sympy_str(s)
-    (args...; kwargs...) -> sympy_meth(Symbol(s), args...; kwargs...)
+    (args...; kwargs...) -> _sympy_str(Symbol(s), args...; kwargs...)
 end
 end
 sympy_str_v0_4 = quote
 macro sympy_str(s)
-    (args...) -> sympy_meth(Symbol(s), args...)
+    (args...) -> _sympy_str(Symbol(s), args...)
 end
 end    
 VERSION < v"0.5.0" ? eval(sympy_str_v0_4) : eval(sympy_str_v0_5)
 
+"""
 
+    try various ways of calling a sympy function specified as a key
+
+function behind `sympy"key"(...)` interface        
+
+"""
+function _sympy_str(fn, args...; kwargs...)
+    try
+        sympy_meth(Symbol(fn), args...; kwargs...)
+    catch err
+        try
+            xs = [args...]
+            x = shift!(xs)
+            object_meth(x, fn, xs...; kwargs...)
+        catch err
+            try
+                xs = [args...]
+                x = shift!(xs)
+                call_matrix_meth(x, fn, xs...; kwargs...)
+            catch err
+                try
+                    mpmath_meth(fn, args...; kwargs...)
+                catch err
+                    throw(ArgumentError("Can not find this method $fn for the given signature"))
+                end
+            end
+        end
+    end
+end
 
 
 global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
