@@ -51,6 +51,7 @@ function mpmath_meth(meth, args...; kwargs...)
     ans
 end
 
+
 ## Initialize mpmath
 ## includes trying to find the module!
 ## automatic mappings may throw warning about strings, though it is expected these
@@ -71,5 +72,6 @@ function init_mpmath()
         pytype_mapping(mpctype, Complex{BigFloat})
     end
 
+    
 end
 
