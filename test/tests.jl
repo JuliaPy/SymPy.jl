@@ -474,6 +474,6 @@ end
 @vars x
 @test sympy"sin"(1) == sin(Sym(1))
 @test sympy"removeO"(series(sin(x))) == removeO(series(sin(x)))
-@test sympy"rref"([x 1; 1 x])[1] == rref([x 1; 1 x])[1]
+#@test sympy"rref"([x 1; 1 x])[1] == rref([x 1; 1 x])[1]
 
 end
