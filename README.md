@@ -103,12 +103,10 @@ However, for some tasks the `PyCall` interface is still needed, as
 only a portion of the `SymPy` interface is exposed. To call an
 underlying SymPy method, the `getindex` method is overloaded for
 `symbol` indices so that `ex[:meth_name](...)` dispatches to either to
-SymPy's `ex.meth_name(...)` or `meth_name(ex, ...)`, as possible. Any
-`Sym` objects are projected down onto the underlying `PyObject` for
-use within `PyCall`. Otherwise, to dig the `PyObject` out of a `Sym`
-object, you access its property `x`, as in `y.x`. To find a SymPy
-method, a call like `sympy[:meth_name](...)` is possible,
-e.g. `sympy[:harmonic](10)`. 
+SymPy's `ex.meth_name(...)` or `meth_name(ex, ...)`, as possible.
+There is a `sympy` string macro to simplify this a bit, with the call
+looking like: `sympy"meth_name"(...)`, for example `sympy"harmonic"(10)`.
+
 
 ## Notes
 
@@ -128,14 +126,13 @@ det(a)
 Can be replaced with
 
 ```
-a[:det]()
+sympy"det"(a)
 ```
 
-Similarly for `:trace`, `:eigenvects`, ... . Note these are `sympy`
+Similarly for `trace`, `eigenvects`, ... . Note these are `sympy`
 methods, not `Julia` methods that have been ported. (Hence,
-`:eigenvects` and not `eigvecs`.)
+`eigenvects` and not `eigvecs`.)
 
-## TODO
 
 
 

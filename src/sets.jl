@@ -103,7 +103,7 @@ Base.contains(I::Sym, x) = (I[:contains](x) == Sym(true))
 Base.in(x::Number, I::Sym) = contains(I, x)
 
 "Elements of finite set"
-elements(x::Sym) = collect(PyObject(x)) 
+elements(x::Sym) = broadcast(Sym, collect(PyObject(x)))
 export elements
 
 
