@@ -16,13 +16,24 @@ pprint(s::SymbolicObject, args...; kwargs...) = sympy_meth(:pprint, s, args...; 
 "Call SymPy's `latex` function. Not exported. "
 latex(s::SymbolicObject, args...; kwargs...)  = sympy_meth(:latex, s, args...; kwargs...)
 
-"create basic printed output"
-function jprint(x::SymbolicObject)
-    out = PyCall.pycall(pybuiltin("str"), Compat.UTF8String, PyObject(x))
-    if ismatch(r"\*\*", out)
-        out = replace(out, "**", "^")
+if VERSION < v"0.6.0"
+    "create basic printed output"
+    function jprint(x::SymbolicObject)
+        out = PyCall.pycall(pybuiltin("str"), Compat.UTF8String, PyObject(x))
+        if ismatch(r"\*\*", out)
+            out = replace(out, "**", "^")
+        end
+        out
     end
-    out
+else
+    "create basic printed output"
+    function jprint(x::SymbolicObject)
+        out = PyCall.pycall(pybuiltin("str"), String, PyObject(x))
+        if ismatch(r"\*\*", out)
+            out = replace(out, "**", "^")
+        end
+        out
+    end
 end
 jprint(x::AbstractArray) = map(jprint, x)
 
