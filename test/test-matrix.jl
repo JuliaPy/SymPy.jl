@@ -25,8 +25,8 @@ end
     @test @compat simplify.(inv(A) * A) ==  eye(2)
     @test @compat simplify.(A * inv(A)) == eye(2)
     @test @compat simplify.(A[:inv]() - inv(A)) == zeros(2, 2)
-    @test adjoint(B) == [conj(x) 0; 1 conj(2x)]
-    @test adjoint(B) == B'
+    @test SymPy.adjoint(B) == [conj(x) 0; 1 conj(2x)]
+    @test SymPy.adjoint(B) == B'
     @test dual(A) == zeros(2, 2)
 
 
