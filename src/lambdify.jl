@@ -138,7 +138,7 @@ map(lambdify(ex), xs)    # 0.007085 seconds
 This is a *temporary* solution. The proper fix is to do this in SymPy.
 
 """
-function lambdify(ex::Sym, vars=free_symbols(ex); typ=Any, ns=Dict(), values=Dict())
+function lambdify(ex::Sym, vars=free_symbols(ex); typ=Any, fns=Dict(), values=Dict())
     # if :julia_code printer is there, use it
     if haskey(sympy, :julia_code)
         body = parse(sympy_meth(:julia_code, ex))
@@ -146,10 +146,8 @@ function lambdify(ex::Sym, vars=free_symbols(ex); typ=Any, ns=Dict(), values=Dic
         body = walk_expression(ex, fns=fns, values=values)
     end
     try
-        fn = eval(Expr(:function,
-            Expr(:call, gensym(),
-                map(s->Expr(:(::),s,typ), Symbol.(vars))...),
-            body))
+        syms = typ == Any ? map(Symbol,vars) : map(s->Expr(:(::),s,typ), Symbol.(vars))
+        fn = eval(Expr(:function, Expr(:call, gensym(), syms...), body))
         (args...) -> invokelatest(fn, args...) # https://github.com/JuliaLang/julia/pull/19784
     catch err
         throw(ArgumentError("Expression does not lambdify"))
@@ -192,7 +190,7 @@ lambdify_expr(x*y^2, [y, x])    # alternate ordering
 ```
 
 """
-function lambdify_expr(ex::Sym, vars=free_symbols(ex); name=gensym(), typ=Any, ns=Dict(), values=Dict())
+function lambdify_expr(ex::Sym, vars=free_symbols(ex); name=gensym(), typ=Any, fns=Dict(), values=Dict())
     # if :julia_code printer is there, use it
     if haskey(sympy, :julia_code)
         body = parse(sympy_meth(:julia_code, ex))
@@ -200,10 +198,8 @@ function lambdify_expr(ex::Sym, vars=free_symbols(ex); name=gensym(), typ=Any, n
         body = walk_expression(ex, fns=fns, values=values)
     end
     try
-        Expr(:function,
-            Expr(:call, name,
-                 map(s->Expr(:(::),s,typ), Symbol.(vars))...),
-            body)
+        syms = typ == Any ? map(Symbol,vars) : map(s->Expr(:(::),s,typ), Symbol.(vars))
+        Expr(:function, Expr(:call, name, syms...), body)
     catch err
         throw(ArgumentError("Expression does not lambdify"))
     end
