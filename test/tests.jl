@@ -447,6 +447,11 @@ end
         u = lambdify(i)
         @test u(.5) == 1
         @test u(1.5) == 0
+
+        i2 = SymPy.lambdify_expr(x^2,name=:square)
+        @test i2.head == :function
+        @test i2.args[1].args[1] == :square
+        @test i2.args[2] == :(x.^2)
     end
 
     ## issue #67
