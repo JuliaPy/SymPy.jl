@@ -178,7 +178,7 @@ end
     @vars a b; eqs = (a*x+2y-3, 2b*x + 3y - 4)
     as = linsolve(eqs, x, y)
     @test length(elements(as)) == 1
-    
+
     ## limits
     @test limit(x -> sin(x)/x, 0) == 1
     @test limit(sin(x)/x, x, 0) |> float == 1
@@ -474,6 +474,12 @@ end
     y = Sym(eps())
     @test round(y, 5) == 0
     @test round(y, 16) != 0
+
+    ## test cse output
+    @test cse(x) == (Any[], x)
+    @test cse([x]) == (Any[], [x])
+    @test cse([x, x]) == (Any[], [x, x])
+    @test cse([x x; x x]) == (Any[], [x x; x x])
 
 ## sympy"..."(...)
 @vars x
