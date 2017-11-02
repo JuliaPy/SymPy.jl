@@ -50,33 +50,33 @@ end
 ## Instead we have: 
 ## We use unicode for visual appeal of infix operators, but the Lt, Le, Eq, Ge, Gt are the proper way:
 
-"This is `\ll<tab>` mapped as an infix operator to `Lt`"
-(≪)(a::Sym, b::Sym) = Lt(a,b)  # \ll<tab>
-(≪)(a::Sym, b::Number) = Lt(a,Sym(b))  # \ll<tab>
-(≪)(a::Number, b::Sym) = Lt(Sym(a),b)  # \ll<tab>
+"This is `\\ll<tab>` mapped as an infix operator to `Lt`"
+(≪)(a::Sym, b::Sym) = Lt(a,b) # \ll<tab>
+(≪)(a::Sym, b::Number) = Lt(a,Sym(b)) # \ll<tab>
+(≪)(a::Number, b::Sym) = Lt(Sym(a),b) # \ll<tab>
 
 ## could just do this, but it would interfere with other uses outside of SymPy
 ## (≪)(a::Number, b::Number) = Lt(promote(a,b)...)  # \ll<tab>
 
-"This is `\leqq<tab>` mapped as an infix operator to `Le`"
-(≦)(a::Sym, b::Sym) = Le(a,b)  # \ll<tab>
-(≦)(a::Sym, b::Number) = Le(a,Sym(b))  # \ll<tab>
-(≦)(a::Number, b::Sym) = Le(Sym(a),b)  # \ll<tab>
+"This is `\\leqq<tab>` mapped as an infix operator to `Le`"
+(≦)(a::Sym, b::Sym) = Le(a,b) |> asBool # \ll<tab>
+(≦)(a::Sym, b::Number) = Le(a,Sym(b)) |> asBool # \ll<tab>
+(≦)(a::Number, b::Sym) = Le(Sym(a),b) |> asBool # \ll<tab>
 
-"This is `\gg<tab>` mapped as an infix operator to `Gt`"
+"This is `\\gg<tab>` mapped as an infix operator to `Gt`"
 (≫)(a::Sym, b::Sym) = Gt(a,b)
 (≫)(a::Sym, b::Number) = Gt(a,Sym(b))
 (≫)(a::Number, b::Sym) = Gt(Sym(a),b)
 
-"This is `\geqq<tab>` mapped as an infix operator to `Ge`"
-(≧)(a::Sym, b::Sym) = Ge(a,b)
-(≧)(a::Sym, b::Number) = Ge(a,Sym(b))
-(≧)(a::Number, b::Sym) = Ge(Sym(a),b)
+"This is `\\geqq<tab>` mapped as an infix operator to `Ge`"
+(≧)(a::Sym, b::Sym) = Ge(a,b) |> asBool
+(≧)(a::Sym, b::Number) = Ge(a,Sym(b)) |> asBool
+(≧)(a::Number, b::Sym) = Ge(Sym(a),b) |> asBool
 
-"For infix `Eq` one can use \Equal<tab> unicode operator"
-(⩵)(a::Sym, b::Sym) = Eq(a,b)  # \Equal<tab>
-(⩵)(a::Sym, b::Number) = Eq(a,Sym(b))  # \Equal<tab>
-(⩵)(a::Number, b::Sym) = Eq(Sym(a),b)  # \Equal<tab>
+"For infix `Eq` one can use \\Equal<tab> unicode operator"
+(⩵)(a::Sym, b::Sym) = Eq(a,b) |> asBool # \Equal<tab>
+(⩵)(a::Sym, b::Number) = Eq(a,Sym(b)) |> asBool # \Equal<tab>
+(⩵)(a::Number, b::Sym) = Eq(Sym(a),b) |> asBool # \Equal<tab>
 
 
 export ≪,≦,⩵,≧,≫
