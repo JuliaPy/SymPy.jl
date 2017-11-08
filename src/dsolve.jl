@@ -55,7 +55,7 @@ Macro to create multiple symbolic functions in the Main workspace.
 Example:
 ```
 @symfuns Vd Vq id iq
-@syms Rs Lq=>"\lambda_q"  Ld=>"lambda_d" FLq FLd We Wm Np FLf t
+@syms Rs Lq=>"\\lambda_q"  Ld=>"lambda_d" FLq FLd We Wm Np FLf t
 
 basicDQEquations = [
     -Vq(t) + Rs*iq(t) + We*Ld*id(t) + We*FLf + Lq*iq'(t)

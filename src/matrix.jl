@@ -90,6 +90,7 @@ Specific docs may also be found at [SymPy Docs for matrices](http://docs.sympy.o
     eval(Expr(:export, meth))
 end
 
+VERSION >= v"0.7.0-" && import Base.adjoint
 
 ## These are matrix methods that need exporting
 matrix_methods = (:LDLsolve,
