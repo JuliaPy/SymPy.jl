@@ -167,9 +167,9 @@ export(Derivative)
 Create a piecewise defined function.
 
 To create conditions on the variable, the functions `Lt`, `Le`, `Eq`, `Ge`, and `Gt` can be used. For infix notation,
-unicode operators can be used: `\ll<tab>`, `\leqq<tab>`, `\Equal<tab>`, `\geqq<tab>`, and `\gg<tab>` (but *not* `\ge<tab>` or `\le<tab>`).
+unicode operators can be used: `\\ll<tab>`, `\\leqq<tab>`, `\\Equal<tab>`, `\\geqq<tab>`, and `\\gg<tab>` (but *not* `\\ge<tab>` or `\\le<tab>`).
 
-To combine terms, the unicode `\vee<tab>` (for "or"), `\wedge<tab>` (for "and") can be used
+To combine terms, the unicode `\\vee<tab>` (for "or"), `\\wedge<tab>` (for "and") can be used
 
 
 Examples:
@@ -193,7 +193,7 @@ piecewise_fold(ex::Sym) = sympy_meth(:piecewise_fold, ex)
 Base.ifelse(ex::Sym, a, b) = piecewise((a, ex), (b, true))
 
 """
-Indicator expression: (Either `\Chi[tab](x,a,b)` or `Indicator(x,a,b)`)
+Indicator expression: (Either `\\Chi[tab](x,a,b)` or `Indicator(x,a,b)`)
 
 `Χ(x, a, b)` is `1` on `[a,b]` and 0 otherwise.
 
