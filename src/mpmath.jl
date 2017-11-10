@@ -42,7 +42,7 @@ function mpmath_meth(meth, args...; kwargs...)
         return(Sym(NaN))
     end
     
-    fn = mpmath[@compat(Symbol(meth))]
+    fn = mpmath[Symbol(meth)]
     ans = call_sympy_fun(fn, args...; kwargs...)
     ## make nicer...
     if isa(ans, Vector)

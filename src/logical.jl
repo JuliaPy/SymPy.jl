@@ -25,8 +25,8 @@ end
 
 ## XXX Experimental! Not sure these are such a good idea ...
 ## but used with piecewise
-@compat Base.:&(x::Sym, y::Sym) = PyCall.pycall(PyObject(x)["__and__"], Sym, y) 
-@compat Base.:|(x::Sym, y::Sym) =  PyCall.pycall(PyObject(x)["__or__"], Sym, y) 
+Base.:&(x::Sym, y::Sym) = PyCall.pycall(PyObject(x)["__and__"], Sym, y) 
+Base.:|(x::Sym, y::Sym) =  PyCall.pycall(PyObject(x)["__or__"], Sym, y) 
 !(x::Sym)         =       PyCall.pycall(x.x["__invert__"], Sym)::Sym 
 
 ## use ∨, ∧, ¬ for |,&,! (\vee<tab>, \wedge<tab>, \neg<tab>)
@@ -51,7 +51,7 @@ end
 ## We use unicode for visual appeal of infix operators, but the Lt, Le, Eq, Ge, Gt are the proper way:
 
 "This is `\\ll<tab>` mapped as an infix operator to `Lt`"
-(≪)(a::Sym, b::Sym) = Lt(a,b) # \ll<tab>
+(≪)(a::Sym, b::Sym) = Lt(a,b)  # \ll<tab>
 (≪)(a::Sym, b::Number) = Lt(a,Sym(b)) # \ll<tab>
 (≪)(a::Number, b::Sym) = Lt(Sym(a),b) # \ll<tab>
 
@@ -59,24 +59,24 @@ end
 ## (≪)(a::Number, b::Number) = Lt(promote(a,b)...)  # \ll<tab>
 
 "This is `\\leqq<tab>` mapped as an infix operator to `Le`"
-(≦)(a::Sym, b::Sym) = Le(a,b) |> asBool # \ll<tab>
-(≦)(a::Sym, b::Number) = Le(a,Sym(b)) |> asBool # \ll<tab>
-(≦)(a::Number, b::Sym) = Le(Sym(a),b) |> asBool # \ll<tab>
+(≦)(a::Sym, b::Sym) = Le(a,b)   # \ll<tab>
+(≦)(a::Sym, b::Number) = Le(a,Sym(b))  # \ll<tab>
+(≦)(a::Number, b::Sym) = Le(Sym(a),b)   # \ll<tab>
 
 "This is `\\gg<tab>` mapped as an infix operator to `Gt`"
-(≫)(a::Sym, b::Sym) = Gt(a,b)
-(≫)(a::Sym, b::Number) = Gt(a,Sym(b))
-(≫)(a::Number, b::Sym) = Gt(Sym(a),b)
+(≫)(a::Sym, b::Sym) = Gt(a,b) |> asBool 
+(≫)(a::Sym, b::Number) = Gt(a,Sym(b)) 
+(≫)(a::Number, b::Sym) = Gt(Sym(a),b) 
 
 "This is `\\geqq<tab>` mapped as an infix operator to `Ge`"
-(≧)(a::Sym, b::Sym) = Ge(a,b) |> asBool
-(≧)(a::Sym, b::Number) = Ge(a,Sym(b)) |> asBool
-(≧)(a::Number, b::Sym) = Ge(Sym(a),b) |> asBool
+(≧)(a::Sym, b::Sym) = Ge(a,b) |> asBool 
+(≧)(a::Sym, b::Number) = Ge(a,Sym(b))  
+(≧)(a::Number, b::Sym) = Ge(Sym(a),b) 
 
 "For infix `Eq` one can use \\Equal<tab> unicode operator"
-(⩵)(a::Sym, b::Sym) = Eq(a,b) |> asBool # \Equal<tab>
-(⩵)(a::Sym, b::Number) = Eq(a,Sym(b)) |> asBool # \Equal<tab>
-(⩵)(a::Number, b::Sym) = Eq(Sym(a),b) |> asBool # \Equal<tab>
+(⩵)(a::Sym, b::Sym) = Eq(a,b)  # \Equal<tab>
+(⩵)(a::Sym, b::Number) = Eq(a,Sym(b))  # \Equal<tab>
+(⩵)(a::Number, b::Sym) = Eq(Sym(a),b)  # \Equal<tab>
 
 
 export ≪,≦,⩵,≧,≫
@@ -97,8 +97,9 @@ function asBool(x::Sym)
     x == SympyTRUE && return true
     x == !SympyTRUE && return false
     funcname(x) == "Equality" && return ==(args(x)...)
-    
-    throw(DomainError())
+
+    convert(Bool, x)
+#    throw(DomainError("Non Boolean value"))
 end
 
 Base.isless(a::Sym, b::Sym) = asBool(Lt(a,b))
@@ -109,7 +110,7 @@ Base.isequal(a::Sym, b::Sym) = asBool(Eq(a,b))
 Base.isequal(a::Sym, b::Number) = asBool(Eq(promote(a,b)...))
 Base.isequal(a::Number, b::Sym) = asBool(Eq(promote(a,b)...))
 
-function !={T <: Real}(x::Sym, y::T) 
+function !=(x::Sym, y::T)  where {T <: Real}
     try 
         x = convert(Float64, x)
         x != y
@@ -117,7 +118,7 @@ function !={T <: Real}(x::Sym, y::T)
         true
     end
 end
-function !={T <: Complex}(x::Sym, y::T) 
+function !=(x::Sym, y::T) where {T <: Complex}
     try 
         x = complex(x)
         x != y

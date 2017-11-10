@@ -59,7 +59,7 @@ fn_map = Dict(
               "Greater" => :(>) 
               )
               
-map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : @compat(Symbol(key))
+map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : Symbol(key)
               
               
 ## TODO? In SymPy, one can pass in dictionary keys to replace functions
@@ -72,7 +72,7 @@ function walk_expression(ex; values=Dict(), fns=Dict())
     fn = funcname(ex)
     
     if fn == "Symbol"
-        return @compat(Symbol(string(ex)))
+        return Symbol(string(ex))
     elseif fn in ["Integer" , "Float"]
         return N(ex)
     elseif fn == "Rational"
@@ -148,7 +148,7 @@ function lambdify(ex::Sym, vars=free_symbols(ex); typ=Any, fns=Dict(), values=Di
     try
         syms = typ == Any ? map(Symbol,vars) : map(s->Expr(:(::),s,typ), Symbol.(vars))
         fn = eval(Expr(:function, Expr(:call, gensym(), syms...), body))
-        (args...) -> invokelatest(fn, args...) # https://github.com/JuliaLang/julia/pull/19784
+        (args...) -> Base.invokelatest(fn, args...) # https://github.com/JuliaLang/julia/pull/19784
     catch err
         throw(ArgumentError("Expression does not lambdify"))
     end

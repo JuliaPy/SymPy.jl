@@ -64,7 +64,7 @@ lhs(ex::Sym, args...; kwargs...) = PyObject(ex)[:lhs]
 """
 Return a vector of free symbols in an expression
 """
-function free_symbols{T<:SymbolicObject}(ex::Union{T, Vector{T}})
+function free_symbols(ex::Union{T, Vector{T}}) where {T<:SymbolicObject}
     fs = PyObject(ex)[:free_symbols]
     ## are these a set?
     if fs[:__class__][:__name__] == "set"

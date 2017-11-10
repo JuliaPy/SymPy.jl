@@ -1,12 +1,9 @@
+using SpecialFunctions
+using SymPy
 using SymPy.SpecialFuncs
 using SymPy: Sym, sqrt, conjugate, symbols, PI, simplify,
              expand_func, rewrite, N, gamma
-if VERSION >= v"0.5.0-dev+7720"
-    using Base.Test
-else
-    using BaseTestNext
-    const Test = BaseTestNext
-end
+#using Test
 
 
 @testset "SpecialFuns" begin

@@ -6,7 +6,7 @@ math_sympy_methods_base = (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, 
                            :sech, :csch,
                            :coth, :acoth,
                            :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
-                           :sqrt, :erf, :erfc, :erfcx, :erfi, :erfinv, :erfcinv, :dawson,
+                           :sqrt, :dawson,
                            :ceiling, :floor, 
                            :factorial,
                            :gcd, :lcm,
@@ -40,12 +40,12 @@ for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
           :acosd, :acotd, :acscd, :asecd, :asind, :atand)
 
     rad_fn = string(fn)[1:end-1]
-    @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](x * Sym(sympy["pi"])/180)
+    @eval ($fn)(x::Sym) = sympy[Symbol($rad_fn)](x * Sym(sympy["pi"])/180)
 end
 
 for fn in (:cospi, :sinpi)
     rad_fn = string(fn)[1:end-2]
-    @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](x * Sym(sympy["pi"]))
+    @eval ($fn)(x::Sym) = sympy[Symbol($rad_fn)](x * Sym(sympy["pi"]))
 end
 
 ## :asech, :acsch, :sinc, :cosc,

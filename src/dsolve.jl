@@ -1,7 +1,7 @@
 ## dsolve
 
 ## A type akin to SymFunction but with the ability to keep track of derivative
-type SymFunction <: SymPy.SymbolicObject
+mutable struct SymFunction <: SymPy.SymbolicObject
     x::PyCall.PyObject
     n::Int
 end
@@ -33,7 +33,7 @@ F,G,H = SymFunction("F, G, H")
 ```
 
 """
-function SymFunction{T<:AbstractString}(x::T)
+function SymFunction(x::T) where {T<:AbstractString}
     us = split(x, r",\s*")
     if length(us) > 1
         map(u -> SymFunction(sympy["Function"](u), 0), us)
@@ -92,8 +92,12 @@ Base.show(io::IO, u::SymFunction) = println("$(string(Sym(u.x)))" * repeat("'", 
 
 
 ## rather than use `diff(u(x),x,1)` we can use `u'(x)`
-function Base.ctranspose(x::SymFunction)
-    SymFunction(x.x, x.n + 1)
+if  VERSION < v"0.7.0-"
+    import Base: ctranspose
+    Base.ctranspose(x::SymFunction) = SymFunction(x.x, x.n + 1)
+else
+    import Base: adjoint
+    Base.adjoint(x::SymFunction)    = SymFunction(x.x, x.n + 1)
 end
 
 
