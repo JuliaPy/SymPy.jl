@@ -9,7 +9,7 @@ Sym(s::Symbol) = Sym(string(s))
 
 
 "Create a symbolic number"
-Sym{T <: Number}(x::T) = convert(Sym, x)
+Sym(x::T)  where  {T <: Number} = convert(Sym, x)
 
 ## math constants in math.jl and done in __init__ stage
 
@@ -212,7 +212,7 @@ Base.hash(x::Sym) = hash(PyObject(x))
 
 
 ## Helper function from PyCall.pywrap:
-function members(o::@compat Union{PyObject, Sym})
+function members(o::Union{PyObject, Sym})
     out = pycall(PyCall.inspect["getmembers"], PyObject, o)
     AbstractString[a for (a,b) in out]
 end

@@ -85,11 +85,12 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
 
 Specific docs may also be found at [SymPy Docs for matrices](http://docs.sympy.org/latest/modules/matrices/matrices.html#module-sympy.matrices.matrices)
 """ ->
-         ($meth)(args...; kwargs...) = sympy_meth(@compat(Symbol($meth_name)), args...; kwargs...)
+         ($meth)(args...; kwargs...) = sympy_meth(Symbol($meth_name), args...; kwargs...)
     end
     eval(Expr(:export, meth))
 end
 
+VERSION >= v"0.7.0-" && import Base.adjoint
 
 ## These are matrix methods that need exporting
 matrix_methods = (:LDLsolve,
@@ -127,7 +128,7 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
 
 Specific docs may also be found at [SymPy Docs for matrices](http://docs.sympy.org/latest/modules/matrices/matrices.html#module-sympy.matrices.matrices)
 """ ->
-        ($meth)(ex::Matrix{Sym}, args...; kwargs...) =  call_matrix_meth(ex, @compat(Symbol($meth_name)), args...;kwargs...)
+        ($meth)(ex::Matrix{Sym}, args...; kwargs...) =  call_matrix_meth(ex, Symbol($meth_name), args...;kwargs...)
     end
     eval(Expr(:export, meth))
 end
@@ -162,7 +163,7 @@ end
 norm(a::AbstractVector{Sym}, args...; kwargs...) = call_matrix_meth(a, :norm, args...; kwargs...)
 norm(a::AbstractMatrix{Sym}, args...; kwargs...) = call_matrix_meth(a, :norm, args...; kwargs...)
 chol(a::Matrix{Sym}) = cholesky(a)
-expm(a::Matrix{Sym}) = call_matrix_meth(a, :exp)
+exp(a::Matrix{Sym}) = call_matrix_meth(a, :exp)
 conj(a::Sym) = conjugate(a)
 eigvals(a::Matrix{Sym}) = collect(keys(call_matrix_meth(a, :eigenvals))) # a[:eigevnals]() has multiplicity
 function eigvecs(a::Matrix{Sym})
@@ -173,8 +174,8 @@ function eigvecs(a::Matrix{Sym})
     end
     out
 end
-rref{T <: Integer}(a::Matrix{T}) = N(rref(convert(Matrix{Sym}, a)))
-rref{T <: Integer}(a::Matrix{Rational{T}}) = N(rref(convert(Matrix{Sym}, a)))
+rref(a::Matrix{T}) where {T <: Integer} = N(rref(convert(Matrix{Sym}, a))) 
+rref(a::Matrix{Rational{T}}) where {T <: Integer} = N(rref(convert(Matrix{Sym}, a)))
 
 """
 Return orthogonal basis from a set of vectors
@@ -185,7 +186,7 @@ L = [Sym[1,2,3], Sym[2,5,9], Sym[1,4,2]] # need Sym vectors.
 GramSchmidt(L, true)
 ```
 """
-GramSchmidt{T}(vecs::Vector{Vector{T}}, args...; kwargs...) = sympy_meth(:GramSchmidt, map(u->convert(Vector{Sym},u),vecs), args...; kwargs...)
+GramSchmidt(vecs::Vector{Vector{T}}, args...; kwargs...) where {T} = sympy_meth(:GramSchmidt, map(u->convert(Vector{Sym},u),vecs), args...; kwargs...)
 ## :cross?
 ## hessian, wronskian, GramSchmidt
 
@@ -218,6 +219,6 @@ wronskian([u,v], x)  # determinant of [u v; u' v']
 ```
 
 """
-wronskian{T <: SymbolicObject}(fs::Vector{T}, x::Sym, args...; kwargs...) = sympy_meth(:wronskian, fs, x, args...; kwargs...)
+wronskian(fs::Vector{T}, x::Sym, args...; kwargs...) where {T <: SymbolicObject} = sympy_meth(:wronskian, fs, x, args...; kwargs...)
 
 export GramSchmidt, hessian, wronskian

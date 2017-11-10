@@ -2,7 +2,7 @@
 
 
 ## Symbol class for controlling dispatch
-@compat abstract type SymbolicObject <: Number end
+abstract type SymbolicObject <: Number end
 
 ## Basic types defined here
 """
@@ -17,13 +17,13 @@ underlying python-based SymPy object. Many methods are extended to the
 is the variables can not be function names in base.
 
 """
-immutable Sym <: SymbolicObject
+struct Sym <: SymbolicObject
     x::PyCall.PyObject
 end
 Sym(s::SymbolicObject) = s
 
 ## sets
-immutable SymSet <: SymbolicObject
+struct SymSet <: SymbolicObject
     x::PyCall.PyObject
 end
 
@@ -34,10 +34,10 @@ end
 #pytype_mapping(mpctype, Sym)
 
 ## some typealiases
-const SymOrReal = @compat Union{Sym,Real}
-const SymOrNumber = @compat Union{Sym,Number}
-const SymOrString = @compat Union{Sym,AbstractString}
-const SymbolicTypes = @compat Union{AbstractString,Symbol,SymbolicObject}
+const SymOrReal =  Union{Sym,Real}
+const SymOrNumber =  Union{Sym,Number}
+const SymOrString =  Union{Sym,AbstractString}
+const SymbolicTypes = Union{AbstractString,Symbol,SymbolicObject}
 
 
 ## in #83, @stevengj suggests using
@@ -45,7 +45,7 @@ PyCall.PyObject(x::SymbolicObject) = x.x
 
 ## Promotion
 ## promote up to symbolic so that math ops work
-promote_rule{T<:SymbolicObject, S<:Number}(::Type{T}, ::Type{S} ) = T
+promote_rule(::Type{T}, ::Type{S})  where {T<:SymbolicObject, S<:Number}= T
 
 
 
@@ -62,15 +62,15 @@ function convert(::Type{Tuple}, o::PyCall.PyObject)
 end
 
 ## rational
-convert{T<:SymbolicObject}(::Type{T}, x::Rational) = sympy_meth(:Rational, x.num, x.den)::T
+convert(::Type{T}, x::Rational) where {T<:SymbolicObject} = sympy_meth(:Rational, x.num, x.den)::T
 
 ## big. Need mpmath installed separately -- not as a SymPy module as that is how it is called in PyCall
-convert{T<:SymbolicObject}(::Type{T}, x::BigFloat) = Sym(PyCall.PyObject(x))::T
+convert(::Type{T}, x::BigFloat) where {T<:SymbolicObject} = Sym(PyCall.PyObject(x))::T
 convert(::Type{Sym}, x::Complex{BigFloat}) = Sym(PyCall.PyObject(x))::Sym
 
 ## real
-convert{S<:SymbolicObject, T <: Real}(::Type{S}, x::T) = sympy_meth(:sympify, x)::S
-convert{T <: Real}(::Type{T}, x::Sym) = convert(T, PyObject(x))
+convert(::Type{S}, x::T) where {S<:SymbolicObject, T <: Real}= sympy_meth(:sympify, x)::S
+convert(::Type{T}, x::Sym) where {T <: Real} = convert(T, PyObject(x))
 
 
 ## complex
@@ -93,4 +93,4 @@ convert(::Type{Function}, ex::Sym) = lambdify(ex)
 
 ## we usually promote to Sym objects, but here we want to promote to functions
 ## so [x, sin] -> will be plottable as two functions
-Base.promote_rule{T<:SymbolicObject, S<:Function}(::Type{T}, ::Type{S} ) = S
+Base.promote_rule(::Type{T}, ::Type{S}) where {T<:SymbolicObject, S<:Function} = S

@@ -32,7 +32,7 @@ Example: (from man page)
 cse(((w + x + y + z)*(w + y + z))/(w + x)^3), ([(x0, y + z), (x1, w + x)], [(w + x0)*(x0 + x1)/x1^3]) # tuple of replacements and reduced expressions.
 
 """ ->
-function cse{T<:SymbolicObject}(ex::Union{T, AbstractArray{T}}, args...; kwargs...)
+function cse(ex::Union{T, AbstractArray{T}}, args...; kwargs...) where {T<:SymbolicObject}
     a, b = sympy_meth(:cse, ex, args...; kwargs...)
     a, oftype(ex, b[1])
 end

@@ -1,12 +1,11 @@
 using SymPy
-using Compat
-if VERSION >= v"0.5.0-dev+7720"
-    using Base.Test
-else
-    using BaseTestNext
-    const Test = BaseTestNext
-end
+using SpecialFunctions
 
+#using Test
+
+if isdefined(Base, :MathConstants)
+    e = Base.MathConstants.e
+end
 
 @testset "Core" begin
     ## Symbol creation
@@ -40,7 +39,7 @@ end
     @test Sym(1 + 2im) == 1 + 2im
     @test N(Sym(pi)) == Float64(pi)
     @test N(Sym(e)) == Float64(e)
-    @test N(Sym(catalan)) == Float64(catalan)
+    @test N(Sym(SpecialFunctions.catalan)) == Float64(SpecialFunctions.catalan)
 
     ## function conversion
     f1 = convert(Function, x^2)
@@ -99,7 +98,7 @@ end
 
     #Test subs for pars and dicts
     ex = 1
-    dict1 = Dict{Compat.String,Any}()
+    dict1 = Dict{String,Any}()
     dict2 = Dict{Any,Any}()
     #test subs
     for i=1:4
@@ -166,9 +165,9 @@ end
     solve(Lt(x-2, 0))
     solve( x-2 ≪ 0)
     exs = [x-y-1, x+y-2]
-    d = solve(exs)
-    @test d[x] == 3//2
-    @test map(ex -> subs(ex, d), exs) == [0,0]
+    di = solve(exs)
+    @test di[x] == 3//2
+    @test map(ex -> subs(ex, di), exs) == [0,0]
     solve([x-y-a, x+y], [x,y])
 
     ## linsolve
@@ -223,8 +222,8 @@ end
     summation(1/x^2, (x, 1, 10))
     out = summation(1/x^2, (x, 1, 10))
     out1 = sum([1//x^2 for  x in 1:10])
-    @test @compat round(Integer, out.x[:p]) == out1.num
-    @test @compat round(Integer, out.x[:q]) == out1.den
+    @test round(Integer, out.x[:p]) == out1.num
+    @test round(Integer, out.x[:q]) == out1.den
 
 
     ## Ops
@@ -235,22 +234,22 @@ end
     a = [x 1; 1 x]
     b = [x 1 2; 1 2 x]
 
-    const DIMERROR = VERSION < v"0.4.0-dev" ? ErrorException : DimensionMismatch
-    const DimensionOrMethodError =  Union{MethodError, DimensionMismatch}
+    DIMERROR =  DimensionMismatch
+    DimensionOrMethodError =  Union{MethodError, DimensionMismatch}
     ## scalar, [vector, matrix]
-    @test s + v == [x+3, 4]
-    @test v + s == [x+3, 4]
-    @test s + rv == [x+3 4]
-    @test rv + s == [x+3 4]
-    @test s + a == [x+3 4; 4 x+3]
-    @test a + s == [x+3 4; 4 x+3]
+    @test s .+ v == [x+3, 4]
+    @test v .+ s == [x+3, 4]
+    @test s .+ rv == [x+3 4]
+    @test rv .+ s == [x+3 4]
+    @test s .+ a == [x+3 4; 4 x+3]
+    @test a .+ s == [x+3 4; 4 x+3]
 
-    @test s - v == [3-x, 2]
-    @test v - s == [x-3, -2]
-    @test s - rv == [3-x 2]
-    @test rv - s == [x-3 -2]
-    @test s - a == [3-x 2; 2 3-x]
-    @test a - s == [x-3 -2; -2 x-3]
+    @test s .- v == [3-x, 2]
+    @test v .- s == [x-3, -2]
+    @test s .- rv == [3-x 2]
+    @test rv .- s == [x-3 -2]
+    @test s .- a == [3-x 2; 2 3-x]
+    @test a .- s == [x-3 -2; -2 x-3]
 
     2v
     2rv
@@ -395,7 +394,8 @@ end
     @test args(ex) == (x^2, x)
 
     ## mpmath functions
-    if isdefined(:mpmath)
+#    if @isdefined mpmath
+if isdefined(:mpmath)
         x = Sym("x")
         Sym(big(2))
         Sym(big(2.0))                   # may need mpmath (e.g., conda install mpmath)
@@ -420,6 +420,23 @@ end
     @test measure(union(a, b)) == 2
 
 
+
+    ## test cse output
+    @test cse(x) == (Any[], x)
+    @test cse([x]) == (Any[], [x])
+    @test cse([x, x]) == (Any[], [x, x])
+    @test cse([x x; x x]) == (Any[], [x x; x x])
+
+## sympy"..."(...)
+@vars x
+@test sympy"sin"(1) == sin(Sym(1))
+@test sympy"removeO"(series(sin(x))) == removeO(series(sin(x)))
+@test sympy"rref"([x 1; 1 x])[1] == rref([x 1; 1 x])[1]
+
+end
+
+@testset "Fix past issues" begin
+    @vars x y z
     ## Issue # 56
     @test Sym(1+2im) == 1+2IM
 
@@ -430,29 +447,27 @@ end
     cse([sin(x), sin(x)*cos(x), cos(x), sin(x)*cos(x)])
 
     ## Issue #60, lambidfy
-    if VERSION >= v"0.4.0"
-        #@vars x,y
-        x, y = symbols("x, y")
-        lambdify(sin(x)*cos(2x) * exp(x^2/2))
-        fn = lambdify(sin(x)*asin(x)*sinh(x)); fn(0.25)
-        lambdify(real(x)*imag(x))
+    x, y = symbols("x, y")
+    lambdify(sin(x)*cos(2x) * exp(x^2/2))
+    fn = lambdify(sin(x)*asin(x)*sinh(x)); fn(0.25)
+    lambdify(real(x)*imag(x))
     #    @test lambdify(Min(x,y))(3,2) == 2
 
-        ex = 2*x^2/(3-x)*exp(x)*sin(x)*sind(x)
-        fn = lambdify(ex); map(fn, rand(10))
-        ex = x - y
-        #@test lambdify(ex)(3,2) == 1
+    ex = 2 * x^2/(3-x)*exp(x)*sin(x)*sind(x)
+    fn = lambdify(ex); map(fn, rand(10))
+    ex = x - y
+    #@test lambdify(ex)(3,2) == 1
 
-        i = Indicator(x, 0, 1)
-        u = lambdify(i)
-        @test u(.5) == 1
-        @test u(1.5) == 0
+    i = Indicator(x, 0, 1)
+    u = lambdify(i)
+    @test u(.5) == 1
+    @test u(1.5) == 0
 
-        i2 = SymPy.lambdify_expr(x^2,name=:square)
-        @test i2.head == :function
-        @test i2.args[1].args[1] == :square
-        @test i2.args[2] == :(x.^2)
-    end
+    i2 = SymPy.lambdify_expr(x^2,name=:square)
+    @test i2.head == :function
+    @test i2.args[1].args[1] == :square
+    @test i2.args[2] == :(x.^2)
+
 
     ## issue #67
     @test N(Sym(4//3)) == 4//3
@@ -461,7 +476,6 @@ end
     @test log(Sym(3), Sym(4)) == log(Sym(4)) / log(Sym(3))
 
     ## issue #103 # this does not work for `x` (which has `classname(x) == "Symbol"`), but should work for other expressions
-    @vars x y z
     for ex in (sin(x), x*y^2*x, sqrt(x^2 - 2y))
         @test func(ex)(args(ex)...) == ex
     end
@@ -474,17 +488,5 @@ end
     y = Sym(eps())
     @test round(y, 5) == 0
     @test round(y, 16) != 0
-
-    ## test cse output
-    @test cse(x) == (Any[], x)
-    @test cse([x]) == (Any[], [x])
-    @test cse([x, x]) == (Any[], [x, x])
-    @test cse([x x; x x]) == (Any[], [x x; x x])
-
-## sympy"..."(...)
-@vars x
-@test sympy"sin"(1) == sin(Sym(1))
-@test sympy"removeO"(series(sin(x))) == removeO(series(sin(x)))
-#@test sympy"rref"([x 1; 1 x])[1] == rref([x 1; 1 x])[1]
 
 end

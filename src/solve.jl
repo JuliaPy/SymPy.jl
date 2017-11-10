@@ -50,7 +50,7 @@ Note: The individual components of the array display more nicely than the array.
 Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html#algebraic-equations)
 
 """
-function solve{T<:Sym}(ex::(@compat Union{T,Vector{T}});  kwargs...)
+function solve(ex::Union{T,Vector{T}};  kwargs...) where {T<:Sym}
     ## No symbols specified? Find them
     xs = free_symbols(ex)
     if length(xs) ==0
@@ -94,11 +94,12 @@ function _mapdict(out::Dict,xs=nothing)
 end
 
 ## Solve for a single variable from equations. Return Dict{Sym,Sym}
-function solve{T<:Sym}(exs::(@compat Union{T,Vector{T}}), x::Sym; kwargs...)
+function solve(exs::Union{T,Vector{T}}, x::Sym; kwargs...) where {T<:Sym}
+    
     solve(exs, [x;]; kwargs...)
 end
 
-function solve{T<:Sym,S<:Sym}(exs::(@compat Union{T,Vector{T}}), xs::Vector{S}; kwargs...)
+function solve(exs::Union{T,Vector{T}}, xs::Vector{S}; kwargs...) where {T<:Sym,S<:Sym}
     a = sympy_meth(:solve, exs, xs;  kwargs...)
     ## nicer output
     if isa(a, Dict)
@@ -126,7 +127,7 @@ Reference: [SymPy Docs](http://docs.sympy.org/0.7.5/modules/solvers/solvers.html
 """
 nsolve(ex::Sym, x::Sym, x0::Number, args...; kwargs...) = sympy_meth(:nsolve, ex, x, x0, args...; kwargs...)
 nsolve(ex::Sym, x0::Number,  args...; kwargs...) =  sympy_meth(:nsolve, ex, x0,  args...; kwargs...) 
-function nsolve{T <: Number}(ex::Vector{Sym}, x::Vector{Sym}, x0::Vector{T}; kwargs...)
+function nsolve(ex::Vector{Sym}, x::Vector{Sym}, x0::Vector{T}; kwargs...) where {T <: Number}
     out = sympy_meth(:nsolve, tuple(ex...), tuple(x...), tuple(x0...); kwargs...)
     ## ans is matrix object -- convert
     convert(Array{Sym}, sympy["Matrix"](out))
@@ -154,7 +155,7 @@ solveset(x^2 + 1, x)           # +/- i
 solveset(x^2 + 1, x, domain=S.Reals)  # empty set
 ```
 """    
-function solveset{T<:Sym}(ex::(@compat Union{T,Vector{T}});  kwargs...)
+function solveset(ex::Union{T,Vector{T}};  kwargs...) where {T<:Sym}
     ## No symbols specified? Find them
     xs = free_symbols(ex)
     if length(xs) ==0
@@ -230,10 +231,10 @@ linsolve((M, B), x, y)
 
 [cf.](http://docs.sympy.org/dev/modules/solvers/solveset.html#sympy.solvers.solveset.linsolve)
 """
-linsolve{T<:Sym}(exs::Matrix{T}, args...; kwargs...) = sympy_meth(:linsolve, exs, args...; kwargs...)
-linsolve{T<:Sym, N}(exs::Tuple{T, N}, args...; kwargs...) = sympy_meth(:linsolve, exs, args...; kwargs...)
-linsolve{T<:Sym}(exs::Vector{T}, args...; kwargs...) = sympy_meth(:linsolve, tuple(exs...), args...; kwargs...)
-linsolve{T<:Sym, M, N}(exs::Tuple{Array{T,M}, N}, args...; kwargs...) = sympy_meth(:linsolve, exs, args...; kwargs...)
+linsolve(exs::Matrix{T}, args...; kwargs...) where {T<:Sym} = sympy_meth(:linsolve, exs, args...; kwargs...)
+linsolve(exs::Tuple{T, N}, args...; kwargs...) where {T<:Sym, N} = sympy_meth(:linsolve, exs, args...; kwargs...)
+linsolve(exs::Vector{T}, args...; kwargs...) where {T<:Sym} = sympy_meth(:linsolve, tuple(exs...), args...; kwargs...)
+linsolve(exs::Tuple{Array{T,M}, N}, args...; kwargs...) where {T<:Sym, M, N} = sympy_meth(:linsolve, exs, args...; kwargs...)
 
 ## may not be there
 """
@@ -241,6 +242,6 @@ linsolve{T<:Sym, M, N}(exs::Tuple{Array{T,M}, N}, args...; kwargs...) = sympy_me
 
 [cf.](http://docs.sympy.org/dev/modules/solvers/solvers.html)
 """
-nonlinsolve{T<:Sym}(exs::Vector{T}, args...; kwargs...) = sympy_meth(:nonlinsolve, exs, args...; kwargs...)
+nonlinsolve(exs::Vector{T}, args...; kwargs...) where {T<:Sym} = sympy_meth(:nonlinsolve, exs, args...; kwargs...)
 
 export linsolve, nonlinsolve

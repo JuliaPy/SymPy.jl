@@ -5,8 +5,6 @@ __precompile__()
 
 module SymPy
 
-using Compat
-import Compat: @compat, invokelatest
 
 """
 
@@ -77,12 +75,8 @@ import Base: div
 import Base: trunc
 import Base: isinf, isnan
 import Base: real, imag
-import Base: expm
 import Base: nullspace
 
-if VERSION < v"0.6.0-dev"
-    import Base: factor, isprime
-end
 
 export sympy, sympy_meth, @sympy_str, object_meth, call_matrix_meth
 export Sym, @syms, @vars, symbols
@@ -141,9 +135,7 @@ include("display.jl")
 include("lambdify.jl")
 include("physics.jl")
 
-## add call interface depends on version
-VERSION >= v"0.5.0-" && include("call.jl")
-v"0.4.0" <= VERSION < v"0.5.0-" && include("call-0.4.jl")
+include("call.jl")
 
 include("plot_recipes.jl") # hook into Plots
 
@@ -181,7 +173,8 @@ for meth in union(core_sympy_methods,
                   summations_sympy_methods,
                   logic_sympy_methods,
                   polynomial_sympy_methods,
-                  ntheory_sympy_methods,
+    ntheory_sympy_methods,
+    combinatoric_sympy_methods,
                   solveset_sympy_methods
                   )
 
@@ -191,7 +184,7 @@ for meth in union(core_sympy_methods,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth){T<:SymbolicObject}(ex::T, args...; kwargs...) = sympy_meth($meth_name, ex, args...; kwargs...)
+        ($meth)(ex::T, args...; kwargs...) where {T<:SymbolicObject} = sympy_meth($meth_name, ex, args...; kwargs...)
 
     end
     eval(Expr(:export, meth))
@@ -239,7 +232,7 @@ for prop in union(core_object_properties,
                   polynomial_predicates)
 
     prop_name = string(prop)
-    @eval ($prop)(ex::Sym) = PyObject(ex)[@compat(Symbol($prop_name))]
+    @eval ($prop)(ex::Sym) = PyObject(ex)[Symbol($prop_name)]
     eval(Expr(:export, prop))
 end
 
@@ -279,18 +272,9 @@ end
 # sympy"integrate"(x^2, (x, 0, 1))
 # ```
 # """
-
-sympy_str_v0_5 = quote
 macro sympy_str(s)
     (args...; kwargs...) -> _sympy_str(Symbol(s), args...; kwargs...)
 end
-end
-sympy_str_v0_4 = quote
-macro sympy_str(s)
-    (args...) -> _sympy_str(Symbol(s), args...)
-end
-end    
-VERSION < v"0.5.0" ? eval(sympy_str_v0_4) : eval(sympy_str_v0_5)
 
 """
 
@@ -325,7 +309,7 @@ end
 
 
 global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
-    call_sympy_fun(PyObject(object)[@compat(Symbol(meth))],  args...; kwargs...)
+    call_sympy_fun(PyObject(object)[Symbol(meth)],  args...; kwargs...)
 
 end
 

@@ -16,24 +16,13 @@ pprint(s::SymbolicObject, args...; kwargs...) = sympy_meth(:pprint, s, args...; 
 "Call SymPy's `latex` function. Not exported. "
 latex(s::SymbolicObject, args...; kwargs...)  = sympy_meth(:latex, s, args...; kwargs...)
 
-if VERSION < v"0.6.0"
-    "create basic printed output"
-    function jprint(x::SymbolicObject)
-        out = PyCall.pycall(pybuiltin("str"), Compat.UTF8String, PyObject(x))
-        if ismatch(r"\*\*", out)
-            out = replace(out, "**", "^")
-        end
-        out
+"create basic printed output"
+function jprint(x::SymbolicObject)
+    out = PyCall.pycall(pybuiltin("str"), String, PyObject(x))
+    if ismatch(r"\*\*", out)
+        out = replace(out, "**", "^")
     end
-else
-    "create basic printed output"
-    function jprint(x::SymbolicObject)
-        out = PyCall.pycall(pybuiltin("str"), String, PyObject(x))
-        if ismatch(r"\*\*", out)
-            out = replace(out, "**", "^")
-        end
-        out
-    end
+    out
 end
 jprint(x::AbstractArray) = map(jprint, x)
 
@@ -44,10 +33,10 @@ Base.show(io::IO, s::Sym) = print(io, jprint(s))
 ## We add show methods for the REPL (text/plain) and IJulia (text/latex)
 
 ## text/plain
-@compat show(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy["pretty"](s))
+show(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy["pretty"](s))
 
-@compat show(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
-@compat function  show(io::IO, ::MIME"text/latex", x::AbstractArray{Sym})
+show(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
+function  show(io::IO, ::MIME"text/latex", x::AbstractArray{Sym})
     function toeqnarray(x::Vector{Sym})
         a = join([latex(x[i]) for i in 1:length(x)], "\\\\")
         "\\begin{bmatrix}$a\\end{bmatrix}"
@@ -61,7 +50,7 @@ Base.show(io::IO, s::Sym) = print(io, jprint(s))
 end
 
 ## Pretty print dicts
-@compat function show{T<:Any, S<:Any}(io::IO, ::MIME"text/latex", d::Dict{T,S})
+function show(io::IO, ::MIME"text/latex", d::Dict{T,S}) where {T<:Any, S<:Any}
     Latex(x::Sym) = latex(x)
     Latex(x) = sprint(Base.showcompact, x)
 
