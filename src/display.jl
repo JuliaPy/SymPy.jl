@@ -61,7 +61,7 @@ Base.show(io::IO, s::Sym) = print(io, jprint(s))
 end
 
 ## Pretty print dicts
-@compat function show{T<:Any, S<:Any}(io::IO, ::MIME"text/latex", d::Dict{T,S})
+@compat function show{T<:Sym, S<:Any}(io::IO, ::MIME"text/latex", d::Dict{T,S})
     Latex(x::Sym) = latex(x)
     Latex(x) = sprint(Base.showcompact, x)
 
