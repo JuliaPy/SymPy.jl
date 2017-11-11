@@ -86,16 +86,18 @@ Base.imag(x::Sym) = sympy_meth(:im, x)
 Base.eps(::Type{Sym}) = zero(Sym)
 
 
-#minimum(ex::Sym,x::NAtype) = x
-#minimum(ex::Sym, args...; kwargs...) = sympy_meth(:Min, ex, args...; kwargs...)
-#maximum(ex::Sym,x::NAtype) = x
-#maximum(ex::Sym, args...; kwargs...) = sympy_meth(:Max, ex, args...; kwargs...)
-
 ## use SymPy Names here...
-Base.min(ex::Sym, exs...) = reduce((x,y)->sympy_meth(:Min, x, y), ex, exs)
-Base.max(ex::Sym, exs...) = reduce((x,y)->sympy_meth(:Max, x, y), ex, exs)
+## XXX This pattern may be of general usage. XXX
+## It allows fn(Any, Sym) or f(Sym, Any) to match
 
+import Base: min, max
+min(x::Sym, a) = sympy_meth(:Min, x, a)
+min(a, x::Union{SA, Real}) where {SA <: Sym} = min(x,a)
 
+max(x::Sym, a) = sympy_meth(:Max, x, a)
+max(a, x::Union{SA, Real}) where {SA <: Sym} = max(x,a)
+
+# SymPy names
 Min(ex::Sym, ex1::Sym) = sympy_meth(:Min, ex, ex1)
 Max(ex::Sym, ex1::Sym) = sympy_meth(:Max, ex, ex1)
 

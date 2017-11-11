@@ -161,6 +161,8 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
     end
 end
 
+
+    
 ## These are *added*, so exported
 for meth in union(core_sympy_methods,
                   math_sympy_methods,
