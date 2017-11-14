@@ -32,7 +32,9 @@ end
 export primerange
     
 ## Combinatorics
-Base.binomial(n::Sym,k) = sympy_meth(:binomial, n, k)
+import Base: binomial
+binomial(n::Sym,k) = sympy_meth(:binomial, n, k)
+binomial(n, k::Union{SA, Integer}) where {SA <: Sym} = sympy_meth(:binomial, n, k)
 
 combinatoric_sympy_methods = (:bell,
                               :bernoulli,

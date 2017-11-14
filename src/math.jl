@@ -249,12 +249,20 @@ global E = Sym(pynull())
 global IM = Sym(pynull())
 global oo = Sym(pynull())
 
-Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
-Base.convert(::Type{Sym}, x::Irrational{:e}) = E
-Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
-Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
-Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
 
+if isdefined(Base, :MathConstants)
+    Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
+    Base.convert(::Type{Sym}, x::Irrational{:e}) = E
+    Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
+    Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
+    Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
+else
+    Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
+    Base.convert(::Type{Sym}, x::Irrational{:e}) = E
+    Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
+    Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
+    Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
+end
 function init_math()
     "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors."
     copy!(PI.x,  sympy["pi"])

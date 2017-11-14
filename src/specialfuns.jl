@@ -4,113 +4,18 @@ using PyCall
 using SymPy
 using SpecialFunctions
 
-# https://github.com/JuliaMath/SpecialFunctions.jl/blob/master/src/SpecialFunctions.jl
 
-if isdefined(Base, :airyai) && VERSION < v"0.7.0-DEV.986" #22763
-    import Base:
-    airyai,
-    airyaix,
-    airyaiprime,
-    airyaiprimex,
-    airybi,
-    airybix,
-    airybiprime,
-    airybiprimex,
-    besselh,
-    besselhx,
-    besseli,
-    besselix,
-    besselj,
-    besselj0,
-    besselj1,
-    besseljx,
-    besselk,
-    besselkx,
-    bessely,
-    bessely0,
-    bessely1,
-    besselyx,
-    hankelh1,
-    hankelh1x,
-    hankelh2,
-    hankelh2x,
-    dawson,
-    erf,
-    erfc,
-    erfcinv,
-    erfcx,
-    erfi,
-    erfinv,
-    eta,
-    digamma,
-    invdigamma,
-    polygamma,
-    trigamma,
-    zeta,
-
-    # deprecated
-    airy,
-    airyx,
-    airyprime,
-    # also
-    gamma,
-    lgamma
-    
-else
-
-    import SpecialFunctions:
-        airyai,
-        airyaiprime,
-        airybi,
-        airybiprime,
-        airyaix,
-        airyaiprimex,
-        airybix,
-        airybiprimex,
-        besselh,
-        besselhx,
-        besseli,
-        besselix,
-        besselj,
-        besselj0,
-        besselj1,
-        besseljx,
-        besselk,
-        besselkx,
-        bessely,
-        bessely0,
-        bessely1,
-        besselyx,
-        dawson,
-        erf,
-        erfc,
-        erfcinv,
-        erfcx,
-        erfi,
-        erfinv,
-        eta,
-        digamma,
-        invdigamma,
-        polygamma,
-        trigamma,
-        hankelh1,
-        hankelh1x,
-        hankelh2,
-        hankelh2x,
-    zeta
-
-    
-end
 
 # Still in base
 import Base: gamma, lgamma
-
+gamma(x::Sym, args...; kwargs...) = sympy_meth(:gamma, x, args...; kwargs...)
+lgamma(x::Sym, args...; kwargs...) = sympy_meth(:loggamma, x, args...; kwargs...)
 
 
 
                         
-
-# julia -> sympy
+## https://github.com/JuliaMath/SpecialFunctions.jl/blob/master/src/SpecialFunctions.jl
+## julia -> sympy mapping.
 julia_sympy_map = (
                    :airyai       => :airyai,
                    :airyaiprime  => :airyaiprime,
@@ -151,9 +56,6 @@ julia_sympy_map = (
 :hankelh2   => :nothing,
 :hankelh2x  => :nothing,
 :zeta       => :zeta,
-#
-:gamma      => :gamma,
-:lgamma     => :loggamma,
 #
 #  SymPy only
 #
@@ -211,12 +113,14 @@ julia_sympy_map = (
                       
 for (jmeth, smeth) in [(j,s) for (j,s) in julia_sympy_map if s !== :nothing && j!== :nothing]
     meth_name = string(smeth)
+    eval(Expr(:import, :SpecialFunctions, jmeth))
     @eval begin
         @doc """
         `$($meth_name)`: a SymPy function.
             The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
             """ ->
         ($jmeth)(x::Sym, xs...;kwargs...) = sympy_meth($meth_name, x, xs...; kwargs...)
+        
     end
 end
 
@@ -236,128 +140,15 @@ end
 
 
 
-              
-              
-
-
-
 ## these have (parameter, x) signature. Use symbolic x to call sympy version, othewise
 ## should dispatch to julia version.
-for fn in (:besselj, :bessely, :besseli, :besselk)<
+for fn in (:besselj, :bessely, :besseli, :besselk)
     meth = string(fn)
-#    eval(Expr(:import, :Base, fn))
+    eval(Expr(:import, :SpecialFunctions, fn))
     @eval ($fn)(nu::Number, x::Sym; kwargs...) = sympy_meth($meth, nu, x; kwargs...)
     @eval ($fn)(nu::Number, a::AbstractArray{Sym}) = map(x ->$fn(nu, x), a)
 end
 
-
-
-
-
-
-
-
-# ## In SymPy and SpecialFunctions.jl
-# ## Disambiguate by leading term
-# sympy_special_funs = (
-#                       :gamma,
-#                       :polygamma,
-#                       :beta,
-#                       :airyai,
-#                       :airybi,
-#                       :besseli,
-#                       :besselj,
-#                       :besselk,
-#                       :bessely,
-#                       :erf, 
-#                       :erfc,
-#                       :erfcinv,                      
-# :erfcx,
-# :erfi,
-# :erfinv,
-
-# )
-                      
-# for meth in sympy_special_funs
-#     meth_name = string(meth)
-#     @eval begin
-#         @doc """
-#         `$($meth_name)`: a SymPy function.
-#             The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-#             """ ->
-#         ($meth)(x::Sym, xs...;kwargs...) = sympy_meth($meth_name, x, xs...; kwargs...)
-#     end
-#     eval(Expr(:export, meth))
-# end
-
-# # sympy, but not in SpecialFunctions.jl
-# sympy_new_special_funs = (:lowergamma,
-#                           :uppergamma,
-#                           :loggamma,
-#                           :digamma,
-#                           :trigamma,
-                      
-# :erf2,
-#                           :erf2inv,
-#                           :expint,
-#                           :E1,
-#                           :li,
-#                           :Li,
-#                           :Si,
-#                           :Ci,
-# :Shi,
-# :Chi,
-# :hankel1,
-# :hankel2,
-                          
-#                           :jacobi,
-#                           :gegenbauer,
-#                           :chebyshevt,
-#                           :chebyshevu,
-#                           :legendre,
-#                           :assoc_legendre,
-#                           :hermite,
-#                           :laguerre,
-#                           :assoc_laguerre,
-#                           :Ynm,
-#                           :Ynm_c,
-# :hankel1,
-# :hankel2,
-# :jn,
-# :yn,
-# :elliptic_e,
-# :elliptic_k,
-# :elliptic_f,
-# :elliptic_pi
-#              )
-
-# for meth in 
-#     meth_name = string(meth)
-#     @eval begin
-#         @doc """
-#             `$($meth_name)`: a SymPy function.
-#                 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-#                 """ ->
-#         ($meth)(xs...;kwargs...) = sympy_meth($meth_name, xs...; kwargs...)
-#     end
-#     eval(Expr(:export, meth))
-# end
-
-# for meth in (:fresnels, :fresnelc, :Ei, :Si, :Ci,
-#              :airyai, :airybi
-#            )
-#     meth_name = string(meth)
-
-#     @eval begin
-#         @doc """<
-# `$($meth_name)`: a SymPy function.
-# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-# """ ->
-#         ($meth)(x::Sym;kwargs...) = sympy_meth($meth_name, x; kwargs...)
-#     end
-# #    @eval ($meth)(a::AbstractArray{Sym}) = map($meth, a)
-#     eval(Expr(:export, meth))
-# end
 
 
 

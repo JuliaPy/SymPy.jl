@@ -1,6 +1,6 @@
 using SymPy
 using SpecialFunctions
-
+using SymPy.SpecialFuncs
 #using Test
 
 if isdefined(Base, :MathConstants)
@@ -37,9 +37,16 @@ end
     @test Sym(im) == 1im
     @test Sym(2im) == 2im
     @test Sym(1 + 2im) == 1 + 2im
-    @test N(Sym(pi)) == Float64(pi)
-    @test N(Sym(e)) == Float64(e)
-    @test N(Sym(SpecialFunctions.catalan)) == Float64(SpecialFunctions.catalan)
+    
+    if isdefined(Base, :MathConstants)
+        _pi, _e, _catalan = Base.MathConstants.pi, Base.MathConstants.e, Base.MathConstants.catalan
+    else
+        _pi, _e, _catalan = pi, e, catalan
+    end
+    @test N(Sym(_pi)) == Float64(_pi)
+    @test N(Sym(_e)) == Float64(_e)
+    @test N(Sym(_catalan)) == Float64(_catalan)
+        
 
     ## function conversion
     f1 = convert(Function, x^2)
@@ -395,13 +402,13 @@ end
 
     ## mpmath functions
 #    if @isdefined mpmath
-if isdefined(:mpmath)
+    if isdefined(SymPy, :mpmath)
         x = Sym("x")
         Sym(big(2))
         Sym(big(2.0))                   # may need mpmath (e.g., conda install mpmath)
 
         @test limit(besselj(1,1/x), x, 0) == Sym(0)
-        complex(hankel2(2, pi))
+        complex(N(hankel2(2, pi)))
         bei(2, 3.5)
         bei(1+im, 2+3im)
     end
