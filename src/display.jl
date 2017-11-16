@@ -50,7 +50,7 @@ function  show(io::IO, ::MIME"text/latex", x::AbstractArray{Sym})
 end
 
 ## Pretty print dicts
-function show(io::IO, ::MIME"text/latex", d::Dict{T,S}) where {T<:Any, S<:Any}
+function show(io::IO, ::MIME"text/latex", d::Dict{T,S}) where {T<:Sym, S<:Any}
     Latex(x::Sym) = latex(x)
     Latex(x) = sprint(Base.showcompact, x)
 
