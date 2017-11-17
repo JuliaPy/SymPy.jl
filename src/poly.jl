@@ -140,12 +140,11 @@ export Poly
 ## not coeffs(x^2 -1), rather poly(x^2 - 1)  |> coeffs
 ## or poly(a*x^2 + b*x + c, x) |> coeffs to specify a specific variable
 polynomial_instance_methods = (:EC, :ET, :LC, :LM, :LT, :TC, ## no .abs()
-                              :add_ground,
-                              :all_coeffs,
+                               :add_ground,
+                               :all_coeffs,
                               :all_monoms, :all_roots, :all_terms,
                               :as_dict, :as_expr, :as_list,
                               :clear_denoms,
-                              :coeffs,
                               :deflate,
                               :exclude,
                               :l1_norm,
@@ -164,7 +163,57 @@ polynomial_instance_methods = (:EC, :ET, :LC, :LM, :LT, :TC, ## no .abs()
                               :sqr, :sub_ground,
                               :to_exact, :to_field, :to_ring, :total_degree,
                               :unify
-                              )
+)
+
+"""
+Return coefficients, `[a0, a1, ..., an]`, of a polynomial `p = a0 + a1*x + ... + an*x^n`.
+
+Note: SymPy has the `all_coeffs` function to do this for objects of class `Poly`. The SymPy `coeffs` function returns the non-zero values. Use `sympy"coeffs"` for this functionality.
+
+This function returns the coefficients starting with the constant and
+includes zeros, when present. This matches the `coeffs` function of
+the `Polynomials` package.
+
+The expression is converted to a object of class `Poly` When more than
+one, this function uses `all_coeffs` and also calls `Poly` on the
+expression `p` to simplify. If there is more than one free symbol, the
+call to `Poly` will use `x` if present, or the first one returned by
+`free_symbols`.
+
+Examples:
+```
+@vars x a b c
+ex = 2x^2 + 3x + 4
+coeffs(ex)  # [4, 3, 2]
+## Same as reverse(all_coeffs(Poly(ex, x)))
+
+ex = a*x^2 + b*x + c
+coeffs(ex)  # [c, b, a]
+
+## may need to be explicit if `x` not present:
+@vars y
+ex = a*y^2 + b*y + c
+coeffs(ex)  ## not [c,b,a] as `c` is first free symbol
+reverse(all_coeffs(Poly(ex, y)))  ## is [c,b,a]
+```
+"""    
+function coeffs(p::Sym)
+    vars = free_symbols(p)
+    length(vars) == 0 && DomainError("No free variables specified")
+    if length(vars) == 1
+        q = Poly(p)
+    else
+        i = indexin(["x"], string.(vars))[1]
+        if i == 0
+            ## use the first free variable
+            i = 1
+        end
+        q = Poly(p, vars[i])
+    end
+
+    reverse(object_meth(q, :all_coeffs))
+end
+export coeffs
 
 
 polynomial_predicates = (
