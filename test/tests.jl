@@ -1,7 +1,7 @@
 using SymPy
 using SpecialFunctions
 using SymPy.SpecialFuncs
-#using Test
+using Compat.Test
 
 if isdefined(Base, :MathConstants)
     e = Base.MathConstants.e
