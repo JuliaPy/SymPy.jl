@@ -417,6 +417,11 @@ end
     @test ask(Q.even(Sym(2))) == true
     @test ask(Q.even(Sym(3))) == false
     @test ask(Q.nonzero(Sym(3))) == true
+    @vars x_real real=true
+    @vars x_real_positive real=true positive=true
+    @test ask(Q.positive(x_real)) == nothing
+    @test ask(Q.positive(x_real_positive)) == true
+    @test ask(Q.nonnegative(x_real^2)) == true
 
     ## sets
     s = FiniteSet("H","T")
