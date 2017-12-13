@@ -65,7 +65,7 @@ polynomial_sympy_methods = (
                             :apart, :together,
                             :poly,
                             :poly_from_expr,
-                            :degree, :degree_list,
+                            :degree_list,
                             :pdiv, :prem, :pquo, :pexquo,
                             :quo, :exquo,
                             :half_gcdex, :gcdex,
@@ -102,7 +102,8 @@ polynomial_sympy_methods = (
 #                            :roots ## conflict with Roots.roots and functionality provided by solve
                             )
 
-
+degree(x::Sym) = sympy_meth(:degree, x)
+export degree
 
 denom(x::Sym) = sympy_meth(:denom, x)
 numer(x::Sym) = sympy_meth(:numer, x)
@@ -227,12 +228,15 @@ polynomial_predicates = (
                          :is_monomial,
                          :is_multivariate,
                          :is_one,
-                         :is_primitive,
+#                        :is_primitive,
                          :is_quadratic,
                          :is_sqf,
                          :is_univariate,
                          :is_zero)
 
+
+is_primitive(x::Sym) = PyObject(ex)[Symbol($prop_name)]
+export is_primitive
 
 
 ##

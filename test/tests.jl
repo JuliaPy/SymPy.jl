@@ -422,8 +422,11 @@ end
     @test ask(Q.positive(x_real)) == nothing
     @test ask(Q.positive(x_real_positive)) == true
     @test ask(Q.nonnegative(x_real^2)) == true
+    @test ask(Q.upper_triangular([x_real 1; 0 x_real])) == true
+    @test ask(Q.positive_definite([x_real 1; 1 x_real])) == nothing
 
-    ## sets
+
+              ## sets
     s = FiniteSet("H","T")
     s1 = powerset(s)
     VERSION >= v"0.4.0" && @test length(collect(convert(Set, s1))) == length(collect(s1.x))

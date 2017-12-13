@@ -50,7 +50,7 @@ promote_rule(::Type{T}, ::Type{S})  where {T<:SymbolicObject, S<:Number}= T
 
 
 ## Conversion
-convert(::Type{Sym}, o::PyCall.PyObject) = Sym(o)
+convert(::Type{T}, o::PyCall.PyObject) where {T <: SymbolicObject} = T(o)
 convert(::Type{PyObject}, s::Sym) = s.x
 
 
