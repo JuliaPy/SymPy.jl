@@ -11,6 +11,7 @@
 
 using SymPy
 using SymPy.Permutations
+using PyCall
 using Base.Test
 Base.range(i::Int64) = 0:(i-1)
 

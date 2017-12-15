@@ -173,7 +173,7 @@ import Base: ==, hash
 ^(i::Integer, p::SymPermutation) = p(i)   # python has i^p = p(i)
 ^(i::Sym, p::SymPermutation) = p(i)       # SymPy has i^p = p(i)
 ^(p::SymPermutation, q::SymPermutation)  = PyCall.py"$p^$q" # conjugate
-inv(p::SymPermutation) = p^(-1)
+inv(p::SymPermutation) = PyCall.py"$p**(-1)"
 /(p::SymPermutation, q::SymPermutation) = p * inv(q)
 
 function +(p::SymPermutation, q::SymPermutation)

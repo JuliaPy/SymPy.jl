@@ -235,7 +235,7 @@ polynomial_predicates = (
                          :is_zero)
 
 
-is_primitive(x::Sym) = PyObject(ex)[Symbol($prop_name)]
+is_primitive(x::Sym) = PyObject(x)[:is_primitive]
 export is_primitive
 
 
