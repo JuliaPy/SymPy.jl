@@ -335,20 +335,19 @@ function __init__()
     copy!(combinatorics, PyCall.pyimport_conda("sympy.combinatorics", "sympy"))
     pytype_mapping(combinatorics["permutations"]["Permutation"], SymPermutation)
     pytype_mapping(combinatorics["perm_groups"]["PermutationGroup"], SymPermutationGroup)    
-
-    basictype = sympy["basic"]["Basic"]
-    pytype_mapping(basictype, Sym)
-
     polytype = sympy["polys"]["polytools"]["Poly"]
     pytype_mapping(polytype, Sym)
 
     try
-        matrixtype = sympy["matrices"]["MatrixBase"]
-        pytype_mapping(matrixtype, Array{Sym})
-        pytype_mapping(sympy["Matrix"], Array{Sym})        
+        pytype_mapping(sympy["Matrix"], Array{Sym})
+        pytype_mapping(sympy["matrices"]["MatrixBase"], Array{Sym})
     catch e
     end
 
+
+    basictype = sympy["basic"]["Basic"]
+    pytype_mapping(basictype, Sym)
+    
 
     
     ##
