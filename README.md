@@ -13,7 +13,7 @@ Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Jul
 The `SymPy` package  (`http://sympy.org/`)  is a Python library for symbolic mathematics. 
 
 With the excellent `PyCall` package of `julia`, one has access to the
-many features of `SymPy` from a `julia` session.
+many features of `SymPy` from within a `Julia` session.
 
 This `SymPy` package provides a light interface for _some_ of the
 features of `SymPy` that makes working with `SymPy` objects a bit
@@ -31,7 +31,7 @@ installed on your system. If `PyCall` is installed using `Conda`
 underlying `SymPy` library will be installed via `Conda` when the
 package is first loaded. Otherwise, installing both `Python` and
 `SymPy` (which also requires `mpmath`) can be done by other means.
-The `Anaconda` distribution is suggested, as it provides a single
+In this case, the `Anaconda` distribution is suggested, as it provides a single
 installation of `Python` that includes `SymPy` and many other
 scientifice libraries that can be profitably accessed within `Julia`
 via `PyCall`. (Otherwise, install `Python` then download the `sympy`
@@ -75,7 +75,7 @@ This gets replaced by a more `julia`n syntax:
 
 ```
 using SymPy                    
-x = symbols("x")		       # or   @syms x, Sym("x"), or  Sym(:x)
+x = symbols("x")		       # or   @vars x, Sym("x"), or  Sym(:x)
 y = sin(pi*x)
 y(1)                           # Does subs(y, x, 1). Use y(x=>1) to be specific as to which symbol to substitute
 ```
@@ -83,12 +83,12 @@ y(1)                           # Does subs(y, x, 1). Use y(x=>1) to be specific 
 The object `x` we create is of type `Sym`, a simple proxy for the
 underlying `PyObject`. We then overload the familiar math functions so
 that working with symbolic expressions can use natural `julia`
-idioms. The final result is here is a symbolic value of `0`, which
+idioms. The final result  here is a symbolic value of `0`, which
 prints as `0` and not `PyObject 0`. To convert it into a numeric value
 within `Julia`, the `N` function may be used, which acts like the
-`float` call, only attempts to preserve the variable type.
+`float` call, only there is an attempt to preserve the variable type.
 
-(There is a subtlety, the value of `pi` here is converted to the
+(There is a subtlety, the value of `pi` here (an `Irrational` in `Julia`) is converted to the
 symbolic `PI`, but in general won't be if the math constant is coerced
 to a floating point value before it encounters a symbolic object. It
 is better to just use the symbolic value `PI`, an alias for `sympy.pi`
@@ -100,9 +100,23 @@ only a portion of the `SymPy` interface is exposed. To call an
 underlying SymPy method, the `getindex` method is overloaded for
 `symbol` indices so that `ex[:meth_name](...)` dispatches to either to
 SymPy's `ex.meth_name(...)` or `meth_name(ex, ...)`, as possible.
-There is a `sympy` string macro to simplify this a bit, with the call
-looking like: `sympy"meth_name"(...)`, for example `sympy"harmonic"(10)`.
 
+
+There is a `sympy` string macro to simplify this a bit, with the call
+looking like: `sympy"meth_name"(...)`, for example
+`sympy"harmonic"(10)`. For example, the above could also be done
+through:
+
+```
+@vars x
+y = sympy"sin"(pi * x)
+y(1)
+```
+
+As calling the underlying SymPy function is not difficult, the
+interface exposed through overloading `Julia`'s methods attempts to
+keep similar functionality to the familiar `Julia` method when there is
+a discrepancy between conventions.
 
 ## Notes
 

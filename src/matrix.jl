@@ -222,3 +222,5 @@ wronskian([u,v], x)  # determinant of [u v; u' v']
 wronskian(fs::Vector{T}, x::Sym, args...; kwargs...) where {T <: SymbolicObject} = sympy_meth(:wronskian, fs, x, args...; kwargs...)
 
 export GramSchmidt, hessian, wronskian
+
+

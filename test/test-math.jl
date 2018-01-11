@@ -1,5 +1,5 @@
 using SymPy
-#using Test
+using Compat.Test
 using SpecialFunctions
 
 @testset "Math" begin

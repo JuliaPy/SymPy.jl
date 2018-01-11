@@ -1,5 +1,5 @@
 using SymPy
-#using Test
+using Compat.Test
 
 @testset "Logical" begin
     ## More logical expressions

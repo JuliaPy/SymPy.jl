@@ -109,7 +109,7 @@ export members, doc, _str
 ## Following PyPlot, we initialize our variables outside _init_
 const sympy  = PyCall.PyNULL()
 const mpmath = PyCall.PyNULL()
-
+const combinatorics  = PyCall.PyNULL()
 
 include("types.jl")
 include("utils.jl")
@@ -118,7 +118,6 @@ include("core.jl")
 include("logical.jl")
 include("math.jl")
 include("mpmath.jl")
-include("specialfuns.jl")
 include("solve.jl")
 include("dsolve.jl")
 include("subs.jl")
@@ -133,11 +132,14 @@ include("ntheory.jl")
 include("sets.jl")
 include("display.jl")
 include("lambdify.jl")
-include("physics.jl")
-
 include("call.jl")
-
 include("plot_recipes.jl") # hook into Plots
+
+## optional modules
+include("permutations.jl")
+include("physics.jl")
+include("specialfuns.jl")
+
 
 ## create some methods
 
@@ -175,8 +177,8 @@ for meth in union(core_sympy_methods,
                   summations_sympy_methods,
                   logic_sympy_methods,
                   polynomial_sympy_methods,
-    ntheory_sympy_methods,
-    combinatoric_sympy_methods,
+                  ntheory_sympy_methods,
+                  combinatoric_sympy_methods,
                   solveset_sympy_methods
                   )
 
@@ -234,7 +236,7 @@ for prop in union(core_object_properties,
                   polynomial_predicates)
 
     prop_name = string(prop)
-    @eval ($prop)(ex::Sym) = PyObject(ex)[Symbol($prop_name)]
+    @eval ($prop)(ex::SymbolicObject) = PyObject(ex)[Symbol($prop_name)]
     eval(Expr(:export, prop))
 end
 
@@ -311,32 +313,43 @@ end
 
 
 global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
-    call_sympy_fun(PyObject(object)[Symbol(meth)],  args...; kwargs...)
-
+    meth_or_prop = PyObject(object)[Symbol(meth)]
+    if isa(meth_or_prop, PyCall.PyObject)
+        call_sympy_fun(meth_or_prop,  args...; kwargs...) # method
+    else
+        meth_or_prop            # property
+    end
 end
 
-
-
+   
 ## For precompilation we must put PyCall instances in __init__:
 function __init__()
 
     ## Define sympy, mpmath, ...
     copy!(sympy, PyCall.pyimport_conda("sympy", "sympy"))
 
-    ## mappings from PyObjects to types.
-    basictype = sympy["basic"]["Basic"]
-    pytype_mapping(basictype, Sym)
+ 
 
+    ## mappings from PyObjects to types.
+
+    copy!(combinatorics, PyCall.pyimport_conda("sympy.combinatorics", "sympy"))
+    pytype_mapping(combinatorics["permutations"]["Permutation"], SymPermutation)
+    pytype_mapping(combinatorics["perm_groups"]["PermutationGroup"], SymPermutationGroup)    
     polytype = sympy["polys"]["polytools"]["Poly"]
     pytype_mapping(polytype, Sym)
 
     try
-        matrixtype = sympy["matrices"]["MatrixBase"]
-        pytype_mapping(matrixtype, Array{Sym})
-        pytype_mapping(sympy["Matrix"], Array{Sym})        
+        pytype_mapping(sympy["Matrix"], Array{Sym})
+        pytype_mapping(sympy["matrices"]["MatrixBase"], Array{Sym})
     catch e
     end
 
+
+    basictype = sympy["basic"]["Basic"]
+    pytype_mapping(basictype, Sym)
+    
+
+    
     ##
     init_logical()
     init_math()
