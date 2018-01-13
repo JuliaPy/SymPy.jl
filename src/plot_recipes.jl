@@ -183,8 +183,8 @@ export VectorField
 
 @recipe function f(F::VectorField; n=8)
 
-    xlims = get(d,:xlims, (-5,5))
-    ylims = get(d, :ylims, (-5,5))
+    xlims = get(plotattributes,:xlims, (-5,5))
+    ylims = get(plotattributes, :ylims, (-5,5))
     
     xs = repeat(linspace(xlims[1], xlims[2], n), inner=(n,))
     ys = repeat(linspace(ylims[1], ylims[2], n), outer=(n,))
