@@ -1,13 +1,5 @@
 using SymPy
-using Compat
-import Compat.view
-if VERSION >= v"0.5.0-dev+7720"
-    using Base.Test
-else
-    using BaseTestNext
-    const Test = BaseTestNext
-end
-
+using Compat.Test
 
 @testset "Matrix" begin
     ## matrices
@@ -22,9 +14,9 @@ end
     ## we use inverse for A[:inv]()
 
     # aliased to use inverse
-    @test @compat simplify.(inv(A) * A) ==  eye(2)
-    @test @compat simplify.(A * inv(A)) == eye(2)
-    @test @compat simplify.(A[:inv]() - inv(A)) == zeros(2, 2)
+    @test simplify.(inv(A) * A) ==  eye(2)
+    @test simplify.(A * inv(A)) == eye(2)
+    @test simplify.(A[:inv]() - inv(A)) == zeros(2, 2)
     @test SymPy.adjoint(B) == [conj(x) 0; 1 conj(2x)]
     @test SymPy.adjoint(B) == B'
     @test dual(A) == zeros(2, 2)
@@ -35,7 +27,7 @@ end
 
 
     s = LUsolve(A, v)
-    @test @compat simplify.(A * s) == v
+    @test simplify.(A * s) == v
 
     # norm
     @test norm(A) == sqrt(2 * abs(x)^2 + 2)
@@ -44,8 +36,8 @@ end
     @test norm(A) == norm(view(A, :, :))
 
     # abs
-    @test @compat all(abs.(A) .>= 0)
-    @test @compat abs.(A) == abs.(view(A, :, :))
+    @test  all(convert.(Bool, abs.(A) .≧ 0))
+    @test  abs.(A) == abs.(view(A, :, :))
 
     # is_lower, is_square, is_symmetric much slower than julia only counterparts. May deprecate, but for now they are here
     @test is_lower(A) == istril(A)
@@ -89,8 +81,11 @@ end
     @test D == inv(P) * M * P
 
     # test SymPy's expm against Julia's expm
-    @test @compat Float64.(expm(M)) ≈ expm(Float64.(M))
-
+    if VERSION >=v"0.7.0-"
+        @test Float64.(exp(M)) ≈ exp(Float64.(M))
+    else
+        @test Float64.(exp(M)) ≈ expm(Float64.(M))
+    end
     M = [x y; 1 0]
     @test integrate(M, x) == [x^2/2 x*y; x 0]
     @test integrate(M, (x, 0, 2)) == [2 2y; 2 0]

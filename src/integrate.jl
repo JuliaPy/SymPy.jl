@@ -40,7 +40,7 @@ line_integrate(x + y, C, [x,y])
 ```
 
 """
-Curve{T<:Sym}(exs::Vector{T}, p) = sympy_meth(:Curve, exs, p)
+Curve(exs::Vector{T}, p) where {T<:Sym} = sympy_meth(:Curve, exs, p) 
 export Curve
 
 """

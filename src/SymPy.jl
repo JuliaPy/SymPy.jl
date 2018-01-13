@@ -5,8 +5,6 @@ __precompile__()
 
 module SymPy
 
-using Compat
-import Compat: @compat, invokelatest
 
 """
 
@@ -77,12 +75,8 @@ import Base: div
 import Base: trunc
 import Base: isinf, isnan
 import Base: real, imag
-import Base: expm
 import Base: nullspace
 
-if VERSION < v"0.6.0-dev"
-    import Base: factor, isprime
-end
 
 export sympy, sympy_meth, @sympy_str, object_meth, call_matrix_meth
 export Sym, @syms, @vars, symbols
@@ -115,7 +109,7 @@ export members, doc, _str
 ## Following PyPlot, we initialize our variables outside _init_
 const sympy  = PyCall.PyNULL()
 const mpmath = PyCall.PyNULL()
-
+const combinatorics  = PyCall.PyNULL()
 
 include("types.jl")
 include("utils.jl")
@@ -124,7 +118,6 @@ include("core.jl")
 include("logical.jl")
 include("math.jl")
 include("mpmath.jl")
-include("specialfuns.jl")
 include("solve.jl")
 include("dsolve.jl")
 include("subs.jl")
@@ -139,13 +132,14 @@ include("ntheory.jl")
 include("sets.jl")
 include("display.jl")
 include("lambdify.jl")
-include("physics.jl")
-
-## add call interface depends on version
-VERSION >= v"0.5.0-" && include("call.jl")
-v"0.4.0" <= VERSION < v"0.5.0-" && include("call-0.4.jl")
-
+include("call.jl")
 include("plot_recipes.jl") # hook into Plots
+
+## optional modules
+include("permutations.jl")
+include("physics.jl")
+include("specialfuns.jl")
+
 
 ## create some methods
 
@@ -169,6 +163,8 @@ The SymPy documentation can be found through: http://docs.sympy.org/latest/searc
     end
 end
 
+
+    
 ## These are *added*, so exported
 for meth in union(core_sympy_methods,
                   math_sympy_methods,
@@ -182,6 +178,7 @@ for meth in union(core_sympy_methods,
                   logic_sympy_methods,
                   polynomial_sympy_methods,
                   ntheory_sympy_methods,
+                  combinatoric_sympy_methods,
                   solveset_sympy_methods
                   )
 
@@ -191,7 +188,7 @@ for meth in union(core_sympy_methods,
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth){T<:SymbolicObject}(ex::T, args...; kwargs...) = sympy_meth($meth_name, ex, args...; kwargs...)
+        ($meth)(ex::T, args...; kwargs...) where {T<:SymbolicObject} = sympy_meth($meth_name, ex, args...; kwargs...)
 
     end
     eval(Expr(:export, meth))
@@ -239,7 +236,7 @@ for prop in union(core_object_properties,
                   polynomial_predicates)
 
     prop_name = string(prop)
-    @eval ($prop)(ex::Sym) = PyObject(ex)[@compat(Symbol($prop_name))]
+    @eval ($prop)(ex::SymbolicObject) = PyObject(ex)[Symbol($prop_name)]
     eval(Expr(:export, prop))
 end
 
@@ -279,18 +276,9 @@ end
 # sympy"integrate"(x^2, (x, 0, 1))
 # ```
 # """
-
-sympy_str_v0_5 = quote
 macro sympy_str(s)
     (args...; kwargs...) -> _sympy_str(Symbol(s), args...; kwargs...)
 end
-end
-sympy_str_v0_4 = quote
-macro sympy_str(s)
-    (args...) -> _sympy_str(Symbol(s), args...)
-end
-end    
-VERSION < v"0.5.0" ? eval(sympy_str_v0_4) : eval(sympy_str_v0_5)
 
 """
 
@@ -325,32 +313,43 @@ end
 
 
 global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
-    call_sympy_fun(PyObject(object)[@compat(Symbol(meth))],  args...; kwargs...)
-
+    meth_or_prop = PyObject(object)[Symbol(meth)]
+    if isa(meth_or_prop, PyCall.PyObject)
+        call_sympy_fun(meth_or_prop,  args...; kwargs...) # method
+    else
+        meth_or_prop            # property
+    end
 end
 
-
-
+   
 ## For precompilation we must put PyCall instances in __init__:
 function __init__()
 
     ## Define sympy, mpmath, ...
     copy!(sympy, PyCall.pyimport_conda("sympy", "sympy"))
 
-    ## mappings from PyObjects to types.
-    basictype = sympy["basic"]["Basic"]
-    pytype_mapping(basictype, Sym)
+ 
 
+    ## mappings from PyObjects to types.
+
+    copy!(combinatorics, PyCall.pyimport_conda("sympy.combinatorics", "sympy"))
+    pytype_mapping(combinatorics["permutations"]["Permutation"], SymPermutation)
+    pytype_mapping(combinatorics["perm_groups"]["PermutationGroup"], SymPermutationGroup)    
     polytype = sympy["polys"]["polytools"]["Poly"]
     pytype_mapping(polytype, Sym)
 
     try
-        matrixtype = sympy["matrices"]["MatrixBase"]
-        pytype_mapping(matrixtype, Array{Sym})
-        pytype_mapping(sympy["Matrix"], Array{Sym})        
+        pytype_mapping(sympy["Matrix"], Array{Sym})
+        pytype_mapping(sympy["matrices"]["MatrixBase"], Array{Sym})
     catch e
     end
 
+
+    basictype = sympy["basic"]["Basic"]
+    pytype_mapping(basictype, Sym)
+    
+
+    
     ##
     init_logical()
     init_math()

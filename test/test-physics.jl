@@ -2,12 +2,7 @@ using SymPy.Physics
 using SymPy: Sym, sqrt, symbols, doit, PI
 using SymPy.SpecialFuncs: Ynm
 using PyCall: PyError
-if VERSION >= v"0.5.0-dev+7720"
-    using Base.Test
-else
-    using BaseTestNext
-    const Test = BaseTestNext
-end
+using Compat.Test
 
 
 @testset "Physics" begin
@@ -16,13 +11,13 @@ end
     @test clebsch_gordan(Sym(3)/2, Sym(1)/2, 1, -Sym(1)/2, Sym(1)/2, 0) == -sqrt(Sym(2))/2
 
     θ, ϕ = symbols("theta, phi")
-    VERSION < v"0.6.0-dev" && @test doit(dot_rot_grad_Ynm(3, 2, 2, 0, θ, ϕ)) == 3*sqrt(Sym(55))*Ynm(5, 2, θ, ϕ)/(11*sqrt(PI))
+    @test doit(dot_rot_grad_Ynm(3, 2, 2, 0, θ, ϕ)) == 3*sqrt(Sym(55))*Ynm(5, 2, θ, ϕ)/(11*sqrt(PI))
 
     @test gaunt(1,0,1,1,0,-1) == -1/(2*sqrt(PI))
     #@test N(gaunt(1000,1000,1200,9,3,-12)) ≈ 0.00689500421922113448 # takes forever to compute
 
-    @test_throws PyCall.PyError gaunt(1.2,0,1.2,0,0,0)
-    @test_throws PyCall.PyError gaunt(1,0,1,1.1,0,-1.1)
+    @test_throws PyError gaunt(1.2,0,1.2,0,0,0)
+    @test_throws PyError gaunt(1,0,1,1.1,0,-1.1)
 
     @test racah(3,3,3,3,3,3) == -1//14
 
@@ -35,7 +30,6 @@ end
 
 
     # Optics
-    # the following two fail
-    #@test RayTransferMatrix(1,2,3,4) == convert(SymMatrix, Sym[1 2; 3 4])
-    #@test FlatMirror() == convert(SymMatrix, Sym[1 0; 0 1])
+    @test RayTransferMatrix(1,2,3,4) == Sym[1 2; 3 4]
+    @test FlatMirror() == Sym[1 0; 0 1]
 end

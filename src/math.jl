@@ -6,7 +6,7 @@ math_sympy_methods_base = (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, 
                            :sech, :csch,
                            :coth, :acoth,
                            :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
-                           :sqrt, :erf, :erfc, :erfcx, :erfi, :erfinv, :erfcinv, :dawson,
+                           :sqrt, :dawson,
                            :ceiling, :floor, 
                            :factorial,
                            :gcd, :lcm,
@@ -40,12 +40,12 @@ for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
           :acosd, :acotd, :acscd, :asecd, :asind, :atand)
 
     rad_fn = string(fn)[1:end-1]
-    @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](x * Sym(sympy["pi"])/180)
+    @eval ($fn)(x::Sym) = sympy[Symbol($rad_fn)](x * Sym(sympy["pi"])/180)
 end
 
 for fn in (:cospi, :sinpi)
     rad_fn = string(fn)[1:end-2]
-    @eval ($fn)(x::Sym) = sympy[@compat(Symbol($rad_fn))](x * Sym(sympy["pi"]))
+    @eval ($fn)(x::Sym) = sympy[Symbol($rad_fn)](x * Sym(sympy["pi"]))
 end
 
 ## :asech, :acsch, :sinc, :cosc,
@@ -86,16 +86,18 @@ Base.imag(x::Sym) = sympy_meth(:im, x)
 Base.eps(::Type{Sym}) = zero(Sym)
 
 
-#minimum(ex::Sym,x::NAtype) = x
-#minimum(ex::Sym, args...; kwargs...) = sympy_meth(:Min, ex, args...; kwargs...)
-#maximum(ex::Sym,x::NAtype) = x
-#maximum(ex::Sym, args...; kwargs...) = sympy_meth(:Max, ex, args...; kwargs...)
-
 ## use SymPy Names here...
-Base.min(ex::Sym, exs...) = reduce((x,y)->sympy_meth(:Min, x, y), ex, exs)
-Base.max(ex::Sym, exs...) = reduce((x,y)->sympy_meth(:Max, x, y), ex, exs)
+## XXX This pattern may be of general usage. XXX
+## It allows fn(Any, Sym) or f(Sym, Any) to match
 
+import Base: min, max
+min(x::Sym, a) = sympy_meth(:Min, x, a)
+min(a, x::Union{SA, Real}) where {SA <: Sym} = min(x,a)
 
+max(x::Sym, a) = sympy_meth(:Max, x, a)
+max(a, x::Union{SA, Real}) where {SA <: Sym} = max(x,a)
+
+# SymPy names
 Min(ex::Sym, ex1::Sym) = sympy_meth(:Min, ex, ex1)
 Max(ex::Sym, ex1::Sym) = sympy_meth(:Max, ex, ex1)
 
@@ -167,9 +169,9 @@ export(Derivative)
 Create a piecewise defined function.
 
 To create conditions on the variable, the functions `Lt`, `Le`, `Eq`, `Ge`, and `Gt` can be used. For infix notation,
-unicode operators can be used: `\ll<tab>`, `\leqq<tab>`, `\Equal<tab>`, `\geqq<tab>`, and `\gg<tab>` (but *not* `\ge<tab>` or `\le<tab>`).
+unicode operators can be used: `\\ll<tab>`, `\\leqq<tab>`, `\\Equal<tab>`, `\\geqq<tab>`, and `\\gg<tab>` (but *not* `\\ge<tab>` or `\\le<tab>`).
 
-To combine terms, the unicode `\vee<tab>` (for "or"), `\wedge<tab>` (for "and") can be used
+To combine terms, the unicode `\\vee<tab>` (for "or"), `\\wedge<tab>` (for "and") can be used
 
 
 Examples:
@@ -193,7 +195,7 @@ piecewise_fold(ex::Sym) = sympy_meth(:piecewise_fold, ex)
 Base.ifelse(ex::Sym, a, b) = piecewise((a, ex), (b, true))
 
 """
-Indicator expression: (Either `\Chi[tab](x,a,b)` or `Indicator(x,a,b)`)
+Indicator expression: (Either `\\Chi[tab](x,a,b)` or `Indicator(x,a,b)`)
 
 `Χ(x, a, b)` is `1` on `[a,b]` and 0 otherwise.
 
@@ -247,12 +249,20 @@ global E = Sym(pynull())
 global IM = Sym(pynull())
 global oo = Sym(pynull())
 
-Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
-Base.convert(::Type{Sym}, x::Irrational{:e}) = E
-Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
-Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
-Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
 
+if isdefined(Base, :MathConstants)
+    Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
+    Base.convert(::Type{Sym}, x::Irrational{:e}) = E
+    Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
+    Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
+    Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
+else
+    Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
+    Base.convert(::Type{Sym}, x::Irrational{:e}) = E
+    Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
+    Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
+    Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
+end
 function init_math()
     "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors."
     copy!(PI.x,  sympy["pi"])

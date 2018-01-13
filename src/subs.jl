@@ -62,14 +62,14 @@ ex(x=2, y=3)
 The `replace` function is related, but not identical to subs.
 
 """
-subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{Any, Any})) =
+subs(ex::T, y::Tuple{Any, Any}) where {T <: SymbolicObject}=
     object_meth(ex, :subs, Sym(y[1]), convert(Sym,y[2]))
-subs{T <: SymbolicObject}(ex::T, y::@compat(Tuple{Any, Any}), args...) = subs(subs(ex, y), args...)
-subs{T <: SymbolicObject, S<:SymbolicObject}(ex::T, y::S, val) = subs(ex, (y,val))
-subs{T <: SymbolicObject}(ex::T, dict::Dict) = subs(ex, dict...)
-subs{T <: SymbolicObject}(ex::T, d::Pair...) = subs(ex, [(p.first, p.second) for p in d]...)
+subs(ex::T, y::Tuple{Any, Any}, args...) where {T <: SymbolicObject} = subs(subs(ex, y), args...)
+subs(ex::T, y::S, val) where {T <: SymbolicObject, S<:SymbolicObject} = subs(ex, (y,val))
+subs(ex::T, dict::Dict) where {T <: SymbolicObject} = subs(ex, dict...)
+subs(ex::T, d::Pair...) where {T <: SymbolicObject} = subs(ex, [(p.first, p.second) for p in d]...)
 # matrix interace in `matrix.jl`
-subs{T <: SymbolicObject, N}(exs::Tuple{T, N}, args...;kwargs...) = map(u -> subs(u, args...;kwargs...), exs)
+subs(exs::Tuple{T, N}, args...;kwargs...) where {T <: SymbolicObject, N} = map(u -> subs(u, args...;kwargs...), exs)
 subs(x::Number, args...) = x
 
 ## curried versions to use with |>
