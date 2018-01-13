@@ -1,11 +1,6 @@
 using SymPy
-if VERSION >= v"0.5.0-dev+7720"
-    using Base.Test
-else
-    using BaseTestNext
-    const Test = BaseTestNext
-end
-
+using Compat.Test
+using SpecialFunctions
 
 @testset "Math" begin
     ρ = symbols("rho", positive=true)
@@ -36,10 +31,10 @@ end
 
     @test diff(sinc(x), x) == piecewise((Sym(0), Eq(x, 0)), (cos(PI*x)/x - sin(PI*x)/(PI*x^2), Gt(abs(x), 0)))
 
-    @test flipsign(Sym(3), 2.) == 3
-    @test flipsign(Sym(3), 0.) == 3
-    @test flipsign(Sym(3), -0.) == -3
-    @test flipsign(Sym(3), -2.) == -3
+    @test flipsign(Sym(3), 2.0) == 3
+    @test flipsign(Sym(3), 0.0) == 3
+    @test flipsign(Sym(3), -0.0) == -3
+    @test flipsign(Sym(3), -2.0) == -3
 
     @test eps(Sym) == 0
     #@test rewrite(sinc(x), "jn") == jn(0, PI * x)

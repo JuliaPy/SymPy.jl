@@ -30,7 +30,7 @@ contains(a, 3/2), contains(b, 3/2) # false, true
 inf(a), sup(b)  # 1, 2
 right_open(b)   # true
 complement(b, S.Reals)  # (-∞, 1/2) ∪ [2, ∞)
-complement(b, a)  # [0, 1/2)  (This is a \ b, but that notation is not provided)
+complement(b, a)  # [0, 1/2)  (This is a \\ b, but that notation is not provided)
 
 x = symbols("x")
 as_relational(a, x)  #  0 ≤ x ∧ x ≤ 1
@@ -107,7 +107,6 @@ elements(x::Sym) = broadcast(Sym, collect(PyObject(x)))
 export elements
 
 
-VERSION < v"0.5.0-" && eval(Expr(:import, :Base, :complement))
 "Complement of set within the universe"
 complement(I::Sym, U::Sym=S.Reals) = I[:complement](U)
 export complement
@@ -115,7 +114,6 @@ export complement
 "boundary, returnsa set"
 boundary(I::Sym) = PyObject(I)[:boundary]
 
-VERSION < v"0.5.0-" && eval(Expr(:import, :Base, :inf))
 "Infinum of I"
 inf(I::Sym) = PyObject(I)[:inf]
 export inf
@@ -148,7 +146,7 @@ sup(I::Sym) = PyObject(I)[:sup]
 "Union of two intervals"
 Base.union(I::Sym, J::Sym) = I[:union](J)
 
-"Symmetric difference of two intervals, in one or other, but not both: `(I ∪ J) \ (I  ∩ J)"
+"Symmetric difference of two intervals, in one or other, but not both: `(I ∪ J) \\ (I  ∩ J)"
 Base.symdiff(I::Sym, J::Sym) = complement(intersection(I,J), union(I,J))
 
 "rexpress I in terms of relations involving variable `x`"

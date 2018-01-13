@@ -174,7 +174,7 @@ plot!(rhs(out))
 ```
 
 """
-immutable VectorField
+struct VectorField
     fx
     fy
 end
@@ -224,7 +224,7 @@ plot_parametric_surface((u*v,u-v,u+v), (u,0,1), (v,0,1))
 
 This uses `PyPlot`, not `Plots` for now.
 """
-function plot_parametric_surface(exs::(@compat Tuple{Sym,Sym,Sym}),
+function plot_parametric_surface(exs::Tuple{Sym,Sym,Sym},
                                  xvar=(-5.0, 5.0),
                                  yvar=(-5.0, 5.0),
                                  args...;

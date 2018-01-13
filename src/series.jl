@@ -10,12 +10,8 @@ series_sympy_meths = (#:limit
                       )
 
 import Base: truncate
+export scale
 
-if VERSION < v"0.6.0-dev"
-    eval(Expr(:import, :Base, :scale))
-else
-     eval(Expr(:export, :scale))
-end
 series_object_meths_base = (:truncate,
                             )
 

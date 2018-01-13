@@ -18,6 +18,7 @@ ntheory_sympy_methods = (
 
 """
 
+
 [primerange](http://docs.sympy.org/dev/modules/ntheory.html): Generate all prime numbers in the range [a, b).
 
 This is a replication of `primes` to which we dispatch.
@@ -30,3 +31,20 @@ function primerange(a::Sym,b)
 end
 export primerange
     
+## Combinatorics
+import Base: binomial
+binomial(n::Sym,k) = sympy_meth(:binomial, n, k)
+binomial(n, k::Union{SA, Integer}) where {SA <: Sym} = sympy_meth(:binomial, n, k)
+
+combinatoric_sympy_methods = (:bell,
+                              :bernoulli,
+                              :subfactorial,
+                              :factorial2,
+                              :FallingFactorial,
+                              :fibonacci,
+                              :harmonic,
+                              :lucas,
+                              :nC,
+                              :nK
+                              )
+                              
