@@ -221,27 +221,3 @@ end
 classname(ex::Sym) = PyObject(ex)[:__class__][:__name__]
 
 
-
-"""
-Access SymPy's docstrings
-
-There are several calling styles, as finding the underlying SymPy object from
-a Julia object is a bit tricky.
-
-Examples
-```
-@vars x
-sympy_help(:sin)   # a symbol in the `sympy` namespace
-sympy_help(sin)    # similar, just calls Symbol(sin)
-sympy_help(sin(x)) # can work, though only if sympy defers evaluation
-sympy_help(Poly(x^2,x), :coeffs) # coeffs is an object method of the poly instance
-sympy_help([x 1;1 x], :LUsolve)  # LUsolve is a matrix method
-sympy_help(SymPy.mpmath, :hypercomb) # explicit module lookup
-```
-"""
-sympy_help(u::Symbol) = _sympy_help(sympy[u])
-sympy_help(obj, u) = _sympy_help(PyObject(obj)[Symbol(u)])
-sympy_help(u::Sym) = _sympy_help(PyObject(u))
-sympy_help(obj) = sympy_help(Symbol(obj))
-_sympy_help(u) = PyCall.builtin[:help](u)
-export sympy_help
