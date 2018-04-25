@@ -94,7 +94,7 @@ end
 
 """
 
-`lambidfy(ex::Sym,[vars];type=Any)`: Lambidfy an expression returning a
+`lambidfy(ex::Sym,[vars]; typ=Any)`: Lambidfy an expression returning a
 native Julia function.  SymPy's
 [lambdify](http://docs.sympy.org/dev/modules/utilities/lambdify.html)
 function translates code into Python, this translates an expression
@@ -158,7 +158,7 @@ export(lambdify)
 
 """
 
-`lambidfy_expr(ex::Sym,[vars];type=Any,name=gensym())`: Lambidfy an expression
+`lambidfy_expr(ex::Sym,[vars]; typ=Any, name=gensym())`: Lambidfy an expression
 returning a native Julia function `Expr` object.  SymPy's
 [lambdify](http://docs.sympy.org/dev/modules/utilities/lambdify.html)
 function translates code into Python, this translates an expression
