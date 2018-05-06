@@ -1,8 +1,32 @@
 ## Display code
 
+
+"""
+Access SymPy's docstrings
+
+There are several calling styles, as finding the underlying SymPy object from
+a Julia object is a bit tricky.
+
+Examples
+```
+@vars x
+import Base.Docs.doc
+doc(sin(x))        # 
+doc(sympy[:sin])   # explicit module lookup
+doc(SymPy.mpmath[:hypercomb]) # explicit module lookup
+doc(Poly(x^2,x), :coeffs) # coeffs is an object method of the poly instance
+doc([x 1;1 x], :LUsolve)  # LUsolve is a matrix method
+```
+"""
+Base.Docs.doc(x::SymbolicObject) = Base.Docs.doc(PyObject(x))
+Base.Docs.doc(x::SymbolicObject, s::Symbol) = Base.Docs.doc(PyObject(x)[s])
+Base.Docs.doc(x::Array{T,N}, s::Symbol) where {T <: SymbolicObject, N} = Base.Docs.doc(PyObject(x)[s])
+
 ## Add some of SymPy's displays
 ## Some pretty printing
-doc(x::SymbolicObject) = print(x[:__doc__])
+
+
+#doc(x::SymbolicObject) = print(x[:__doc__])
 
 "Map a symbolic object to a string"
 _str(s::SymbolicObject) = s[:__str__]()
