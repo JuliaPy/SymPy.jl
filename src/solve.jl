@@ -232,7 +232,7 @@ linsolve((M, B), x, y)
 [cf.](http://docs.sympy.org/dev/modules/solvers/solveset.html#sympy.solvers.solveset.linsolve)
 """
 linsolve(exs::Matrix{T}, args...; kwargs...) where {T<:Sym} = sympy_meth(:linsolve, exs, args...; kwargs...)
-linsolve(exs::Tuple{T, N}, args...; kwargs...) where {T<:Sym, N} = sympy_meth(:linsolve, exs, args...; kwargs...)
+linsolve(exs::NTuple{N,T}, args...; kwargs...) where {T<:Sym, N} = sympy_meth(:linsolve, exs, args...; kwargs...)
 linsolve(exs::Vector{T}, args...; kwargs...) where {T<:Sym} = sympy_meth(:linsolve, tuple(exs...), args...; kwargs...)
 linsolve(exs::Tuple{Array{T,M}, N}, args...; kwargs...) where {T<:Sym, M, N} = sympy_meth(:linsolve, exs, args...; kwargs...)
 
