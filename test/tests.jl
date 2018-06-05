@@ -504,4 +504,13 @@ end
     @test round(y, 5) == 0
     @test round(y, 16) != 0
 
+    ## lambdify over a matrix #218
+    @vars x y
+    s = [1 0; 0 1]
+    @test lambdify(x*s)(2) == 2 * s
+    U = [x-y x+y; x+y x-y]
+    @test lambdify(U, [x,y])(2,4) == [-2 6;6 -2]
+    @test lambdify(U, [y,x])(2,4) == [ 2 6;6  2]
+    
+
 end

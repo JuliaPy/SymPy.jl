@@ -154,6 +154,12 @@ function lambdify(ex::Sym, vars=free_symbols(ex); typ=Any, fns=Dict(), values=Di
     end
 end
 
+# from @mistguy cf. https://github.com/JuliaPy/SymPy.jl/issues/218
+function lambdify(exs::Array{T, N}, vars = union(free_symbols.(exs)...); kwargs...) where {T <: Sym, N}
+    f = lambdify.(exs, (vars,)) # prevent broadcast in vars
+    (args...) -> map.(f, args...)
+end
+
 export(lambdify)
 
 """
