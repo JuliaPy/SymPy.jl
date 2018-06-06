@@ -511,6 +511,8 @@ end
     U = [x-y x+y; x+y x-y]
     @test lambdify(U, [x,y])(2,4) == [-2 6;6 -2]
     @test lambdify(U, [y,x])(2,4) == [ 2 6;6  2]
-    
+
+    @test eltype(lambdify([x 0; 1 x])(0)) <: Integer
+    @test eltype(lambdify([x 0; 1 x], T=Float64)(0)) == Float64
 
 end
