@@ -1,5 +1,5 @@
-Base.call{T <: SymbolicObject}(ex::T) = ex
-function Base.call{T <: SymbolicObject}(ex::T, args...)
+Base.call(ex::T) where {T <: SymbolicObject} = ex
+function Base.call(ex::T, args...) where T <: SymbolicObject
     xs = free_symbols(ex)
     if length(xs) >= 1
         subs(ex, collect(zip(xs, args))...)

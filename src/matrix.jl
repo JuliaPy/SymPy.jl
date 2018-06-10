@@ -153,7 +153,7 @@ for meth in matrix_properties
 `$($meth_name)`: a SymPy function.
 The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 """ ->
-        ($meth)(ex::Matrix{Sym}, args...; kwargs...) =  ex[@compat(Symbol($meth_name))]
+        ($meth)(ex::Matrix{Sym}, args...; kwargs...) =  ex[Symbol($meth_name)]
     end
     eval(Expr(:export, meth))
 end
