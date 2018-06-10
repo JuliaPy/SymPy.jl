@@ -154,6 +154,17 @@ function lambdify(ex::Sym, vars=free_symbols(ex); typ=Any, fns=Dict(), values=Di
     end
 end
 
+# from @mistguy cf. https://github.com/JuliaPy/SymPy.jl/issues/218
+# T a data type to convert to, when specified
+function lambdify(exs::Array{S, N}, vars = union(free_symbols.(exs)...); T::DataType=Void, kwargs...) where {S <: Sym, N}
+    f = lambdify.(exs, (vars,)) # prevent broadcast in vars
+    if T == Void
+        (args...) -> map.(f, args...)
+    else
+        (args...) -> convert(Array{T,N}, map.(f, args...))
+    end
+end
+
 export(lambdify)
 
 """
