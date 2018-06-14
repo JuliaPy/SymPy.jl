@@ -124,7 +124,7 @@ export sympy_plotting
 using RecipesBase
 
 ##
-@recipe f{T<:Sym}(::Type{T}, v::T) = lambdify(v)
+@recipe f(::Type{T}, v::T) where {T<:Sym} = lambdify(v)
 
 ## for vectors of expressions
 ## This does not work. See: https://github.com/JuliaPlots/RecipesBase.jl/issues/19
