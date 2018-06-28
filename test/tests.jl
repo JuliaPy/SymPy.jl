@@ -515,4 +515,7 @@ end
     @test eltype(lambdify([x 0; 1 x])(0)) <: Integer
     @test eltype(lambdify([x 0; 1 x], T=Float64)(0)) == Float64
 
+    # issue 222 type of eigvals
+    A = [Sym("a") 1; 0 1]
+    @test typeof(eigvals(A)) <: Vector{Sym}
 end

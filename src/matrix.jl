@@ -165,7 +165,7 @@ norm(a::AbstractMatrix{Sym}, args...; kwargs...) = call_matrix_meth(a, :norm, ar
 chol(a::Matrix{Sym}) = cholesky(a)
 exp(a::Matrix{Sym}) = call_matrix_meth(a, :exp)
 conj(a::Sym) = conjugate(a)
-eigvals(a::Matrix{Sym}) = collect(keys(call_matrix_meth(a, :eigenvals))) # a[:eigevnals]() has multiplicity
+eigvals(a::Matrix{Sym}) = [k for (k,v) in call_matrix_meth(a, :eigenvals)] # a[:eigevnals]() has multiplicity
 function eigvecs(a::Matrix{Sym})
     ds =  call_matrix_meth(a, :eigenvects)
     out = Any[]
