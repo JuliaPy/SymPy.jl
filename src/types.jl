@@ -80,7 +80,8 @@ function convert(::Type{Sym}, x::Complex)
     y = ifelse(isa(x, Complex{Bool}), real(x) + imag(x) * im, x)
     real(y) + imag(y) * IM
 end
-convert(::Type{Complex}, x::Sym) = complex(map(x -> convert(Float64, x), x[:as_real_imag]())...)::Sym
+convert(::Type{Complex}, x::Sym) = complex(map(x -> convert(Float64, x), x[:as_real_imag]())...)
+complex(::Type{Sym}) = Sym
 complex(x::Sym) = convert(Complex, x)
 complex(xs::AbstractArray{Sym}) = map(complex, xs)
 
