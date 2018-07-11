@@ -519,3 +519,29 @@ end
     A = [Sym("a") 1; 0 1]
     @test typeof(eigvals(A)) <: Vector{Sym}
 end
+
+@testset "generic programming, issue 223" begin
+    # arose in issue 223
+    @vars xreal real=true
+    @vars xcomplex
+    zreal = Sym(1)
+    zcomplex = Sym(1) + Sym(2)*IM
+
+    @test isreal(xreal)     # is_real(xreal) is also true, but xreal is Sym, not a Julia object
+    @test !isreal(xcomplex) # is_real(xcomplex) is nothing
+    @test isreal(zreal)
+    @test !isreal(zcomplex)
+    
+    # conversions
+    @test complex(xreal) == xreal
+    @test complex(xreal, xreal) == xreal + IM*xreal
+    @test complex(xcomplex) != xcomplex
+    @test complex(zreal) == zreal
+    @test complex(zreal) !== zreal      # Complex{Int} !== Sym
+    @test complex(zcomplex) == zcomplex
+    @test complex(zcomplex) !== zcomplex
+
+    
+
+
+end

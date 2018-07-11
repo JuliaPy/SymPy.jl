@@ -74,16 +74,16 @@ convert(::Type{T}, x::Sym) where {T <: Real} = convert(T, PyObject(x))
 
 
 ## complex
+## cf math.jl for `complex` of a value
 ## IM is SymPy's "i" (sympy["I"], not Python's
 ## Sym(PyCall.PyObject(im)) which gives 1j.
 function convert(::Type{Sym}, x::Complex)
     y = ifelse(isa(x, Complex{Bool}), real(x) + imag(x) * im, x)
     real(y) + imag(y) * IM
 end
-convert(::Type{Complex}, x::Sym) = complex(map(x -> convert(Float64, x), x[:as_real_imag]())...)
+convert(::Type{Complex{T}}, x::Sym) where {T} = complex(map(x -> convert(T, x), x[:as_real_imag]())...)
 complex(::Type{Sym}) = Sym
-complex(x::Sym) = convert(Complex, x)
-complex(xs::AbstractArray{Sym}) = map(complex, xs)
+
 
 ## string
 convert(::Type{Sym}, o::AbstractString) = sympy_meth(:sympify, o)
