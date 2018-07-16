@@ -22,6 +22,7 @@ using SymPy
 #import SymPy: degree, is_even, is_odd,
 import SymPy: is_primitive
 import PyCall
+import Compat.LinearAlgebra: rank
 
 ## raise error if wrong format
 function _check_permutation_format(x::Vector{Vector{T}}) where {T}
@@ -224,7 +225,7 @@ end
 Base.length(p::SymPermutation) = object_meth(p, :length)
 Base.max(p::SymPermutation) = object_meth(p, :max)
 Base.min(p::SymPermutation) = object_meth(p, :min)
-Base.rank(p::SymPermutation) = object_meth(p, :rank)
+rank(p::SymPermutation) = object_meth(p, :rank)
 
 ## non-Base object methods
 for meth in (:ascents,
