@@ -35,7 +35,6 @@ polydiv(ex::Sym, args...; kwargs...) = sympy_meth(:div, ex, args...; kwargs...)
 Polynomial division remainer.
 
 """
-
 polyrem(ex::Sym, args...; kwargs...) = rem(ex, args...; kwargs...)
 
 """

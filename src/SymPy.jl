@@ -153,11 +153,10 @@ for meth in union(
     meth_name = string(meth)
 #    eval(Expr(:import, :Base, meth)) # (kept in import list above)
     @eval begin
-                @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-    """ ->
-
+#                 @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+#     """ ->
         ($meth)(ex::Sym, args...; kwargs...) =
             sympy_meth($meth_name, ex, args...; kwargs...)
     end
@@ -184,10 +183,10 @@ for meth in union(core_sympy_methods,
 
     meth_name = string(meth)
     @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
+#         @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+# """ ->
         ($meth)(ex::T, args...; kwargs...) where {T<:SymbolicObject} = sympy_meth($meth_name, ex, args...; kwargs...)
 
     end
@@ -202,10 +201,10 @@ for meth in union(math_object_methods_base,
 
     meth_name = string(meth)
     @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
+#         @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+# """ ->
         ($meth)(ex::SymbolicObject, args...; kwargs...) = object_meth(ex, $meth_name, args...; kwargs...)
     end
 end
@@ -220,10 +219,10 @@ for meth in union(core_object_methods,
 
     meth_name = string(meth)
     @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
+#         @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+# """ ->
         ($meth)(ex::SymbolicObject, args...; kwargs...) = object_meth(ex, $meth_name, args...; kwargs...)
     end
     eval(Expr(:export, meth))
@@ -293,12 +292,12 @@ function _sympy_str(fn, args...; kwargs...)
     catch err
         try
             xs = [args...]
-            x = shift!(xs)
+            x = popfirst!(xs)
             object_meth(x, fn, xs...; kwargs...)
         catch err
             try
                 xs = [args...]
-                x = shift!(xs)
+                x = popfirst!(xs)
                 call_matrix_meth(x, fn, xs...; kwargs...)
             catch err
                 try

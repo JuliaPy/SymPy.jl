@@ -209,10 +209,10 @@ permutations_new_functions = (
 for meth in permutations_new_functions
     meth_name = string(meth)
     @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
+#         @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+# """ ->
         ($meth)(args...; kwargs...) = SymPy.combinatorics[:permutations][:Permutation][$meth_name](args...; kwargs...)
     end
     eval(Expr(:export, meth))
@@ -257,10 +257,10 @@ for meth in (:ascents,
 
     meth_name = string(meth)
     @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
+#         @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+# """ ->
         ($meth)(ex::SymPermutation, args...; kwargs...) = object_meth(ex, $meth_name, args...; kwargs...)
     end
     eval(Expr(:export, meth))
@@ -291,10 +291,10 @@ for prop in (:is_Empty,
 
     prop_name = string(prop)
     @eval begin
-        @doc """
-`$($prop_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($prop_name)
-""" ->
+#         @doc """
+# `$($prop_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($prop_name)
+# """ ->
         ($prop)(ex::SymPermutation) = PyCall.PyObject(ex)[Symbol($prop_name)]
     end
     eval(Expr(:export, prop))
@@ -375,10 +375,10 @@ for meth in permutation_group_methods_in_base
     meth_name = string(meth)
     eval(Expr(:import, :Base, meth))
     @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
+#         @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+# """ ->
         ($meth)(ex::SymPermutationGroup, args...; kwargs...) = object_meth(ex, $meth_name, args...; kwargs...)
     end
 end
@@ -431,10 +431,10 @@ permutation_group_methods = (#:baseswap,
 for meth in permutation_group_methods
     meth_name = string(meth)
     @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
+#         @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+# """ ->
         ($meth)(ex::SymPermutationGroup, args...; kwargs...) = object_meth(ex, $meth_name, args...; kwargs...)
     end
     eval(Expr(:export, meth))
@@ -480,10 +480,10 @@ permutation_group_properties = (:base,
 for prop in permutation_group_properties
     prop_name = string(prop)
     @eval begin
-        @doc """
-`$($prop_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($prop_name)
-""" ->
+#         @doc """
+# `$($prop_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($prop_name)
+# """ ->
         ($prop)(ex::SymPermutationGroup) = PyCall.PyObject(ex)[Symbol($prop_name)]
     end
     eval(Expr(:export, prop))

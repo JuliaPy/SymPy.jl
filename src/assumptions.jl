@@ -22,7 +22,7 @@ filter(x -> ask(Q.prime(x)), [1:1000])
 """
 ask(x::Sym, args...) = sympy_meth(:ask, x, args...)
 ask(x::Bool, args...) = x
-ask(x::Void, args...) = x
+ask(x::Nothing, args...) = x
 export ask
 
 ## should we support & and | for (sym,sym) pairs? Not sure
@@ -138,10 +138,10 @@ Q_predicates = (:antihermitian,
 for meth in Q_predicates
    nm = string(meth)
       @eval begin
-            @doc """
-`$($nm)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($nm)
-""" ->
+#             @doc """
+# `$($nm)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($nm)
+# """ ->
             ($meth)(x) = PyCall.pycall(SymPy.sympy["Q"][$nm], SymPy.Sym, x)::SymPy.Sym
    end
 end

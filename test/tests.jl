@@ -385,11 +385,12 @@ end
     @test subs(p,x,-1) == 0
     @test subs(p,x,0) == 1
 
-    u = ifelse(Lt(x, 0), "neg", ifelse(Gt(x, 0), "pos", "zero"))
-    @test subs(u,x,-1) == Sym("neg")
-    @test subs(u,x, 0) == Sym("zero")
-    @test subs(u,x, 1) == Sym("pos")
-
+    if VERSION < v"0.7.0-" # ifelse changed
+        u = ifelse(Lt(x, 0), "neg", ifelse(Gt(x, 0), "pos", "zero"))
+        @test subs(u,x,-1) == Sym("neg")
+        @test subs(u,x, 0) == Sym("zero")
+        @test subs(u,x, 1) == Sym("pos")
+    end
     p = piecewise((-x, x ≪ 0), (x, x ≧ 0))
 
 

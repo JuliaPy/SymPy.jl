@@ -39,12 +39,15 @@ end
 
 get_matrix_index(s::PyObject, i::Integer...) = get(s, Sym, ntuple(k -> i[k]-1, length(i)))
 function get_matrix_index(s::PyObject, i::Integer)
-    ind = ind2sub(matrix_size(s), i-1) # 0-base PyThon, 1 base Julia
-    if length(ind) == 1
-        get(s, Sym, ind[1])
+    sz = matrix_size(s)
+    if length(sz) == 1
+        ind = i - 1
+    elseif VERSION < v"0.7.0-"
+        ind = ind2sub(sz, i)
     else
-        get(s, Sym, ind)
+        ind = Tuple(Base.CartesianIndices(sz)[i])
     end
+    get(s, Sym, ind)
 end
 
 function convert(::Type{Array{Sym}}, o::PyObject)
@@ -79,12 +82,12 @@ sympy_matrix_methods = (:jordan_cell,
 for meth in sympy_matrix_methods
     meth_name=string(meth)
     @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+#         @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 
-Specific docs may also be found at [SymPy Docs for matrices](http://docs.sympy.org/latest/modules/matrices/matrices.html#module-sympy.matrices.matrices)
-""" ->
+# Specific docs may also be found at [SymPy Docs for matrices](http://docs.sympy.org/latest/modules/matrices/matrices.html#module-sympy.matrices.matrices)
+# """ ->
          ($meth)(args...; kwargs...) = sympy_meth(Symbol($meth_name), args...; kwargs...)
     end
     eval(Expr(:export, meth))
@@ -122,12 +125,12 @@ matrix_methods = (:LDLsolve,
 for meth in matrix_methods
     meth_name = string(meth)
     @eval begin
-      @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+#       @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 
-Specific docs may also be found at [SymPy Docs for matrices](http://docs.sympy.org/latest/modules/matrices/matrices.html#module-sympy.matrices.matrices)
-""" ->
+# Specific docs may also be found at [SymPy Docs for matrices](http://docs.sympy.org/latest/modules/matrices/matrices.html#module-sympy.matrices.matrices)
+# """ ->
         ($meth)(ex::Matrix{Sym}, args...; kwargs...) =  call_matrix_meth(ex, Symbol($meth_name), args...;kwargs...)
     end
     eval(Expr(:export, meth))
@@ -149,10 +152,10 @@ matrix_properties = (:H, :C,
 for meth in matrix_properties
      meth_name = string(meth)
     @eval begin
-      @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
+#       @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+# """ ->
         ($meth)(ex::Matrix{Sym}, args...; kwargs...) =  ex[Symbol($meth_name)]
     end
     eval(Expr(:export, meth))

@@ -115,10 +115,10 @@ for (jmeth, smeth) in [(j,s) for (j,s) in julia_sympy_map if s !== :nothing && j
     meth_name = string(smeth)
     eval(Expr(:import, :SpecialFunctions, jmeth))
     @eval begin
-        @doc """
-        `$($meth_name)`: a SymPy function.
-            The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-            """ ->
+        # @doc """
+        # `$($meth_name)`: a SymPy function.
+        #     The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+        #     """ ->
         ($jmeth)(x::Sym, xs...;kwargs...) = sympy_meth($meth_name, x, xs...; kwargs...)
         
     end
@@ -129,10 +129,10 @@ end
 for meth in [v for (k,v) in julia_sympy_map if k == :nothing]
     meth_name = string(meth)
     @eval begin
-        @doc """
-            `$($meth_name)`: a SymPy function.
-                The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-                """ ->
+        # @doc """
+        #     `$($meth_name)`: a SymPy function.
+        #         The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+        #         """ ->
         ($meth)(xs...; kwargs...) = sympy_meth($meth_name, xs...; kwargs...)
     end
     eval(Expr(:export, meth))

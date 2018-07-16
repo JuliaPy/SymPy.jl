@@ -43,8 +43,8 @@ latex(s::SymbolicObject, args...; kwargs...)  = sympy_meth(:latex, s, args...; k
 "create basic printed output"
 function jprint(x::SymbolicObject)
     out = PyCall.pycall(pybuiltin("str"), String, PyObject(x))
-    if ismatch(r"\*\*", out)
-        out = replace(out, "**", "^")
+    if occursin(r"\*\*", out)
+        out = replace(out, "**" => "^")
     end
     out
 end

@@ -30,10 +30,10 @@ for (m, meths) in physics
     for meth in meths
         meth_name = string(meth)
         @eval begin
-            @doc """
-            `$($meth_name)`: a SymPy function.
-                The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-                """ ->
+            # @doc """
+            # `$($meth_name)`: a SymPy function.
+            #     The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+            #     """ ->
             ($meth)(args...;kwargs...) = pycall(getindex($m, $meth_name), PyAny, map(Sym, args)..., map(Sym, kwargs)...)
         end
         eval(Expr(:export, meth))

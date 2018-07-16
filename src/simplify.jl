@@ -21,8 +21,10 @@ expand_sympy_meths = (:expand_trig,
 
 ## special case cse due to output
 ## If this pattern is common, will need to collect and use metaprogramming.
-@doc """
-`$(cse)`: Perform common subexpression elimination on an expression.
+"""
+    cse(ex, args...; kwargs...)
+
+Perform common subexpression elimination on an expression.
 
 [cf.](http://docs.sympy.org/latest/modules/simplify/simplify.html)
 
@@ -30,8 +32,8 @@ Example: (from man page)
 ```
 @vars x w y z x0 x1
 cse(((w + x + y + z)*(w + y + z))/(w + x)^3), ([(x0, y + z), (x1, w + x)], [(w + x0)*(x0 + x1)/x1^3]) # tuple of replacements and reduced expressions.
-
-""" ->
+```
+"""
 function cse(ex::Union{T, AbstractArray{T}}, args...; kwargs...) where {T<:SymbolicObject}
     a, b = sympy_meth(:cse, ex, args...; kwargs...)
     a, oftype(ex, b[1])

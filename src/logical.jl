@@ -12,9 +12,9 @@ const relational_sympy_values = (:GreaterThan, :LessThan,
 for meth in relational_sympy_values           
     meth_name = string(meth)
     @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function. [cf.](http://docs.sympy.org/dev/_modules/sympy/core/relational.html)
-""" ->
+#         @doc """
+# `$($meth_name)`: a SymPy function. [cf.](http://docs.sympy.org/dev/_modules/sympy/core/relational.html)
+# """ ->
         ($meth)(a::Real, b::Real) = sympy_meth($meth_name,a, b)
     end
 #    eval(Expr(:export, meth))
@@ -128,5 +128,5 @@ function !=(x::Sym, y::T) where {T <: Complex}
 end
 
 function init_logical()
-    global const SympyTRUE = sympy_meth(:Lt, 0,1)
+    global SympyTRUE = sympy_meth(:Lt, 0,1)
 end
