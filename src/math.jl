@@ -81,8 +81,6 @@ Base.abs2(x::Sym) = re(x*conj(x))
 Base.copysign(x::Sym, y::Sym) = abs(x)*sign(y)
 Base.signbit(x::Sym) = x < 0
 Base.flipsign(x::Sym, y) = signbit(y) ? -x : x
-Base.real(x::Sym) = sympy_meth(:re, x)
-Base.imag(x::Sym) = sympy_meth(:im, x)
 Base.eps(::Type{Sym}) = zero(Sym)
 
 
@@ -237,6 +235,44 @@ Base.typemax(::Type{Sym}) = oo
 Base.typemin(::Type{Sym}) = -oo
 
 
+## complex, real, imag, float, ...
+## For real, complex we have type instability:
+## * if numeric return a julia object
+## * if symbolic, return a symbolic object
+
+Base.real(x::Sym) = _real(N(x))
+_real(x::Sym) = sympy_meth(:re, x)
+_real(x) = real(x)
+
+## This is different from is_real, as that has is_real(x) == nothing if indeterminate
+Base.isreal(x::Sym) = is_real(x) == true
+
+
+Base.imag(x::Sym) = _imag(N(x))
+_imag(x::Sym) = sympy_meth(:im, x)
+_imag(x) = imag(x)
+
+Base.complex(r::Sym) = real(r) + imag(r) * im
+function Base.complex(r::Sym, i)
+    isreal(r) || throw(ArgumentError("r and i must not be complex"))
+    isreal(i) || throw(ArgumentError("r and i must not be complex"))
+    N(r) + N(i) * im
+end
+complex(xs::AbstractArray{Sym}) = complex.(xs) # why is this in base?
+
+## this is like is_integer, but not quite
+Base.isinteger(x::Sym) = _isinteger(N(x))
+_isinteger(x::Sym) = false
+_isinteger(x) = isinteger(x)
+
+Base.iseven(x::Sym) = _iseven(N(x))
+_iseven(x::Sym)= false
+_iseven(x) = iseven(x)
+
+Base.isodd(x::Sym) = _isodd(N(x))
+_isodd(x::Sym)= false
+_isodd(x) = isodd(x)
+
 ##################################################
 ## special numbers are initialized after compilation
 if isdefined(PyCall,:PyNULL)
@@ -263,6 +299,7 @@ else
     Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
     Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
 end
+
 function init_math()
     "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors."
     copy!(PI.x,  sympy["pi"])

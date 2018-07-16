@@ -171,7 +171,7 @@ function N(ex::Sym)
     end
     throw(DomainError())
 end
-N(x::Number) = x
+N(x::Number) = x  # implies N(x::Sym) = x if ...
 N(m::AbstractArray{Sym}) = map(N, m)
 """
 `N` can take a precision argument. 
