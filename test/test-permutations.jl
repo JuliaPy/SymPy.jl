@@ -12,7 +12,7 @@
 using SymPy
 using SymPy.Permutations
 using PyCall
-using Base.Test
+using Compat.Test
 Base.range(i) = 0:(i-1)
 
 @testset "Permutations" begin

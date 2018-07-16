@@ -240,6 +240,13 @@ Base.typemin(::Type{Sym}) = -oo
 ## * if numeric return a julia object
 ## * if symbolic, return a symbolic object
 
+Base.float(x::Sym) = _float(N(x))
+_float(x::Sym) = throw(ArgumentError("variable must have no free symbols"))
+_float(x) = float(x)
+Base.Float64(x::Sym) = _Float64(N(x))
+_Float64(x::Sym) = throw(ArgumentError("variable must have no free symbols"))
+_Float64(x) = Float64(x)
+
 Base.real(x::Sym) = _real(N(x))
 _real(x::Sym) = sympy_meth(:re, x)
 _real(x) = real(x)

@@ -163,6 +163,7 @@ end
 
 
 ## These are special cased
+inv(A::Matrix{Sym}) = inverse_LU(A)
 norm(a::AbstractVector{Sym}, args...; kwargs...) = call_matrix_meth(a, :norm, args...; kwargs...)
 norm(a::AbstractMatrix{Sym}, args...; kwargs...) = call_matrix_meth(a, :norm, args...; kwargs...)
 chol(a::Matrix{Sym}) = cholesky(a)

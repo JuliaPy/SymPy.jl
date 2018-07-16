@@ -85,8 +85,11 @@ import Base: real, imag
 
 
 using Compat.LinearAlgebra
-import LinearAlgebra: norm, chol, eigvals, eigvecs, rank,
-             nullspace, dot, det, cross, tr
+import Compat.LinearAlgebra: norm, chol, eigvals, eigvecs, rank,
+nullspace, dot, det, cross
+if VERSION >= v"0.7.0-"
+    import Compat.LinearAlgebra: cholesky, tr
+end
 import SpecialFunctions: erf, erfc, erfcx, erfi, erfinv, erfcinv, dawson
 
 

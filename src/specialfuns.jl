@@ -4,8 +4,11 @@ using PyCall
 using SymPy
 using SpecialFunctions
 import SpecialFunctions: besseli, besselj, besselk, bessely
-#import SpecialFunctions: erf, erfc, erfcx, erfi, erfcinv
-#import SpecialFunctions: gamma, lgamma
+import SpecialFunctions: airyai, airyaiprime, airybi, airybiprime, airyaix,airyaiprimex,
+airybix, airybiprimex, besselh, besselhx, besselix, besselj0, besselj1, besseljx, besselkx,
+bessely0, bessely1, besselyx, beta, dawson, erf, erfc, erfcinv, erfcx, erfi, erfinv,
+eta, digamma, gamma, invdigamma, lgamma, polygamma, trigamma,
+hankelh1, hankelh1x, hankelh2, hankelh2x, zeta
 
 
 
@@ -35,11 +38,12 @@ julia_sympy_map = (
 :bessely0   => :nothing,
 :bessely1   => :nothing,
 :besselyx   => :nothing,
+#:beta       => :beta,
 :dawson     => :nothing,
 :erf        => :erf,
 :erfc       => :erfc,
 :erfcinv    => :erfcinv,
-:erfcx      => :nothing,
+:erfcx      => :erfcx,
 :erfi       => :erfi,
 :erfinv     => :erfinv,
 :eta        => :nothing,
@@ -60,7 +64,6 @@ julia_sympy_map = (
 :nothing    => :uppergamma,
 :nothing    => :lowergamma,
 :nothing    => :erf2,
-:nothing    => :erfcx,
 :nothing    => :erf2inv,
 :nothing    => :fresnels,
 :nothing    => :fresnelc,
@@ -118,8 +121,8 @@ for (jmeth, smeth) in [(j,s) for (j,s) in julia_sympy_map if s !== :nothing && j
         #     The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
         #     """ ->
         ($jmeth)(x::Sym, xs...;kwargs...) = sympy_meth($meth_name, x, xs...; kwargs...)
-        
     end
+    eval(Expr(:export,smeth))
 end
 
 
@@ -140,7 +143,9 @@ end
 #lgamma(x::Sym, args...; kwargs...) = sympy_meth(:loggamma, x, args...; kwargs...)
 
 
-
+beta(x::Sym, y::Number) = sympy_meth(:beta, x, y)
+export beta
+lgamma(x::Sym) = log(gamma(x))
 
 ## these have (parameter, x) signature. Use symbolic x to call sympy version, othewise
 ## should dispatch to julia version.

@@ -1,5 +1,6 @@
 using SymPy
 using Compat.Test
+using Compat.LinearAlgebra
 
 @testset "Matrix" begin
     ## matrices
@@ -14,8 +15,8 @@ using Compat.Test
     ## we use inverse for A[:inv]()
 
     # aliased to use inverse
-    @test simplify.(inv(A) * A) ==  eye(2)
-    @test simplify.(A * inv(A)) == eye(2)
+    @test simplify.(inv(A) * A) ==  [1 0; 0 1]
+    @test simplify.(A * inv(A)) == [1 0; 0 1]
     @test simplify.(A[:inv]() - inv(A)) == zeros(2, 2)
     @test SymPy.adjoint(B) == [conj(x) 0; 1 conj(2x)]
     @test SymPy.adjoint(B) == B'
@@ -23,7 +24,7 @@ using Compat.Test
 
 
     r = cholesky(A)
-    @test r*r.' == A
+    @test r*transpose(r) == A
 
 
     s = LUsolve(A, v)
@@ -69,7 +70,7 @@ using Compat.Test
     L, U, _ = LUdecomposition(A)
     @test L == Sym[1 0; 3//2 1]
 
-    A = 2eye(Sym, 2)
+    A = Sym[1 0; 0 1] * 2
     B = Sym[1 2; 3 4]
     @test diagonal_solve(A, B) == B/2
 
