@@ -107,6 +107,8 @@ export degree
 denom(x::Sym) = sympy_meth(:denom, x)
 numer(x::Sym) = sympy_meth(:numer, x)
 export denom, numer
+Base.denominator(x::SymbolicObject) = denom(x)
+Base.numerator(x::SymbolicObject) = numer(x)
 
 polynomial_sympy_methods_base = (:expand,
                                  :factor #,
