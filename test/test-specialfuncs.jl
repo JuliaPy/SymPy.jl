@@ -1,8 +1,10 @@
-using SpecialFunctions
 using SymPy: Sym, sqrt, conjugate, symbols, PI, simplify,
-             expand_func, rewrite, N, gamma
-using SymPy.SpecialFuncs
+             expand_func, rewrite, N
+using Compat.LinearAlgebra
 using Compat.Test
+
+using SymPy.SpecialFuncs
+using SpecialFunctions
 
 
 @testset "SpecialFuns" begin

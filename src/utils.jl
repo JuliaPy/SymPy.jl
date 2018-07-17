@@ -37,7 +37,6 @@ x,y,z = symbols("x, y, z", real=true)
 ```
 
 """
-
 function symbols(x::AbstractString; kwargs...)
     out = sympy_meth(:symbols, x; kwargs...)
 end
@@ -160,9 +159,17 @@ end
 
 
 ## Iterator for Sym
-Base.start(x::Sym) = 1
-Base.next(x::Sym, state) = (x.x, state-1)
-Base.done(x::Sym, state) = state <= 0
+
+if VERSION < v"0.7.0-DEV.5126"
+    import Base: start, next, done
+    start(x::Sym) = 1
+    next(x::Sym, state) = (x.x, state-1)
+    done(x::Sym, state) = state <= 0
+else
+    import Base.iterate
+    iterate(x::Sym) = (x.x, 0)
+    iterate(x::Sym, state) = nothing
+end
 
 
 

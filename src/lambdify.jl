@@ -140,11 +140,12 @@ This is a *temporary* solution. The proper fix is to do this in SymPy.
 """
 function lambdify(ex::Sym, vars=free_symbols(ex); typ=Any, fns=Dict(), values=Dict())
     # if :julia_code printer is there, use it
-    if haskey(sympy, :julia_code)
-        body = parse(sympy_meth(:julia_code, ex))
-    else
-        body = walk_expression(ex, fns=fns, values=values)
-    end
+    # if haskey(sympy, :julia_code)
+    #     body = parse(sympy_meth(:julia_code, ex)) # issue here with 2.*...
+    # else
+    #     body = walk_expression(ex, fns=fns, values=values)
+    # end
+    body = walk_expression(ex, fns=fns, values=values)    
     try
         syms = typ == Any ? map(Symbol,vars) : map(s->Expr(:(::),s,typ), Symbol.(vars))
         fn = eval(Expr(:function, Expr(:call, gensym(), syms...), body))
@@ -156,9 +157,9 @@ end
 
 # from @mistguy cf. https://github.com/JuliaPy/SymPy.jl/issues/218
 # T a data type to convert to, when specified
-function lambdify(exs::Array{S, N}, vars = union(free_symbols.(exs)...); T::DataType=Void, kwargs...) where {S <: Sym, N}
+function lambdify(exs::Array{S, N}, vars = union(free_symbols.(exs)...); T::DataType=Nothing, kwargs...) where {S <: Sym, N}
     f = lambdify.(exs, (vars,)) # prevent broadcast in vars
-    if T == Void
+    if T == Nothing
         (args...) -> map.(f, args...)
     else
         (args...) -> convert(Array{T,N}, map.(f, args...))
@@ -203,11 +204,12 @@ lambdify_expr(x*y^2, [y, x])    # alternate ordering
 """
 function lambdify_expr(ex::Sym, vars=free_symbols(ex); name=gensym(), typ=Any, fns=Dict(), values=Dict())
     # if :julia_code printer is there, use it
-    if haskey(sympy, :julia_code)
-        body = parse(sympy_meth(:julia_code, ex))
-    else
-        body = walk_expression(ex, fns=fns, values=values)
-    end
+    # if haskey(sympy, :julia_code)
+    #     body = parse(sympy_meth(:julia_code, ex))
+    # else
+    #     body = walk_expression(ex, fns=fns, values=values)
+    # end
+    body = walk_expression(ex, fns=fns, values=values)    
     try
         syms = typ == Any ? map(Symbol,vars) : map(s->Expr(:(::),s,typ), Symbol.(vars))
         Expr(:function, Expr(:call, name, syms...), body)

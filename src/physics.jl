@@ -11,6 +11,7 @@ module Physics
 
 using PyCall
 using SymPy
+using Compat
 
 physics = [(SymPy.Wigner, [:clebsch_gordan,
                            :dot_rot_grad_Ynm,
@@ -30,11 +31,12 @@ for (m, meths) in physics
     for meth in meths
         meth_name = string(meth)
         @eval begin
-            @doc """
-            `$($meth_name)`: a SymPy function.
-                The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-                """ ->
-            ($meth)(args...;kwargs...) = pycall(getindex($m, $meth_name), PyAny, map(Sym, args)..., map(Sym, kwargs)...)
+            # @doc """
+            # `$($meth_name)`: a SymPy function.
+            #     The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+            #     """ ->
+            ($meth)(args...;kwargs...) = pycall(getindex($m, $meth_name), PyAny, map(Sym, args)...,
+                                                [k=>Sym(v) for (k,v) in Compat.pairs(kwargs)]...)
         end
         eval(Expr(:export, meth))
     end

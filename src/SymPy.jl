@@ -42,7 +42,8 @@ import Base: show
 import Base: convert, promote_rule
 import Base: getindex
 import Base: start, next, done
-import Base: complex
+import Base: complex, real, imag, float
+import Base: eps
 import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        atan, asinh, acosh, atanh, sec, csc, cot, asec,
        acsc, acot, sech, csch, coth, asech, acsch, acoth,
@@ -51,10 +52,10 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        sinpi, cospi,
        log, log2,
        log10, log1p, exponent, exp, exp2, expm1, cbrt, sqrt,
-       erf, erfc, erfcx, erfi, erfinv, erfcinv, dawson, ceil, floor,
+       ceil, floor,
        trunc, round, significand,
-       abs, max, min, maximum, minimum,
-       sign, dot,
+       abs, abs2, max, min, maximum, minimum, diff,
+       sign, 
        zero, one,
        hypot
 import Base: transpose
@@ -62,20 +63,34 @@ import Base: diff
 import Base: factorial, gcd, lcm, isqrt
 import Base: length,  size
 import Base: expand, collect
-import Base: !=, ==
-import Base:  inv, conj, det,
-              cross, eigvals, eigvecs, trace, norm, chol
-import Base: promote_rule
+import Base: inv, conj
 import Base: match, replace, round
+import Base: intersect, union, symdiff
 import Base: +, -, *, /, //, \
 import Base: ^, .^
+import Base: !=, ==
 import Base: &, |, !, >, >=, ==, <=, <
+import Base: isless, isequal
+import Base: rad2deg, deg2rad
+import Base: copysign, signbit, flipsign, isinf, isnan, typemax, typemin
+import Base: zero, zeros, one, ones
+import Base: contains, in, replace, match
+import Base: promote_rule
+
 ## poly.jl
-import Base: div
+import Base: div, rem, divrem
 import Base: trunc
 import Base: isinf, isnan
 import Base: real, imag
-import Base: nullspace
+
+
+using Compat.LinearAlgebra
+import Compat.LinearAlgebra: norm, chol, eigvals, eigvecs, rank,
+nullspace, dot, det, cross
+if VERSION >= v"0.7.0-"
+    import Compat.LinearAlgebra: cholesky, tr
+end
+import SpecialFunctions: erf, erfc, erfcx, erfi, erfinv, erfcinv, dawson
 
 
 export sympy, sympy_meth, @sympy_str, object_meth, call_matrix_meth
@@ -151,13 +166,11 @@ for meth in union(
                   )
 
     meth_name = string(meth)
-#    eval(Expr(:import, :Base, meth)) # (kept in import list above)
     @eval begin
-                @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-    """ ->
-
+#                 @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+#     """ ->
         ($meth)(ex::Sym, args...; kwargs...) =
             sympy_meth($meth_name, ex, args...; kwargs...)
     end
@@ -184,10 +197,10 @@ for meth in union(core_sympy_methods,
 
     meth_name = string(meth)
     @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
+#         @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+# """ ->
         ($meth)(ex::T, args...; kwargs...) where {T<:SymbolicObject} = sympy_meth($meth_name, ex, args...; kwargs...)
 
     end
@@ -202,10 +215,10 @@ for meth in union(math_object_methods_base,
 
     meth_name = string(meth)
     @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
+#         @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+# """ ->
         ($meth)(ex::SymbolicObject, args...; kwargs...) = object_meth(ex, $meth_name, args...; kwargs...)
     end
 end
@@ -220,10 +233,10 @@ for meth in union(core_object_methods,
 
     meth_name = string(meth)
     @eval begin
-        @doc """
-`$($meth_name)`: a SymPy function.
-The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-""" ->
+#         @doc """
+# `$($meth_name)`: a SymPy function.
+# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+# """ ->
         ($meth)(ex::SymbolicObject, args...; kwargs...) = object_meth(ex, $meth_name, args...; kwargs...)
     end
     eval(Expr(:export, meth))
@@ -293,12 +306,12 @@ function _sympy_str(fn, args...; kwargs...)
     catch err
         try
             xs = [args...]
-            x = shift!(xs)
+            x = popfirst!(xs)
             object_meth(x, fn, xs...; kwargs...)
         catch err
             try
                 xs = [args...]
-                x = shift!(xs)
+                x = popfirst!(xs)
                 call_matrix_meth(x, fn, xs...; kwargs...)
             catch err
                 try

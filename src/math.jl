@@ -90,10 +90,10 @@ Base.eps(::Type{Sym}) = zero(Sym)
 
 import Base: min, max
 min(x::Sym, a) = sympy_meth(:Min, x, a)
-min(a, x::Union{SA, Real}) where {SA <: Sym} = min(x,a)
+VERSION < v"0.7.0-" && (min(a, x::Union{SA, Real}) where {SA <: Sym} = min(x,a))
 
 max(x::Sym, a) = sympy_meth(:Max, x, a)
-max(a, x::Union{SA, Real}) where {SA <: Sym} = max(x,a)
+VERSION < v"0.7.0-" && (max(a, x::Union{SA, Real}) where {SA <: Sym} = max(x,a))
 
 # SymPy names
 Min(ex::Sym, ex1::Sym) = sympy_meth(:Min, ex, ex1)
@@ -190,7 +190,7 @@ const Piecewise = piecewise
 
 piecewise_fold(ex::Sym) = sympy_meth(:piecewise_fold, ex)
 
-Base.ifelse(ex::Sym, a, b) = piecewise((a, ex), (b, true))
+VERSION < v"0.7.0-" && (Base.ifelse(ex::Sym, a, b) = piecewise((a, ex), (b, true)))
 
 """
 Indicator expression: (Either `\\Chi[tab](x,a,b)` or `Indicator(x,a,b)`)
@@ -239,6 +239,13 @@ Base.typemin(::Type{Sym}) = -oo
 ## For real, complex we have type instability:
 ## * if numeric return a julia object
 ## * if symbolic, return a symbolic object
+
+Base.float(x::Sym) = _float(N(x))
+_float(x::Sym) = throw(ArgumentError("variable must have no free symbols"))
+_float(x) = float(x)
+Base.Float64(x::Sym) = _Float64(N(x))
+_Float64(x::Sym) = throw(ArgumentError("variable must have no free symbols"))
+_Float64(x) = Float64(x)
 
 Base.real(x::Sym) = _real(N(x))
 _real(x::Sym) = sympy_meth(:re, x)

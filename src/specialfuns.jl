@@ -3,13 +3,12 @@ module SpecialFuncs
 using PyCall
 using SymPy
 using SpecialFunctions
-
-
-
-# Still in base
-import Base: gamma, lgamma
-gamma(x::Sym, args...; kwargs...) = sympy_meth(:gamma, x, args...; kwargs...)
-lgamma(x::Sym, args...; kwargs...) = sympy_meth(:loggamma, x, args...; kwargs...)
+import SpecialFunctions: besseli, besselj, besselk, bessely
+import SpecialFunctions: airyai, airyaiprime, airybi, airybiprime, airyaix,airyaiprimex,
+airybix, airybiprimex, besselh, besselhx, besselix, besselj0, besselj1, besseljx, besselkx,
+bessely0, bessely1, besselyx, beta, dawson, erf, erfc, erfcinv, erfcx, erfi, erfinv,
+eta, digamma, gamma, invdigamma, lgamma, polygamma, trigamma,
+hankelh1, hankelh1x, hankelh2, hankelh2x, zeta
 
 
 
@@ -27,9 +26,9 @@ julia_sympy_map = (
                    :airybiprimex => :nothing,
                    :besselh      => :nothing,
                    :besselhx     => :nothing,
-##                   :besseli      => :besseli,
+#                  :besseli      => :besseli,
                    :besselix     => :nothing,
-##                   :besselj      => :besselj,
+#                  :besselj      => :besselj,
                    :besselj0     => :nothing,
 :besselj1   => :nothing,
 :besseljx   => :nothing,
@@ -39,16 +38,19 @@ julia_sympy_map = (
 :bessely0   => :nothing,
 :bessely1   => :nothing,
 :besselyx   => :nothing,
+#:beta       => :beta,
 :dawson     => :nothing,
 :erf        => :erf,
 :erfc       => :erfc,
 :erfcinv    => :erfcinv,
-:erfcx      => :nothing,
+:erfcx      => :erfcx,
 :erfi       => :erfi,
 :erfinv     => :erfinv,
 :eta        => :nothing,
 :digamma    => :digamma,
+:gamma      => :gamma,
 :invdigamma => :nothing,
+:lgamma     => :lgamma,
 :polygamma  => :polygamma,
 :trigamma   => :trigamma,
 :hankelh1   => :nothing,
@@ -62,7 +64,6 @@ julia_sympy_map = (
 :nothing    => :uppergamma,
 :nothing    => :lowergamma,
 :nothing    => :erf2,
-:nothing    => :erfcx,
 :nothing    => :erf2inv,
 :nothing    => :fresnels,
 :nothing    => :fresnelc,
@@ -115,13 +116,13 @@ for (jmeth, smeth) in [(j,s) for (j,s) in julia_sympy_map if s !== :nothing && j
     meth_name = string(smeth)
     eval(Expr(:import, :SpecialFunctions, jmeth))
     @eval begin
-        @doc """
-        `$($meth_name)`: a SymPy function.
-            The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-            """ ->
+        # @doc """
+        # `$($meth_name)`: a SymPy function.
+        #     The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+        #     """ ->
         ($jmeth)(x::Sym, xs...;kwargs...) = sympy_meth($meth_name, x, xs...; kwargs...)
-        
     end
+    eval(Expr(:export,smeth))
 end
 
 
@@ -129,16 +130,22 @@ end
 for meth in [v for (k,v) in julia_sympy_map if k == :nothing]
     meth_name = string(meth)
     @eval begin
-        @doc """
-            `$($meth_name)`: a SymPy function.
-                The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-                """ ->
+        # @doc """
+        #     `$($meth_name)`: a SymPy function.
+        #         The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
+        #         """ ->
         ($meth)(xs...; kwargs...) = sympy_meth($meth_name, xs...; kwargs...)
     end
     eval(Expr(:export, meth))
 end
 
+#gamma(x::Sym, args...; kwargs...) = sympy_meth(:gamma, x, args...; kwargs...)
+#lgamma(x::Sym, args...; kwargs...) = sympy_meth(:loggamma, x, args...; kwargs...)
 
+
+beta(x::Sym, y::Number) = sympy_meth(:beta, x, y)
+export beta
+lgamma(x::Sym) = log(gamma(x))
 
 ## these have (parameter, x) signature. Use symbolic x to call sympy version, othewise
 ## should dispatch to julia version.

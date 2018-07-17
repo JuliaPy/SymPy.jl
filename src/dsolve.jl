@@ -143,7 +143,6 @@ approach breaks down, then those steps can be done manually starting
 with the output of `dsolve` without the initial conditions.
 
 """
-
 dsolve(ex::Sym;kwargs...) = sympy_meth(:dsolve, ex; kwargs...)
 dsolve(exs::Vector{Sym};kwargs...) = sympy_meth(:dsolve, exs; kwargs...)
 dsolve(exs::Vector{Sym}, fx::Sym; kwargs...) = sympy_meth(:dsolve, exs, fx; kwargs...)
