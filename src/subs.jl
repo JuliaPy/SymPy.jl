@@ -169,7 +169,8 @@ function N(ex::Sym)
         catch e
         end
     end
-    throw(DomainError())
+    ex  # do nothing if not a number
+#    throw(DomainError())
 end
 N(x::Number) = x  # implies N(x::Sym) = x if ...
 N(m::AbstractArray{Sym}) = map(N, m)
