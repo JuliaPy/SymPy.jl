@@ -521,6 +521,12 @@ end
     # issue 222 type of eigvals
     A = [Sym("a") 1; 0 1]
     @test typeof(eigvals(A)) <: Vector{Sym}
+
+    # issue 231 Q.complex
+    @vars x_maybecomplex
+    @vars x_imag imaginary=true
+    @test ask(Q.complex(x_maybecomplex)) == nothing
+    @test ask(Q.complex(x_imag)) == true
 end
 
 @testset "generic programming, issue 223" begin

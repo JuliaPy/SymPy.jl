@@ -95,7 +95,7 @@ import Compat.LinearAlgebra: det, norm
 Q_predicates = (:antihermitian,
                 :bounded, :finite, # bounded deprecated
                 :commutative,
-#                :complex,
+                :complex,
                 :composite,
                 :even,
                 :extended_real,
