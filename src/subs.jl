@@ -134,7 +134,7 @@ rts = solve(x^5 - x + 1)
 The `evalf` function is similar, though it leaves the expression as a symbolic object.
 This breaks the similarity of N and evalf for sympy users.
 
-Throws a `DomainError` if no conversion is possible, such as when the expression still has symbolic values.
+Returns the value unchanged when it has free symbols.
 
 `N` is type unstable.
 
@@ -142,6 +142,9 @@ Throws a `DomainError` if no conversion is possible, such as when the expression
 function N(ex::Sym)
     ## more work than I'd like
     ## XXX consolidate this and N(ex, digits)
+
+    length(free_symbols(ex)) > 0 && return ex
+    
     if is_integer(ex) == nothing
         evalf_ex = ex[:evalf]()
         if ex == evalf_ex
