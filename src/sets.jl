@@ -15,7 +15,7 @@ The `S` module provides some built-in sets: `S.Reals`, `S.Integers`, `S.Naturals
 Various methods for sets and intervals are provided, though not all are defined for unions:
 
 * `powerset`
-* `union`, `intersection`, `contains`, `boundary`
+* `union`, `intersection`, `in`, `boundary`
 * `complement`, `is_disjoint`, `is_subset`, `is_superset`, `is_proper_subset`
 * `sup`, `inf`, `measure`
 * `is_Union`, `is_Interval`, `is_FiniteSet`
@@ -26,7 +26,7 @@ Examples:
 a,b = Interval(0,1), Interval(1//2,2, false, true)  # [0,1], [1/2, 2)
 union(a, b)     # [0,2), also  a ∪ b
 intersect(a,b)  # [1/2,1],  also a ∩ b
-contains(a, 3/2), contains(b, 3/2) # false, true
+3/2 in a; 3/2 in b # false, true
 inf(a), sup(b)  # 1, 2
 right_open(b)   # true
 complement(b, S.Reals)  # (-∞, 1/2) ∪ [2, ∞)
@@ -64,7 +64,7 @@ end
 
 export S, FiniteSet, Interval, ProductSet, ConditionSet
 export powerset, imageset
-export contains,  boundary, sup, measure
+export boundary, sup, measure
 export as_relational
 export is_disjoint
 export is_proper_subset, is_subset, is_superset
@@ -98,9 +98,9 @@ powerset(s::Sym) = s[:powerset]()
 
 
 
-"Does I contain x?"
-Base.contains(I::Sym, x) = (I[:contains](x) == Sym(true))
-Base.in(x::Number, I::Sym) = contains(I, x)
+"Is `x` in `I`?"
+Base.in(x, I::Sym) = (I[:contains](x) == Sym(true))
+
 
 "Elements of finite set"
 elements(x::Sym) = broadcast(Sym, collect(PyObject(x)))

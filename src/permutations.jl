@@ -22,7 +22,7 @@ using SymPy
 #import SymPy: degree, is_even, is_odd,
 import SymPy: is_primitive
 import PyCall
-import Compat.LinearAlgebra: rank
+import LinearAlgebra: rank
 
 ## raise error if wrong format
 function _check_permutation_format(x::Vector{Vector{T}}) where {T}
@@ -386,13 +386,11 @@ end
 
 
 # new methods
-import Base: base, contains
 permutation_group_methods = (#:baseswap,
                              :base,
                              :center,
                              :centralizer,
                              :commutator,
-                             :contains,
                              :coset_factor,
                              :coset_rank,
                              :coset_table,
@@ -443,6 +441,12 @@ end
 
 len(G::SymPermutationGroup) = PyCall.py"len($(G.x))"
 export len
+"""
+   occursin(x, G::SymPermutationGroup)
+
+Does G contain x. (In SymPy, this is `contains.)
+"""
+Base.occursin(x, G::SymPermutationGroup; kwargs...) = (G[:contains](x; kwargs...) == Sym(true)) # was contains
 
 ## These need PyVector in the call
 orbit(G::SymPy.SymPermutationGroup, alpha::Number, args...; kwargs...) = object_meth(G, :orbit, alpha, args...; kwargs...)
@@ -463,8 +467,7 @@ export baseswap
 
 # non-base properties
 import SymPy: degree
-permutation_group_properties = (:base,
-                                :basic_orbits,
+permutation_group_properties = (:basic_orbits,
                                 :basic_stabilizers,
                                 :basic_transversals,
                                 :degree,
@@ -489,6 +492,16 @@ for prop in permutation_group_properties
     end
     eval(Expr(:export, prop))
 end
+
+
+if !(VERSION >= v"1.0.0")
+    import Base: base
+end
+
+base(ex::SymPermutationGroup) = PyCall.PyObject(ex)[:base]
+export base
+
+
 
 strong_gens(D::SymPermutationGroup) = PyCall.PyObject(D)[:strong_gens]
 export strong_gens

@@ -25,7 +25,7 @@ math_sympy_methods = (:radians2degrees, :degrees2radians,
 
 # hypot and atan2
 hypot(x::Sym, y::Number) = sqrt(x^2 + y^2)
-atan2(y::Sym, x::Number) = sympy_meth(:atan2, y, x)
+atan(y::Sym, x::Number) = sympy_meth(:atan2, y, x)
 
 ## Log function handles arguments differently
 log(x::Sym) = sympy_meth(:log, x)
@@ -82,6 +82,7 @@ Base.copysign(x::Sym, y::Sym) = abs(x)*sign(y)
 Base.signbit(x::Sym) = x < 0
 Base.flipsign(x::Sym, y) = signbit(y) ? -x : x
 Base.eps(::Type{Sym}) = zero(Sym)
+#Base.eps(x::SymbolicObject) = zero(Sym)
 
 
 ## use SymPy Names here...
@@ -293,19 +294,12 @@ global IM = Sym(pynull())
 global oo = Sym(pynull())
 
 
-if isdefined(Base, :MathConstants)
-    Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
-    Base.convert(::Type{Sym}, x::Irrational{:e}) = E
-    Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
-    Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
-    Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
-else
-    Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
-    Base.convert(::Type{Sym}, x::Irrational{:e}) = E
-    Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
-    Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
-    Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
-end
+
+Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
+Base.convert(::Type{Sym}, x::Irrational{:e}) = E
+Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
+Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
+Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
 
 function init_math()
     "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors."

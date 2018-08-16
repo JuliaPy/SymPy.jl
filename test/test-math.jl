@@ -1,5 +1,5 @@
 using SymPy
-using Compat.Test
+using Test
 using SpecialFunctions
 
 @testset "Math" begin
@@ -10,8 +10,8 @@ using SpecialFunctions
     @test simplify(hypot(ρ*cos(ϕ), ρ * sin(ϕ))) == ρ
     @test hypot(ρ*cos(ϕ), 3) == sqrt(ρ^2*cos(ϕ)^2 + 9)
 
-    @test atan2(Sym(1), 1) == PI/4
-    @test atan2(Sym(1), -1) == 3PI/4
+    @test atan(Sym(1), 1) == PI/4
+    @test atan(Sym(1), -1) == 3PI/4
 
     @test factorial(Sym(0)) == 1
     @test factorial(Sym(7)) == 5040

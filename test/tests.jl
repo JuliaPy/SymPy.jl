@@ -1,13 +1,10 @@
 using SymPy
 using SpecialFunctions
 using SymPy.SpecialFuncs
-using Compat.Test
-using Compat.LinearAlgebra
-using Compat.MathConstants
+using Test
+using LinearAlgebra
+using Base.MathConstants
 
-# if isdefined(Base, :MathConstants)
-#     e = Base.MathConstants.e
-# end
 
 @testset "Core" begin
     ## Symbol creation
@@ -40,14 +37,10 @@ using Compat.MathConstants
     @test Sym(2im) == 2im
     @test Sym(1 + 2im) == 1 + 2im
     
-    if isdefined(Base, :MathConstants)
-        _pi, _e, _catalan = Base.MathConstants.pi, Base.MathConstants.e, Base.MathConstants.catalan
-    else
-        _pi, _e, _catalan = pi, e, catalan
-    end
-    @test N(Sym(_pi)) == Float64(_pi)
-    @test N(Sym(_e)) == Float64(_e)
-    @test N(Sym(_catalan)) == Float64(_catalan)
+    pi, e, catalan = Base.MathConstants.pi, Base.MathConstants.e, Base.MathConstants.catalan
+    @test N(Sym(pi)) == Float64(pi)
+    @test N(Sym(e)) == Float64(e)
+    @test N(Sym(catalan)) == Float64(catalan)
         
 
     ## function conversion
@@ -154,9 +147,9 @@ using Compat.MathConstants
     @test p[:coeffs]() == Any[1,-3,2] # p.coeffs
 
     ## algebra
-    @test expand((x + 1)*(x + 2)) == x^2 + 3x + 2
+    @test SymPy.expand((x + 1)*(x + 2)) == x^2 + 3x + 2  # v0.7 deprecates expand, in v1.0 this is fine w/o qualifacation
     x1 = (x + 1)*(x + 2)
-    @test expand(x1) == x^2 + 3x + 2
+    @test SymPy.expand(x1) == x^2 + 3x + 2
     @test expand_trig(sin(2x)) == 2sin(x)*cos(x)
 
     ## math functions
@@ -448,9 +441,6 @@ using Compat.MathConstants
 ## sympy"..."(...)
 @vars x
 @test sympy"sin"(1) == sin(Sym(1))
-@test sympy"removeO"(series(sin(x))) == removeO(series(sin(x)))
-@test sympy"rref"([x 1; 1 x])[1] == rref([x 1; 1 x])[1]
-
 end
 
 @testset "Fix past issues" begin

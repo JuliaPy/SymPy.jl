@@ -166,7 +166,7 @@ end
 inv(A::Matrix{Sym}) = inverse_LU(A)
 norm(a::AbstractVector{Sym}, args...; kwargs...) = call_matrix_meth(a, :norm, args...; kwargs...)
 norm(a::AbstractMatrix{Sym}, args...; kwargs...) = call_matrix_meth(a, :norm, args...; kwargs...)
-chol(a::Matrix{Sym}) = cholesky(a)
+#chol(a::Matrix{Sym}) = cholesky(a)
 exp(a::Matrix{Sym}) = call_matrix_meth(a, :exp)
 conj(a::Sym) = conjugate(a)
 eigvals(a::Matrix{Sym}) = [k for (k,v) in call_matrix_meth(a, :eigenvals)] # a[:eigevnals]() has multiplicity

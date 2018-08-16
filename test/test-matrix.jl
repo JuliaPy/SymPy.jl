@@ -1,6 +1,6 @@
 using SymPy
-using Compat.Test
-using Compat.LinearAlgebra
+using Test
+using LinearAlgebra
 
 @testset "Matrix" begin
     ## matrices
@@ -22,9 +22,10 @@ using Compat.LinearAlgebra
     @test SymPy.adjoint(B) == B'
     @test dual(A) == zeros(2, 2)
 
-
-    r = cholesky(A)
-    @test r*transpose(r) == A
+    
+    A1 = Sym[25 15 -5; 15 18 0; -5 0 11]
+    r = cholesky(A1)
+    @test r*transpose(r) == A1
 
 
     s = LUsolve(A, v)

@@ -159,17 +159,9 @@ end
 
 
 ## Iterator for Sym
-
-if VERSION < v"0.7.0-DEV.5126"
-    import Base: start, next, done
-    start(x::Sym) = 1
-    next(x::Sym, state) = (x.x, state-1)
-    done(x::Sym, state) = state <= 0
-else
-    import Base.iterate
-    iterate(x::Sym) = (x.x, 0)
-    iterate(x::Sym, state) = nothing
-end
+import Base.iterate
+iterate(x::Sym) = (x.x, 0)
+iterate(x::Sym, state) = nothing
 
 
 
