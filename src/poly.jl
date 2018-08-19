@@ -101,7 +101,7 @@ polynomial_sympy_methods = (
 #                            :roots ## conflict with Roots.roots and functionality provided by solve
                             )
 
-degree(x::Sym) = sympy_meth(:degree, x)
+degree(x::Sym;kwargs...) = sympy_meth(:degree, x; kwargs...)
 export degree
 
 denom(x::Sym) = sympy_meth(:denom, x)

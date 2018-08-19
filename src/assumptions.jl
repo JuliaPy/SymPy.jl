@@ -89,7 +89,7 @@ matrices are not used, though a replacement is given.
 module Q
 import SymPy
 import PyCall
-import Compat.LinearAlgebra: det, norm
+import LinearAlgebra: det, norm
 
 ##http://docs.sympy.org/dev/_modules/sympy/assumptions/ask.html#ask
 Q_predicates = (:antihermitian,

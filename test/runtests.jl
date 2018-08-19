@@ -1,5 +1,5 @@
 using SymPy
-using Compat.Test
+using Test
 
 include("tests.jl")
 include("test-math.jl")

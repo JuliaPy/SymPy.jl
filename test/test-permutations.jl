@@ -12,7 +12,7 @@
 using SymPy
 using SymPy.Permutations
 using PyCall
-using Compat.Test
+using Test
 Base.range(i) = 0:(i-1)
 
 @testset "Permutations" begin
@@ -1253,7 +1253,7 @@ P10 = make_perm(G, [0, 1])
 
 # from sympy.combinatorics import Permutation, PermutationGroup
 G = PermutationGroup([Permutation(0, 1, 3)(2, 4)])
-@test    SymPy.base(G) == [0,2]
+@test    SymPy.Permutations.base(G) == [0,2]
 # [0, 2]
 
 
@@ -1295,10 +1295,10 @@ G = PermutationGroup([Permutation(0, 1, 3)(2, 4)])
 # # from sympy.combinatorics.perm_groups import PermutationGroup
 S = SymmetricGroup(4)
 schreier_sims(S)
-@test    SymPy.base(S) == [0, 1, 2]
+@test    SymPy.Permutations.base(S) == [0, 1, 2]
 # [0, 1, 2]
 
-_base, gens = baseswap(S, base(S), strong_gens(S), 1, randomized=false)  
+_base, gens = baseswap(S, SymPy.Permutations.base(S), strong_gens(S), 1, randomized=false)  
 @test _base == [0,2,1]
 @test gens == [Permutation(0, 1, 2, 3), Permutation(3)(0, 1), Permutation(1, 3, 2),
               Permutation(2, 3), Permutation(1, 3)]
@@ -1339,7 +1339,7 @@ S = SymmetricGroup(4)
 # from sympy.combinatorics.named_groups import AlternatingGroup
 A = AlternatingGroup(4)
 schreier_sims(A)
-@test   SymPy.base(A) == [0, 1]
+@test   SymPy.Permutations.base(A) == [0, 1]
 # [0, 1]
 for g in basic_stabilizers(A)
      g
@@ -1446,7 +1446,7 @@ G = commutator(S, S, A)
 
 ## -----
 
-# contains(g, strict=True)[source]
+# contains(g, strict=True)[source] ##XXX this is `occursin` to match Julia
 # Test if permutation g belong to self, G.
 
 # If g is an element of G it can be written as a product of factors drawn# from the cosets of G’s stabilizers. To see if g is one of the actual generators defining the group use G.has(g).
@@ -1463,20 +1463,20 @@ G = commutator(S, S, A)
 a = Permutation(1, 2)
 b = Permutation(2, 3, 1)
 G = PermutationGroup(a, b, degree=5)
-@test contains(G, G[1]) # trivial check
+@test occursin(G[1], G) # trivial check
 # True
 elem = Permutation([[2, 3]], size=5)
-@test contains(G, elem)
+@test occursin(elem, G)
 # True
-@test !contains(G, Permutation(4)(0, 1, 2, 3))
+@test !occursin(Permutation(4)(0, 1, 2, 3), G)
 # False
 # If strict is False, a permutation will be resized, if necessary:
 
 
 H = PermutationGroup(Permutation(5))
-@test !contains(H, Permutation(3))
+@test !occursin(Permutation(3), H)
 # False
-@test contains(H, Permutation(3), strict=false)
+@test occursin(Permutation(3), H, strict=false)
 # True
 # To test if a given permutation is present in the group:
 
@@ -1513,7 +1513,7 @@ end
 # Confirm that it is an element of G:
 
 
- contains(G, g)
+ occursin(g, G)
 # True
 # Thus, it can be written as a product of factors (up to 3) drawn# from u. See below that a factor# from u1 and u2 and the Identity permutation have been used:
 
@@ -2061,7 +2061,9 @@ G = PermutationGroup([Permutation([0, 2, 1, 3])])
 # from sympy.combinatorics.perm_groups import PermutationGroup
 # from sympy.combinatorics.named_groups import DihedralGroup
 D = DihedralGroup(10)
-@test minimal_block(D, [0, 5]) == [0, 6, 2, 8, 4, 0, 6, 2, 8, 4]
+@test minimal_block(D, [0, 5]) == [0, 1, 2, 3, 4, 0, 1, 2, 3, 4]
+## This changed in newer versions of sympy
+##[0, 6, 2, 8, 4, 0, 6, 2, 8, 4]
 # [0, 6, 2, 8, 4, 0, 6, 2, 8, 4]
 @test minimal_block(D, [0, 1]) == [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 # [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -2428,7 +2430,7 @@ G = DihedralGroup(6)
 D = DihedralGroup(4)
 @test strong_gens(D)  == [Permutation(0, 1, 2, 3), Permutation(0, 3)(1, 2), Permutation(1, 3)]
 # [(0 1 2 3), (0 3)(1 2), (1 3)]
-@test SymPy.base(D) == [0,1]
+@test SymPy.Permutations.base(D) == [0,1]
 # [0, 1]
 
 

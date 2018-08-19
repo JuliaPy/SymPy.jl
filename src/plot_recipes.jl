@@ -43,7 +43,7 @@ plot(sin(x), cos(x), x, 0, 4pi) # helix in 3d
 
 ```
 @vars x y
-plot(linspace(0,5), linspace(0,5), x*y)
+plot(range(0,stop=5, length=50), range(0,stop=5, length=50), x*y)
 ```
 
 
@@ -59,8 +59,8 @@ surface(-5:5, -5:5, 25 - x^2 - y^2)
 
 ```
 function vfieldplot(fx, fy; xlim=(-5,5), ylim=(-5,5), n=7)
-    xs = linspace(xlim..., n)
-    ys = linspace(ylim..., n)
+    xs = range(xlim[1], stop=xlim[2], length=n)
+    ys = range(ylim[1], stop=ylim[2], length=n)    
 
     us = vec([x for x in xs, y in ys])
     vs = vec([y for x in xs, y in ys])
@@ -186,8 +186,8 @@ export VectorField
     xlims = get(plotattributes,:xlims, (-5,5))
     ylims = get(plotattributes, :ylims, (-5,5))
     
-    xs = repeat(linspace(xlims[1], xlims[2], n), inner=(n,))
-    ys = repeat(linspace(ylims[1], ylims[2], n), outer=(n,))
+    xs = repeat(range(xlims[1], stop=xlims[2], length=n), inner=(n,))
+    ys = repeat(range(ylims[1], stop=ylims[2], length=n), outer=(n,))
 
     us, vs = broadcast(F.fx, xs, ys), broadcast(F.fy, xs, ys)
 

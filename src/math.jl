@@ -25,7 +25,7 @@ math_sympy_methods = (:radians2degrees, :degrees2radians,
 
 # hypot and atan2
 hypot(x::Sym, y::Number) = sqrt(x^2 + y^2)
-atan2(y::Sym, x::Number) = sympy_meth(:atan2, y, x)
+atan(y::Sym, x::Number) = sympy_meth(:atan2, y, x)
 
 ## Log function handles arguments differently
 log(x::Sym) = sympy_meth(:log, x)
@@ -82,6 +82,7 @@ Base.copysign(x::Sym, y::Sym) = abs(x)*sign(y)
 Base.signbit(x::Sym) = x < 0
 Base.flipsign(x::Sym, y) = signbit(y) ? -x : x
 Base.eps(::Type{Sym}) = zero(Sym)
+#Base.eps(x::SymbolicObject) = zero(Sym)
 
 
 ## use SymPy Names here...
@@ -90,10 +91,10 @@ Base.eps(::Type{Sym}) = zero(Sym)
 
 import Base: min, max
 min(x::Sym, a) = sympy_meth(:Min, x, a)
-VERSION < v"0.7.0-" && (min(a, x::Union{SA, Real}) where {SA <: Sym} = min(x,a))
-
 max(x::Sym, a) = sympy_meth(:Max, x, a)
-VERSION < v"0.7.0-" && (max(a, x::Union{SA, Real}) where {SA <: Sym} = max(x,a))
+# at one time this allowed mixing of a,x order, but broke in v0.7
+#(min(a, x::Union{SA, Real}) where {SA <: Sym} = min(x,a))
+#(max(a, x::Union{SA, Real}) where {SA <: Sym} = max(x,a))
 
 # SymPy names
 Min(ex::Sym, ex1::Sym) = sympy_meth(:Min, ex, ex1)
@@ -190,7 +191,8 @@ const Piecewise = piecewise
 
 piecewise_fold(ex::Sym) = sympy_meth(:piecewise_fold, ex)
 
-VERSION < v"0.7.0-" && (Base.ifelse(ex::Sym, a, b) = piecewise((a, ex), (b, true)))
+## This broke with VERSION v"0.7.0"
+##(Base.ifelse(ex::Sym, a, b) = piecewise((a, ex), (b, true)))
 
 """
 Indicator expression: (Either `\\Chi[tab](x,a,b)` or `Indicator(x,a,b)`)
@@ -293,19 +295,12 @@ global IM = Sym(pynull())
 global oo = Sym(pynull())
 
 
-if isdefined(Base, :MathConstants)
-    Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
-    Base.convert(::Type{Sym}, x::Irrational{:e}) = E
-    Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
-    Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
-    Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
-else
-    Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
-    Base.convert(::Type{Sym}, x::Irrational{:e}) = E
-    Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
-    Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
-    Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
-end
+
+Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
+Base.convert(::Type{Sym}, x::Irrational{:e}) = E
+Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
+Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
+Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
 
 function init_math()
     "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors."

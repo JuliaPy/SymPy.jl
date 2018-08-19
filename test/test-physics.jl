@@ -2,7 +2,7 @@ using SymPy.Physics
 using SymPy: Sym, sqrt, symbols, doit, PI
 using SymPy.SpecialFuncs: Ynm
 using PyCall: PyError
-using Compat.Test
+using Test
 
 
 @testset "Physics" begin

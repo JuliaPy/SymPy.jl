@@ -173,11 +173,11 @@ solveset_sympy_methods = (:solveset,
 
 ## solveset does not currently allow simulataneous equations
 ## Solve for a single variable from equations. Return Dict{Sym,Sym}
-# function solveset{T<:Sym}(exs::(@compat Union{T,Vector{T}}), x::Sym; kwargs...)
+# function solveset{T<:Sym}(exs::(Union{T,Vector{T}}), x::Sym; kwargs...)
 #     solveset(exs, [x;]; kwargs...)
 # end
 
-# function solveset{T<:Sym,S<:Sym}(exs::(@compat Union{T,Vector{T}}), xs::Vector{S}; kwargs...)
+# function solveset{T<:Sym,S<:Sym}(exs::(Union{T,Vector{T}}), xs::Vector{S}; kwargs...)
 #     a = sympy_meth(:solveset, convert(SymMatrix, exs), xs;  kwargs...)
 #     ## finesse output
 #     a

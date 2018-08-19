@@ -42,8 +42,6 @@ function get_matrix_index(s::PyObject, i::Integer)
     sz = matrix_size(s)
     if length(sz) == 1
         ind = i - 1
-    elseif VERSION < v"0.7.0-"
-        ind = ind2sub(sz, i)
     else
         ind = Tuple(Base.CartesianIndices(sz)[i])
     end
@@ -166,7 +164,7 @@ end
 inv(A::Matrix{Sym}) = inverse_LU(A)
 norm(a::AbstractVector{Sym}, args...; kwargs...) = call_matrix_meth(a, :norm, args...; kwargs...)
 norm(a::AbstractMatrix{Sym}, args...; kwargs...) = call_matrix_meth(a, :norm, args...; kwargs...)
-chol(a::Matrix{Sym}) = cholesky(a)
+#chol(a::Matrix{Sym}) = cholesky(a)
 exp(a::Matrix{Sym}) = call_matrix_meth(a, :exp)
 conj(a::Sym) = conjugate(a)
 eigvals(a::Matrix{Sym}) = [k for (k,v) in call_matrix_meth(a, :eigenvals)] # a[:eigevnals]() has multiplicity

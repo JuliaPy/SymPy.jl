@@ -1,7 +1,7 @@
 using SymPy: Sym, sqrt, conjugate, symbols, PI, simplify,
              expand_func, rewrite, N
-using Compat.LinearAlgebra
-using Compat.Test
+using LinearAlgebra
+using Test
 
 using SymPy.SpecialFuncs
 using SpecialFunctions
@@ -97,7 +97,7 @@ using SpecialFunctions
     @test Ynm(n, -m, θ, ϕ) == (-1)^m*exp(-2im*m*ϕ)*Ynm(n, m, θ, ϕ)
     @test Ynm(n, m, -θ, ϕ) == Ynm(n, m, θ, ϕ)
     @test Ynm(n, m, θ, -ϕ) == exp(-2im*m*ϕ)*Ynm(n, m, θ, ϕ)
-    @test expand(simplify(Ynm(0, 0, θ, ϕ)), func=true) == 1/(2*sqrt(PI))
+    @test SymPy.expand(simplify(Ynm(0, 0, θ, ϕ)), func=true) == 1/(2*sqrt(PI))
 
     @test Ynm_c(n, m, θ, ϕ) == conjugate(Ynm(n, m, θ, ϕ))
 

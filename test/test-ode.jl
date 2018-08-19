@@ -1,5 +1,5 @@
 using SymPy
-using Compat.Test
+using Test
 
 @testset "ODes" begin
     ## ODEs

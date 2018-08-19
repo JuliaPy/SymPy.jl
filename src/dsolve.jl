@@ -92,13 +92,9 @@ Base.show(io::IO, u::SymFunction) = println("$(string(Sym(u.x)))" * repeat("'", 
 
 
 ## rather than use `diff(u(x),x,1)` we can use `u'(x)`
-if  VERSION < v"0.7.0-"
-    import Base: ctranspose
-    Base.ctranspose(x::SymFunction) = SymFunction(x.x, x.n + 1)
-else
-    import Base: adjoint
-    Base.adjoint(x::SymFunction)    = SymFunction(x.x, x.n + 1)
-end
+## Will play poorly with matrices of SymFunctions
+import Base: adjoint
+Base.adjoint(x::SymFunction)    = SymFunction(x.x, x.n + 1)
 
 
 """
