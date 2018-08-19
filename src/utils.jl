@@ -46,7 +46,8 @@ symbols(x::Symbol; kwargs...) = symbols(string(x); kwargs...)
 ## @syms a b c --- no commas on right hand side!
 ## Thanks to vtjnash for this!
 """
-
+    @syms x [y z ...] [assumptions...]
+    
 Macro to create many symbolic objects at once.
 
 The `@syms` macros creates the variables and assigns them into the
@@ -70,13 +71,9 @@ Additionally you can rename arguments using pairs notation:
 @syms   Ld=>"L_d" Lq=>"L_q"
 ```
 
-The `@vars` macro is similar, but this is
-transitional and `@syms` should be used. (This is the name used in
-MATLAB.). The original behaviour of `@syms` was to create the symbols and
-return them for assignment through the left hand side.  The `symbols`
-function does this with just few more keystrokes and allows
-assumptions to be made. Hence, `@syms` is repurposed.
-
+The `@vars` macro is similar, `@syms` is the name used in
+MATLAB.
+    
 Original macro magic contributed by @vtjnash and extended by @alhirzel and
 @spencerlyon2
 """
@@ -105,10 +102,11 @@ macro syms(x...)
 end
 
 
-
+# TODO alias @vars to @syms
 """
-
-The `vars` macro is identical to  `@syms`. This name will likely be deprecated.
+    @vars x y z
+  
+The `vars` macro is identical to  `@syms`.
 
 """
 macro vars(x...)

@@ -1,4 +1,4 @@
-[![SymPy](http://pkg.julialang.org/badges/SymPy_0.6.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=0.6) 
+[![SymPy](http://pkg.julialang.org/badges/SymPy_0.7.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=0.7) 
 
 Linux: [![Build Status](https://travis-ci.org/JuliaPy/SymPy.jl.svg?branch=master)](https://travis-ci.org/JuliaPy/SymPy.jl)
 &nbsp;
@@ -33,7 +33,7 @@ package is first loaded. Otherwise, installing both `Python` and
 `SymPy` (which also requires `mpmath`) can be done by other means.
 In this case, the `Anaconda` distribution is suggested, as it provides a single
 installation of `Python` that includes `SymPy` and many other
-scientifice libraries that can be profitably accessed within `Julia`
+scientific libraries that can be profitably accessed within `Julia`
 via `PyCall`. (Otherwise, install `Python` then download the `sympy`
 library from https://github.com/sympy/sympy/releases and install.)
 
@@ -104,7 +104,7 @@ SymPy's `ex.meth_name(...)` or `meth_name(ex, ...)`, as possible.
 
 There is a `sympy` string macro to simplify this a bit, with the call
 looking like: `sympy"meth_name"(...)`, for example
-`sympy"harmonic"(10)`. For example, the above could also be done
+`sympy"harmonic"(10)`. For another example, the above could also be done
 through:
 
 ```

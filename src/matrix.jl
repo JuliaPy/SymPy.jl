@@ -42,8 +42,6 @@ function get_matrix_index(s::PyObject, i::Integer)
     sz = matrix_size(s)
     if length(sz) == 1
         ind = i - 1
-    elseif VERSION < v"0.7.0-"
-        ind = ind2sub(sz, i)
     else
         ind = Tuple(Base.CartesianIndices(sz)[i])
     end

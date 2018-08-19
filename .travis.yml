@@ -24,6 +24,6 @@ before_install:
   - if [ $MPMATH = "true" ]; then julia -e 'Pkg.add("Conda"); using Conda; Conda.add("mpmath")';fi
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia -e 'Pkg.clone(pwd()); Pkg.build("SymPy"); Pkg.test("SymPy"; coverage=true)'
+  - julia -e 'using Pkg; Pkg.clone(pwd()); Pkg.build("SymPy"); Pkg.test("SymPy"; coverage=true)'
 after_success: 
-  - julia -e 'Pkg.add("Coverage"); cd(Pkg.dir("SymPy")); using Coverage; Coveralls.submit(process_folder())'
+  - julia -e 'using Pkg; Pkg.add("Coverage"); cd(Pkg.dir("SymPy")); using Coverage; Coveralls.submit(process_folder())'

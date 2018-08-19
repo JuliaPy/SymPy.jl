@@ -34,17 +34,17 @@ x = Sym("x")
 This creates a symbolic object `x`, which can be manipulated through further function calls.
 
 
-There is the `@syms` macro that makes creating multiple variables a
+There is the `@vars` macro that makes creating multiple variables a
 bit less typing, as it creates variables in the local scope -- no
 assignment is necessary. Compare these similar ways to create symbolic
 variables:
 
 ```
-@syms a b c
+@vars a b c
 a,b,c = Sym("a,b,c")
 ```
 
-(For now, `@vars` is also an alias for `@syms`.)
+(There is the identical `@syms` for MATLAB users.)
 
 ### Assumptions
 
@@ -73,10 +73,10 @@ solve(x^2 + 1)   # ±i are not real
 solve(y1 + 1)    # -1 is not positive
 ```
 
-The `@syms` macro can also have assumptions passed in as follows:
+The `@vars` macro can also have assumptions passed in as follows:
 
 ```
-@syms u1 positive=true u2 positive=true
+@vars u1 u2 positive=true
 solve(u1 + u2)  # empty, though solving u1 - u2 is not.
 ```
 
@@ -108,7 +108,7 @@ function, the second to `SymPy`'s:
 SymPy provides a means to substitute values in for the symbolic expressions. The specification requires an expression, a variable in the expression to substitute in for, and a new value. For example, this is one way to make a polynomial in a new variable:
 
 ```
-@syms x y
+@vars x y
 ex = x^2 + 2x + 1
 subs(ex, x, y)
 ```
@@ -218,7 +218,7 @@ but the latter two expressions do not.
 `SymPy` makes it very easy to work with polynomial and rational expressions. First we create some variables:
 
 ```
-@syms x y z
+@vars x y z
 ```
 
 ### The expand, factor, collect, and simplify functions
@@ -348,7 +348,7 @@ The SymPy [tutorial](http://docs.sympy.org/dev/tutorial/simplification.html#powe
 We see that with assumptions, the following expression does simplify to $0$:
 
 ```
-@syms x y nonnegative=true a real=true
+@vars x y nonnegative=true a real=true
 simplify(x^a * y^a - (x*y)^a)
 ```
 
@@ -418,7 +418,7 @@ p(x=>0)
 Though one could use some trick like this to find all the coefficients:
 
 ```
-Sym[[coeff(p, x^i) for i in N(degree(p)):-1:1]; p(x=>0)]
+Sym[[coeff(p, x^i) for i in N(degree(p,gen=x)):-1:1]; p(x=>0)]
 ```
 
 that is cumbersome, at best. SymPy has a function `coeffs`, but it is defined for polynomial types, so will fail on `p`:
@@ -509,7 +509,7 @@ rts = solve(p)
 But in fact, `rts` contains lots of information. We can extract numeric values quite easily with `N`:
 
 ```
-[N(r) for r in rts]     # or map(N, rts)
+N.(rts)
 ```
 
 These are numeric approximations to irrational values. For numeric
@@ -699,6 +699,7 @@ For example:
 ```
 x = symbols("x")
 using Plots
+pyplot()
 #
 plot(x^2 - 2, -2,2)
 ```
@@ -815,15 +816,6 @@ limit(sign(x), x => 0, dir="-"), limit(sign(x), x => 0, dir="+")
 careful, either plot or check that both the left and right limit exist
 and are equal.)
 
-#### Operator interface
-
-
-For univariate functions there is an "operator" interface, where we pass a function object as the first argument and the value for `c` as the second (the variable is implicit, as `f` has only one).
-
-```
-f(x) = sin(5x)/x
-limit(f, 0)
-```
 
 #### Numeric limits
 
@@ -900,14 +892,6 @@ f(x) = (12x^2 - 1) / (x^3)
 diff(f(x), x) |> solve
 ```
 
-#### Operator version
-
-`SymPy` provides an "operator" version of `diff` for univariate functions for convenience (`diff(f::Function,k=1)=diff(f(x),x,k)`):
-
-```
-f(x) = exp(x)*cos(x)
-diff(f, 2)
-```
 
 #### Partial derivatives
 
@@ -1173,19 +1157,6 @@ integ = Integral(sin(x^2), x)
 doit(integ)
 ```
 
-#### Operator version
-For convenience, for univariate functions there is a convenience wrapper so that the operator styles -- `integrate(f)` and `integrate(f, a, b)` -- will perform the integrations.
-
-```
-f(x) = exp(x) * cos(x)
-integrate(f)
-```
-
-Or
-
-```
-integrate(sin, 0, pi)
-```
 
 ### Taylor series
 
@@ -1259,6 +1230,7 @@ w = [1,y,3]
 The generic definitions of vector operations will work as expected with symbolic objects:
 
 ```
+using LinearAlgebra
 dot(v,w)
 ```
 
@@ -1306,7 +1278,7 @@ M = [1 x; x 1]
 As much as possible, generic `Julia` functions are utilized:
 
 ```
-diagm(ones(Sym, 5))
+diagm(0=>ones(Sym, 5))
 M^2
 det(M)
 ```
@@ -1501,9 +1473,7 @@ To plot this over a range of values for `a` we have:
 as = -2:0.6:2
 ex = rhs(out)
 p = plot(ex(a=>as[1]), -1.8, 1.8, ylims=(-4, 4))
-for i in as[2:end]
-  plot!(p, ex(a=>i), -1.8, 1.8, ylims=(-4, 4))
-end
+[plot!(p, ex(a=>i), -1.8, 1.8, ylims=(-4, 4)) for i in as[2:end]]
 p  
 ```
 
@@ -1536,7 +1506,7 @@ plot(rhs(out), -1/3, 2)
 
 ##### Example
 
-Boundary value problems can be solved for as well through a similar
+Boundary value problems can be solved for, as well, through a similar
 syntax. Continuing with examples from the
 [Wolfram](https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html)
 page, we solve $y''(x) +y(x) = e^x$ over $[0,1]$ with conditions
