@@ -80,7 +80,7 @@ macro symfuns(x...)
         end
     end
     push!(q.args, Expr(:tuple, fs...)) # return all of the functions we created
-    eval(Main, q)
+    Core.eval(Main, q)
 end
 
 
