@@ -11,7 +11,7 @@ Examples
 ```
 @vars x
 import Base.Docs.doc
-doc(sin(x))        # 
+doc(sin(x))        #
 doc(sympy[:sin])   # explicit module lookup
 doc(SymPy.mpmath[:hypercomb]) # explicit module lookup
 doc(Poly(x^2,x), :coeffs) # coeffs is an object method of the poly instance
@@ -43,9 +43,7 @@ latex(s::SymbolicObject, args...; kwargs...)  = sympy_meth(:latex, s, args...; k
 "create basic printed output"
 function jprint(x::SymbolicObject)
     out = PyCall.pycall(pybuiltin("str"), String, PyObject(x))
-    if occursin(r"\*\*", out)
-        out = replace(out, "**" => "^")
-    end
+    out = replace(out, r"\*\*" => "^")
     out
 end
 jprint(x::AbstractArray) = map(jprint, x)
@@ -58,8 +56,8 @@ Base.show(io::IO, s::Sym) = print(io, jprint(s))
 
 ## text/plain
 show(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy["pretty"](s))
+show(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*"))
 
-show(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*", itex=true))
 function  show(io::IO, ::MIME"text/latex", x::AbstractArray{Sym})
     function toeqnarray(x::Vector{Sym})
         a = join([latex(x[i]) for i in 1:length(x)], "\\\\")
@@ -76,7 +74,7 @@ end
 ## Pretty print dicts
 function show(io::IO, ::MIME"text/latex", d::Dict{T,S}) where {T<:Sym, S<:Any}
     Latex(x::Sym) = latex(x)
-    Latex(x) = sprint(Base.showcompact, x)
+    Latex(x) = sprint(io -> show(IOContext(io, :compact => true), x))
 
     out = "\\begin{equation*}\\begin{cases}"
     for (k,v) in d
@@ -89,4 +87,4 @@ end
 
 
 ## Convert SymPy symbol to Julia expression
-convert(::Type{Expr}, x::SymbolicObject) = parse(jprint(x))
+convert(::Type{Expr}, x::SymbolicObject) = Meta.parse(jprint(x))
