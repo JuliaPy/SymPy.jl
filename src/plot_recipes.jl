@@ -58,26 +58,32 @@ surface(-5:5, -5:5, 25 - x^2 - y^2)
 * a vectorfield plot can (inefficiently but directly) be produced following this example:
 
 ```
-function vfieldplot(fx, fy; xlim=(-5,5), ylim=(-5,5), n=7)
+function vfieldplot(fx, fy; xlim=(-5,5), ylim=(-5,5), n=8)
     xs = range(xlim[1], stop=xlim[2], length=n)
-    ys = range(ylim[1], stop=ylim[2], length=n)    
+    ys = range(ylim[1], stop=ylim[2], length=n)
 
     us = vec([x for x in xs, y in ys])
     vs = vec([y for x in xs, y in ys])
     fxs = vec([fx(x,y) for x in xs, y in ys])
     fys = vec([fy(x,y) for x in xs, y in ys])
 
-    quiver(us, vs, quiver=(fxs, fys))
+    mxs = maximum(abs.(filter(!isinf, filter(!isnan, fxs))))
+    mys = maximum(abs.(filter(!isinf, filter(!isnan, fys))))
+    d = 1/2 * max((xlim[2]-xlim[1])/mxs, (ylim[2]-ylim[1])/mys) / n
+
+    quiver(us, vs, quiver=(fxs.*d, fys.*d))
+
 end
 fx = (x + y) / sqrt(x^2 + y^2)
 fy = (x - y) / sqrt(x^2 + y^2)
 vfieldplot(fx, fy)
-```
 
+
+```
 
 * To plot two or more functions at once, the style `plot([ex1, ex2], a, b)` does not work. Rather, use
     `plot(ex1, a, b); plot!(ex2)`, as in:
-    
+
 ```
 @vars x
 plot(sin(x), 0, 2pi)
@@ -185,7 +191,7 @@ export VectorField
 
     xlims = get(plotattributes,:xlims, (-5,5))
     ylims = get(plotattributes, :ylims, (-5,5))
-    
+
     xs = repeat(range(xlims[1], stop=xlims[2], length=n), inner=(n,))
     ys = repeat(range(ylims[1], stop=ylims[2], length=n), outer=(n,))
 
@@ -193,7 +199,7 @@ export VectorField
 
     delta = min((xlims[2]-xlims[1])/n, (ylims[2]-ylims[1])/n)
     m = maximum([norm([u,v]) for (u,v) in zip(us, vs)])
-    
+
     lambda = delta / m
 
     x := xs

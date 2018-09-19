@@ -54,7 +54,7 @@ id = Permutation(0:10)
 ```
 
 Cycle notation can more compactly describe a permuation, it can be passed in as a container of cycles specified through tuples or vectors:
-    
+
 ```
 p = Permutation([(0,2), (1,3)])
 ```
@@ -71,7 +71,7 @@ constructor with values separated by commas and the "call" method for
 `i -> j` is created (also the notation `i^p` returns this`) *but* if
 more than one argument is given, a cycle is created and multiplied on
 the *right* by `p`, so that the above becomes `(0,2) * (1,3)`.
-    
+
 Here are two permutations forming the symmetries of square, naturally represented in the two ways:
 
 ```
@@ -81,11 +81,11 @@ rotate = Permutation([1,2,3,0])    # or Permutation(0,1,2,3) in cycle notation
 
 Operations on permutations include:
 
-* a function call, `p(i)` to recover `j` where `i -> j`, also `i^p`.  
+* a function call, `p(i)` to recover `j` where `i -> j`, also `i^p`.
 * `*` for multiplication. The convention is `(p*q)(i) = q(p(i))` or with the `^` notation: `i^(p*q) = (i^p)^q`.
 * `+` for multiplication when `p` and `q` commute, where a check on commuting is performed.
 * `inv` for the inverse permutation.
-* `/`, where `p/q` is `p * inv(q)`.    
+* `/`, where `p/q` is `p * inv(q)`.
 * `p^n` for powers. We have `inv(p) = p^(-1)` and `p^order(p)` is the identity.
 * `p^q` for conjugate, defined by `inv(q) * p * q`.
 
@@ -99,7 +99,7 @@ flip^2  # the identity
 wheres a rotation is not (as it has order 4)
 
 ```
-rotate * rotate    
+rotate * rotate
 order(rotate)
 ```
 
@@ -122,10 +122,10 @@ We can see this is the correct mapping `1 -> 3` with
 We can check that `flip` and `rotate^2` do commute:
 
 ```
-id = Permutation(3)   # (n) is the identify    
+id = Permutation(3)   # (n) is the identify
 commutator(flip, rotate^2) == id
-```    
-    
+```
+
 The conjugate for flip and rotate does the inverse of the flip, then rotates, then flips:
 
 ```
@@ -136,12 +136,12 @@ This is different than `flip^rotate`. As `flip` commutes with `rotate^2` this wi
 
 ```
 (rotate^2)^flip
-```    
+```
 
 !!! Differences:
 
-There is no support for the `Cycle` class    
-    
+There is no support for the `Cycle` class
+
 """
 function Permutation(x; kwargs...)
     if typeof(x) <: UnitRange
@@ -218,7 +218,7 @@ for meth in permutations_new_functions
     end
     eval(Expr(:export, meth))
 end
-                           
+
 
 
 ## Base methods of the object
@@ -303,7 +303,7 @@ end
 
 _unflatten_cyclic_form(m::Matrix) = [m[i,:] for i in 1:size(m)[1]]
 _unflatten_cyclic_form(m) = m
-                             
+
 function cyclic_form(p::SymPermutation)
     m = PyCall.PyObject(p)[:cyclic_form]
     _unflatten_cyclic_form(m)
@@ -331,12 +331,12 @@ Some pre-defined groups are built-in:
 * `DihedralGroup`: Group formed by a flip and rotation
 * AlternativeGroup: Subgroup of S_n of even elements
 * AbelianGroup: Returns the direct product of cyclic groups with the given orders.
-    
+
 
 Differences:
 
 * use `collect(generate(G))` in place of `list(G.generate())`
-    
+
 """
 PermutationGroup(args...; kwargs...) = SymPy.combinatorics[:perm_groups][:PermutationGroup](args...; kwargs...)
 export PermutationGroup
@@ -366,7 +366,7 @@ SymPy.elements(gp::SymPy.SymPermutationGroup) = [a for a in PyCall.PyObject(gp)[
     random_element(gp, ...)
 
 A random group element. Alias to `sympy"random"`.
-"""    
+"""
 random_element(gp::SymPy.SymPermutationGroup, args...) = object_meth(gp, :random, args...)
 
 # base_methods
@@ -387,7 +387,7 @@ end
 
 # new methods
 permutation_group_methods = (#:baseswap,
-                             :base,
+                             #:base,
                              :center,
                              :centralizer,
                              :commutator,
@@ -479,7 +479,7 @@ permutation_group_properties = (:basic_orbits,
 :generators,
 :max_div,
                                 :transitivity_degree
-                                
+
                                 )
 for prop in permutation_group_properties
     prop_name = string(prop)
@@ -493,10 +493,6 @@ for prop in permutation_group_properties
     eval(Expr(:export, prop))
 end
 
-
-if !(VERSION >= v"1.0.0")
-    import Base: base
-end
 
 base(ex::SymPermutationGroup) = PyCall.PyObject(ex)[:base]
 export base
