@@ -36,12 +36,12 @@ using Base.MathConstants
     @test Sym(im) == 1im
     @test Sym(2im) == 2im
     @test Sym(1 + 2im) == 1 + 2im
-    
+
     pi, e, catalan = Base.MathConstants.pi, Base.MathConstants.e, Base.MathConstants.catalan
     @test N(Sym(pi)) == Float64(pi)
     @test N(Sym(e)) == Float64(e)
     @test N(Sym(catalan)) == Float64(catalan)
-        
+
 
     ## function conversion
     f1 = convert(Function, x^2)
@@ -517,6 +517,15 @@ end
     @vars x_imag imaginary=true
     @test ask(Q.complex(x_maybecomplex)) == nothing
     @test ask(Q.complex(x_imag)) == true
+
+    # issue 242 lambdify and conjugate
+    @vars x
+    expr = conjugate(x)
+    fn = lambdify(expr)
+    @test fn(1.0im) == 0.0 - 1.0im
+    fn = lambdify(expr, use_julia_code=true)
+    @test fn(1.0im) == 0.0 - 1.0im
+
 end
 
 @testset "generic programming, issue 223" begin
@@ -530,7 +539,7 @@ end
     @test !isreal(xcomplex) # is_real(xcomplex) is nothing
     @test isreal(zreal)
     @test !isreal(zcomplex)
-    
+
     # conversions
     @test complex(xreal) == xreal
     @test complex(xreal, xreal) == xreal + IM*xreal
@@ -540,7 +549,7 @@ end
     @test complex(zcomplex) == zcomplex
     @test complex(zcomplex) !== zcomplex
 
-    
+
 
 
 end

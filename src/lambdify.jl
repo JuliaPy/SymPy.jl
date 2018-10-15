@@ -1,6 +1,5 @@
 ## Lambidfy an expression
 ## https://github.com/jverzani/SymPy.jl/issues/60
-## Hack until SymPy -> Julia converter written
 
 ## some tools, perhaps. Not exported for now.
 funcname(x) = PyObject(x)[:func][:__name__]
@@ -56,21 +55,22 @@ fn_map = Dict(
               "LessThan" => :(<=),
               "Equal" => :(==),
               "GreaterThan" => :(>=),
-              "Greater" => :(>) 
+"Greater" => :(>),
+"conjugate" => :conj
               )
-              
+
 map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : Symbol(key)
-              
-              
+
+
 ## TODO? In SymPy, one can pass in dictionary keys to replace functions
 ## http://docs.sympy.org/dev/tutorial/manipulation.html
 function walk_expression(ex; values=Dict(), fns=Dict())
 
     fns_map = merge(fn_map, fns)
     vals_map = merge(val_map, values)
-    
+
     fn = funcname(ex)
-    
+
     if fn == "Symbol"
         return Symbol(string(ex))
     elseif fn in ["Integer" , "Float"]
@@ -116,6 +116,8 @@ Additionally, a DataType keyword can be specified for the function.
 
 Not all expressions can be lambdified. If not, an error is thrown.
 
+There are two steps: a conversion from SymPy code to an expression, then a conversion into an anonymous function. The first step is performed either through `walk_expression` (the default) or through a converter provided by SymPy, `SymPy.sympy_meth(:julia_code, expr)`. The latter has some issues with the dot notation so is not the default. To use it, pass `do_julia_code=true` to `lambdify`.
+
 Some simple examples
 
 ```
@@ -135,17 +137,19 @@ map(u -> N(ex(u)), xs)   # 3.435850 seconds
 map(lambdify(ex), xs)    # 0.007085 seconds
 ```
 
-This is a *temporary* solution. The proper fix is to do this in SymPy.
 
 """
-function lambdify(ex::Sym, vars=free_symbols(ex); typ=Any, fns=Dict(), values=Dict())
+function lambdify(ex::Sym, vars=free_symbols(ex); typ=Any, fns=Dict(), values=Dict(), use_julia_code=false)
     # if :julia_code printer is there, use it
-    # if haskey(sympy, :julia_code)
-    #     body = parse(sympy_meth(:julia_code, ex)) # issue here with 2.*...
-    # else
-    #     body = walk_expression(ex, fns=fns, values=values)
-    # end
-    body = walk_expression(ex, fns=fns, values=values)    
+    if use_julia_code
+        body = Meta.parse(sympy_meth(:julia_code, ex)) # issue here with 2.*...
+    else
+        body = walk_expression(ex, fns=fns, values=values)
+    end
+    _lambdify(body, vars; typ=typ, fns=fns, values=values)
+end
+
+function _lambdify(body, vars=free_symbols(ex); typ=Any, fns=Dict(), values=Dict())
     try
         syms = typ == Any ? map(Symbol,vars) : map(s->Expr(:(::),s,typ), Symbol.(vars))
         fn = eval(Expr(:function, Expr(:call, gensym(), syms...), body))
@@ -154,6 +158,8 @@ function lambdify(ex::Sym, vars=free_symbols(ex); typ=Any, fns=Dict(), values=Di
         throw(ArgumentError("Expression does not lambdify"))
     end
 end
+
+
 
 # from @mistguy cf. https://github.com/JuliaPy/SymPy.jl/issues/218
 # T a data type to convert to, when specified
@@ -209,7 +215,7 @@ function lambdify_expr(ex::Sym, vars=free_symbols(ex); name=gensym(), typ=Any, f
     # else
     #     body = walk_expression(ex, fns=fns, values=values)
     # end
-    body = walk_expression(ex, fns=fns, values=values)    
+    body = walk_expression(ex, fns=fns, values=values)
     try
         syms = typ == Any ? map(Symbol,vars) : map(s->Expr(:(::),s,typ), Symbol.(vars))
         Expr(:function, Expr(:call, name, syms...), body)
@@ -227,4 +233,3 @@ function init_lambdify()
 #        eval(Expr(:export, :julia_code))
 #    end
 end
-
