@@ -12,7 +12,7 @@ hankelh1, hankelh1x, hankelh2, hankelh2x, zeta
 
 
 
-                        
+
 ## https://github.com/JuliaMath/SpecialFunctions.jl/blob/master/src/SpecialFunctions.jl
 ## julia -> sympy mapping.
 julia_sympy_map = (
@@ -111,7 +111,7 @@ julia_sympy_map = (
 
 )
 
-                      
+
 for (jmeth, smeth) in [(j,s) for (j,s) in julia_sympy_map if s !== :nothing && j!== :nothing]
     meth_name = string(smeth)
     eval(Expr(:import, :SpecialFunctions, jmeth))
@@ -120,7 +120,7 @@ for (jmeth, smeth) in [(j,s) for (j,s) in julia_sympy_map if s !== :nothing && j
         # `$($meth_name)`: a SymPy function.
         #     The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
         #     """ ->
-        ($jmeth)(x::Sym, xs...;kwargs...) = sympy_meth($meth_name, x, xs...; kwargs...)
+        ($jmeth)(x::Sym, xs...;kwargs...) = SymPy._sympy_meth($meth_name, x, xs...; kwargs...)
     end
     eval(Expr(:export,smeth))
 end
@@ -134,7 +134,7 @@ for meth in [v for (k,v) in julia_sympy_map if k == :nothing]
         #     `$($meth_name)`: a SymPy function.
         #         The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
         #         """ ->
-        ($meth)(xs...; kwargs...) = sympy_meth($meth_name, xs...; kwargs...)
+        ($meth)(xs...; kwargs...) = SymPy._sympy_meth($meth_name, xs...; kwargs...)
     end
     eval(Expr(:export, meth))
 end
@@ -152,7 +152,7 @@ lgamma(x::Sym) = log(gamma(x))
 for fn in (:besselj, :bessely, :besseli, :besselk)
     meth = string(fn)
     eval(Expr(:import, :SpecialFunctions, fn))
-    @eval ($fn)(nu::Number, x::Sym; kwargs...) = sympy_meth($meth, nu, x; kwargs...)
+    @eval ($fn)(nu::Number, x::Sym; kwargs...) = SymPy._sympy_meth($meth, nu, x; kwargs...)
     @eval ($fn)(nu::Number, a::AbstractArray{Sym}) = map(x ->$fn(nu, x), a)
 end
 

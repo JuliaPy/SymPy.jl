@@ -44,14 +44,14 @@ import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
        atan, asinh, acosh, atanh, sec, csc, cot, asec,
        acsc, acot, sech, csch, coth, asech, acsch, acoth,
        sinc, cosc, cosd, cotd, cscd, secd, sind, tand,
-       acosd, acotd, acscd, asecd, asind, atand, 
+       acosd, acotd, acscd, asecd, asind, atand,
        sinpi, cospi,
        log, log2,
        log10, log1p, exponent, exp, exp2, expm1, cbrt, sqrt,
        ceil, floor,
        trunc, round, significand,
        abs, abs2, max, min, maximum, minimum, diff,
-       sign, 
+       sign,
        zero, one,
        hypot
 import Base: transpose
@@ -164,12 +164,12 @@ for meth in union(
 # The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 #     """ ->
         ($meth)(ex::Sym, args...; kwargs...) =
-            sympy_meth($meth_name, ex, args...; kwargs...)
+            _sympy_meth($meth_name, ex, args...; kwargs...)
     end
 end
 
 
-    
+
 ## These are *added*, so exported
 for meth in union(core_sympy_methods,
                   math_sympy_methods,
@@ -193,7 +193,7 @@ for meth in union(core_sympy_methods,
 # `$($meth_name)`: a SymPy function.
 # The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 # """ ->
-        ($meth)(ex::T, args...; kwargs...) where {T<:SymbolicObject} = sympy_meth($meth_name, ex, args...; kwargs...)
+        ($meth)(ex::T, args...; kwargs...) where {T<:SymbolicObject} = _sympy_meth($meth_name, ex, args...; kwargs...)
 
     end
     eval(Expr(:export, meth))
@@ -255,17 +255,32 @@ global call_sympy_fun(fn::PyCall.PyObject, args...; kwargs...) = PyCall.pycall(f
 
 ## Main interface to methods in sympy
 ## sympy_meth(:name, ars, kwars...)
-global sympy_meth(meth, args...; kwargs...) = begin
+## These  get coverted to PyAny for conversion via
+## PyCall, others directly call `Sym`, as it is faster
+function sympy_meth(meth, args...; kwargs...)
     ans = call_sympy_fun(sympy[string(meth)], args...; kwargs...)
     ## make nicer...
     try
         if isa(ans, Vector)
             ans = Sym[i for i in ans]
-        end
+         end
     catch err
     end
     ans
 end
+
+# bypass PyAny
+## can't do for sympy[:FiniteSet],
+# pybuiltin(:dict),
+# pybuiltin(:list),
+# pybuiltin(:str),
+# pybuiltin(:int) and iterables
+# ## also PyObject(pybuiltin(:None))
+function _sympy_meth(meth, args...; kwargs...)
+    out = PyCall.pycall(sympy[string(meth)], PyCall.PyObject, args...; kwargs...)
+    Sym(out)
+end
+
 
 
 # """
@@ -289,7 +304,7 @@ end
 
     try various ways of calling a sympy function specified as a key
 
-function behind `sympy"key"(...)` interface        
+function behind `sympy"key"(...)` interface
 
 """
 function _sympy_str(fn, args...; kwargs...)
@@ -326,20 +341,20 @@ global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
     end
 end
 
-   
+
 ## For precompilation we must put PyCall instances in __init__:
 function __init__()
 
     ## Define sympy, mpmath, ...
     copy!(sympy, PyCall.pyimport_conda("sympy", "sympy"))
 
- 
+
 
     ## mappings from PyObjects to types.
 
     copy!(combinatorics, PyCall.pyimport_conda("sympy.combinatorics", "sympy"))
     pytype_mapping(combinatorics["permutations"]["Permutation"], SymPermutation)
-    pytype_mapping(combinatorics["perm_groups"]["PermutationGroup"], SymPermutationGroup)    
+    pytype_mapping(combinatorics["perm_groups"]["PermutationGroup"], SymPermutationGroup)
     polytype = sympy["polys"]["polytools"]["Poly"]
     pytype_mapping(polytype, Sym)
 
@@ -352,9 +367,9 @@ function __init__()
 
     basictype = sympy["basic"]["Basic"]
     pytype_mapping(basictype, Sym)
-    
 
-    
+
+
     ##
     init_logical()
     init_math()

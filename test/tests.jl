@@ -526,6 +526,10 @@ end
     fn = lambdify(expr, use_julia_code=true)
     @test fn(1.0im) == 0.0 - 1.0im
 
+    # issue 245 missing sincos
+    @test applicable(sincos, x)
+    @test sincos(x)[1] == sin(x)
+
 end
 
 @testset "generic programming, issue 223" begin

@@ -7,7 +7,7 @@ math_sympy_methods_base = (:sin, :cos, :tan, :sinh, :cosh, :tanh, :asin, :acos, 
                            :coth, :acoth,
                            :log2, :log10, :log1p, :exponent, :exp, :exp2, :expm1,
                            :sqrt, :dawson,
-                           :ceiling, :floor, 
+                           :ceiling, :floor,
                            :factorial,
                            :gcd, :lcm,
                            :isqrt
@@ -25,11 +25,11 @@ math_sympy_methods = (:radians2degrees, :degrees2radians,
 
 # hypot and atan2
 hypot(x::Sym, y::Number) = sqrt(x^2 + y^2)
-atan(y::Sym, x::Number) = sympy_meth(:atan2, y, x)
+atan(y::Sym, x::Number) = _sympy_meth(:atan2, y, x)
 
 ## Log function handles arguments differently
-log(x::Sym) = sympy_meth(:log, x)
-log(b::Sym, x::Sym) = sympy_meth(:log, x, b)
+log(x::Sym) = _sympy_meth(:log, x)
+log(b::Sym, x::Sym) = _sympy_meth(:log, x, b)
 
 ### Trigonometry
 Base.rad2deg(x::Sym) = radians2degrees(x)
@@ -47,6 +47,8 @@ for fn in (:cospi, :sinpi)
     rad_fn = string(fn)[1:end-2]
     @eval ($fn)(x::Sym) = sympy[Symbol($rad_fn)](x * Sym(sympy["pi"]))
 end
+
+Base.sincos(x::Sym) = (sin(x), cos(x))
 
 ## :asech, :acsch, :sinc, :cosc,
 ## These fail, so define from definitions
@@ -76,7 +78,7 @@ functions_sympy_methods = (
 
 
 ## map Abs->abs, Max->max, Min->min
-abs(ex::Sym, args...; kwargs...) = sympy_meth(:Abs, ex, args...; kwargs...)
+abs(ex::Sym, args...; kwargs...) = _sympy_meth(:Abs, ex, args...; kwargs...)
 Base.abs2(x::Sym) = re(x*conj(x))
 Base.copysign(x::Sym, y::Sym) = abs(x)*sign(y)
 Base.signbit(x::Sym) = x < 0
@@ -90,15 +92,15 @@ Base.eps(::Type{Sym}) = zero(Sym)
 ## It allows fn(Any, Sym) or f(Sym, Any) to match
 
 import Base: min, max
-min(x::Sym, a) = sympy_meth(:Min, x, a)
-max(x::Sym, a) = sympy_meth(:Max, x, a)
+min(x::Sym, a) = _sympy_meth(:Min, x, a)
+max(x::Sym, a) = _sympy_meth(:Max, x, a)
 # at one time this allowed mixing of a,x order, but broke in v0.7
 #(min(a, x::Union{SA, Real}) where {SA <: Sym} = min(x,a))
 #(max(a, x::Union{SA, Real}) where {SA <: Sym} = max(x,a))
 
 # SymPy names
-Min(ex::Sym, ex1::Sym) = sympy_meth(:Min, ex, ex1)
-Max(ex::Sym, ex1::Sym) = sympy_meth(:Max, ex, ex1)
+Min(ex::Sym, ex1::Sym) = _sympy_meth(:Min, ex, ex1)
+Max(ex::Sym, ex1::Sym) = _sympy_meth(:Max, ex, ex1)
 
 
 
@@ -129,7 +131,7 @@ fn(x) = x^x
 limit(fn, 0)    # symbol not needed
 ```
 """
-limit(ex::Sym, args...; kwargs...) = sympy_meth(:limit, ex, args...; kwargs...)
+limit(ex::Sym, args...; kwargs...) = _sympy_meth(:limit, ex, args...; kwargs...)
 limit(ex::Sym, d::Pair; kwargs...) = limit(ex, d.first, d.second;kwargs...)
 limit(ex::Sym, ds::Pair...) = reduce(limit, ex, ds)
 limit(f::Function, c::Number=0; kwargs...) = (z = (symbols(gensym())); limit(f(z),z=>c;kwargs...))
@@ -141,7 +143,7 @@ function Base.diff(ex::Sym, args...; kwargs...)
     if funcname(ex) in map(string, relational_sympy_values)
         Eq(diff(lhs(ex), args...; kwargs...), diff(rhs(ex), args...; kwargs...))
     else
-        sympy_meth(:diff, ex, args...; kwargs...)
+        _sympy_meth(:diff, ex, args...; kwargs...)
     end
 end
 
@@ -159,7 +161,7 @@ function diff(f::Function, k::Int=1; kwargs...)
 end
 
 # set up derivative, call doit to implement
-Derivative(ex::Sym, args...) = sympy_meth(:Derivative, ex, args...)
+Derivative(ex::Sym, args...) = _sympy_meth(:Derivative, ex, args...)
 export(Derivative)
 #### Piecewise functions
 
@@ -185,11 +187,11 @@ subs(p, x, a - 1)
 [Note: there is also an alias `Piecewise` for copy-n-pasting from python code, but despite the capital letter, this is not a constructor for a type.]
 """
 function piecewise(args...)
-    sympy_meth(:Piecewise, args...)
+    _sympy_meth(:Piecewise, args...)
 end
 const Piecewise = piecewise
 
-piecewise_fold(ex::Sym) = sympy_meth(:piecewise_fold, ex)
+piecewise_fold(ex::Sym) = _sympy_meth(:piecewise_fold, ex)
 
 ## This broke with VERSION v"0.7.0"
 ##(Base.ifelse(ex::Sym, a, b) = piecewise((a, ex), (b, true)))
@@ -250,7 +252,7 @@ _Float64(x::Sym) = throw(ArgumentError("variable must have no free symbols"))
 _Float64(x) = Float64(x)
 
 Base.real(x::Sym) = _real(N(x))
-_real(x::Sym) = sympy_meth(:re, x)
+_real(x::Sym) = _sympy_meth(:re, x)
 _real(x) = real(x)
 
 ## This is different from is_real, as that has is_real(x) == nothing if indeterminate
@@ -258,7 +260,7 @@ Base.isreal(x::Sym) = is_real(x) == true
 
 
 Base.imag(x::Sym) = _imag(N(x))
-_imag(x::Sym) = sympy_meth(:im, x)
+_imag(x::Sym) = _sympy_meth(:im, x)
 _imag(x) = imag(x)
 
 Base.complex(r::Sym) = real(r) + imag(r) * im

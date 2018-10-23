@@ -47,7 +47,7 @@ symbols(x::Symbol; kwargs...) = symbols(string(x); kwargs...)
 ## Thanks to vtjnash for this!
 """
     @syms x [y z ...] [assumptions...]
-    
+
 Macro to create many symbolic objects at once.
 
 The `@syms` macros creates the variables and assigns them into the
@@ -73,7 +73,7 @@ Additionally you can rename arguments using pairs notation:
 
 The `@vars` macro is similar, `@syms` is the name used in
 MATLAB.
-    
+
 Original macro magic contributed by @vtjnash and extended by @alhirzel and
 @spencerlyon2
 """
@@ -105,7 +105,7 @@ end
 # TODO alias @vars to @syms
 """
     @vars x y z
-  
+
 The `vars` macro is identical to  `@syms`.
 
 """
@@ -202,7 +202,7 @@ function getindex(x::SymbolicObject, i::Symbol)
     else
        MethodError()
     end
-end 
+end
 
 ## Override this so that using symbols as keys in a dict works
 Base.hash(x::Sym) = hash(PyObject(x))
@@ -216,5 +216,3 @@ end
 
 " Return class name as a string "
 classname(ex::Sym) = PyObject(ex)[:__class__][:__name__]
-
-
