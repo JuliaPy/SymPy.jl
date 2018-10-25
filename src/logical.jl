@@ -8,14 +8,14 @@ logical_sympy_methods = (:Eq, :Ne, :Lt, :Le, :Gt, :Ge)
 ## not exported
 const relational_sympy_values = (:GreaterThan, :LessThan,
                                  :StrictGreaterThan, :StrictLessThan,
-                                 :Equality, :Unequality)  
-for meth in relational_sympy_values           
+                                 :Equality, :Unequality)
+for meth in relational_sympy_values
     meth_name = string(meth)
     @eval begin
 #         @doc """
 # `$($meth_name)`: a SymPy function. [cf.](http://docs.sympy.org/dev/_modules/sympy/core/relational.html)
 # """ ->
-        ($meth)(a::Real, b::Real) = sympy_meth($meth_name,a, b)
+        ($meth)(a::Real, b::Real) = _sympy_meth($meth_name,a, b)
     end
 #    eval(Expr(:export, meth))
 end
@@ -25,9 +25,9 @@ end
 
 ## XXX Experimental! Not sure these are such a good idea ...
 ## but used with piecewise
-Base.:&(x::Sym, y::Sym) = PyCall.pycall(PyObject(x)["__and__"], Sym, y) 
-Base.:|(x::Sym, y::Sym) =  PyCall.pycall(PyObject(x)["__or__"], Sym, y) 
-!(x::Sym)         =       PyCall.pycall(x.x["__invert__"], Sym)::Sym 
+Base.:&(x::Sym, y::Sym) = PyCall.pycall(PyObject(x)["__and__"], Sym, y)
+Base.:|(x::Sym, y::Sym) =  PyCall.pycall(PyObject(x)["__or__"], Sym, y)
+!(x::Sym)         =       PyCall.pycall(x.x["__invert__"], Sym)::Sym
 
 ## use ∨, ∧, ¬ for |,&,! (\vee<tab>, \wedge<tab>, \neg<tab>)
 ∨(x::Sym, y::Sym) = x | y
@@ -47,7 +47,7 @@ Base.:|(x::Sym, y::Sym) =  PyCall.pycall(PyObject(x)["__or__"], Sym, y)
 ## * `>`  is `\gg<tab>`
 
 
-## Instead we have: 
+## Instead we have:
 ## We use unicode for visual appeal of infix operators, but the Lt, Le, Eq, Ge, Gt are the proper way:
 
 "This is `\\ll<tab>` mapped as an infix operator to `Lt`"
@@ -64,14 +64,14 @@ Base.:|(x::Sym, y::Sym) =  PyCall.pycall(PyObject(x)["__or__"], Sym, y)
 (≦)(a::Number, b::Sym) = Le(Sym(a),b)   # \ll<tab>
 
 "This is `\\gg<tab>` mapped as an infix operator to `Gt`"
-(≫)(a::Sym, b::Sym) = Gt(a,b) |> asBool 
-(≫)(a::Sym, b::Number) = Gt(a,Sym(b)) 
-(≫)(a::Number, b::Sym) = Gt(Sym(a),b) 
+(≫)(a::Sym, b::Sym) = Gt(a,b) |> asBool
+(≫)(a::Sym, b::Number) = Gt(a,Sym(b))
+(≫)(a::Number, b::Sym) = Gt(Sym(a),b)
 
 "This is `\\geqq<tab>` mapped as an infix operator to `Ge`"
-(≧)(a::Sym, b::Sym) = Ge(a,b) |> asBool 
-(≧)(a::Sym, b::Number) = Ge(a,Sym(b))  
-(≧)(a::Number, b::Sym) = Ge(Sym(a),b) 
+(≧)(a::Sym, b::Sym) = Ge(a,b) |> asBool
+(≧)(a::Sym, b::Number) = Ge(a,Sym(b))
+(≧)(a::Number, b::Sym) = Ge(Sym(a),b)
 
 "For infix `Eq` one can use \\Equal<tab> unicode operator"
 (⩵)(a::Sym, b::Sym) = Eq(a,b)  # \Equal<tab>
@@ -111,7 +111,7 @@ Base.isequal(a::Sym, b::Number) = asBool(Eq(promote(a,b)...))
 Base.isequal(a::Number, b::Sym) = asBool(Eq(promote(a,b)...))
 
 function !=(x::Sym, y::T)  where {T <: Real}
-    try 
+    try
         x = convert(Float64, x)
         x != y
     catch
@@ -119,7 +119,7 @@ function !=(x::Sym, y::T)  where {T <: Real}
     end
 end
 function !=(x::Sym, y::T) where {T <: Complex}
-    try 
+    try
         x = complex(x)
         x != y
     catch
@@ -128,5 +128,5 @@ function !=(x::Sym, y::T) where {T <: Complex}
 end
 
 function init_logical()
-    global SympyTRUE = sympy_meth(:Lt, 0,1)
+    global SympyTRUE = _sympy_meth(:Lt, 0,1)
 end

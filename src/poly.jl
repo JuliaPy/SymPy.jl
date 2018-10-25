@@ -8,7 +8,7 @@
 const SymPoly = Sym
 
 
-Base.divrem(p::Sym, q::Sym) = sympy_meth(:div, p, q)
+Base.divrem(p::Sym, q::Sym) = _sympy_meth(:div, p, q)
 Base.div(p::Sym, q::Sym) = divrem(p,q)[1]
 Base.rem(p::Sym, q::Sym) = divrem(p,q)[2]
 
@@ -42,7 +42,7 @@ polyrem(ex::Sym, args...; kwargs...) = rem(ex, args...; kwargs...)
 Polynomial division with remainder. Renamed from `divrem` in SymPy to avoid confusion with Julia's `divrem`
 
 """
-polydivrem(ex::Sym, args...; kwargs...) = sympy_meth(:div, ex, args...; kwargs...)
+polydivrem(ex::Sym, args...; kwargs...) = _sympy_meth(:div, ex, args...; kwargs...)
 
 
 """
@@ -101,11 +101,11 @@ polynomial_sympy_methods = (
 #                            :roots ## conflict with Roots.roots and functionality provided by solve
                             )
 
-degree(x::Sym;kwargs...) = sympy_meth(:degree, x; kwargs...)
+degree(x::Sym;kwargs...) = _sympy_meth(:degree, x; kwargs...)
 export degree
 
-denom(x::Sym) = sympy_meth(:denom, x)
-numer(x::Sym) = sympy_meth(:numer, x)
+denom(x::Sym) = _sympy_meth(:denom, x)
+numer(x::Sym) = _sympy_meth(:numer, x)
 export denom, numer
 Base.denominator(x::SymbolicObject) = denom(x)
 Base.numerator(x::SymbolicObject) = numer(x)
@@ -170,7 +170,7 @@ polynomial_instance_methods = (:EC, :ET, :LC, :LM, :LT, :TC, ## no .abs()
 """
 
     coeffs(p, [x])
-    
+
 Return coefficients, `[a0, a1, ..., an]`, of a polynomial `p = a0 + a1*x + ... + an*x^n` in `D[x]`.
 
 Note: SymPy has the `all_coeffs` function to do this for objects of class `Poly`. The SymPy `coeffs` function returns the non-zero values. Use `sympy"coeffs"` for this functionality.
@@ -255,6 +255,6 @@ interpolate(1:4, sin.(1:4), x)     # xs, ys
 interpolate([(1,2), (2,3), (3,2)], x)  # [(x1,y1), ..., (xn, yn)]
 ```
 """
-interpolate(xsys::AbstractVector, x) = sympy_meth(:interpolate, xsys, x)
+interpolate(xsys::AbstractVector, x) = _sympy_meth(:interpolate, xsys, x)
 interpolate(xs::AbstractVector, ys::AbstractVector, x::Sym) = interpolate(collect(zip(xs, ys)), x)
 export interpolate

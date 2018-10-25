@@ -30,11 +30,11 @@ function primerange(a::Sym,b)
     primes(a,b)
 end
 export primerange
-    
+
 ## Combinatorics
 import Base: binomial
-binomial(n::Sym,k) = sympy_meth(:binomial, n, k)
-binomial(n, k::Union{SA, Integer}) where {SA <: Sym} = sympy_meth(:binomial, n, k)
+binomial(n::Sym,k) = _sympy_meth(:binomial, n, k)
+binomial(n, k::Union{SA, Integer}) where {SA <: Sym} = _sympy_meth(:binomial, n, k)
 
 combinatoric_sympy_methods = (:bell,
                               :bernoulli,
@@ -47,4 +47,3 @@ combinatoric_sympy_methods = (:bell,
                               :nC,
                               :nK
                               )
-                              
