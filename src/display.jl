@@ -62,7 +62,7 @@ function  show(io::IO, ::MIME"text/latex", x::AbstractArray{Sym})
     function toeqnarray(x::Vector{Sym})
         a = join([latex(x[i]) for i in 1:length(x)], "\\\\")
         """\\[ \\left[ \\begin{array}{r}$a\\end{array} \\right] \\]"""
-#        "\\begin{matrix}$a\\end{matrix}"
+#        "\\begin{bmatrix}$a\\end{bmatrix}"
     end
     function toeqnarray(x::AbstractArray{Sym,2})
         sz = size(x)
