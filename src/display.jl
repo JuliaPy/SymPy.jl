@@ -61,12 +61,14 @@ show(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*"))
 function  show(io::IO, ::MIME"text/latex", x::AbstractArray{Sym})
     function toeqnarray(x::Vector{Sym})
         a = join([latex(x[i]) for i in 1:length(x)], "\\\\")
-        "\\begin{bmatrix}$a\\end{bmatrix}"
+        """\\[ \\left[ \\begin{array}{r}$a\\end{array} \\right] \\]"""
+#        "\\begin{bmatrix}$a\\end{bmatrix}"
     end
     function toeqnarray(x::AbstractArray{Sym,2})
         sz = size(x)
         a = join([join(map(latex, x[i,:]), "&") for i in 1:sz[1]], "\\\\")
-        "\\begin{bmatrix}$a\\end{bmatrix}"
+        "\\[\\left[ \\begin{array}{" * repeat("r",sz[2]) * "}" * a * "\\end{array}\\right]\\]"
+#        "\\begin{bmatrix}$a\\end{bmatrix}"
     end
     print(io, toeqnarray(x))
 end
