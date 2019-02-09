@@ -21,6 +21,6 @@ notifications:
   email: false
 before_install:
     #install mpmath to test functionallity
-  - if [ $MPMATH = "true" ]; then julia -e 'using Pkg; Pkg.add("Conda"); using Conda; Conda.add("mpmath")';fi
+  - if [ $MPMATH = "true" ]; then julia -e 'using Pkg; Pkg.instantiate(); Pkg.add("Conda"); using Conda; Conda.add("mpmath")';fi
 after_success: 
   - julia -e 'using Pkg; Pkg.add("Coverage"); cd(Pkg.dir("SymPy")); using Coverage; Coveralls.submit(process_folder())'
