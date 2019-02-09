@@ -114,7 +114,7 @@ julia_sympy_map = (
 
 for (jmeth, smeth) in [(j,s) for (j,s) in julia_sympy_map if s !== :nothing && j!== :nothing]
     meth_name = string(smeth)
-    eval(Expr(:import, :SpecialFunctions, jmeth))
+    @eval import SpecialFunctions: $jmeth
     @eval begin
         # @doc """
         # `$($meth_name)`: a SymPy function.
@@ -151,7 +151,7 @@ lgamma(x::Sym) = log(gamma(x))
 ## should dispatch to julia version.
 for fn in (:besselj, :bessely, :besseli, :besselk)
     meth = string(fn)
-    eval(Expr(:import, :SpecialFunctions, fn))
+    @eval import SpecialFunctions: $fn
     @eval ($fn)(nu::Number, x::Sym; kwargs...) = SymPy._sympy_meth($meth, nu, x; kwargs...)
     @eval ($fn)(nu::Number, a::AbstractArray{Sym}) = map(x ->$fn(nu, x), a)
 end
