@@ -32,4 +32,8 @@ using Test
     # Optics
     @test RayTransferMatrix(1,2,3,4) == Sym[1 2; 3 4]
     @test FlatMirror() == Sym[1 0; 0 1]
+
+    # Spin
+    @test doit(WignerD(Sym(3), Sym(2), Sym(1), PI, PI/2, -PI)) == -sqrt(Sym(10))/8
+    @test doit(WignerD(Sym(1), Sym(1), Sym(0), 0, θ, 0)) == -sin(θ)/sqrt(Sym(2))
 end
