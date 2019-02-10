@@ -1,9 +1,11 @@
-Wigner = PyCall.PyNULL()
-Optics = PyCall.PyNULL()
+Wigner  = PyCall.PyNULL()
+Optics  = PyCall.PyNULL()
+Spin = PyCall.PyNULL()
 
 function init_physics()
-    copy!(Wigner, PyCall.pyimport_conda("sympy.physics.wigner", "sympy"))
-    copy!(Optics, PyCall.pyimport_conda("sympy.physics.optics", "sympy"))
+    copy!(Wigner,  PyCall.pyimport_conda("sympy.physics.wigner",       "sympy"))
+    copy!(Optics,  PyCall.pyimport_conda("sympy.physics.optics",       "sympy"))
+    copy!(Spin ,   PyCall.pyimport_conda("sympy.physics.quantum.spin", "sympy"))
 end
 
 
@@ -22,7 +24,8 @@ physics = [(SymPy.Wigner, [:clebsch_gordan,
            (SymPy.Optics, [:RayTransferMatrix,
                            :FreeSpace,
                            :CurvedRefraction,
-                           :FlatMirror])
+                           :FlatMirror]),
+           (SymPy.Spin  , [:WignerD])
 ]
 
 
