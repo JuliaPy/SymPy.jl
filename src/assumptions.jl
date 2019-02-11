@@ -70,7 +70,7 @@ ask(Q.positive(1 + x^2) # true  -- must be postive now.
 
 The ask function uses tri-state logic, returning one of 3 values:
 `true`; `false`; or `nothing`, when the query is indeterminate.
-        
+
 The construction of predicates is done through `Q` methods. These can
 be combined logically. For example, this will be `true`:
 
@@ -85,7 +85,7 @@ The above use `&` as an infix operation for the binary operator
 Note: As `SymPy.jl` converts symbolic matrices into Julia's `Array`
 type and not as matrices within Python, the predicate functions from SymPy for
 matrices are not used, though a replacement is given.
-"""    
+"""
 module Q
 import SymPy
 import PyCall
@@ -143,7 +143,7 @@ for meth in Q_predicates
 # `$($nm)`: a SymPy function.
 # The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($nm)
 # """ ->
-            ($meth)(x) = PyCall.pycall(SymPy.sympy["Q"][$nm], SymPy.Sym, x)::SymPy.Sym
+            ($meth)(x) = PyCall.pycall(SymPy.sympy.Q.$nm, SymPy.Sym, x)::SymPy.Sym
    end
 end
 
@@ -190,7 +190,7 @@ function orthogonal(M::Array{T,2}) where {T <: SymPy.Sym}
     no_nothing > 0 && return nothing
     return true
 end
-   
+
 
 function unitary(M::Array{T,2}) where {T <: SymPy.Sym}
     vals = SymPy.simplify.(SymPy.simplify.(M*ctranspose(M)) .== one(T))
@@ -216,7 +216,7 @@ function normal(M::Array{T,2}) where {T <: SymPy.Sym}
     for val in vals
         a = SymPy.ask(val)
         if a == nothing
-            no_nothing += 1 
+            no_nothing += 1
         elseif a == false
             return false
         end
@@ -250,7 +250,7 @@ end
 
 
 upper_triangular(M::Array{T,2}) where {T <: SymPy.Sym} = SymPy.istriu(M)
-lower_triangular(M::Array{T,2}) where {T <: SymPy.Sym} = SymPy.istril(M) 
+lower_triangular(M::Array{T,2}) where {T <: SymPy.Sym} = SymPy.istril(M)
 diagonal(M::Array{T,2}) where {T <: SymPy.Sym} = upper_triangular(M) && lower_triangular(M)
 triangular(M::Array{T,2}) where {T <: SymPy.Sym} = upper_triangular(M) || lower_triangular(M)
 
@@ -260,7 +260,7 @@ function full_rank(M::Array{T,2}) where {T <: SymPy.Sym}
     m,n = size(M)
     m <= n || return full_rank(transpose(M))
 
-    
+
     rr, p = SymPy.rref(M)
     lr = rr[end, :] # is this zero?
     no_nothing = 0
@@ -281,7 +281,7 @@ function full_rank(M::Array{T,2}) where {T <: SymPy.Sym}
     else
         return true
     end
-                         
+
 end
 
 
@@ -304,7 +304,7 @@ end
 function complex_elements(M::Array{T,2}) where {T <: SymPy.Sym}
     vals = real.(M)
     for val in vals
-        a = SymPy.ask(SymPy.sympy["Q"][:complex](val))
+        a = SymPy.ask(SymPy.sympy."Q".complex(val))
         (a == nothing || a == false) && return false
     end
     return true

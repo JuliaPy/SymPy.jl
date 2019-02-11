@@ -2,8 +2,8 @@
 ## These are not right!!!
 ## see hyper and meijerg to indicate what needs to be done for these special function
 ## they really need to be coordinated with `Julia`'s as well.
-mpmath_fns = (:hyp0f1, 
-           :hyp1f1, :hyp1f2, 
+mpmath_fns = (:hyp0f1,
+           :hyp1f1, :hyp1f2,
            :hyp2f0, :hyp2f1, :hyp2f2, :hyp2f3,
            :hyp3f2,
            :hypercomb,
@@ -17,7 +17,7 @@ mpmath_fns = (:hyp0f1,
            :webere,
            :coulombc,
            :legenp, :legenq,
-           :chebyt, :chebyu, 
+           :chebyt, :chebyu,
            :pcfd, :pcfu, :pcfv, :pcfw,
            :lommels1, :lommels2,
            :coulombf, :coulombg,
@@ -25,7 +25,7 @@ mpmath_fns = (:hyp0f1,
            :whitm, :whitw,
            :scorergi, :scorerhi,
            :spherharm,
-           :airyaizero, :airybizero, 
+           :airyaizero, :airybizero,
            :besseljzero, :besselyzero
            )
 for fn in mpmath_fns
@@ -36,13 +36,13 @@ end
 
 ## Call a function in the mpmath module, giving warning and returning NaN if module is not found
 ## (Doesn't need to be in init_mpmath?)
-function mpmath_meth(meth, args...; kwargs...) 
+function mpmath_meth(meth, args...; kwargs...)
     if isa(mpmath, Nothing)
         warn("The mpmath module of Python is not installed. http://docs.sympy.org/dev/modules/mpmath/setup.html#download-and-installation")
         return(Sym(NaN))
     end
-    
-    fn = mpmath[Symbol(meth)]
+
+    fn = getproperty(mpmath, Symbol(meth))
     ans = call_sympy_fun(fn, args...; kwargs...)
     ## make nicer...
     if isa(ans, Vector)
@@ -66,12 +66,11 @@ function init_mpmath()
     copy!(mpmath, PyCall.pyimport_conda("mpmath", "mpmath"))
     if mpmath != PyCall.PyNULL()
         ## ignore warnings for now...
-        mpftype = mpmath["mpf"]
+        mpftype = mpmath."mpf"
         pytype_mapping(mpftype, BigFloat) ## Raises warning!!!
-        mpctype = mpmath["mpc"]
+        mpctype = mpmath."mpc"
         pytype_mapping(mpctype, Complex{BigFloat})
     end
 
-    
-end
 
+end

@@ -241,7 +241,7 @@ for prop in union(core_object_properties,
                   polynomial_predicates)
 
     prop_name = string(prop)
-    @eval ($prop)(ex::SymbolicObject) = PyObject(ex)[Symbol($prop_name)]
+    @eval ($prop)(ex::SymbolicObject) = getproperty(PyObject(ex), Symbol($prop_name))
     eval(Expr(:export, prop))
 end
 
@@ -258,7 +258,7 @@ global call_sympy_fun(fn::PyCall.PyObject, args...; kwargs...) = PyCall.pycall(f
 ## These  get coverted to PyAny for conversion via
 ## PyCall, others directly call `Sym`, as it is faster
 function sympy_meth(meth, args...; kwargs...)
-    ans = call_sympy_fun(sympy[string(meth)], args...; kwargs...)
+    ans = call_sympy_fun(getproperty(sympy, Symbol(string(meth))), args...; kwargs...)
     ## make nicer...
     try
         if isa(ans, Vector)
@@ -277,7 +277,7 @@ end
 # pybuiltin(:int) and iterables
 # ## also PyObject(pybuiltin(:None))
 function _sympy_meth(meth, args...; kwargs...)
-    out = PyCall.pycall(sympy[string(meth)], PyCall.PyObject, args...; kwargs...)
+    out = PyCall.pycall(getproperty(sympy, Symbol(string(meth))), PyCall.PyObject, args...; kwargs...)
     Sym(out)
 end
 
@@ -333,7 +333,7 @@ end
 
 
 global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
-    meth_or_prop = PyObject(object)[Symbol(meth)]
+    meth_or_prop = getproperty(PyObject(object),Symbol(meth))
     if isa(meth_or_prop, PyCall.PyObject)
         call_sympy_fun(meth_or_prop,  args...; kwargs...) # method
     else
@@ -353,19 +353,20 @@ function __init__()
     ## mappings from PyObjects to types.
 
     copy!(combinatorics, PyCall.pyimport_conda("sympy.combinatorics", "sympy"))
-    pytype_mapping(combinatorics["permutations"]["Permutation"], SymPermutation)
-    pytype_mapping(combinatorics["perm_groups"]["PermutationGroup"], SymPermutationGroup)
-    polytype = sympy["polys"]["polytools"]["Poly"]
+    pytype_mapping(combinatorics."permutations"."Permutation", SymPermutation)
+    pytype_mapping(combinatorics."perm_groups"."PermutationGroup", SymPermutationGroup)
+    polytype = sympy.polys.polytools.Poly
     pytype_mapping(polytype, Sym)
 
     try
-        pytype_mapping(sympy["Matrix"], Array{Sym})
-        pytype_mapping(sympy["matrices"]["MatrixBase"], Array{Sym})
+        pytype_mapping(sympy."Matrix", Array{Sym})
+        pytype_mapping(sympy."matrices"."MatrixBase", Array{Sym})
     catch e
     end
 
 
-    basictype = sympy["basic"]["Basic"]
+    ## need "" here, as basictype = sympy.basic.Basic will not convert
+    basictype = sympy."basic"."Basic"
     pytype_mapping(basictype, Sym)
 
 

@@ -2,7 +2,7 @@
 core_object_methods = (:as_poly, :atoms,
                        :compare, :compare_pretty,
                        :doit, :dummy_eq, # :count,
-                       :has, 
+                       :has,
                        :sort_key,
                        :args_cnc,
                        :as_coeff_Add, :as_coeff_Mul, :as_coeff_add,
@@ -55,8 +55,8 @@ x = Sym("x")
 Eq(x, sin(x)) |> rhs  ## sin(x)
 ```
 """
-rhs(ex::Sym, args...; kwargs...) = PyObject(ex)[:rhs]
-lhs(ex::Sym, args...; kwargs...) = PyObject(ex)[:lhs]
+rhs(ex::Sym, args...; kwargs...) = PyObject(ex).rhs
+lhs(ex::Sym, args...; kwargs...) = PyObject(ex).lhs
 
 
 
@@ -65,9 +65,9 @@ lhs(ex::Sym, args...; kwargs...) = PyObject(ex)[:lhs]
 Return a vector of free symbols in an expression
 """
 function free_symbols(ex::Union{T, Vector{T}}) where {T<:SymbolicObject}
-    fs = PyObject(ex)[:free_symbols]
+    fs = PyObject(ex).free_symbols
     ## are these a set?
-    if fs[:__class__][:__name__] == "set"
+    if fs.__class__.__name__ == "set"
         convert(Vector{Sym}, collect(fs))
     else
         Sym[]
@@ -77,4 +77,3 @@ end
 free_symbols(exs::Tuple) = free_symbols(Sym[ex for ex in exs])
 
 export free_symbols
-

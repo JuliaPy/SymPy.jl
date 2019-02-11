@@ -135,7 +135,7 @@ end
 
 ## length of object
 function length(x::SymbolicObject)
-    haskey(PyObject(x), :length) && return PyObject(x)[:length]
+    PyCall.hasproperty(PyObject(x), :length) && return PyObject(x).length
     sz = size(x)
     length(sz) == 0 && return(0)
     *(sz...)
@@ -160,6 +160,22 @@ end
 import Base.iterate
 iterate(x::Sym) = (x.x, 0)
 iterate(x::Sym, state) = nothing
+
+
+## Following recent changes to PyCall where:
+# For o::PyObject, make o["foo"], o[:foo], and o.foo equivalent to o.foo in Python,
+# with the former returning an raw PyObject and the latter giving the PyAny
+# conversion.
+# We do something similar to SymPy
+#
+# We only implement for symbols here, not strings
+function Base.getproperty(o::T, s::Symbol) where {T <: SymbolicObject}
+    if !(s in fieldnames(T))
+        getproperty(PyCall.PyObject(o), s)
+    else
+        getfield(o, s)
+    end
+end
 
 
 
@@ -210,9 +226,9 @@ Base.hash(x::Sym) = hash(PyObject(x))
 
 ## Helper function from PyCall.pywrap:
 function members(o::Union{PyObject, Sym})
-    out = pycall(PyCall.inspect["getmembers"], PyObject, o)
+    out = pycall(PyCall.inspect.getmembers, PyObject, o)
     AbstractString[a for (a,b) in out]
 end
 
 " Return class name as a string "
-classname(ex::Sym) = PyObject(ex)[:__class__][:__name__]
+classname(ex::Sym) = ex.__class__.__name__

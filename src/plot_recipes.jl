@@ -236,7 +236,7 @@ function plot_parametric_surface(exs::Tuple{Sym,Sym,Sym},
                                  args...;
                                  kwargs...)
 
-    SymPy.call_sympy_fun(sympy["plotting"]["plot3d_parametric_surface"], exs..., args...; kwargs...)
+    SymPy.call_sympy_fun(sympy.plotting.plot3d_parametric_surface, exs..., args...; kwargs...)
 
 end
 export plot_parametric_surface
