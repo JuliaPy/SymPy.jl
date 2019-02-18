@@ -176,8 +176,10 @@ function eigvecs(a::Matrix{Sym})
     end
     out
 end
-rref(a::Matrix{T}) where {T <: Integer} = N(rref(convert(Matrix{Sym}, a))) 
+rref(a::Matrix{T}) where {T <: Integer} = N(rref(convert(Matrix{Sym}, a)))
 rref(a::Matrix{Rational{T}}) where {T <: Integer} = N(rref(convert(Matrix{Sym}, a)))
+
+det(A::Matrix{T}) where {T <: Sym} = sympy[:det](A)
 
 """
 Return orthogonal basis from a set of vectors
@@ -224,5 +226,3 @@ wronskian([u,v], x)  # determinant of [u v; u' v']
 wronskian(fs::Vector{T}, x::Sym, args...; kwargs...) where {T <: SymbolicObject} = sympy_meth(:wronskian, fs, x, args...; kwargs...)
 
 export GramSchmidt, hessian, wronskian
-
-
