@@ -205,12 +205,12 @@ x = Sym("x")
 
 """
 function getindex(x::SymbolicObject, i::Symbol)
-    if haskey(PyObject(x), i)
+    if PyCall.hasproperty(PyObject(x), i)
         function __XXxxXX__(args...;kwargs...) # replace with generated name
             object_meth(x, i, args...; kwargs...)
         end
         return __XXxxXX__
-    elseif haskey(sympy, i)
+    elseif PyCall.hasproperty(sympy, i)
         function __XXyyXX__(args...;kwargs...)
             sympy_meth(i, x, args...; kwargs...)
         end

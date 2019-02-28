@@ -1,4 +1,4 @@
 julia 0.7.0
-PyCall 1.18.5
+PyCall 1.90.0
 RecipesBase 0.5.0
 SpecialFunctions 0.3.4
