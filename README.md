@@ -1,4 +1,4 @@
-[![SymPy](http://pkg.julialang.org/badges/SymPy_0.7.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=0.7) 
+[![SymPy](http://pkg.julialang.org/badges/SymPy_0.7.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=0.7)
 
 Linux: [![Build Status](https://travis-ci.org/JuliaPy/SymPy.jl.svg?branch=master)](https://travis-ci.org/JuliaPy/SymPy.jl)
 &nbsp;
@@ -10,7 +10,7 @@ Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/Jul
 
 
 
-The `SymPy` package  (`http://sympy.org/`)  is a Python library for symbolic mathematics. 
+The `SymPy` package  (`http://sympy.org/`)  is a Python library for symbolic mathematics.
 
 With the excellent `PyCall` package of `julia`, one has access to the
 many features of `SymPy` from within a `Julia` session.
@@ -44,37 +44,37 @@ The only point to this package is that using `PyCall` to access
 a symbolic value `x`, take its sine, then evaluate at `pi`, say:
 
 ```
-using PyCall			
-@pyimport sympy
+using PyCall
+sympy = pyimport("sympy")
 x = sympy.Symbol("x")
 y = sympy.sin(x)
-y[:subs](x, sympy.pi) |> float
+z = y.subs(x, sympy.pi)
+convert(Float64, z)
 ```
 
 The `Symbol` and `sin` function of `SymPy` are found within the
 imported `sympy` object. They may be referenced with `Python`'s dot
-notation. However, the `subs` method of the `y` object is accessed
-differently, using indexing notation with a symbol. The call above
-substitutes a value of `sympy.pi` for `x`. This leaves the object as a
-`PyObject` storing a number which can be brought back into `julia`
-through conversion, in this case with the `float` function.
+notation. Similarly, the `subs` method of the `y` object may be
+accessed with Python's dot nottation using PyCall's `getproperty`
+overload to call the method. The call above substitutes a value of
+`sympy.pi` for `x`. This leaves the object as a `PyObject` storing a
+number which can be brought back into `julia` through conversion, in
+this case through an explicit `convert` call.
 
-The above isn't so awkward, but even more cumbersome is the similarly
-simple task of finding `sin(pi*x)`.  As this multiplication is done at
-the python level and is not a method of `sympy` or the `x` object, we
-need to evaluate python code. Here is one solution:
+
+Alternatively, `PyCall` now has a `*` method, so this could be done with
 
 ```
 x = sympy.Symbol("x")
-y = pycall(sympy.Mul, PyAny, sympy.pi, x)
-z = sympy.sin(y)		
-z[:subs](x, 1) |> float
+y = sympy.pi * x
+z = sympy.sin(y)
+convert(Float64, z.subs(x, 1))
 ```
 
-This gets replaced by a more `julia`n syntax:
+With `SymPy` this gets replaced by a more `julia`n syntax:
 
 ```
-using SymPy                    
+using SymPy
 x = symbols("x")		       # or   @vars x, Sym("x"), or  Sym(:x)
 y = sin(pi*x)
 y(1)                           # Does subs(y, x, 1). Use y(x=>1) to be specific as to which symbol to substitute
@@ -86,31 +86,26 @@ that working with symbolic expressions can use natural `julia`
 idioms. The final result  here is a symbolic value of `0`, which
 prints as `0` and not `PyObject 0`. To convert it into a numeric value
 within `Julia`, the `N` function may be used, which acts like the
-`float` call, only there is an attempt to preserve the variable type.
+float conversion, only there is an attempt to preserve the variable type.
 
-(There is a subtlety, the value of `pi` here (an `Irrational` in `Julia`) is converted to the
-symbolic `PI`, but in general won't be if the math constant is coerced
-to a floating point value before it encounters a symbolic object. It
-is better to just use the symbolic value `PI`, an alias for `sympy.pi`
-used above. A similar comment applies for `e`, where `E` should be
-used.)
+(There is a subtlety, the value of `pi` here (an `Irrational` in
+`Julia`) is converted to the symbolic `PI`, but in general won't be if
+the math constant is coerced to a floating point value before it
+encounters a symbolic object. It is better to just use the symbolic
+value `PI`, an alias for `sympy.pi` used above. A similar comment
+applies for `e`, where `E` should be used.)
 
 However, for some tasks the `PyCall` interface is still needed, as
 only a portion of the `SymPy` interface is exposed. To call an
-underlying SymPy method, the `getindex` method is overloaded for
-`symbol` indices so that `ex[:meth_name](...)` dispatches to either to
-SymPy's `ex.meth_name(...)` or `meth_name(ex, ...)`, as possible.
+underlying SymPy method, the `getproperty` method is overloaded so
+that `ex.meth_name(...)` dispatches the method of the object and
+`sympy.meth_name(...)` calls a function in the SymPy module.
 
-
-There is a `sympy` string macro to simplify this a bit, with the call
-looking like: `sympy"meth_name"(...)`, for example
-`sympy"harmonic"(10)`. For another example, the above could also be done
-through:
+For example, we could have been more explicit and used:
 
 ```
-@vars x
-y = sympy"sin"(pi * x)
-y(1)
+y = sympy.sin(pi * x)
+y.subs(x, 1)
 ```
 
 As calling the underlying SymPy function is not difficult, the
@@ -136,14 +131,9 @@ det(a)
 Can be replaced with
 
 ```
-sympy"det"(a)
+sympy.det(a)
 ```
 
 Similarly for `trace`, `eigenvects`, ... . Note these are `sympy`
 methods, not `Julia` methods that have been ported. (Hence,
 `eigenvects` and not `eigvecs`.)
-
-
-
-
-

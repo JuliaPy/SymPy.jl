@@ -25,9 +25,9 @@ end
 
 ## XXX Experimental! Not sure these are such a good idea ...
 ## but used with piecewise
-Base.:&(x::Sym, y::Sym) = PyCall.pycall(PyObject(x)["__and__"], Sym, y)
-Base.:|(x::Sym, y::Sym) =  PyCall.pycall(PyObject(x)["__or__"], Sym, y)
-!(x::Sym)         =       PyCall.pycall(x.x["__invert__"], Sym)::Sym
+Base.:&(x::Sym, y::Sym) = PyCall.pycall(PyObject(x).__and__, Sym, y)
+Base.:|(x::Sym, y::Sym) =  PyCall.pycall(PyObject(x).__or__, Sym, y)
+!(x::Sym)         =       PyCall.pycall(PyObject(x).__invert__, Sym)::Sym
 
 ## use ∨, ∧, ¬ for |,&,! (\vee<tab>, \wedge<tab>, \neg<tab>)
 ∨(x::Sym, y::Sym) = x | y

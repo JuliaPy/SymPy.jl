@@ -148,17 +148,17 @@ function Permutation(x; kwargs...)
         x = collect(x)
     end
     _check_permutation_format(x)
-    SymPy.combinatorics[:permutations][:Permutation](x; kwargs...)
+    SymPy.combinatorics.permutations.Permutation(x; kwargs...)
 end
 function Permutation(i, j, xs...; kwargs...)
     Permutation([vcat(i,j,xs...)]; kwargs...)
 end
-Permutation(;kwargs...) = SymPy.combinatorics[:permutations][:Permutation](; kwargs...)
+Permutation(;kwargs...) = SymPy.combinatorics.permutations.Permutation(; kwargs...)
 export Permutation
 
 ## name?
 ## random permutation of {0,1,..., n-1}
-randomperm(n) = SymPy.combinatorics[:permutations][:Permutation][:random](n)
+randomperm(n) = SymPy.combinatorics.permutations.Permutation.random(n)
 export randomperm
 # ops
 import Base: +, -, *, /, ^, inv
@@ -214,7 +214,7 @@ for meth in permutations_new_functions
 # `$($meth_name)`: a SymPy function.
 # The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 # """ ->
-        ($meth)(args...; kwargs...) = SymPy.combinatorics[:permutations][:Permutation][$meth_name](args...; kwargs...)
+        ($meth)(args...; kwargs...) = getproperty(SymPy.combinatorics.permutations.Permutation,$meth_name)(args...; kwargs...)
     end
     eval(Expr(:export, meth))
 end
@@ -273,7 +273,7 @@ export transpositions
 
 ## properties
 ## Base methods
-Base.size(p::SymPermutation) = p.x[:size] # property, not method call
+Base.size(p::SymPermutation) = p.x.size # property, not method call
 
 ## non-base methods
 #import SymPy: is_even, is_odd
@@ -296,7 +296,7 @@ for prop in (:is_Empty,
 # `$($prop_name)`: a SymPy function.
 # The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($prop_name)
 # """ ->
-        ($prop)(ex::SymPermutation) = PyCall.PyObject(ex)[Symbol($prop_name)]
+        ($prop)(ex::SymPermutation) = getproperty(PyCall.PyObject(ex),Symbol($prop_name))
     end
     eval(Expr(:export, prop))
 end
@@ -305,12 +305,12 @@ _unflatten_cyclic_form(m::Matrix) = [m[i,:] for i in 1:size(m)[1]]
 _unflatten_cyclic_form(m) = m
 
 function cyclic_form(p::SymPermutation)
-    m = PyCall.PyObject(p)[:cyclic_form]
+    m = p.cyclic_form
     _unflatten_cyclic_form(m)
 end
 
 function full_cyclic_form(p::SymPermutation)
-    m = PyCall.PyObject(p)[:full_cyclic_form]
+    m = p.full_cyclic_form
     _unflatten_cyclic_form(m)
 end
 
@@ -338,7 +338,7 @@ Differences:
 * use `collect(generate(G))` in place of `list(G.generate())`
 
 """
-PermutationGroup(args...; kwargs...) = SymPy.combinatorics[:perm_groups][:PermutationGroup](args...; kwargs...)
+PermutationGroup(args...; kwargs...) = SymPy.combinatorics.perm_groups.PermutationGroup(args...; kwargs...)
 export PermutationGroup
 
 ## Algebra therof
@@ -349,18 +349,18 @@ G1::SymPy.SymPermutationGroup *  G2::SymPy.SymPermutationGroup = PyCall.py"$G1*$
 Base.getindex(Gp::SymPy.SymPermutationGroup, i::Int) = PyCall.py"$(Gp.x)[$(i-1)]"  # 1-base
 
 ## Special groups
-SymmetricGroup(n::Int) = SymPy.combinatorics[:named_groups][:SymmetricGroup](n)
-CyclicGroup(n::Int) = SymPy.combinatorics[:named_groups][:CyclicGroup](n)
-DihedralGroup(n::Int) = SymPy.combinatorics[:named_groups][:DihedralGroup](n)
-AlternatingGroup(n::Int) = SymPy.combinatorics[:named_groups][:AlternatingGroup](n)
-AbelianGroup(args...) =  SymPy.combinatorics[:named_groups][:AbelianGroup](args...)
+SymmetricGroup(n::Int) = SymPy.combinatorics.named_groups.SymmetricGroup(n)
+CyclicGroup(n::Int) = SymPy.combinatorics.named_groups.CyclicGroup(n)
+DihedralGroup(n::Int) = SymPy.combinatorics.named_groups.DihedralGroup(n)
+AlternatingGroup(n::Int) = SymPy.combinatorics.named_groups.AlternatingGroup(n)
+AbelianGroup(args...) =  SymPy.combinatorics.named_groups.AbelianGroup(args...)
 
 export SymmetricGroup, CyclicGroup, DihedralGroup, AlternatingGroup, AbelianGroup
 
 
 
 # special methods
-SymPy.elements(gp::SymPy.SymPermutationGroup) = [a for a in PyCall.PyObject(gp)[:elements]]
+SymPy.elements(gp::SymPy.SymPermutationGroup) = [a for a in gp.elements]
 
 """
     random_element(gp, ...)
@@ -446,7 +446,7 @@ export len
 
 Does G contain x. (In SymPy, this is `contains.)
 """
-Base.occursin(x, G::SymPermutationGroup; kwargs...) = (G[:contains](x; kwargs...) == Sym(true)) # was contains
+Base.occursin(x, G::SymPermutationGroup; kwargs...) = (G.contains(x; kwargs...) == Sym(true)) # was contains
 
 ## These need PyVector in the call
 orbit(G::SymPy.SymPermutationGroup, alpha::Number, args...; kwargs...) = object_meth(G, :orbit, alpha, args...; kwargs...)
@@ -488,18 +488,18 @@ for prop in permutation_group_properties
 # `$($prop_name)`: a SymPy function.
 # The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($prop_name)
 # """ ->
-        ($prop)(ex::SymPermutationGroup) = PyCall.PyObject(ex)[Symbol($prop_name)]
+        ($prop)(ex::SymPermutationGroup) = getproperty(PyCall.PyObject(ex),Symbol($prop_name))
     end
     eval(Expr(:export, prop))
 end
 
 
-base(ex::SymPermutationGroup) = PyCall.PyObject(ex)[:base]
+base(ex::SymPermutationGroup) = ex.base
 export base
 
 
 
-strong_gens(D::SymPermutationGroup) = PyCall.PyObject(D)[:strong_gens]
+strong_gens(D::SymPermutationGroup) = D.strong_gens
 export strong_gens
 
 

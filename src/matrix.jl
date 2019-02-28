@@ -5,7 +5,7 @@
 ## this is achieved with the convert(Array{Sym}, o::PyObject) method below.
 
 ## Array{Sym} objects are converted into Python objects via
-PyCall.PyObject(a::AbstractArray{Sym}) = pycall(sympy[:Matrix], PyObject, PyCall.array2py(a))
+PyCall.PyObject(a::AbstractArray{Sym}) = pycall(sympy.Matrix, PyObject, PyCall.array2py(a))
 
 ## Matrix methods and objects
 
@@ -13,7 +13,7 @@ PyCall.PyObject(a::AbstractArray{Sym}) = pycall(sympy[:Matrix], PyObject, PyCall
 ## For calling methods we have  call_matrix_meth(M, :meth, ...) for M.meth(...)
 ## This helps, grabbing the M.meth part
 function getindex(s::AbstractArray{Sym}, i::Symbol)
-    PyObject(s)[i]
+    getproperty(PyObject(s),i)
 end
 
 
@@ -21,15 +21,15 @@ end
 # though this may need to be done specially for some arguments that are passed in as collections
 global call_matrix_meth(object, meth, args...; kwargs...) = begin
     o = PyObject(object)
-    o[meth](args...; kwargs...)
+    getproperty(o,meth)(args...; kwargs...)
 end
 
 
 ## support for convert(Array{Sym}, o::PyObject)
 function matrix_size(x::PyObject)
-    a = x[:shape]            # tuple
+    a = x.shape            # tuple
     if isa(a, PyObject)
-        a =  (a[:__getitem__](0), a[:__getitem__](1))
+        a =  (a.__getitem__(0), a.__getitem__(1))
     end
     while a[end] == 1
         a = a[1:end-1]
@@ -154,7 +154,7 @@ for meth in matrix_properties
 # `$($meth_name)`: a SymPy function.
 # The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
 # """ ->
-        ($meth)(ex::Matrix{Sym}, args...; kwargs...) =  ex[Symbol($meth_name)]
+        ($meth)(ex::Matrix{Sym}, args...; kwargs...) =  getproperty(PyObject(ex),Symbol($meth_name))
     end
     eval(Expr(:export, meth))
 end
@@ -176,7 +176,7 @@ function eigvecs(a::Matrix{Sym})
     end
     out
 end
-rref(a::Matrix{T}) where {T <: Integer} = N(rref(convert(Matrix{Sym}, a))) 
+rref(a::Matrix{T}) where {T <: Integer} = N(rref(convert(Matrix{Sym}, a)))
 rref(a::Matrix{Rational{T}}) where {T <: Integer} = N(rref(convert(Matrix{Sym}, a)))
 
 """
@@ -224,5 +224,3 @@ wronskian([u,v], x)  # determinant of [u v; u' v']
 wronskian(fs::Vector{T}, x::Sym, args...; kwargs...) where {T <: SymbolicObject} = sympy_meth(:wronskian, fs, x, args...; kwargs...)
 
 export GramSchmidt, hessian, wronskian
-
-

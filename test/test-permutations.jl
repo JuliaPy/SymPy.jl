@@ -212,7 +212,7 @@ as = [Permutation(1, 2), Permutation(3, 5), Permutation(3, 4)]
 # The number of permutations on a set of n elements is given by n! and is called the cardinality.
 @test size(p) == 4
 # 4
-@test cardinality(p) == 24 
+@test cardinality(p) == 24
 # 24
 
 # A given permutation has a rank among all the possible permutations of the same elements, but what that rank is depends on how the permutations are enumerated. (There are a number of different methods of doing so.) The lexicographic rank is given by the rank method and this rank is used to increment a permutation with addition/subtraction:
@@ -334,7 +334,7 @@ c = commutator(p, x);
 Id = Permutation(3)
 p = [(Id + i) for i in range(6)]
 for i in eachindex(p)
-    for j in eachindex(p)  
+    for j in eachindex(p)
     c = commutator(p[i], p[j])
     if p[i]*p[j] == p[j]*p[i]
         @assert c == I
@@ -372,7 +372,7 @@ b = Permutation([2, 3, 5, 4, 1, 0])
 #from sympy.combinatorics import Permutation
 
 @test cycle_structure(Permutation(3)) ==  Dict{Any,Any}(1=>4)
-# {1: 4} 
+# {1: 4}
 @test cycle_structure(Permutation(0, 4, 3)(1, 2)(5, 6)) == Dict{Any,Any}(2=>2, 3=>1)
 # {2: 2, 3: 1}
 # cycles
@@ -399,9 +399,9 @@ b = Permutation([2, 3, 5, 4, 1, 0])
 
 #from sympy.combinatorics.permutations import Permutation
 p = Permutation([0, 3, 1, 2])
-@test cyclic_form(p) ==[[1, 3, 2]] 
+@test cyclic_form(p) ==[[1, 3, 2]]
 # [[1, 3, 2]]
-@test cyclic_form(Permutation([1, 0, 2, 4, 3, 5])) == [[0, 1], [3, 4]] 
+@test cyclic_form(Permutation([1, 0, 2, 4, 3, 5])) == [[0, 1], [3, 4]]
 # [[0, 1], [3, 4]]
 
 
@@ -455,7 +455,7 @@ p = Permutation([4, 0, 1, 3, 2])
 # ['S', 'y', 'm', 'P', 'y']
 
 ### XXX Passing in a method should be done via `pymethod`, though
-## 
+##
 #Permutation.from_sequence('SymPy', key=lambda x: x.lower()) XXX
 # (4)(0 2)(1 3)
 
@@ -508,11 +508,11 @@ r = Permutation([0, 2, 1, 4, 3])
 
 #from sympy.combinatorics.permutations import Permutation
 p = josephus(3, 6, 1)
-@test get_adjacency_matrix(p) == Sym[0  0  0  0  0  0; 
-0  0  0  0  1  0; 
-0  0  0  0  0  1; 
-0  1  0  0  0  0; 
-1  0  0  0  0  0; 
+@test get_adjacency_matrix(p) == Sym[0  0  0  0  0  0;
+0  0  0  0  1  0;
+0  0  0  0  0  1;
+0  1  0  0  0  0;
+1  0  0  0  0  0;
 0  0  0  1  0  0]
 # Matrix([
 # [0, 0, 0, 0, 0, 0],
@@ -1037,7 +1037,7 @@ p = Permutation([0, 2, 1, 3])
 
 a, b = Permutation(1,2,0), Permutation(0,2,1)
 ## XXX--->>> Permutation.rmul(a, [0, 2, 1]) == Permutation.rmul(a, b) # this fails, [0,2,1] not promoted
-@test Permutation(rmul(a, b)...) == rmul(a, b)  
+@test Permutation(rmul(a, b)...) == rmul(a, b)
 # True
 # The reverse order of arguments will raise a TypeError.
 
@@ -1266,7 +1266,7 @@ G = PermutationGroup([Permutation(0, 1, 3)(2, 4)])
 
 # The randomized version (default) is of Las Vegas type.
 
-# Parameters:	
+# Parameters:
 # base, strong_gens
 # The base and strong generating set.
 # pos
@@ -1279,7 +1279,7 @@ G = PermutationGroup([Permutation(0, 1, 3)(2, 4)])
 # The basic orbits, if known.
 # strong_gens_distr
 # The strong generators distributed by basic stabilizers, if known.
-# Returns:	
+# Returns:
 # (base, strong_gens)
 # base is the new base, and strong_gens is a generating set relative to it.
 # See also schreier_sims
@@ -1289,7 +1289,7 @@ G = PermutationGroup([Permutation(0, 1, 3)(2, 4)])
 
 # Examples
 
-# 
+#
 # # from sympy.combinatorics.named_groups import SymmetricGroup
 # # from sympy.combinatorics.testutil import _verify_bsgs
 # # from sympy.combinatorics.perm_groups import PermutationGroup
@@ -1298,7 +1298,7 @@ schreier_sims(S)
 @test    SymPy.Permutations.base(S) == [0, 1, 2]
 # [0, 1, 2]
 
-_base, gens = baseswap(S, SymPy.Permutations.base(S), strong_gens(S), 1, randomized=false)  
+_base, gens = baseswap(S, SymPy.Permutations.base(S), strong_gens(S), 1, randomized=false)
 @test _base == [0,2,1]
 @test gens == [Permutation(0, 1, 2, 3), Permutation(3)(0, 1), Permutation(1, 3, 2),
               Permutation(2, 3), Permutation(1, 3)]
@@ -1307,7 +1307,7 @@ _base, gens = baseswap(S, SymPy.Permutations.base(S), strong_gens(S), 1, randomi
 # #  (2 3), (1 3)])
 # # check that base, gens is a BSGS
 
-# 
+#
 # ## XXX--->>>    S1 = PermutationGroup(gens)
 # ## XXX--->>>    _verify_bsgs(S1, base, gens)
 # True
@@ -1400,7 +1400,7 @@ G = center(D)
 
 # It is naturally a subgroup of G; the centralizer of a permutation group is equal to the centralizer of any set of generators for that group, since any element commuting with the generators commutes with any product of the generators.
 
-# Parameters:	
+# Parameters:
 # other
 # a permutation group/list of permutations/single permutation
 # See also subgroup_search
@@ -1613,7 +1613,7 @@ collect(generate(G)) ## list(generate(G)) XXX
 
 # The derived series for a group GG is defined as G=G0>G1>G2>…G=G0>G1>G2>… where Gi=[Gi−1,Gi−1]Gi=[Gi−1,Gi−1], i.e. GiGi is the derived subgroup of Gi−1Gi−1, for i∈ℕi∈N. When we have Gk=Gk−1Gk=Gk−1 for some k∈ℕk∈N, the series terminates.
 
-# Returns:	
+# Returns:
 # A list of permutation groups containing the members of the derived
 # series in the order G=G0,G1,G2,…G=G0,G1,G2,….
 # See also derived_subgroup
@@ -1685,9 +1685,7 @@ elements(p)
 # The permutation group given in the tetrahedron object is also true groups:
 
 
-tet = SymPy.combinatorics[:tetrahedron]
-G = PyCall.PyObject(tet)[:pgroup]
-#G = tetrahedron.pgroup
+G = SymPy.combinatorics.tetrahedron.pgroup
 @test is_group(G)
 # G.is_group
 # True
@@ -2078,7 +2076,7 @@ D = DihedralGroup(10)
 
 # If S is a subset of a group G, the normal closure of A in G is defined as the intersection of all normal subgroups of G that contain A ([1], p.14). Alternatively, it is the group generated by the conjugates x^{-1}yx for x a generator of G and y a generator of the subgroup \left\langle S\right\rangle generated by S (for some chosen generating set for \left\langle S\right\rangle) ([1], p.73).
 
-# Parameters:	
+# Parameters:
 # other
 # a subgroup/list of permutations/single permutation
 # k
@@ -2126,7 +2124,7 @@ G = PermutationGroup([a])
 @test Set(orbit(G, 0)) == Set([0,1,2])
 # {0, 1, 2}
 
-@test Set(orbit(G, [0, 4], "union")) == Set([0, 1, 2, 3, 4, 5, 6])  
+@test Set(orbit(G, [0, 4], "union")) == Set([0, 1, 2, 3, 4, 5, 6])
 # {0, 1, 2, 3, 4, 5, 6}
 
 
@@ -2304,12 +2302,12 @@ basic_transversals(G)
 # schreier_sims_incremental(base=None, gens=None)[source]
 # Extend a sequence of points and generating set to a base and strong generating set.
 
-# Parameters:	
+# Parameters:
 # base
 # The sequence of points to be extended to a base. Optional parameter with default value [].
 # gens
 # The generating set to be extended to a strong generating set relative to the base obtained. Optional parameter with default value self.generators.
-# Returns:	
+# Returns:
 # (base, strong_gens)
 # base is the base obtained, and strong_gens is the strong generating set relative to it. The original parameters base, gens remain unchanged.
 # See also schreier_sims, schreier_sims_random
@@ -2344,7 +2342,7 @@ _base[2]
 
 # The randomized Schreier-Sims algorithm takes the sequence base and the generating set gens, and extends base to a base, and gens to a strong generating set relative to that base with probability of a wrong answer at most 2−consec_succ2−consec_succ, provided the random generators are sufficiently random.
 
-# Parameters:	
+# Parameters:
 # base
 # The sequence to be extended to a base.
 # gens
@@ -2353,7 +2351,7 @@ _base[2]
 # The parameter defining the probability of a wrong answer.
 # _random_prec
 # An internal parameter used for testing purposes.
-# Returns:	
+# Returns:
 # (base, strong_gens)
 # base is the base and strong_gens is the strong generating set relative to it.
 # See also schreier_sims
@@ -2369,7 +2367,7 @@ _base[2]
 # from sympy.combinatorics.named_groups import SymmetricGroup
 S = SymmetricGroup(5)
 _base, _strong_gens = schreier_sims_random(S, consec_succ=5)
-## _verify_bsgs(S, _base, _strong_gens) 
+## _verify_bsgs(S, _base, _strong_gens)
 # True
 
 
@@ -2448,7 +2446,7 @@ D = DihedralGroup(4)
 
 # This is done by a depth-first search with respect to base images that uses several tests to prune the search tree.
 
-# Parameters:	
+# Parameters:
 # prop
 # The property to be used. Has to be callable on group elements and always return True or False. It is assumed that all group elements satisfying prop indeed form a subgroup.
 # base
@@ -2459,7 +2457,7 @@ D = DihedralGroup(4)
 # A list of callables of length equal to the length of base. These are used to rule out group elements by partial base images, so that tests[l](g) returns False if the element g is known not to satisfy prop base on where g sends the first l + 1 base points.
 # init_subgroup
 # if a subgroup of the sought group is known in advance, it can be passed to the function as this parameter.
-# Returns:	
+# Returns:
 # res
 # The subgroup of all elements satisfying prop. The generating set for this group is guaranteed to be a strong generating set relative to the base base.
 # Notes
@@ -2502,7 +2500,7 @@ a = Permutation([1, 2, 0])
 b = Permutation([1, 0, 2])
 G = PermutationGroup([a, b])
 @test transitivity_degree(G) == 3
-# 3    
+# 3
 
 
 end

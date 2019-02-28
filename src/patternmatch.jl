@@ -9,7 +9,7 @@ func(x*y)     # Mul
 func(x+y)     # Add
 ```
 """
-func(ex::Sym) = Sym(PyObject(ex)[:func])
+func(ex::Sym) = Sym(PyObject(ex).func)
 export func
 
 
@@ -30,15 +30,15 @@ sin(x) |> args ## (x,)
 [Invariant:](http://docs.sympy.org/dev/tutorial/manipulation.html)
 
 Every well-formed SymPy expression `ex` must either have `length(args(ex)) == 0` or
-`func(ex)(args(ex)...) = ex`.         
+`func(ex)(args(ex)...) = ex`.
 """
-args(ex::Sym) = PyObject(ex)[:args]
+args(ex::Sym) = ex.args
 
 
 """
     `Wild(:x)`: create a "wild card" for pattern matching
 """
-Wild(x::AbstractString) = pycall(sympy["Wild"], PyAny, x)
+Wild(x::AbstractString) = pycall(sympy.Wild, PyAny, x)
 Wild(x::Symbol) = Wild(string(x))
 export Wild
 
@@ -52,7 +52,7 @@ If a match is unsuccesful, returns an *empty* dictionary. (SymPy returns "nothin
 The order of the arguments follows `Julia`'s `match` function, not `SymPy`'s. This may change.
 """
 function Base.match(pat::Sym, ex::Sym, args...; kwargs...)
-    out = ex[:match](pat, args...; kwargs...)
+    out = ex.match(pat, args...; kwargs...)
     out == nothing && return Dict()
     out
 end
@@ -124,7 +124,7 @@ function Base.replace(ex::Sym, query::Sym, fn::Function; kwargs...)
 end
 
 function Base.replace(ex::Sym, query::Sym, value; kwargs...)
-    ex[:replace](query, value; kwargs...)
+    ex.replace(query, value; kwargs...)
 end
 ## curried form
 Base.replace(query::Sym, value; kwargs...) = ex -> replace(ex, query, value; kwargs...)
@@ -141,7 +141,7 @@ rewrite(sin(x), "exp")         # can use a string here
 ```
 """
 function rewrite(ex::Sym,  args...; kwargs...)
-    ex[:rewrite](args...; kwargs...)
+    ex.rewrite(args...; kwargs...)
 end
 export rewrite
 
@@ -163,7 +163,7 @@ xreplace(Integral(sin(x), x), x=> y) # bound and unbound are replaced
 ```
 """
 function xreplace(ex::Sym, rule::Dict, args...; kwargs...)
-    ex[:xreplace](rule, args...; kwargs...)
+    ex.xreplace(rule, args...; kwargs...)
 end
 xreplace(ex::Sym, xs::Pair...; kwargs...) = xreplace(ex, Dict(xs...); kwargs...)
 

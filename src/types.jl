@@ -57,8 +57,8 @@ convert(::Type{PyObject}, s::Sym) = s.x
 function convert(::Type{Tuple}, o::PyCall.PyObject)
     ## check that o is a tuple?
     ## PyCall.pytypeof(o)
-    n = o[:__len__]()
-    ntuple(i -> o[:__getitem__](i-1), n)
+    n = o.__len__()
+    ntuple(i -> o.__getitem__(i-1), n)
 end
 
 ## rational
@@ -75,13 +75,13 @@ convert(::Type{T}, x::Sym) where {T <: Real} = convert(T, PyObject(x))
 
 ## complex
 ## cf math.jl for `complex` of a value
-## IM is SymPy's "i" (sympy["I"], not Python's
+## IM is SymPy's "i" (sympy.I, not Python's
 ## Sym(PyCall.PyObject(im)) which gives 1j.
 function convert(::Type{Sym}, x::Complex)
     y = ifelse(isa(x, Complex{Bool}), real(x) + imag(x) * im, x)
     real(y) + imag(y) * IM
 end
-convert(::Type{Complex{T}}, x::Sym) where {T} = complex(map(x -> convert(T, x), x[:as_real_imag]())...)
+convert(::Type{Complex{T}}, x::Sym) where {T} = complex(map(x -> convert(T, x), x.as_real_imag())...)
 complex(::Type{Sym}) = Sym
 
 

@@ -32,7 +32,7 @@ integrals_instance_methods = (:as_sum,
 """
 Create a parameterized curve for line integrals
 
-[SymPy Documentation](http://docs.sympy.org/dev/modules/integrals/integrals.html#sympy.integrals.line_integrate)    
+[SymPy Documentation](http://docs.sympy.org/dev/modules/integrals/integrals.html#sympy.integrals.line_integrate)
 ```
 @vars t x y
 C = Curve([exp(t)+1, exp(t)-1], (t, 0, log(Sym(2))))
@@ -40,7 +40,7 @@ line_integrate(x + y, C, [x,y])
 ```
 
 """
-Curve(exs::Vector{T}, p) where {T<:Sym} = sympy_meth(:Curve, exs, p) 
+Curve(exs::Vector{T}, p) where {T<:Sym} = sympy_meth(:Curve, exs, p)
 export Curve
 
 """
@@ -48,7 +48,7 @@ Dirac delta for integration
 
 [SymPy Documentation](http://docs.sympy.org/dev/modules/functions/special.html)
 """
-DiracDelta(x::Number) = pycall(sympy["DiracDelta"], PyAny, x)
+DiracDelta(x::Number) = pycall(sympy.DiracDelta, PyAny, x)
 export DiracDelta
 
 """
@@ -58,7 +58,7 @@ Heaviside function for integration.
 
 [SymPy Documentation](http://docs.sympy.org/dev/modules/functions/special.html)
 """
-Heaviside(x::Number) = pycall(sympy["Heaviside"], PyAny, x)
+Heaviside(x::Number) = pycall(sympy.Heaviside, PyAny, x)
 export Heaviside
 
 

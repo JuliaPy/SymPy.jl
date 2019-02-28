@@ -40,12 +40,12 @@ for fn in (:cosd, :cotd, :cscd, :secd, :sind, :tand,
           :acosd, :acotd, :acscd, :asecd, :asind, :atand)
 
     rad_fn = string(fn)[1:end-1]
-    @eval ($fn)(x::Sym) = sympy[Symbol($rad_fn)](x * Sym(sympy["pi"])/180)
+    @eval ($fn)(x::Sym) = sympy.$rad_fn(x * Sym(sympy.pi)/180)
 end
 
 for fn in (:cospi, :sinpi)
     rad_fn = string(fn)[1:end-2]
-    @eval ($fn)(x::Sym) = sympy[Symbol($rad_fn)](x * Sym(sympy["pi"]))
+    @eval ($fn)(x::Sym) = sympy.$rad_fn(x * Sym(sympy.pi))
 end
 
 Base.sincos(x::Sym) = (sin(x), cos(x))
@@ -224,8 +224,8 @@ Base.isinf(x::Sym) = try isinf(convert(Float64, x)) catch e false end
 Base.isnan(x::Sym) = try isnan(convert(Float64, x)) catch e false end
 
 ## we rename sympy.div -> polydiv
-Base.div(x::Sym, y::SymOrNumber) = convert(Sym, sympy["floor"](x/convert(Sym,y)))
-Base.rem(x::Sym, y::SymOrNumber) = x-Sym(y)*Sym(sympy["floor"](x/y))
+Base.div(x::Sym, y::SymOrNumber) = convert(Sym, sympy.floor(x/convert(Sym,y)))
+Base.rem(x::Sym, y::SymOrNumber) = x-Sym(y)*Sym(sympy.floor.(x/y))
 
 ## zero and one (zeros?)
 Base.zero(x::Sym) = Sym(0)
@@ -300,20 +300,20 @@ global oo = Sym(pynull())
 
 Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
 Base.convert(::Type{Sym}, x::Irrational{:e}) = E
-Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy["EulerGamma"])
-Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy["Catalan"])
+Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy.EulerGamma)
+Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy.Catalan)
 Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
 
 function init_math()
     "PI is a symbolic  π. Using `julia`'s `pi` will give round off errors."
-    copy!(PI.x,  sympy["pi"])
+    copy!(PI.x,  PyObject(sympy.pi))
 
     "E is a symbolic  `e`. Using `julia`'s `e` will give round off errors."
-    copy!(E.x, Sym(sympy["exp"](1)).x)
+    copy!(E.x, PyObject(sympy.exp(1)))
 
     "IM is a symbolic `im`"
-    copy!(IM.x, sympy["I"])
+    copy!(IM.x, PyObject(sympy.I))
 
     "oo is a symbolic infinity. Example: `integrate(exp(-x), x, 0, oo)`."
-    copy!(oo.x, sympy["oo"])
+    copy!(oo.x, PyObject(sympy.oo))
 end

@@ -12,15 +12,15 @@ Examples
 @vars x
 import Base.Docs.doc
 doc(sin(x))        #
-doc(sympy[:sin])   # explicit module lookup
-doc(SymPy.mpmath[:hypercomb]) # explicit module lookup
+doc(sympy.sin)   # explicit module lookup
+doc(SymPy.mpmath.hypercomb) # explicit module lookup
 doc(Poly(x^2,x), :coeffs) # coeffs is an object method of the poly instance
 doc([x 1;1 x], :LUsolve)  # LUsolve is a matrix method
 ```
 """
 Base.Docs.doc(x::SymbolicObject) = Base.Docs.doc(PyObject(x))
 Base.Docs.doc(x::SymbolicObject, s::Symbol) = Base.Docs.doc(PyObject(x)[s])
-Base.Docs.doc(x::Array{T,N}, s::Symbol) where {T <: SymbolicObject, N} = Base.Docs.doc(PyObject(x)[s])
+Base.Docs.doc(x::Array{T,N}, s::Symbol) where {T <: SymbolicObject, N} = Base.Docs.doc(PyObject(x).s)
 
 ## Add some of SymPy's displays
 ## Some pretty printing
@@ -29,7 +29,7 @@ Base.Docs.doc(x::Array{T,N}, s::Symbol) where {T <: SymbolicObject, N} = Base.Do
 #doc(x::SymbolicObject) = print(x[:__doc__])
 
 "Map a symbolic object to a string"
-_str(s::SymbolicObject) = s[:__str__]()
+_str(s::SymbolicObject) = s.__str__()
 
 "Map an array of symbolic objects to a string"
 _str(a::AbstractArray{SymbolicObject}) = map(_str, a)
@@ -55,7 +55,7 @@ Base.show(io::IO, s::Sym) = print(io, jprint(s))
 ## We add show methods for the REPL (text/plain) and IJulia (text/latex)
 
 ## text/plain
-show(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy["pretty"](s))
+show(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy.pretty(s))
 show(io::IO, ::MIME"text/latex", x::Sym) = print(io, latex(x, mode="equation*"))
 
 function  show(io::IO, ::MIME"text/latex", x::AbstractArray{Sym})
