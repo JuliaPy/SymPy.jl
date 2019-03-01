@@ -36,11 +36,11 @@ F,G,H = SymFunction("F, G, H")
 function SymFunction(x::T) where {T<:AbstractString}
     us = split(x, r",\s*")
     if length(us) > 1
-        map(u -> SymFunction(sympy["Function"](u), 0), us)
+        map(u -> SymFunction(sympy."Function"(u), 0), us)
     else
-        SymFunction(sympy["Function"](x), 0)
+        SymFunction(sympy."Function"(x), 0)
     end
-#    u = sympy["Function"](x)
+#    u = sympy."Function"(x)
 #    SymFunction(u, 0)
 end
 

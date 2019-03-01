@@ -2,7 +2,7 @@
 ## https://github.com/jverzani/SymPy.jl/issues/60
 
 ## some tools, perhaps. Not exported for now.
-funcname(x) = PyObject(x)[:func][:__name__]
+funcname(x) = PyObject(x).func.__name__
 srepr(x) = sympy_meth(:srepr, x)
 
 ## Mapping of SymPy Values into julia values

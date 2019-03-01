@@ -140,11 +140,11 @@ using Base.MathConstants
     @test isa(N(r), Float64)
     @test isa(N(z), Integer)
 
-    ## method calls via getindex
+    ## method calls via getproperty
     p = (x-1)*(x-2)
-    @test p[:roots]() == Dict{Any,Any}(Sym(1) => 1, Sym(2)=> 1) # sympy.roots
+    @test sympy.roots(p) == Dict{Any,Any}(Sym(1) => 1, Sym(2)=> 1) # sympy.roots
     p = Poly(p, x)
-    @test p[:coeffs]() == Any[1,-3,2] # p.coeffs
+    @test p.coeffs() == Any[1,-3,2] # p.coeffs
 
     ## algebra
     @test SymPy.expand((x + 1)*(x + 2)) == x^2 + 3x + 2  # v0.7 deprecates expand, in v1.0 this is fine w/o qualifacation
@@ -224,8 +224,8 @@ using Base.MathConstants
     summation(1/x^2, (x, 1, 10))
     out = summation(1/x^2, (x, 1, 10))
     out1 = sum([1//x^2 for  x in 1:10])
-    @test round(Integer, out.x[:p]) == out1.num
-    @test round(Integer, out.x[:q]) == out1.den
+    @test round(Integer, out.p) == out1.num
+    @test round(Integer, out.q) == out1.den
 
 
     ## Ops
@@ -404,7 +404,7 @@ using Base.MathConstants
         Sym(big(2.0))                   # may need mpmath (e.g., conda install mpmath)
 
         @test limit(besselj(1,1/x), x, 0) == Sym(0)
-        complex(N(hankel2(2, pi)))
+        complex(N(SymPy.mpmath.hankel2(2, pi)))
         bei(2, 3.5)
         bei(1+im, 2+3im)
     end
@@ -438,9 +438,9 @@ using Base.MathConstants
     @test cse([x, x]) == (Any[], [x, x])
     @test cse([x x; x x]) == (Any[], [x x; x x])
 
-## sympy"..."(...)
-@vars x
-@test sympy"sin"(1) == sin(Sym(1))
+    ## sympy"..."(...)
+    @vars x
+    @test sympy"sin"(1) == sin(Sym(1))
 end
 
 @testset "Fix past issues" begin

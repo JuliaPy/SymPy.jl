@@ -51,13 +51,13 @@ sypmy_sets = nothing
 module S
 using SymPy
 function init_set()
-    S = sympy["S"]
-    global Reals = S["Reals"]
-    global UniversalSet = S["UniversalSet"]
-    global Naturals = S["Naturals"]
-    global Naturals0 = S["Naturals0"]
-    global Integers = S["Integers"]
-    global EmptySet = S["EmptySet"]
+    S = sympy.S
+    global Reals = S.Reals
+    global UniversalSet = S.UniversalSet
+    global Naturals = S.Naturals
+    global Naturals0 = S.Naturals0
+    global Integers = S.Integers
+    global EmptySet = S.EmptySet
 end
 end
 
@@ -76,7 +76,7 @@ function Base.convert(::Type{Set}, s::Sym)
     is_FiniteSet(s) || throw(ArgumentError("`s` must be a finite set"))
     s1 = Set(Any[u for u in s.x])
     for el in copy(s1)
-        if !isa(el, Set) && !(el.x[:is_Symbol]) && is_FiniteSet(s) && length(el.x) > 1
+        if !isa(el, Set) && !(el.x.is_Symbol) && is_FiniteSet(s) && length(el.x) > 1
             ## replace python FiniteSet with julian Set
             setdiff!(s1, Set([el]))
             push!(s1, Set(convert(Set, el)))
@@ -94,12 +94,12 @@ end
 
 
 "Find power set of set"
-powerset(s::Sym) = s[:powerset]()
+powerset(s::Sym) = s.powerset()
 
 
 
 "Is `x` in `I`?"
-Base.in(x, I::Sym) = (I[:contains](x) == Sym(true))
+Base.in(x, I::Sym) = (I.contains(x) == Sym(true))
 
 
 "Elements of finite set"
@@ -108,77 +108,77 @@ export elements
 
 
 "Complement of set within the universe"
-complement(I::Sym, U::Sym=S.Reals) = I[:complement](U)
+complement(I::Sym, U::Sym=S.Reals) = I.complement(U)
 export complement
 
 "boundary, returnsa set"
-boundary(I::Sym) = PyObject(I)[:boundary]
+boundary(I::Sym) = I.boundary
 
 "Infinum of I"
-inf(I::Sym) = PyObject(I)[:inf]
+inf(I::Sym) = I.inf
 export inf
 
 "Intersection of two intervals"
-Base.intersect(I::Sym, J::Sym) = I[:intersect](J)
+Base.intersect(I::Sym, J::Sym) = I.intersect(J)
 
 "Are `I` and `J` disjoint?"
-is_disjoint(I::Sym, J::Sym) = I[:is_disjoint](J) == Sym(true)
+is_disjoint(I::Sym, J::Sym) = I.is_disjoint(J) == Sym(true)
 
 "Is `J` a proper subset of `I`?"
-is_proper_subset(I::Sym, J::Sym) = I[:is_proper_subset](J) == Sym(true)
+is_proper_subset(I::Sym, J::Sym) = I.is_proper_subset(J) == Sym(true)
 
 "Is `J` a  subset of `I`?"
-is_subset(I::Sym, J::Sym) = I[:is_subset](J) == Sym(true)
+is_subset(I::Sym, J::Sym) = I.is_subset(J) == Sym(true)
 
 "Is `I` a  superset of `J`?"
-is_superset(I::Sym, J::Sym) = I[:is_superset](J) == Sym(true)
+is_superset(I::Sym, J::Sym) = I.is_superset(J) == Sym(true)
 
 "Lebesgue mesuare of an interval"
-measure(I::Sym) = PyObject(I)[:measure]
+measure(I::Sym) = I.measure
 
 
 
 
 "Supremum of a set"
-sup(I::Sym) = PyObject(I)[:sup]
+sup(I::Sym) = I.sup
 
 
 "Union of two intervals"
-Base.union(I::Sym, J::Sym) = I[:union](J)
+Base.union(I::Sym, J::Sym) = I.union(J)
 
 "Symmetric difference of two intervals, in one or other, but not both: `(I ∪ J) \\ (I  ∩ J)"
 Base.symdiff(I::Sym, J::Sym) = complement(intersection(I,J), union(I,J))
 
 "rexpress I in terms of relations involving variable `x`"
-as_relational(I::Sym, x::Sym) = I[:as_relational](x)
+as_relational(I::Sym, x::Sym) = I.as_relational(x)
 
 # not implemented: `end` => `sup`, `left` =>
 
 "Looks like (-oo, a)?"
-is_left_unbounded(I::Sym) = PyObject(I)[:is_left_unbounded] == Sym(true)
+is_left_unbounded(I::Sym) = I.is_left_unbounded == Sym(true)
 
 "Looks like (a, oo)?"
-is_right_unbounded(I::Sym) = PyObject(I)[:is_right_unbounded] == Sym(true)
+is_right_unbounded(I::Sym) = I.is_right_unbounded == Sym(true)
 
 "Looks like (a, b...?"
-left_open(I::Sym) = PyObject(I)[:left_open] == Sym(true)
+left_open(I::Sym) = I.left_open == Sym(true)
 
 "Looks like ..., b)?"
-right_open(I::Sym) = PyObject(I)[:right_open] == Sym(true)
+right_open(I::Sym) = I.right_open == Sym(true)
 
 
 "Is `I` a finite set?"
-is_FiniteSet(I::Sym) = PyObject(I)[:is_FiniteSet]
+is_FiniteSet(I::Sym) = I.is_FiniteSet
 
 "Is `I` an interval?"
-is_Interval(I::Sym) = PyObject(I)[:is_Interval]
+is_Interval(I::Sym) = I.is_Interval
 
 "Is `I` a union?"
-is_Union(I::Sym) = PyObject(I)[:is_Union]
+is_Union(I::Sym) = I.is_Union
 
 function init_sets()
     S.init_set()
-end  
+end
 """
     `FiniteSet(1,2,3)`, `FiniteSet(1:10...)`: create a finite set
 
@@ -191,7 +191,7 @@ global ProductSet(args...) = sympy_meth(:ProductSet, args...)
 
 """
     Means to filter a set to pull out elements by a condition.
-    
+
     ConditionSet:  A set of elements which satisfies a given condition.
 
     `ConditionSet(x, condition, S) = {x | condition(x) == true for x in S}`
@@ -233,5 +233,3 @@ Interval(0,1,true, false) # (0,1]
 
 """
 global Interval(l,r,left_open=false, right_open=false) = sympy_meth(:Interval, Sym(l), Sym(r), left_open ,right_open)
-
-

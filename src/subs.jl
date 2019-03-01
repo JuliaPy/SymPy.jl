@@ -5,7 +5,7 @@
 """
 
 `subs` is used to subsitute a value in an expression with another
-value. 
+value.
 
 Examples:
 
@@ -54,9 +54,9 @@ There were some older convenience forms, but these are now deprecated, as they d
 subs(ex, :y, pi)    # using a symbol, not a symbolic object
 subs(ex, x=1, y=pi) # using keyword argument, and not pairs
 ## or their curried or call forms
-ex |> subs(:x, e)   
-ex |> subs(x=e)     
-ex(x=2, y=3)     
+ex |> subs(:x, e)
+ex |> subs(x=e)
+ex(x=2, y=3)
 ```
 
 The `replace` function is related, but not identical to subs.
@@ -83,8 +83,8 @@ subs(d::Pair...) = ex -> subs(ex, [(p.first, p.second) for p in d]...)
 
 ## helper, as :is_rational will find 1.2 rational...
 function _is_rational(ex::Sym)
-    ex.x[:is_rational] == nothing && return false
-    ex.x[:is_rational] && denom(ex).x[:is_integer]
+    ex.x.is_rational == nothing && return false
+    ex.x.is_rational && denom(ex).x.is_integer
 end
 
 ## evalf, n, N
@@ -105,7 +105,7 @@ available symbolically, by calling `N` on the values.
 
 Using `SymPy` within `Julia` makes having two such functions useful:
 
-* one to do the equivalent of SymPy's `evalf` function 
+* one to do the equivalent of SymPy's `evalf` function
 * one to *also* convert these expressions back into `Julia` objects.
 
 We use `N` to return a `Julia` object and `evalf` to return a symbolic
@@ -144,9 +144,9 @@ function N(ex::Sym)
     ## XXX consolidate this and N(ex, digits)
 
     length(free_symbols(ex)) > 0 && return ex
-    
+
     if is_integer(ex) == nothing
-        evalf_ex = ex[:evalf]()
+        evalf_ex = ex.evalf()
         if ex == evalf_ex
             return ex
         else
@@ -154,30 +154,29 @@ function N(ex::Sym)
         end
     end
     if is_integer(ex)
-        for T in [Int, BigInt]
+        for T in (Int, BigInt)
             try (return(convert(T, ex))) catch e end
         end
     elseif _is_rational(ex)
         return N(numer(ex)) // N(denom(ex))
         ## `convert(Rational, ex)))` fails on `Sym(4//3)`
     elseif is_real(ex) == true
-        for T in [Irrational, Float64] ## BigFloat???
+        for T in (Irrational, Float64) ## BigFloat???
               try (return(convert(T, ex))) catch e end
         end
     elseif is_complex(ex) == true
         try
-            r, i = ex[:re](), ex[:im]()
-            r, i = promote(N(r), N(i))
+            r, i = promote(N.(ex.as_real_imag())...)
             return(Complex(r, i))
         catch e
         end
     end
-    throw(DomainError())
+    throw(DomainError(ex, "Object of type $(typeof(ex)) has no numeric conversion to a Julia object"))
 end
 N(x::Number) = x  # implies N(x::Sym) = x if ...
 N(m::AbstractArray{Sym}) = map(N, m)
 """
-`N` can take a precision argument. 
+`N` can take a precision argument.
 
 When given as an integer greater than 16, we try to match the digits of accuracy using `BigFloat` precision on conversions to floating point.
 
@@ -186,10 +185,10 @@ function N(x::Sym, digits::Int)
     ## check
     digits <= 16 && return(N(x))
     if is_integer(x) == nothing
-        out = x[:evalf](digits)
+        out = x.evalf(digits)
         return( N(out, digits) )
     end
-    
+
     ex = evalf(x, digits)
     if is_integer(x)
         return(convert(BigInt, x))
@@ -198,16 +197,16 @@ function N(x::Sym, digits::Int)
     elseif is_real(x) == true
         p = round(Int,log2(10)*digits)
 
-        out = setprecision(p) do 
+        out = setprecision(p) do
             convert(BigFloat, ex)
         end
         return(out)
     elseif is_complex(x) == true
-        r, i = ex[:re](), ex[:im]()
+        r, i = ex.as_real_imag()
         u, v = promote(N(r, digits), N(i, digits))
         return(Complex(u, v))
     end
-    
+
     throw(DomainError())
 end
 
@@ -219,10 +218,7 @@ Unlike `N`, `evalf` returns an object of type `Sym`.
 Examples
 ```
 x = Sym("x")
-evalf(x, subs=Dict([(x,1/2)])) 
+evalf(x, subs=Dict([(x,1/2)]))
 ```
 """
 evalf(x::Sym, args...; kwargs...) = object_meth(x, :evalf, args...; kwargs...)
-
-
-

@@ -133,7 +133,7 @@ coeffs(p)  ## [a,b,c]
 ```
 
 """
-Poly(x::Sym) = sympy["Poly"](x)
+Poly(x::Sym) = sympy."Poly"(x)
 Poly(x::Sym, args...; kwargs...) = sympy_meth(:Poly, x, args...; kwargs...)
 export Poly
 
@@ -236,7 +236,7 @@ polynomial_predicates = (
                          :is_zero)
 
 
-is_primitive(x::Sym) = PyObject(x)[:is_primitive]
+is_primitive(x::Sym) = x.is_primitive
 export is_primitive
 
 
