@@ -17,7 +17,7 @@ function getindex(s::AbstractArray{Sym}, i::Symbol)
 end
 
 
-# call a matrix method M[:det](). Matrix or vector arguments are converted via symmatrix
+# call a matrix method M.det(). Matrix or vector arguments are converted via symmatrix
 # though this may need to be done specially for some arguments that are passed in as collections
 global call_matrix_meth(object, meth, args...; kwargs...) = begin
     o = PyObject(object)
@@ -170,7 +170,7 @@ conj(a::Sym) = conjugate(a)
 eigvals(a::Matrix{Sym}) = [k for (k,v) in call_matrix_meth(a, :eigenvals)] # a[:eigevnals]() has multiplicity
 function eigvecs(a::Matrix{Sym})
     ds =  call_matrix_meth(a, :eigenvects)
-    out = Any[]
+    out = Vector{Sym}[]
     for d in ds
         append!(out, d[3])
     end
@@ -179,7 +179,7 @@ end
 rref(a::Matrix{T}) where {T <: Integer} = N(rref(convert(Matrix{Sym}, a)))
 rref(a::Matrix{Rational{T}}) where {T <: Integer} = N(rref(convert(Matrix{Sym}, a)))
 
-det(A::Matrix{T}) where {T <: Sym} = sympy[:det](A)
+det(A::Matrix{T}) where {T <: Sym} = sympy.det(A)
 
 """
 Return orthogonal basis from a set of vectors
