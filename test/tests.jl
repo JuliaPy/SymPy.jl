@@ -530,6 +530,13 @@ end
     @test applicable(sincos, x)
     @test sincos(x)[1] == sin(x)
 
+    # issue 256 det
+    @vars rho phi theta real=true
+    xs = [rho*cos(theta)*sin(phi), rho*sin(theta)*sin(phi), rho*cos(phi)]
+    J = [diff(x, u) for x in xs, u in (rho, phi, theta)]
+    det(J)
+
+
 end
 
 @testset "generic programming, issue 223" begin
