@@ -61,7 +61,7 @@ y1, y2 = symbols("y1, y2", positive=true)
 alpha = symbols("alpha", integer=true, positive=true)
 ```
 
-As seen, the `symbols` function can be used to make one or more variables with zero, one or more assumptions. 
+As seen, the `symbols` function can be used to make one or more variables with zero, one or more assumptions.
 
 We jump ahead for a second to illustrate, but here we see that `solve` will respect these assumptions, by failing to find solutions to these equations:
 
@@ -87,10 +87,10 @@ function name in Base.
 
 ### Special constants
 
-`Julia` has its math constants, like `pi` and `e`, `SymPy` as well. A few of these have `Julia` counterparts provided by `SymPy`. For example, these three constants are defined (where `oo` is for infinity):
+`Julia` has its math constants, like `pi` and `e`, `SymPy` as well. A few of these have `Julia` counterparts provided by `SymPy`. For example, these two constants are defined (where `oo` is for infinity):
 
 ```
-PI, E, oo
+PI,  oo
 ```
 
 (The pretty printing of SymPy objects does not work for tuples.)
@@ -110,13 +110,14 @@ SymPy provides a means to substitute values in for the symbolic expressions. The
 ```
 @vars x y
 ex = x^2 + 2x + 1
-subs(ex, x, y)
+ex.subs(x, y)
 ```
+
 
 Substitution can also be numeric:
 
 ```
-subs(ex, x, 0)
+ex.subs(x, 0)
 ```
 
 The output has no free variables, but is still symbolic.
@@ -126,16 +127,18 @@ Expressions with more than one variable can have multiple substitutions, where e
 ```
 x,y,z = symbols("x,y,z")
 ex = x + y + z
-subs(ex, (x,1), (y,pi))      
+ex.subs((x,1), (y,pi))
 ```
 
-Pairs can be used for substitution with:
-
 ```
-subs(ex, x=>1, y=>pi)
+note("""
+The calling pattern for `subs` is different from a typical `Julia` function call. The `subs` call is `object.method(arguments)` whereas a more "`Julia`n" function call is `method(objects, other objects....)`, as `Julia` offers multiple dispatch of methods. `SymPy` uses the Python calling method, adding in `Julia`n style when appropriate for generic usage within `Julia`. In addition, `SymPy` imports all functions from the underlying `sympy` module and specializes them on a symbolic first argument.
+
+For `subs`, the simple substitution `ex.object(x,a)` is similar to simple function evaluation, so `Julia`'s call notation will work. To specify the pairing off of `x` and `a`, the `=>`  pairs notation is used.
+""")
 ```
 
-And, perhaps more conveniently, symbolic objects have their `call` method overloaded to allow substitution:
+This calling style will be equivalent to the last:
 
 ```
 ex(x=>1, y=>pi)
@@ -147,18 +150,7 @@ A straight call is also possble, where the order of the variables is determined 
 ex(1, pi)
 ```
 
-When using the pipeline operator, `|>`, is convenient, there is a curried form that allows the expression to be implicit:
-
-```
-ex |> subs(x, 1)
-```
-
-As `subs` is very similar in spirit to `Julia`'s `replace` function, that alias is provided:
-
-```
-ex |> replace(y, pi)
-```
-
+This is useful for expressions of a single variable, but being more explicit through the use of paired values would be recommended.
 
 ## Conversion from symbolic to numeric
 
@@ -173,28 +165,30 @@ for the value.
 To see the difference, we use both on `PI`:
 
 ```
-N(PI)  # floating-point value
+N(PI)  # converts to underlying pi irrational
 ```
 
-Whereas, while this may look the same, it is still symbolic:
+Whereas, `evalf` will produce a symbolic numeric value:
 
 ```
-evalf(PI)
+(PI).evalf()
 ```
 
-Both `N` and `evalf` allow for a precision argument to be passed through the second argument. This is how 30 digits of $\pi$ can be extracted:
+
+The `evalf` call allows for a precision argument to be passed through the second argument. This is how 30 digits of $\pi$ can be extracted:
 
 ```
-N(PI, 30)
+PI.evalf(30)
 ```
 
-Here `N` produces a `BigFloat` with a precision to match (basically) the specified number of digits. Whereas
+This is a SymPy, symbolic number, not a `Julia` object. Composing with `N`
 
 ```
-evalf(PI, 30)
+N(PI.evalf(30))
 ```
 
-leaves the value as a symbolic object with 30 digits of accuracy.
+will produce a `Julia` number,
+
 
 Explicit conversion via `convert(T, ex)` can also be done, and is
 necessary at times if `N` does not give the desired type.
@@ -235,7 +229,7 @@ factor(p)
 Or
 
 ```
-expand(prod([(x-i) for i in 1:5]))
+expand(prod((x-i) for i in 1:5))
 ```
 
 The `factor` function factors over the rational numbers, so something like this with obvious factors is not finished:
@@ -263,7 +257,7 @@ or the variable `y`:
 collect(q, y)
 ```
 
-These are identical expressions, though viewed differently. 
+These are identical expressions, though viewed differently.
 
 A more broad-brush approach is to let `SymPy` simplify the values. In this case, the common value of `x` is factored out:
 
@@ -398,15 +392,24 @@ expand_trig(sin(2theta))
 Returning to polynomials, there are a few functions to find various pieces of the polynomials. First we make a general quadratic polynomial:
 
 ```
-a,b,c,x = symbols("a, b, c, x") 
+a,b,c,x = symbols("a, b, c, x")
 p = a*x^2 + b*x + c
 ```
 
-The `coeff(ex, monom)` function will return the corresponding coefficient of the monomial:
+If given a polynomial, like `p`, there are different means to extract the coefficients:
+
+* SymPy provides a `coeffs` method for `Poly` objects, but `p` must first be converted to one.
+
+* SymPy provides the `coeff` method for expressions, which allows extration of a coeffiecient for a given monomial
+
+
+
+
+The `ex.coeff(monom)` call will return the corresponding coefficient of the monomial:
 
 ```
-coeff(p, x^2) # a 
-coeff(p, x)   # b
+p.coeff(x^2) # a
+p.coeff(x)   # b
 ```
 
 The constant can be found through substitution:
@@ -418,23 +421,28 @@ p(x=>0)
 Though one could use some trick like this to find all the coefficients:
 
 ```
-Sym[[coeff(p, x^i) for i in N(degree(p,gen=x)):-1:1]; p(x=>0)]
+Sym[[p.coeff(x^i) for i in N(degree(p,gen=x)):-1:1]; p(x=>0)]
 ```
 
 that is cumbersome, at best. SymPy has a function `coeffs`, but it is defined for polynomial types, so will fail on `p`:
 
 
 ```
-coeffs(p) # fails
+p.coeffs() # fails
 ```
 
 Polynomials are a special class in SymPy and must be constructed. The `Poly` constructor can be used. As there is more than one free variable in `p`, we specify the variable `x` below:
 
 ```
-q = Poly(p, x)
-coeffs(q)
+q = sympy.Poly(p, x)
+q.coeffs()
 ```
 
+```
+note("""
+The `Poly` constructor from SymPy is *not* a function, so is not exported when `SymPy` is loaded. To access it, the object must be qualified by its containing module, in this case `Poly`. Were it to be used frequently, an alias could be used, as in `const Poly=sympy.Poly` *or* the `import_from` function, as in `import_from(sympy, :Poly)`. The latter has some attempt to avoid naming collisions.
+""")
+```
 
 ## Polynomial roots: solve, real_roots, polyroots, nroots
 
@@ -444,7 +452,7 @@ $n$ roots when multiplicities and complex roots are accounted for. The
 number of real roots is consequently between $0$ and $n$.
 
 For a *univariate* polynomial expression (a single variable), the real
-roots, when available, are returned by `real_roots`. For example,
+roots, when available, are returned by `roots`. For example,
 
 ```
 real_roots(x^2 - 2)
@@ -466,7 +474,7 @@ real_roots(p)
 
 In this example, the degree of `p` is 8, but only the 6 real roots
 returned, the double root of $3$ is accounted for. The two complex
-roots of `x^2 + x+ 1` are not considered by this function. The complete set 
+roots of `x^2 + x+ 1` are not considered by this function. The complete set
 of distinct roots can be found with `solve`:
 
 ```
@@ -476,28 +484,19 @@ solve(p)
 This finds the complex roots, but does not account for the double
 root. The `roots` function of SymPy does.
 
-This particular function is not exported (as it conflicts with the
-`roots` function from the `Polynomials` package) but we can still
-access it using `p[:roots]()` or its alias `polyroots`.
 
-> Indexing with a symbol. When a symbolic expression is indexed by a
-> symbol it returns a function which maps to a corresponding SymPy
-> function. For example, `p[:roots](args...)` will call `roots(p,
-> args...)` within SymPy. For methods of SymPy objects, the same is
-> true, so if `roots` were a class method, then the call would resolve
-> to `p.roots(args...)`.
 
-The output of calling `polyroots` will be a dictionary whose keys are the roots and values the multiplicity.
+The output of calling `roots` will be a dictionary whose keys are the roots and values the multiplicity.
 
 ```
-polyroots(p)
+roots(p)
 ```
 
-When exact answers are not provided, the `polyroots` call is contentless:
+When exact answers are not provided, the `roots` call is contentless:
 
 ```
 p = x^5 - x + 1
-polyroots(p)
+roots(p)
 ```
 
 Calling `solve` seems to produce very little as well:
@@ -543,14 +542,20 @@ u = solveset(cos(x) - sin(x))
 
 The output of `solveset` is a set, rather than a vector or
 dictionary. To get the values requires some work. For *finite sets* we collect the elements
-with `elements`:
+with `collect`, but first we must convert to a `Julia` `Set`:
 
 ```
 v = solveset(x^2 - 4)
-elements(v)       
+collect(Set(v...))
 ```
 
-The `elements` function does not work for more complicated sets, such as `u`. For these, the `contains` method may be useful.
+This composition is done in the `elements` function:
+
+```
+elements(v)
+```
+
+The `elements` function does not work for more complicated (non-finite) sets, such as `u`. For these, the `contains` method may be useful to query the underlying elements
 
 
 
@@ -560,7 +565,9 @@ Solving within Sympy has limits. For example, there is no symbolic solution here
 solve(cos(x) - x)
 ```
 
-For such, a numeric method would be needed, say:
+(And hence the error message generated.)
+
+For such an equation, a numeric method would be needed, similar to the `Roots` package. For example:
 
 ```
 nsolve(cos(x) - x, 1)
@@ -607,7 +614,7 @@ d = solve(exs)
 We can "check our work" by plugging into each equation. We take advantage of how the `subs` function allows us to pass in a dictionary:
 
 ```
-map(ex -> subs(ex, d), exs)
+map(ex -> ex.subs(d), exs)
 ```
 
 In the previous example, the system had two equations and two
@@ -627,7 +634,7 @@ Again, a dictionary is returned. The polynomial itself can be found by
 substituting back in for `a`, `b`, and `c`:
 
 ```
-quad_approx = subs(p, d)
+quad_approx = p.subs(d)
 ```
 
 (Taking the limit as $h$ goes to 0 produces the answer $1 - x^2/2$.)
@@ -662,7 +669,7 @@ operators are not aliased to these, but there are alternatives
 `\ll[tab]`, `\leqq[tab]`, `\Equal[tab]`, `\geqq[tab]`, `\gg[tab]` and
 `\neg[tab]` to negate.
 
-So, the above could have been written with the following nearly identical expression, though it is entered with `\Equal[tab]`. 
+So, the above could have been written with the following nearly identical expression, though it is entered with `\Equal[tab]`.
 
 ```
 solve(x ⩵ 1)
@@ -718,7 +725,7 @@ with the resulting `Julia` function.
 
 In addition, with `PyPlot` a few other plotting functions from `SymPy` are available from its interface to `MatplotLib`:
 
-* `plot_parametric_surface(ex1::Sym, ex2::Sym, ex3::Sym), (uvar, a0,
+* `plot3d_parametric_surface(ex1::Sym, ex2::Sym, ex3::Sym), (uvar, a0,
   b0), (vvar, a1, b1))` -- make a surface plot of the expressions
   parameterized by the region `[a0,b0] x [a1,b1]`. The default region
   is `[-5,5]x[-5,5]` where the ordering of the variables is given by
@@ -777,7 +784,7 @@ ex(x=>a)         # or subs(ex, x, a)
 We can see it is of the form $0/0$:
 
 ```
-subs(denom(ex), x, a), subs(numer(ex), x, a)
+denom(ex)(x => a), numer(ex)(x => a)
 ```
 
 And we get
@@ -907,16 +914,16 @@ The extra `Sym`, of the form `T[]`, helps `Julia` resolve the type of the output
 
 #### Unevaluated derivatives
 
-The `Derivative` function provides unevaluated derivatives, useful with differential equations and the output for unknown functions. Here is an example:
+The `Derivative` constructor provides unevaluated derivatives, useful with differential equations and the output for unknown functions. Here is an example:
 
 ```
-ex = Derivative(exp(x*y), x, y, 2)
+ex = sympy.Derivative(exp(x*y), x, y, 2)
 ```
 
-(The `y,2` is a replacement for `y,y` which makes higher order terms easier to type.) These expressions are evaluated with `doit`:
+(The `y,2` is a replacement for `y,y` which makes higher order terms easier to type.) These expressions are evaluated with the `doit` method:
 
 ```
-doit(ex)
+ex.doit()
 ```
 
 #### Implicit derivatives
@@ -1016,17 +1023,17 @@ A1 = A(h => h0)
 ```
 
 Now we note this is a parabola in `w`, so any maximum will be an
-endpoint or the vertex, provided the leading term is negative. 
+endpoint or the vertex, provided the leading term is negative.
 The leading term can be found through:
 
 ```
-coeffs(Poly(A1, w))
+sympy.Poly(A1, w).coeffs()
 ```
 
 Or without using the `Poly` methods, we could do this:
 
 ```
-coeff(collect(expand(A1), w), w^2)
+collect(expand(A1), w).coeff(w^2)
 ```
 
 Either way, the leading coefficient, $-1/2 - \pi/8$, is negative, so
@@ -1041,7 +1048,7 @@ A1(w => 0)
 The other endpoint is when $h=0$, or
 
 ```
-b = solve(subs(P-p, h, 0), w)[1]
+b = solve((P-p)(h => 0), w)[1]
 ```
 
 We will need to check the area at `b` and at the vertex.
@@ -1075,7 +1082,7 @@ With this observation, we conclude the maximum area happens at `c` with area `at
 
 ### Integrals
 
-Integration is implemented in SymPy through the `integrate` function. There are two basic calls: 
+Integration is implemented in SymPy through the `integrate` function. There are two basic calls:
 `integrate(f(x), x)` will find the indefinite integral ($\int f(x) dx$) and when endpoints are specified through `integrate(f(x), (x, a, b))` the definite integral will be found ($\int_a^b f(x) dx$). The special form `integrate(ex, x, a, b)` can be used for single integrals, but the specification through a tuple is needed for multiple integrals.
 
 Basic integrals are implemented:
@@ -1147,14 +1154,14 @@ integrate(x^2*y, (y, 0, sqrt(1 - x^2)), (x, -1, 1))
 
 #### Unevaluated integrals
 
-The `Integral` function can stage unevaluated integrals that will be evaluated by calling `doit`. It is also used when the output is unknown. This example comes from the tutorial:
+The `Integral` constructor can stage unevaluated integrals that will be evaluated by calling `doit`. It is also used when the output is unknown. This example comes from the tutorial:
 
 ```
-integ = Integral(sin(x^2), x)
+integ = sympy.Integral(sin(x^2), x)
 ```
 
 ```
-doit(integ)
+integ.doit()
 ```
 
 
@@ -1185,7 +1192,7 @@ simplify(s1 * s2)
 The big "O" term is $x^4$, as smaller order terms in `s2` are covered in this term. The big "O" notation is sometimes not desired, in which case the `removeO` function can be employed:
 
 ```
-removeO(s1)
+s1.removeO()
 ```
 
 
@@ -1205,8 +1212,8 @@ Like `Integrate` and `Derivative`, there is also a `Sum` function to stage the t
 Some famous sums can be computed:
 
 ```
-sn = Sum(1/i^2, (i, 1, n))
-doit(sn)
+sn = sympy.Sum(1/i^2, (i, 1, n))
+sn.doit()
 ```
 
 And from this a limit is available:
@@ -1244,38 +1251,49 @@ Finding gradients can be done using a comprehension.
 
 ```
 ex = x^2*y - x*y^2
-Sym[diff(ex,var) for var in [x,y]]
+Sym[diff(ex,var) for var in (x,y)]
 ```
 
 The mixed partials is similarly done by passing two variables to differentiate in to `diff`:
 
 ```
-Sym[diff(ex, v1, v2) for v1 in [x,y], v2 in [x,y]]
+Sym[diff(ex, v1, v2) for v1 in (x,y), v2 in (x,y)]
 ```
 
-For this task, SymPy provides the `hessian` function:
+For this task, SymPy provides the `hessian` method:
 
 ```
-hessian(ex)
+hessian(ex, (x,y))
 ```
-
-(When there are symbolic parameters, the free variables are specified as a vector, as in `hessian(ex, vars)`.)
 
 ## Matrices
 
-SymPy has a special class to work with matrices, as does `Julia`. With
-`SymPy`, matrices are just `Julia`n matrices with symbolic
-entries. The conversion to matrices that SymPy knows about is
- handled in the background.
+`Julia` has excellent infrastructure to work with generic matrices,
+such as `Matrix{Sym}` objects (matrices with symbolic entries). As
+well, SymPy has a class for matrices. `SymPy` supports both, the
+latter with $0$-based indexing and type `SymMatrix`.
 
-Constructing matrices then follows `Julia`'s conventions:
+
+
+Constructing matrices with symbolic entries follows `Julia`'s conventions:
 
 ```
 x,y = symbols("x,y")
 M = [1 x; x 1]
 ```
 
-As much as possible, generic `Julia` functions are utilized:
+Construction symbolic matrices is done through the `Matrix` constructor, which must be qualified. It is passed a vector or row vectors:
+
+```
+A = sympy.Matrix([[1,x], [x, 1]])
+```
+
+We could also have converted `M` to get `A`:
+
+```
+convert(SymMatrix, M)
+```
+
 
 ```
 diagm(0=>ones(Sym, 5))
@@ -1283,38 +1301,52 @@ M^2
 det(M)
 ```
 
+Similarly,
+
+```
+A^2
+```
+
+```
+A.det()
+```
+
+
 Occasionally, the SymPy method has more content:
 
 ```
 eigvecs(M)
 ```
 
-As compared to SymPy's `:egienvects` which yields:
+As compared to SymPy's `eigenvects` which yields:
 
 ```
-M[:eigenvects]()
+A.eigenvects()
 ```
 
+(This is a bit misleading, as the generic `eigvecs` fails on `M`, so the value is basically just repackaged from `A.eigenvects()`.)
 
 This example from the tutorial shows the `nullspace` function:
 
 ```
 M = Sym[1 2 3 0 0; 4 10 0 0 1]
-vs = nullspace(M)
+A = convert(SymMatrix, M)
+vs = A.nullspace()
 ```
 
 And this shows that they are indeed in the null space of `M`:
 
 ```
-[M*vs[i] for i in 1:3]
+[A*vs[i] for i in 1:3]
 ```
 
 Symbolic expressions can be included in the matrices:
 
 ```
 M = [1 x; x 1]
-P, D = diagonalize(M)  # M = PDP^-1
-D, M - P*D*inv(P)
+A = convert(SymMatrix, M)
+P, D = A.diagonalize()  # M = PDP^-1
+A - P*D*inv(P)
 ```
 
 
@@ -1322,7 +1354,7 @@ D, M - P*D*inv(P)
 
 SymPy has facilities for solving ordinary differential
 [equations](http://docs.sympy.org/latest/modules/solvers/ode.html). The
-key is to create a symbolic function expression using 
+key is to create a symbolic function expression using
 `SymFunction`. Again, this may be done through:
 
 ```
@@ -1339,8 +1371,11 @@ diffeq = Eq(diff(F(x), x, 2) - 2*diff(F(x)) + F(x), sin(x))
 With this, we just need the `dsolve` function. This is called as `dsolve(eq)`:
 
 ```
-ex = dsolve(diffeq)
+ex = sympy.dsolve(diffeq, F(x))
 ```
+
+(We can use just `dsolve` here, but will reserve that for initial-value problems, where `SymPy` provides a convenient interface for some problems.)
+
 
 The `dsolve` function in SymPy has an extensive list of named
 arguments to control the underlying algorithm. These can be passed
@@ -1351,13 +1386,13 @@ find a derivative, so the above could also have been:
 
 ```
 diffeq = F''(x) - 2F'(x) + F(x) - sin(x)
-dsolve(diffeq)
+sympy.dsolve(diffeq, F(x))
 ```
 
-This solution has two constants, $C_1$ and $C_2$, that would be found from initial conditions. Say we know $F(0)=0$ and $F'(0)=1$, can we find the constants? To work with the returned expression, it is most convenient to get just the right hand side. The `rhs` function will return the right-hand side of a relation:
+This solution has two constants, $C_1$ and $C_2$, that would be found from initial conditions. Say we know $F(0)=0$ and $F'(0)=1$, can we find the constants? To work with the returned expression, it is most convenient to get just the right hand side. The `rhs` method will return the right-hand side of a relation:
 
 ```
-ex1 = rhs(ex)
+ex1 = ex.rhs()
 ```
 
 (The
@@ -1379,7 +1414,7 @@ ex2 = ex1(Sym("C1") => -1//2)
 We know that $F'(0)=1$ now, so we solve for `C2` through
 
 ```
-solve( subs(diff(ex2, x), x, 0) - 1, Sym("C2") )
+solve( diff(ex2, x)(x => 0) - 1, Sym("C2") )
 ```
 
 This gives `C2=3/2`. Again we substitute in to get our answer:
@@ -1410,17 +1445,18 @@ v = SymFunction("v")
 ex = Eq( (m/k)*v'(t), alpha^2 - v(t)^2 )
 ```
 
-We can "classify" this ODE with the method `classify_ode`. As this is not exported, we call it using indexing:
+We can "classify" this ODE with the method `classify_ode` function.
 
 ```
-ex[:classify_ode]()
+classify_ode(ex)
 ```
 
 It is linear, but not solvable. Proceeding with `dsolve` gives:
 
 ```
-dsolve(ex)
+sympy.dsolve(ex, v(t))
 ```
+
 
 ### Initial Value Problems
 
@@ -1455,7 +1491,7 @@ out = dsolve(eqn, x, (y, x0, y0))
 Verifying this requires combining some operations:
 
 ```
-u = rhs(out)
+u = out.rhs()
 diff(u, x) - 3*x*u - 1
 ```
 
@@ -1471,10 +1507,10 @@ To plot this over a range of values for `a` we have:
 
 ```
 as = -2:0.6:2
-ex = rhs(out)
+ex = out.rhs()
 p = plot(ex(a=>as[1]), -1.8, 1.8, ylims=(-4, 4))
 [plot!(p, ex(a=>i), -1.8, 1.8, ylims=(-4, 4)) for i in as[2:end]]
-p  
+p
 ```
 
 The comment from the example is "This plots several integral curves of the equation for different values of $a$. The plot shows that the solutions have an inflection point if the parameter  lies between $-1$ and $1$ , while a global maximum or minimum arises for other values of $a$."
@@ -1501,7 +1537,7 @@ out = dsolve(eqn, x, (y, 0, 1), (y', 0, 1))
 To make a plot, we only need the right-hand-side of the answer:
 
 ```
-plot(rhs(out), -1/3, 2)
+plot(out.rhs(), -1/3, 2)
 ```
 
 ##### Example

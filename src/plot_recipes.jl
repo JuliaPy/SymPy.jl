@@ -91,11 +91,11 @@ plot!(cos(x))
 ```
 ----
 
-Some graphics provided by `SymPy` are available if `PyPlot` is installed.
+Some graphics provided by `SymPy` are available if `PyPlot` is installed, such as:
 
+* `sympy.plotting.plot3d_parametric_surface`
+* `sympy.plotting.plot_implicit`
 
-* `plot_parametric_surface(exs::Tuple, (uvar,a0,b0), (vvar,a1,b1);
-  kwargs)` will make parametrically defined surface plots.
 
 Plot the parametrically defined surface `[exs[1](u,v), exs[2](u,v), exs[3](u,v)]` over `[a0,a1] x
 [b0,b1]`. The specification of the variables uses a tuple of the form
@@ -105,18 +105,16 @@ where disambiguation of variable names is needed.
 ```
 @vars theta, phi
 r = 1
-plot_parametric_surface((r*sin(theta)*sin(phi), r*sin(theta)*cos(phi), r*cos(theta)),
+sympy.plotting.plot3d_parametric_surface((r*sin(theta)*sin(phi), r*sin(theta)*cos(phi), r*cos(theta)),
                         (theta, 0, pi), (phi, 0, pi/2))
 ```
 
-(The SymPy name for this function is `plot3d_parametric_surface`, we have dropped the "`3d`" part.)
 
-
-* `plot_implicit(equation, (xvar, x0, x1), (yvar, y0, y1))` will plot implicitly the equation.
+* `sympy.plotting.plot_implicit(equation, (xvar, x0, x1), (yvar, y0, y1))` will plot implicitly the equation.
 
 ```
 @syms x y
-plot_implicit(Eq(x^2+ y^2,3), (x, -2, 2), (y, -2, 2))  # draw a circle
+sympy.plotting.plot_implicit(Eq(x^2+ y^2,3), (x, -2, 2), (y, -2, 2))  # draw a circle
 ```
 
 
@@ -236,7 +234,7 @@ function plot_parametric_surface(exs::Tuple{Sym,Sym,Sym},
                                  args...;
                                  kwargs...)
 
-    SymPy.call_sympy_fun(sympy.plotting.plot3d_parametric_surface, exs..., args...; kwargs...)
+    sympy.plotting.plot3d_parametric_surface(exs..., args...; kwargs...)
 
 end
 export plot_parametric_surface
@@ -254,5 +252,5 @@ plot_implicit(Eq(x^2+ y^2,3), (x, -2, 2), (y, -2, 2))
 ```
 
 """
-plot_implicit(ex, args...; kwargs...) = SymPy.call_sympy_fun(sympy["plotting"]["plot_implicit"], ex, args...; kwargs...)
+plot_implicit(ex, args...; kwargs...) = sympy.plotting.plot_implicit(ex, args...; kwargs...)
 export plot_implicit

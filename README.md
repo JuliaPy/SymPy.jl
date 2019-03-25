@@ -21,7 +21,7 @@ easier.
 
 The [tutorial](examples/tutorial.md) provides an overview. It is
 viewable as an `IJulia` notebook
-[here](http://nbviewer.ipython.org/github/jverzani/SymPy.jl/blob/master/examples/tutorial.ipynb).
+[here](http://nbviewer.ipython.org/github/jverzani/SymPy.jl/blob/sympylite/examples/tutorial.ipynb). In addition, most of the SymPy tutorial has the `julia` counterparts illustrated starting from [index.html](http://htmlpreview.github.io/?https://github.com/jverzani/SymPy.jl/blob/sympylite/examples/index.html)
 
 ### Installation
 
@@ -77,7 +77,7 @@ With `SymPy` this gets replaced by a more `julia`n syntax:
 using SymPy
 x = symbols("x")		       # or   @vars x, Sym("x"), or  Sym(:x)
 y = sin(pi*x)
-y(1)                           # Does subs(y, x, 1). Use y(x=>1) to be specific as to which symbol to substitute
+y(1)                           # Does y.subs(x, 1). Use y(x=>1) to be specific as to which symbol to substitute
 ```
 
 The object `x` we create is of type `Sym`, a simple proxy for the
@@ -92,8 +92,7 @@ float conversion, only there is an attempt to preserve the variable type.
 `Julia`) is converted to the symbolic `PI`, but in general won't be if
 the math constant is coerced to a floating point value before it
 encounters a symbolic object. It is better to just use the symbolic
-value `PI`, an alias for `sympy.pi` used above. A similar comment
-applies for `e`, where `E` should be used.)
+value `PI`, an alias for `sympy.pi` used above.)
 
 However, for some tasks the `PyCall` interface is still needed, as
 only a portion of the `SymPy` interface is exposed. To call an
@@ -112,28 +111,3 @@ As calling the underlying SymPy function is not difficult, the
 interface exposed through overloading `Julia`'s methods attempts to
 keep similar functionality to the familiar `Julia` method when there is
 a discrepancy between conventions.
-
-## Notes
-
-Some aspects of `SymPy` require more modern versions of `sympy` to be
-installed. For example, the matrix functions rely on features of
-`sympy` that are not exposed in the `sympy` installed with Ubuntu LTS
-12.04.
-
-In that particular instance, calls such as
-
-```
-x = symbols("x")
-a = [x 1; 1 x]
-det(a)
-```
-
-Can be replaced with
-
-```
-sympy.det(a)
-```
-
-Similarly for `trace`, `eigenvects`, ... . Note these are `sympy`
-methods, not `Julia` methods that have been ported. (Hence,
-`eigenvects` and not `eigvecs`.)

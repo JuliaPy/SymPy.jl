@@ -1,0 +1,509 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+
+<!-- not TeX-AMS-MML_HTMLorMML-->
+<script type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) {
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Calculus</h1><p><a href="https://docs.sympy.org/latest/tutorial/calculus.html">From</a></p><p>This section covers how to do basic calculus tasks such as derivatives, integrals, limits, and series expansions in SymPy.  If you are not familiar with the math of any part of this section, you may safely skip it.</p><pre class="sourceCode julia">    >>> from sympy import *
+    >>> x, y, z = symbols('x y z')
+    >>> init_printing(use_unicode=True)</pre>
+<h5>In <code>Julia</code></h5><p>we have</p><ul>
+<li><p>all functions from <code>sympy</code> are imported by default</p>
+</li>
+<li><p>unicode printing is enabled by default</p>
+</li>
+<li><p>double quotes are for strings</p>
+</li>
+</ul><p>so the above can be:</p><pre class="sourceCode julia">using SymPy
+x, y, z = symbols("x y z")</pre>
+<pre class="output">
+(x, y, z)</pre>
+
+<p>We can also use the convenient <code>@vars</code> macro, as with</p><pre class="sourceCode julia">@vars x y z</pre>
+<pre class="output">
+(x, y, z)</pre>
+
+<hr /><h2>Derivatives</h2><p>To take derivatives, use the <code>diff</code> function.</p><pre class="sourceCode julia">    >>> diff(cos(x), x)
+    -sin(x)
+    >>> diff(exp(x**2), x)
+         ⎛ 2⎞
+         ⎝x ⎠
+    2⋅x⋅ℯ</pre>
+<h5>In  <code>Julia</code></h5><p>save for <code>**</code> becoming <code>^</code> this is the same</p><pre class="sourceCode julia">diff(cos(x), x)</pre>
+<div class="well well-sm">
+\begin{equation*}- \sin{\left (x \right )}\end{equation*}</div>
+
+<pre class="sourceCode julia">diff(exp(x^2), x)</pre>
+<div class="well well-sm">
+\begin{equation*}2 x e^{x^{2}}\end{equation*}</div>
+
+<hr /><p><code>diff</code> can take multiple derivatives at once.  To take multiple derivatives, pass the variable as many times as you wish to differentiate, or pass a number after the variable.  For example, both of the following find the third derivative of <code>x^4</code>.</p><pre class="sourceCode julia">    >>> diff(x**4, x, x, x)
+    24⋅x
+    >>> diff(x**4, x, 3)
+    24⋅x</pre>
+<h5>In <code>Julia</code></h5><pre class="sourceCode julia">diff(x^4, x, x, x)</pre>
+<div class="well well-sm">
+\begin{equation*}24 x\end{equation*}</div>
+
+<pre class="sourceCode julia">diff(x^4, x, 3)</pre>
+<div class="well well-sm">
+\begin{equation*}24 x\end{equation*}</div>
+
+<hr /><p>You can also take derivatives with respect to many variables at once.  Just pass each derivative in order, using the same syntax as for single variable derivatives.  For example, each of the following will compute $\frac{\partial^7}{\partial x\partial y^2\partial z^4} e^{x y z}$.</p><pre class="sourceCode julia">    >>> expr = exp(x*y*z)
+    >>> diff(expr, x, y, y, z, z, z, z)
+     3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+    x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ
+    >>> diff(expr, x, y, 2, z, 4)
+     3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+    x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ
+    >>> diff(expr, x, y, y, z, 4)
+     3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+    x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = exp(x*y*z)</pre>
+<div class="well well-sm">
+\begin{equation*}e^{x y z}\end{equation*}</div>
+
+<pre class="sourceCode julia">diff(expr, x, y, y, z, z, z, z)</pre>
+<div class="well well-sm">
+\begin{equation*}x^{3} y^{2} \left(x^{3} y^{3} z^{3} + 14 x^{2} y^{2} z^{2} + 52 x y z + 48\right) e^{x y z}\end{equation*}</div>
+
+<pre class="sourceCode julia">diff(expr, x, y, 2, z, 4)</pre>
+<div class="well well-sm">
+\begin{equation*}x^{3} y^{2} \left(x^{3} y^{3} z^{3} + 14 x^{2} y^{2} z^{2} + 52 x y z + 48\right) e^{x y z}\end{equation*}</div>
+
+<pre class="sourceCode julia">diff(expr, x, y, y, z, 4)</pre>
+<div class="well well-sm">
+\begin{equation*}x^{3} y^{2} \left(x^{3} y^{3} z^{3} + 14 x^{2} y^{2} z^{2} + 52 x y z + 48\right) e^{x y z}\end{equation*}</div>
+
+<hr /><p><code>diff</code> can also be called as a method.  The two ways of calling <code>diff</code> are exactly the same, and are provided only for convenience.</p><pre class="sourceCode julia">    >>> expr.diff(x, y, y, z, 4)
+     3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+    x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr.diff(x, y, y, z, 4)</pre>
+<div class="well well-sm">
+\begin{equation*}x^{3} y^{2} \left(x^{3} y^{3} z^{3} + 14 x^{2} y^{2} z^{2} + 52 x y z + 48\right) e^{x y z}\end{equation*}</div>
+
+<hr /><p>To create an unevaluated derivative, use the <code>Derivative</code> class.  It has the same syntax as <code>diff</code>.</p><pre class="sourceCode julia">    >>> deriv = Derivative(expr, x, y, y, z, 4)
+    >>> deriv
+         7
+        ∂     ⎛ x⋅y⋅z⎞
+    ──────────⎝ℯ     ⎠
+      4   2
+      ∂z  ∂y  ∂x</pre>
+<h5>In <code>Julia</code>,</h5><p>classes are not exported, so we use <code>sympy.Derivative</code>:</p><pre class="sourceCode julia">deriv = sympy.Derivative(expr, x, y, y, z, 4)
+deriv</pre>
+<div class="well well-sm">
+\begin{equation*}\frac{\partial^{7}}{\partial z^{4}\partial y^{2}\partial x} e^{x y z}\end{equation*}</div>
+
+<hr /><p>To evaluate an unevaluated derivative, use the <code>doit</code> method.</p><pre class="sourceCode julia">    >>> deriv.doit()
+     3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+    x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">deriv.doit()</pre>
+<div class="well well-sm">
+\begin{equation*}x^{3} y^{2} \left(x^{3} y^{3} z^{3} + 14 x^{2} y^{2} z^{2} + 52 x y z + 48\right) e^{x y z}\end{equation*}</div>
+
+<hr /><p>These unevaluated objects are useful for delaying the evaluation of the derivative, or for printing purposes.  They are also used when SymPy does not know how to compute the derivative of an expression (for example, if it contains an undefined function, which are described in the :ref:<code>Solving Differential Equations &lt;tutorial-dsolve&gt;</code> section).</p><p>Derivatives of unspecified order can be created using tuple <code>&#40;x, n&#41;</code> where <code>n</code> is the order of the derivative with respect to <code>x</code>.</p><pre class="sourceCode julia">    >>> m, n, a, b = symbols('m n a b')
+    >>> expr = (a*x + b)**m
+    >>> expr.diff((x, n))
+      n
+     ∂ ⎛         m⎞
+    ───⎝(a⋅x + b) ⎠
+      n
+    ∂x</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">@vars m n a b
+expr = (a*x + b)^m
+expr.diff((x, n))</pre>
+<div class="well well-sm">
+\begin{equation*}\frac{\partial^{n}}{\partial x^{n}} \left(a x + b\right)^{m}\end{equation*}</div>
+
+<hr /><h2>Integrals</h2><p>To compute an integral, use the <code>integrate</code> function.  There are two kinds of integrals, definite and indefinite.  To compute an indefinite integral, that is, an antiderivative, or primitive, just pass the variable after the expression.</p><pre class="sourceCode julia">    >>> integrate(cos(x), x)
+    sin(x)</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">integrate(cos(x), x)</pre>
+<div class="well well-sm">
+\begin{equation*}\sin{\left (x \right )}\end{equation*}</div>
+
+<hr /><p>Note that SymPy does not include the constant of integration.  If you want it, you can add one yourself, or rephrase your problem as a differential equation and use <code>dsolve</code> to solve it, which does add the constant (see :ref:<code>tutorial-dsolve</code>).</p><blockquote>
+<p>Quick Tip:</p>
+</blockquote><p>$\infty$ in SymPy is <code>oo</code> (that's the lowercase letter "oh" twice).  This    is because <code>oo</code> looks like $\infty$, and is easy to type.</p><hr /><p>To compute a definite integral, pass the argument <code>&#40;integration_variable, lower_limit, upper_limit&#41;</code>.  For example, to compute</p>$$~
+
+   \int_0^\infty e^{-x}\,dx,
+~$$
+<p>we would do</p><pre class="sourceCode julia">    >>> integrate(exp(-x), (x, 0, oo))
+    1</pre>
+<h5>In Julia:</h5><pre class="sourceCode julia">integrate(exp(-x), (x, 0, oo))</pre>
+<div class="well well-sm">
+\begin{equation*}1\end{equation*}</div>
+
+<hr /><p>As with indefinite integrals, you can pass multiple limit tuples to perform a multiple integral.  For example, to compute</p>$$~
+   \int_{-\infty}^{\infty}\int_{-\infty}^{\infty} e^{- x^{2} - y^{2}}\, dx\, dy,
+~$$
+<p>do</p><pre class="sourceCode julia">    >>> integrate(exp(-x**2 - y**2), (x, -oo, oo), (y, -oo, oo))
+    π</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">integrate(exp(-x^2 - y^2), (x, -oo, oo), (y, -oo, oo))</pre>
+<div class="well well-sm">
+\begin{equation*}\pi\end{equation*}</div>
+
+<hr /><p>If <code>integrate</code> is unable to compute an integral, it returns an unevaluated <code>Integral</code> object.</p><pre class="sourceCode julia">    >>> expr = integrate(x**x, x)
+    >>> print(expr)
+    Integral(x**x, x)
+    >>> expr
+    ⌠
+    ⎮  x
+    ⎮ x  dx
+    ⌡</pre>
+<h5>In Julia:</h5><pre class="sourceCode julia">expr = integrate(x^x, x)
+expr</pre>
+<div class="well well-sm">
+\begin{equation*}\int x^{x}\, dx\end{equation*}</div>
+
+<hr /><p>As with <code>Derivative</code>, you can create an unevaluated integral using <code>Integral</code>.  To later evaluate this integral, call <code>doit</code>.</p><pre class="sourceCode julia">    >>> expr = Integral(log(x)**2, x)
+    >>> expr
+    ⌠
+    ⎮    2
+    ⎮ log (x) dx
+    ⌡
+    >>> expr.doit()
+             2
+    x⋅log (x) - 2⋅x⋅log(x) + 2⋅x</pre>
+<h5>In <code>Julia</code>:</h5><p>the <code>Integral</code> class is not exported, so it must be qualified:</p><pre class="sourceCode julia">expr = sympy.Integral(log(x)^2, x)
+expr</pre>
+<div class="well well-sm">
+\begin{equation*}\int \log{\left (x \right )}^{2}\, dx\end{equation*}</div>
+
+<pre class="sourceCode julia">expr.doit()</pre>
+<div class="well well-sm">
+\begin{equation*}x \log{\left (x \right )}^{2} - 2 x \log{\left (x \right )} + 2 x\end{equation*}</div>
+
+<hr /><p><code>integrate</code> uses powerful algorithms that are always improving to compute both definite and indefinite integrals, including heuristic pattern matching type algorithms, a partial implementation of the <code>Risch algorithm &lt;http://en.wikipedia.org/wiki/Risch_algorithm&gt;</code>, and an algorithm using <code>Meijer G-functions &lt;http://en.wikipedia.org/wiki/Meijer_g-function&gt;</code> that is useful for computing integrals in terms of special functions, especially definite integrals.  Here is a sampling of some of the power of <code>integrate</code>.</p><pre class="sourceCode julia">    >>> integ = Integral((x**4 + x**2*exp(x) - x**2 - 2*x*exp(x) - 2*x -
+    ...     exp(x))*exp(x)/((x - 1)**2*(x + 1)**2*(exp(x) + 1)), x)
+    >>> integ
+    ⌠
+    ⎮ ⎛ 4    2  x    2        x          x⎞  x
+    ⎮ ⎝x  + x ⋅ℯ  - x  - 2⋅x⋅ℯ  - 2⋅x - ℯ ⎠⋅ℯ
+    ⎮ ──────────────────────────────────────── dx
+    ⎮               2        2 ⎛ x    ⎞
+    ⎮        (x - 1) ⋅(x + 1) ⋅⎝ℯ  + 1⎠
+    ⌡
+    >>> integ.doit()
+                     x
+       ⎛ x    ⎞     ℯ
+    log⎝ℯ  + 1⎠ + ──────
+                   2
+                  x  - 1
+
+    >>> integ = Integral(sin(x**2), x)
+    >>> integ
+    ⌠
+    ⎮    ⎛ 2⎞
+    ⎮ sin⎝x ⎠ dx
+    ⌡
+    >>> integ.doit()
+                    ⎛√2⋅x⎞
+    3⋅√2⋅√π⋅fresnels⎜────⎟⋅Γ(3/4)
+                    ⎝ √π ⎠
+    ─────────────────────────────
+               8⋅Γ(7/4)
+
+    >>> integ = Integral(x**y*exp(-x), (x, 0, oo))
+    >>> integ
+    ∞
+    ⌠
+    ⎮  y  -x
+    ⎮ x ⋅ℯ   dx
+    ⌡
+    0
+    >>> integ.doit()
+    ⎧ Γ(y + 1)    for -re(y) < 1
+    ⎪
+    ⎪∞
+    ⎪⌠
+    ⎨⎮  y  -x
+    ⎪⎮ x ⋅ℯ   dx    otherwise
+    ⎪⌡
+    ⎪0
+    ⎩</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">integ = sympy.Integral((x^4 + x^2*exp(x) - x^2 - 2*x*exp(x) - 2*x - exp(x))*exp(x)/((x - 1)^2*(x + 1)^2*(exp(x) + 1)), x)
+integ</pre>
+<div class="well well-sm">
+\begin{equation*}\int \frac{\left(x^{4} + x^{2} e^{x} - x^{2} - 2 x e^{x} - 2 x - e^{x}\right) e^{x}}{\left(x - 1\right)^{2} \left(x + 1\right)^{2} \left(e^{x} + 1\right)}\, dx\end{equation*}</div>
+
+<pre class="sourceCode julia">integ.doit()</pre>
+<div class="well well-sm">
+\begin{equation*}\log{\left (e^{x} + 1 \right )} + \frac{e^{x}}{x^{2} - 1}\end{equation*}</div>
+
+<pre class="sourceCode julia">integ = sympy.Integral(sin(x^2), x)
+integ.doit()</pre>
+<div class="well well-sm">
+\begin{equation*}\frac{3 \sqrt{2} \sqrt{\pi} S\left(\frac{\sqrt{2} x}{\sqrt{\pi}}\right) \Gamma\left(\frac{3}{4}\right)}{8 \Gamma\left(\frac{7}{4}\right)}\end{equation*}</div>
+
+<pre class="sourceCode julia">integ = sympy.Integral(x^y*exp(-x), (x, 0, oo))
+integ.doit()</pre>
+<div class="well well-sm">
+\begin{equation*}\begin{cases} \Gamma\left(y + 1\right) & \text{for}\: - \Re{\left(y\right)} < 1 \\\int\limits_{0}^{\infty} x^{y} e^{- x}\, dx & \text{otherwise} \end{cases}\end{equation*}</div>
+
+<hr /><p>This last example returned a <code>Piecewise</code> expression because the integral does not converge unless $\Re(y) > 1.$</p><h2>Limits</h2><p>SymPy can compute symbolic limits with the <code>limit</code> function.  The syntax to compute</p>$$~
+   \lim_{x\to x_0} f(x)
+~$$
+<p>is <code>limit&#40;f&#40;x&#41;, x, x0&#41;</code>.</p><pre class="sourceCode julia">    >>> limit(sin(x)/x, x, 0)
+    1</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">limit(sin(x)/x, x, 0)</pre>
+<div class="well well-sm">
+\begin{equation*}1\end{equation*}</div>
+
+<p>In <code>Julia</code>, a pair can be used to indicate the limit:</p><pre class="sourceCode julia">limit(sin(x)/x, x=>0)</pre>
+<div class="well well-sm">
+\begin{equation*}1\end{equation*}</div>
+
+<hr /><p><code>limit</code> should be used instead of <code>subs</code> whenever the point of evaluation is a singularity.  Even though SymPy has objects to represent $\infty$, using them for evaluation is not reliable because they do not keep track of things like rate of growth.  Also, things like $\infty - \infty$ and $\frac{\infty}{\infty}$ return $\mathrm{nan}$ (not-a-number).  For example</p><pre class="sourceCode julia">    >>> expr = x**2/exp(x)
+    >>> expr.subs(x, oo)
+    nan
+    >>> limit(expr, x, oo)
+    0</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = x^2/exp(x)
+expr.subs(x, oo)</pre>
+<div class="well well-sm">
+\begin{equation*}\mathrm{NaN}\end{equation*}</div>
+
+<pre class="sourceCode julia">limit(expr, x, oo)</pre>
+<div class="well well-sm">
+\begin{equation*}0\end{equation*}</div>
+
+<hr /><p>Like <code>Derivative</code> and <code>Integral</code>, <code>limit</code> has an unevaluated counterpart, <code>Limit</code>.  To evaluate it, use <code>doit</code>.</p><pre class="sourceCode julia">    >>> expr = Limit((cos(x) - 1)/x, x, 0)
+    >>> expr
+         ⎛cos(x) - 1⎞
+     lim ⎜──────────⎟
+    x─→0⁺⎝    x     ⎠
+    >>> expr.doit()
+    0</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = sympy.Limit((cos(x) - 1)/x, x, 0)
+expr</pre>
+<div class="well well-sm">
+\begin{equation*}\lim_{x \to 0^+}\left(\frac{\cos{\left (x \right )} - 1}{x}\right)\end{equation*}</div>
+
+<pre class="sourceCode julia">expr.doit()</pre>
+<div class="well well-sm">
+\begin{equation*}0\end{equation*}</div>
+
+<p>To evaluate a limit at one side only, pass <code>&#39;&#43;&#39;</code> or <code>&#39;-&#39;</code> as a third argument to <code>limit</code>.  For example, to compute</p>$$~
+   \lim_{x\to 0^+}\frac{1}{x},
+~$$
+<p>do</p><pre class="sourceCode julia">    >>> limit(1/x, x, 0, '+')
+    ∞</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">limit(1/x, x => 0, "+")</pre>
+<div class="well well-sm">
+\begin{equation*}\infty\end{equation*}</div>
+
+<hr /><p>As opposed to</p><pre class="sourceCode julia">    >>> limit(1/x, x, 0, '-')
+    -∞</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">limit(1/x, x, 0, "-")</pre>
+<div class="well well-sm">
+\begin{equation*}-\infty\end{equation*}</div>
+
+<hr /><h2>Series Expansion</h2><p>SymPy can compute asymptotic series expansions of functions around a point. To compute the expansion of <code>f&#40;x&#41;</code> around the point <code>x &#61; x_0</code> terms of order <code>x^n</code>, use <code>f&#40;x&#41;.series&#40;x, x0, n&#41;</code>.  <code>x0</code> and <code>n</code> can be omitted, in which case the defaults <code>x0&#61;0</code> and <code>n&#61;6</code> will be used.</p><pre class="sourceCode julia">    >>> expr = exp(sin(x))
+    >>> expr.series(x, 0, 4)
+             2
+            x     ⎛ 4⎞
+    1 + x + ── + O⎝x ⎠
+            2</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = exp(sin(x))
+expr.series(x, 0, 4)</pre>
+<div class="well well-sm">
+\begin{equation*}1 + x + \frac{x^{2}}{2} + O\left(x^{4}\right)\end{equation*}</div>
+
+<hr /><p>The <code>O\left &#40;x^4\right &#41;</code> term at the end represents the Landau order term at <code>x&#61;0</code> (not to be confused with big O notation used in computer science, which generally represents the Landau order term at $x=\infty$).  It means that all x terms with power greater than or equal to <code>x^4</code> are omitted.  Order terms can be created and manipulated outside of <code>series</code>.  They automatically absorb higher order terms.</p><pre class="sourceCode julia">    >>> x + x**3 + x**6 + O(x**4)
+         3    ⎛ 4⎞
+    x + x  + O⎝x ⎠
+    >>> x*O(1)
+    O(x)</pre>
+<h5>In <code>Julia</code>:</h5><p><code>O</code> is not exported, so we must qualify it:</p><pre class="sourceCode julia">x + x^3 + x^6 + sympy.O(x^4)
+</pre>
+<div class="well well-sm">
+\begin{equation*}x + x^{3} + O\left(x^{4}\right)\end{equation*}</div>
+
+<pre class="sourceCode julia">x*sympy.O(1)</pre>
+<div class="well well-sm">
+\begin{equation*}O\left(x\right)\end{equation*}</div>
+
+<hr /><p>If you do not want the order term, use the <code>removeO</code> method.</p><pre class="sourceCode julia">    >>> expr.series(x, 0, 4).removeO()
+     2
+    x
+    ── + x + 1
+    2</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr.series(x, 0, 4).removeO()</pre>
+<div class="well well-sm">
+\begin{equation*}\frac{x^{2}}{2} + x + 1\end{equation*}</div>
+
+<hr /><p>The <code>O</code> notation supports arbitrary limit points (other than 0):</p><pre class="sourceCode julia">    >>> exp(x - 6).series(x, x0=6)
+                2          3          4          5
+         (x - 6)    (x - 6)    (x - 6)    (x - 6)         ⎛       6       ⎞
+    -5 + ──────── + ──────── + ──────── + ──────── + x + O⎝(x - 6) ; x → 6⎠
+            2          6          24        120</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">exp(x - 6).series(x, x0=6)</pre>
+<div class="well well-sm">
+\begin{equation*}-5 + \frac{\left(x - 6\right)^{2}}{2} + \frac{\left(x - 6\right)^{3}}{6} + \frac{\left(x - 6\right)^{4}}{24} + \frac{\left(x - 6\right)^{5}}{120} + x + O\left(\left(x - 6\right)^{6}; x\rightarrow 6\right)\end{equation*}</div>
+
+<h2>Finite differences</h2><p>So far we have looked at expressions with analytic derivatives and primitive functions respectively. But what if we want to have an expression to estimate a derivative of a curve for which we lack a closed form representation, or for which we don't know the functional values for yet. One approach would be to use a finite difference approach.</p><p>The simplest way the differentiate using finite differences is to use the <code>differentiate_finite</code> function:</p><pre class="sourceCode julia">    >>> f, g = symbols('f g', cls=Function)
+    >>> differentiate_finite(f(x)*g(x))
+    -f(x - 1/2)⋅g(x - 1/2) + f(x + 1/2)⋅g(x + 1/2)</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">f, g = symbols("f g", cls=sympy.Function)
+differentiate_finite(f(x)*g(x))</pre>
+<div class="well well-sm">
+\begin{equation*}- f{\left (x - \frac{1}{2} \right )} g{\left (x - \frac{1}{2} \right )} + f{\left (x + \frac{1}{2} \right )} g{\left (x + \frac{1}{2} \right )}\end{equation*}</div>
+
+<p>(The functions <code>f</code> and <code>g</code> can also be created with the command <code>@symfuns f g</code>, using the <code>@symfuns</code> macro.)</p><hr /><p>If we want to expand the intermediate derivative we may pass the flag <code>evaluate&#61;True</code>:</p><pre class="sourceCode julia">    >>> differentiate_finite(f(x)*g(x), evaluate=True)
+    (-f(x - 1/2) + f(x + 1/2))⋅g(x) + (-g(x - 1/2) + g(x + 1/2))⋅f(x)</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">differentiate_finite(f(x)*g(x), evaluate=true)</pre>
+<div class="well well-sm">
+\begin{equation*}\left(- f{\left (x - \frac{1}{2} \right )} + f{\left (x + \frac{1}{2} \right )}\right) g{\left (x \right )} + \left(- g{\left (x - \frac{1}{2} \right )} + g{\left (x + \frac{1}{2} \right )}\right) f{\left (x \right )}\end{equation*}</div>
+
+<hr /><p>This form however does not respect the product rule.</p><p>If you already have a <code>Derivative</code> instance, you can use the <code>as_finite_difference</code> method to generate approximations of the derivative to arbitrary order:</p><pre class="sourceCode julia">    >>> f = Function('f')
+    >>> dfdx = f(x).diff(x)
+    >>> dfdx.as_finite_difference()
+    -f(x - 1/2) + f(x + 1/2)</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">f = sympy.Function("f")
+dfdx = f(x).diff(x)
+dfdx.as_finite_difference()</pre>
+<div class="well well-sm">
+\begin{equation*}- f{\left (x - \frac{1}{2} \right )} + f{\left (x + \frac{1}{2} \right )}\end{equation*}</div>
+
+<hr /><p>here the first order derivative was approximated around x using a minimum number of points (2 for 1st order derivative) evaluated equidistantly using a step-size of 1. We can use arbitrary steps (possibly containing symbolic expressions):</p><pre class="sourceCode julia">    >>> f = Function('f')
+    >>> d2fdx2 = f(x).diff(x, 2)
+    >>> h = Symbol('h')
+    >>> d2fdx2.as_finite_difference([-3*h,-h,2*h])
+    f(-3⋅h)   f(-h)   2⋅f(2⋅h)
+    ─────── - ───── + ────────
+         2        2        2
+      5⋅h      3⋅h     15⋅h</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">f = sympy.Function("f")
+d2fdx2 = f(x).diff(x, 2)
+h = sympy.Symbol("h")
+d2fdx2.as_finite_difference([-3*h,-h,2*h])</pre>
+<div class="well well-sm">
+\begin{equation*}\frac{f{\left (- 3 h \right )}}{5 h^{2}} - \frac{f{\left (- h \right )}}{3 h^{2}} + \frac{2 f{\left (2 h \right )}}{15 h^{2}}\end{equation*}</div>
+
+<hr /><p>If you are just interested in evaluating the weights, you can do so manually:</p><pre class="sourceCode julia">    >>> finite_diff_weights(2, [-3, -1, 2], 0)[-1][-1]
+    [1/5, -1/3, 2/15]</pre>
+<h5>In <code>Julia</code>:</h5><p>the <code>finite_diff_weights</code> function that is exported requires a symbolic first argument. We can wrap it in <code>Sym</code> or qualify the function usage:</p><pre class="sourceCode julia">finite_diff_weights(Sym(2), [-3, -1, 2], 0)[end][end]</pre>
+<div class="well well-sm">
+\begin{equation*}\frac{2}{15}\end{equation*}</div>
+
+<pre class="sourceCode julia">sympy.finite_diff_weights(2, [-3, -1, 2], 0)[end][end]</pre>
+<div class="well well-sm">
+\begin{equation*}\frac{2}{15}\end{equation*}</div>
+
+<hr /><p>note that we only need the last element in the last sublist returned from <code>finite_diff_weights</code>. The reason for this is that the function also generates weights for lower derivatives and using fewer points (see the documentation of <code>finite_diff_weights</code> for more details).</p><p>If using <code>finite_diff_weights</code> directly looks complicated, and the <code>as_finite_difference</code> method of <code>Derivative</code> instances is not flexible enough, you can use <code>apply_finite_diff</code> which takes <code>order</code>, <code>x_list</code>, <code>y_list</code> and <code>x0</code> as parameters:</p><pre class="sourceCode julia">    >>> x_list = [-3, 1, 2]
+    >>> y_list = symbols('a b c')
+    >>> apply_finite_diff(1, x_list, y_list, 0)
+      3⋅a   b   2⋅c
+    - ─── - ─ + ───
+       20   4    5</pre>
+<h5>In <code>Julia</code>,</h5><p>again, we qualify <code>apply_finite_diff</code> as the first argument used is not symbolic:</p><pre class="sourceCode julia">x_list = [-3, 1, 2]
+y_list = symbols("a b c")
+sympy.apply_finite_diff(1, x_list, y_list, 0)</pre>
+<div class="well well-sm">
+\begin{equation*}- \frac{3 a}{20} - \frac{b}{4} + \frac{2 c}{5}\end{equation*}</div>
+
+<hr />
+  </div>
+</div>
+
+</body>
+</html>

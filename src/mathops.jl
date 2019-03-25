@@ -1,5 +1,9 @@
+
+
+##################################################
 ## evaluate binary operations of symbolic objects
 ## XXX -- this may prove too narryw with the use of ::Sym
+
 +(x::SymbolicObject, y::SymbolicObject) = pycall(sympy.Add, Sym, x, y)
 *(x::SymbolicObject, y::SymbolicObject) = pycall(sympy.Mul, Sym, x, y)
 -(x::SymbolicObject, y::SymbolicObject) = x + (-y)

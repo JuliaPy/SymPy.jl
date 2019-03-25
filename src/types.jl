@@ -1,97 +1,103 @@
-## Code for our Types and conversion methods
-
+##################################################
 
 ## Symbol class for controlling dispatch
 abstract type SymbolicObject <: Number end
-
-## Basic types defined here
-"""
-
-* `Sym("x")`
-* `Sym(:x)`
-* `Sym("x, y, z")`
-
-The `Sym` type is an immutable type holding a reference to an
-underlying python-based SymPy object. Many methods are extended to the
-`Sym` type. Instances can be constructed in many ways. The one caveat
-is the variables can not be function names in base.
-
-"""
 struct Sym <: SymbolicObject
     x::PyCall.PyObject
 end
-Sym(s::SymbolicObject) = s
 
-## sets
-struct SymSet <: SymbolicObject
+
+## Matrices
+## mutable so setindex! can work
+mutable struct SymMatrix <: SymbolicObject
     x::PyCall.PyObject
 end
 
-
-## complex float
-## this cause issue with printing on non-complex objects
-#mpctype = sympy.mpmath["ctx_mp_python"]
-#pytype_mapping(mpctype, Sym)
-
-## some typealiases
-const SymOrReal =  Union{Sym,Real}
-const SymOrNumber =  Union{Sym,Number}
-const SymOrString =  Union{Sym,AbstractString}
-const SymbolicTypes = Union{AbstractString,Symbol,SymbolicObject}
+## Permutations
+## A permutation of {0, 1, 2, ..., n} -- 0-based
+struct SymPermutation <: SymbolicObject
+  x::PyCall.PyObject
+end
+export SymPermutation
 
 
-## in #83, @stevengj suggests using
+
+## A permutation of {0, 1, 2, ..., n} -- 0-based
+struct SymPermutationGroup <: SymbolicObject
+  x::PyCall.PyObject
+end
+export SymPermutationGroup
+
+
+
+
+
+## important override
+## this allows most things to flow though PyCall
 PyCall.PyObject(x::SymbolicObject) = x.x
 
-## Promotion
-## promote up to symbolic so that math ops work
-promote_rule(::Type{T}, ::Type{S})  where {T<:SymbolicObject, S<:Number}= T
 
+## Override this so that using symbols as keys in a dict works
+hash(x::SymbolicObject) = hash(PyObject(x))
+==(x::SymbolicObject, y::SymbolicObject) = PyObject(x) == PyObject(y)
 
+## Show methods
+"create basic printed output"
+function jprint(x::SymbolicObject)
+    out = PyCall.pycall(pybuiltin("str"), String, PyObject(x))
+    out = replace(out, r"\*\*" => "^")
+    out
+end
+jprint(x::AbstractArray) = map(jprint, x)
 
-## Conversion
-convert(::Type{T}, o::PyCall.PyObject) where {T <: SymbolicObject} = T(o)
-convert(::Type{PyObject}, s::Sym) = s.x
+## text/plain
+Base.show(io::IO, s::Sym) = print(io, jprint(s))
+Base.show(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy.pretty(s))
 
+## latex enhancements: Sym, array, Dict
+Base.show(io::IO, ::MIME"text/latex", x::SymbolicObject) = print(io, sympy.latex(x, mode="equation*"))
 
-function convert(::Type{Tuple}, o::PyCall.PyObject)
-    ## check that o is a tuple?
-    ## PyCall.pytypeof(o)
-    n = o.__len__()
-    ntuple(i -> o.__getitem__(i-1), n)
+function  show(io::IO, ::MIME"text/latex", x::AbstractArray{Sym})
+    function toeqnarray(x::Vector{Sym})
+        a = join([sympy.latex(x[i]) for i in 1:length(x)], "\\\\")
+        """\\[ \\left[ \\begin{array}{r}$a\\end{array} \\right] \\]"""
+#        "\\begin{bmatrix}$a\\end{bmatrix}"
+    end
+    function toeqnarray(x::AbstractArray{Sym,2})
+        sz = size(x)
+        a = join([join(map(sympy.latex, x[i,:]), "&") for i in 1:sz[1]], "\\\\")
+        "\\[\\left[ \\begin{array}{" * repeat("r",sz[2]) * "}" * a * "\\end{array}\\right]\\]"
+#        "\\begin{bmatrix}$a\\end{bmatrix}"
+    end
+    print(io, toeqnarray(x))
+end
+function show(io::IO, ::MIME"text/latex", d::Dict{T,S}) where {T<:SymbolicObject, S<:Any}
+    Latex(x::Sym) = sympy.latex(x)
+    Latex(x) = sprint(io -> show(IOContext(io, :compact => true), x))
+
+    out = "\\begin{equation*}\\begin{cases}"
+    for (k,v) in d
+        out = out * Latex(k) * " & \\text{=>} &" * Latex(v) * "\\\\"
+    end
+    out = out * "\\end{cases}\\end{equation*}"
+    print(io, out)
 end
 
-## rational
-convert(::Type{T}, x::Rational) where {T<:SymbolicObject} = sympy_meth(:Rational, x.num, x.den)::T
-
-## big. Need mpmath installed separately -- not as a SymPy module as that is how it is called in PyCall
-convert(::Type{T}, x::BigFloat) where {T<:SymbolicObject} = Sym(PyCall.PyObject(x))::T
-convert(::Type{Sym}, x::Complex{BigFloat}) = Sym(PyCall.PyObject(x))::Sym
-
-## real
-convert(::Type{S}, x::T) where {S<:SymbolicObject, T <: Real}= sympy_meth(:sympify, x)::S
-convert(::Type{T}, x::Sym) where {T <: Real} = convert(T, PyObject(x))
 
 
-## complex
-## cf math.jl for `complex` of a value
-## IM is SymPy's "i" (sympy.I, not Python's
-## Sym(PyCall.PyObject(im)) which gives 1j.
-function convert(::Type{Sym}, x::Complex)
-    y = ifelse(isa(x, Complex{Bool}), real(x) + imag(x) * im, x)
-    real(y) + imag(y) * IM
+
+
+## Following recent changes to PyCall where:
+# For o::PyObject, make o["foo"], o[:foo], and o.foo equivalent to o.foo in Python,
+# with the former returning an raw PyObject and the latter giving the PyAny
+# conversion.
+# We do something similar to SymPy
+#
+# We only implement for symbols here, not strings
+function Base.getproperty(o::T, s::Symbol) where {T <: SymbolicObject}
+    if (s in fieldnames(T))
+        getfield(o, s)
+    else
+        getproperty(PyCall.PyObject(o), s)
+    end
 end
-convert(::Type{Complex{T}}, x::Sym) where {T} = complex(map(x -> convert(T, x), x.as_real_imag())...)
-complex(::Type{Sym}) = Sym
-
-
-## string
-convert(::Type{Sym}, o::AbstractString) = sympy_meth(:sympify, o)
-convert(::Type{Sym}, o::Symbol) = sympy_meth(:sympify, string(o))
-
-## function
-convert(::Type{Function}, ex::Sym) = lambdify(ex)
-
-## we usually promote to Sym objects, but here we want to promote to functions
-## so [x, sin] -> will be plottable as two functions
-Base.promote_rule(::Type{T}, ::Type{S}) where {T<:SymbolicObject, S<:Function} = S

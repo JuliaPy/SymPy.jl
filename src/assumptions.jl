@@ -4,7 +4,7 @@
 """
 refine: http://docs.sympy.org/dev/modules/assumptions/refine.html
 """
-refine(ex, assumpts...) = sympy_meth(:refine, ex, assumpts...)
+refine(ex, assumpts...) = sympy.refine(ex, assumpts...)
 export refine
 
 """
@@ -20,7 +20,7 @@ filter(x -> ask(Q.prime(x)), [1:1000])
 ```
 
 """
-ask(x::Sym, args...) = sympy_meth(:ask, x, args...)
+ask(x::Sym, args...) = sympy.ask(x, args...)
 ask(x::Bool, args...) = x
 ask(x::Nothing, args...) = x
 export ask

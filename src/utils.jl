@@ -1,234 +1,299 @@
-## Alternate constructors for symbolic objects
-##
-## Many (too many) ways to create symbolobjects
-## Sym("x"), Sym(:x), Sym("x", "y") or Sym(:x, :y), @syms x y, @vars x y, symbols("x y")
 
-"Create a symbolic object from a symbol or string"
-Sym(s::AbstractString) = sympy_meth(:sympify, s)
-Sym(s::Symbol) = Sym(string(s))
-
-
-"Create a symbolic number"
-Sym(x::T)  where  {T <: Number} = convert(Sym, x)
-
-## math constants in math.jl and done in __init__ stage
-
-"vectorized version of `Sym`"
-Sym(args...) = map(Sym, args)
-
-
-
-## define one or more symbols directly
-## a,b,c = symbols("a,b,c", commutative=false)
-"""
-
-Function to create one or more symbolic objects. These are specified with a string,
-with commas separating different variables.
-
-This function allows the passing of assumptions about the variables
-such as `positive=true`, `real=true` or `commutative=true`. See [SymPy
-Docs](http://docs.sympy.org/dev/modules/core.html#module-sympy.core.assumptions)
-for a complete list.
-
-Example:
-
-```
-x,y,z = symbols("x, y, z", real=true)
-```
-
-"""
-function symbols(x::AbstractString; kwargs...)
-    out = sympy_meth(:symbols, x; kwargs...)
+## Call
+## Call symbolic object with natural syntax
+## ex(x=>val)
+## how to do from any symbolic object?
+(ex::Sym)() = ex
+function (ex::Sym)(args...)
+    xs = ex.free_symbols
+    for (var, val) in zip(xs, args)
+        ex = ex.subs(var, val)
+    end
+    ex
 end
-symbols(x::Symbol; kwargs...) = symbols(string(x); kwargs...)
+function (ex::Sym)(x::Dict)
+    for (k,v) in x
+        ex = ex.subs(k, v)
+    end
+    ex
+end
+function (ex::Sym)(x::Pair...)
+    for (k,v) in x
+        ex = ex.subs(k, v)
+    end
+    ex
+end
+
+## use python iteration
+
+##################################################
+# avoid type piracy. After we call `pytype` mappings, some
+# objects are automatically converted and no longer PyObjects
+pycall_hasproperty(x::PyCall.PyObject, k) = PyCall.hasproperty(x, k)
+pycall_hasproperty(x::Sym, k) = PyCall.hasproperty(PyCall.PyObject(x), k)
+pycall_hasproperty(x, k) = false
+
+# simple helper for boolean properties
+# x.is_finite -> is_(:finite, x)
+# e.g.: is_(:FiniteSet, x) = hasproperty && get property
+function is_(k::Symbol, x::Sym)::Bool
+    key = Symbol("is_$k")
+    pycall_hasproperty(x, key) && getproperty(x, key) == Sym(true)
+end
+## name of symbolic object
+function __name__(x)
+    try
+        x.__class__.__name__
+    catch err
+        ""
+    end
+end
 
 
-## @syms a b c --- no commas on right hand side!
-## Thanks to vtjnash for this!
-"""
-    @syms x [y z ...] [assumptions...]
+_get_members(sm) = PyCall.inspect.getmembers(sm)
+function _get_member_functions(sm, exclude=())
+    mems = _get_members(sm)
+    fns = Dict()
+    for (u, v) in mems
+        # special cases
+        u in exclude && continue
 
-Macro to create many symbolic objects at once.
+        pycall_hasproperty(v, :deprecated) && continue
+        !isa(v, PyCall.PyObject) && continue
 
-The `@syms` macros creates the variables and assigns them into the
-local scope.
-
-Example:
-
-```
-@syms a b c
-```
-
-Additionally you can pass assumptions on using keyword arguments:
-
-```
-@syms a positive=true b real=true c
-```
-
-Additionally you can rename arguments using pairs notation:
-
-```
-@syms   Ld=>"L_d" Lq=>"L_q"
-```
-
-The `@vars` macro is similar, `@syms` is the name used in
-MATLAB.
-
-Original macro magic contributed by @vtjnash and extended by @alhirzel and
-@spencerlyon2
-"""
-macro syms(x...)
-    q = Expr(:block)
-    as = []    # running list of assumptions to be applied
-    ss = []    # running list of symbols created
-    for s in reverse(x)
-        if isa(s, Expr)    # either an assumption or a named variable
-            if s.head == :(=)
-                s.head = :kw
-                push!(as, s)
-            elseif s.head == :(=>)
-                push!(ss, s.args[1])
-                push!(q.args, Expr(:(=), esc(s.args[1]), Expr(:call, :symbols, s.args[2], map(esc,as)...)))
-            end
-        elseif isa(s, Symbol)   # raw symbol to be created
-            push!(ss, s)
-            push!(q.args, Expr(:(=), esc(s), Expr(:call, :symbols, Expr(:quote, s), map(esc,as)...)))
-        else
-            throw(AssertionError("@syms expected a list of symbols and assumptions"))
+        ## we grab functions or FunctionClass objects only
+        if PyCall.hasproperty(v, :__class__) &&
+            v.__class__.__name__ in ("function", "FunctionClass")
+            fns[u] = v
         end
     end
-    push!(q.args, Expr(:tuple, map(esc,reverse(ss))...)) # return all of the symbols we created
-    q
+    fns
 end
 
-
-# TODO alias @vars to @syms
-"""
-    @vars x y z
-
-The `vars` macro is identical to  `@syms`.
-
-"""
-macro vars(x...)
-    q = Expr(:block)
-    as = []    # running list of assumptions to be applied
-    ss = []    # running list of symbols created
-    for s in reverse(x)
-        if isa(s, Expr)    # either an assumption or a named variable
-            if s.head == :(=)
-                s.head = :kw
-                push!(as, s)
-            elseif s.head == :(=>)
-                push!(ss, s.args[1])
-                push!(q.args, Expr(:(=), esc(s.args[1]), Expr(:call, :symbols, s.args[2], map(esc,as)...)))
-            end
-        elseif isa(s, Symbol)   # raw symbol to be created
-            push!(ss, s)
-            push!(q.args, Expr(:(=), esc(s), Expr(:call, :symbols, Expr(:quote, s), map(esc,as)...)))
-        else
-            throw(AssertionError("@syms expected a list of symbols and assumptions"))
-        end
-    end
-    push!(q.args, Expr(:tuple, map(esc,reverse(ss))...)) # return all of the symbols we created
-    q
-end
-
-## length of object
-function length(x::SymbolicObject)
-    PyCall.hasproperty(PyObject(x), :length) && return PyObject(x).length
-    sz = size(x)
-    length(sz) == 0 && return(0)
-    *(sz...)
-end
-
-## size
-function size(x::SymbolicObject)
-    return ()
-end
-
-function size(x::SymbolicObject, dim::Integer)
-    if dim <= 0
-        error("dimension out of range")
-
-    else
-        return 1
+function _is_module(x::Symbol)
+    try
+        typeof(eval(x)) <:  Module && x ≠ :Main
+    catch err
+        false
     end
 end
 
-
-## Iterator for Sym
-import Base.iterate
-iterate(x::Sym) = (x.x, 0)
-iterate(x::Sym, state) = nothing
-
-
-## Following recent changes to PyCall where:
-# For o::PyObject, make o["foo"], o[:foo], and o.foo equivalent to o.foo in Python,
-# with the former returning an raw PyObject and the latter giving the PyAny
-# conversion.
-# We do something similar to SymPy
-#
-# We only implement for symbols here, not strings
-function Base.getproperty(o::T, s::Symbol) where {T <: SymbolicObject}
-    if !(s in fieldnames(T))
-        getproperty(PyCall.PyObject(o), s)
-    else
-        getfield(o, s)
-    end
+function loaded_modules()
+    nms = names(Main,imported=true)
+    nms = filter(nm -> nm != :SymPy, nms)
+    Ms = filter(_is_module,  nms)
+    eval.(Ms)
 end
 
+## """
+##     from_import(PyCallModule; Ms, fns)
+
+## Mimic `from module import *` within `Julia`
+
+## * searches for all functions in PyCallModule, and creates a Julia function specialized on the first argument being a symbolic object.
+## * If this function is exported by a module in Ms, it is extended, if not, it is exported.
+
+## This only imports function objects. Classes are not imported. For example, `sympy.Matrix` is needed and not `Matrix`.
+## """
+## function from_import_all(sm;
+##                          Ms=(Base, LinearAlgebra, SpecialFunctions,Base.MathConstants),
+##                          fns=nothing,
+##                          exclude = ()
+##                          )
 
 
+##     for (k,v) in (fns == nothing ? _get_member_functions(sm, exclude) : fns)
+##         meth = Symbol(k)
+##         inMs = false
+##         for M in Ms
+##             if isdefined(M, meth)
+##                 inMs = true
+## #                @show k
+##                 @eval begin
+##                     ($M.$meth)(ex::SymbolicObject, args...; kwargs...) =
+##                         getproperty($sm,$k)(ex, args...; kwargs...)
+##                 end
+##                 break
+##             end
+##         end
+##         if !inMs
+##             ## need to export
+## #            @show "export", k
+##             @eval begin
+##                 ($meth)(ex::SymbolicObject, args...; kwargs...) =
+##                     getproperty($sm,$k)(ex, args...; kwargs...)
+##             end
+##             eval(Expr(:export, meth))
+##         end
+##     end
+## end
 
+## """
+##     from_import(PyCallModule, meths; Ms)
 
+## Mimics `from module import a, b, c`.
+
+## This is similar to `from_import` only just those specified methods in `meths` are considered.
+## """
+## function from_import(sm, meths;
+##                      Ms=(Base, LinearAlgebra, SpecialFunctions, Base.MathConstants))
+##     mems = PyCall.inspect.getmembers(sm)
+##     fns = Dict()
+##     for (m,p) in mems
+##         if Symbol(m) in meths
+##             fns[m] = p
+##         end
+##     end
+##     from_import_all(sm; Ms=Ms, fns=fns)
+## end
+
+base_Ms = (Base, SpecialFunctions, Base.MathConstants,
+           LinearAlgebra, Random, Statistics
+           )
+
+base_exclude=("C", "lambdify",
+              "latex", "eye", "sympify",
+              "div",
+              "dsolve",
+              "ask",
+              "plot")
 
 """
+    import_from(module, meths; kwargs...)
 
-In SymPy, the typical calling pattern is `obj.method` or
-`sympy.method` ... In `PyCall`, this becomes `obj[:method](...)` or
-`sympy.method(...)`. In `SymPy` many -- but no where near all --
-method calls become `method(obj, ...)`. For those that aren't
-included, this allows the call to follow `PyCall`, and be
-`obj[:method]` where a symbol is passed for the method name.
+Import methods from python module
 
-These just dispatches to `sympy_meth` or `object_meth`, as
-appropriate. This no longer can be used to access properties of the
-underlying `PyObject`. For that, there is no special syntax beyond
-`object.x[:property]`.
+* `module`: a python module, such as `sympy`
+* `meths`: nothing or a tuple of symbols to import. If `nothing`, then all member functions of the module are imported (but not constructors and other objects)
+* `Ms`: additional Julia Modules to import from. By default, a few base modules are searched for to avoid namespace collisions.
+* `typ`: a symbol indicating variable type first argument of new function should be restricted to. For most, the default, `:SymbolicObject` will be appropriate
+* `exclude`: when importing all (`meths=nothing`), this can be used to avoid importing some methods by name. The default has a few to avoid.
 
 Examples:
+
 ```
-x = Sym("x")
-(x^2 - 2x + 1)[:diff]()
-(x^2 - 2x + 1)[:integrate]((x,0,1))
+import_from(sympy)  # bring in functions from sympy (done `import_sympy`)
+import_from(sympy, (:sin, :cos))  # just bring in a few methods
+import_from(sympy , (:Wild,), typ=:Any) # Allows `Wild("x")`
+#
+import PyCall
+PyCall.pyimport_conda("sympy.physics.wigner", "sympy")
+import_from(sympy.physics.wigner)
 ```
 
 """
-function getindex(x::SymbolicObject, i::Symbol)
-    if PyCall.hasproperty(PyObject(x), i)
-        function __XXxxXX__(args...;kwargs...) # replace with generated name
-            object_meth(x, i, args...; kwargs...)
-        end
-        return __XXxxXX__
-    elseif PyCall.hasproperty(sympy, i)
-        function __XXyyXX__(args...;kwargs...)
-            sympy_meth(i, x, args...; kwargs...)
-        end
-        return __XXyyXX__
+function import_from(sm, meths=nothing;
+                     Ms::Tuple=(),
+                     typ::Symbol=:SymbolicObject,
+                     exclude::Union{Nothing, NTuple{N,Symbol}}=nothing
+                     ) where {N}
+
+
+    if meths == nothing
+        _exclude = isa(exclude, Nothing) ? base_exclude : exclude
+        fns = _get_member_functions(sm, _exclude)
     else
-       MethodError()
+        mems = PyCall.inspect.getmembers(sm)
+        fns = Dict()
+        for (m,p) in mems
+            if Symbol(m) in meths
+                fns[m] = p
+            end
+        end
+    end
+
+     for (k,v) in fns
+         meth = Symbol(k)
+         inMs = false
+         for M in union(base_Ms, Ms)
+             if isdefined(M, meth)
+                inMs = true
+#                @show k
+                 @eval begin
+                     ($M.$meth)(ex::($typ), args...; kwargs...) =
+                         getproperty($sm,$k)(ex, args...; kwargs...)
+                 end
+                 break
+            end
+        end
+        if !inMs
+            ## need to export
+#            @show "export", k
+            @eval begin
+                ($meth)(ex::($typ), args...; kwargs...) =
+                    getproperty($sm,$k)(ex, args...; kwargs...)
+            end
+            eval(Expr(:export, meth))
+        end
+    end
+
+end
+
+
+
+##
+function free_symbols(ex::Union{T, Vector{T}}) where {T<:SymbolicObject}
+    pex = PyObject(ex)
+    #fs.__class__.__name__ == "set"
+    if PyCall.hasproperty(pex, :free_symbols)
+        convert(Vector{Sym}, collect(pex.free_symbols))
+    else
+        Sym[]
     end
 end
 
-## Override this so that using symbols as keys in a dict works
-Base.hash(x::Sym) = hash(PyObject(x))
 
 
-## Helper function from PyCall.pywrap:
-function members(o::Union{PyObject, Sym})
-    out = pycall(PyCall.inspect.getmembers, PyObject, o)
-    AbstractString[a for (a,b) in out]
+## Module for Introspection
+module Introspection
+
+import SymPy: Sym
+import PyCall: PyObject, hasproperty
+export funcname, args
+
+
+# utilities
+
+"""
+    funcname(x)
+
+Return name or ""
+"""
+function funcname(x::Sym)
+    y = PyObject(x)
+    if hasproperty(y, :func)
+        return y.func.__name__
+    else
+        return ""
+    end
 end
 
-" Return class name as a string "
-classname(ex::Sym) = ex.__class__.__name__
+"""
+   func(x)
+
+Return funciton head from an expression
+
+
+[Invariant:](http://docs.sympy.org/dev/tutorial/manipulation.html)
+
+Every well-formed SymPy expression `ex` must either have `length(args(ex)) == 0` or
+`func(ex)(args(ex)...) = ex`.
+"""
+func(x::Sym) = Sym(PyObject(x))
+
+"""
+    args(x)
+
+Return arguments of `x`, as a tuple. (Empty if no args)
+"""
+function args(x::Sym)
+    if hasproperty(PyObject(x), :args)
+        return x.args
+    else
+        return ()
+    end
+end
+
+
+
+end

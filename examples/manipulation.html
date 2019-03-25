@@ -1,0 +1,510 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+
+<!-- not TeX-AMS-MML_HTMLorMML-->
+<script type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) {
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Advanced Expression Manipulation</h1><p>In this section, we discuss some ways that we can perform advanced manipulation of expressions.</p><h2>Understanding Expression Trees</h2><div class="admonition note"><p class="admonition-title">Quick Tip</p></div><p>To play with the <code>srepr</code> form of expressions in the SymPy Live shell,    change the output format to <code>Repr</code> in the settings.</p><p>Before we can do this, we need to understand how expressions are represented in SymPy.  A mathematical expression is represented as a tree.  Let us take the expression <code>2^x &#43; xy</code>, i.e., <code>2**x &#43; x*y</code>.  We can see what this expression looks like internally by using <code>srepr</code></p><pre class="sourceCode julia">    >>> from sympy import *
+    >>> x, y, z = symbols('x y z')
+
+    >>> expr = 2**x + x*y
+    >>> srepr(expr)
+    "Add(Pow(Integer(2), Symbol('x')), Mul(Symbol('x'), Symbol('y')))"</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>We replace the import command with a <code>using</code> command, as this will import functions (not Classes though) from <code>sympy</code></p>
+</li>
+</ul><pre class="sourceCode julia">using SymPy
+x, y, z = symbols("x y z")
+
+expr = 2^x + x*y
+srepr(expr)</pre>
+<div class="well well-sm">
+Add(Pow(Integer(2), Symbol('x')), Mul(Symbol('x'), Symbol('y')))</div>
+
+<hr /><p>The easiest way to tear this apart is to look at a diagrm of the expression tree. Here is a <a href="https://docs.sympy.org/latest/tutorial/manipulation.html#understanding-expression-trees">diagram</a>.</p><div class="admonition note"><p class="admonition-title">Note</p><p>This comes from <code>dotprint&#40;2**x &#43; x*y, labelfunc&#61;srepr&#41;</code>. But we don't render digraph objects here</p>
+</div><p>First, let's look at the leaves of this tree.  Symbols are instances of the class Symbol.  While we have been doing</p><pre class="sourceCode julia">    >>> x = symbols('x')</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">x = symbols("x")</pre>
+<div class="well well-sm">
+\begin{equation*}x\end{equation*}</div>
+
+<hr /><p>we could have also done</p><pre class="sourceCode julia">    >>> x = Symbol('x')</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>this can be done, but <code>@vars</code> would be suggested:</p>
+</li>
+</ul><pre class="sourceCode julia">x = sympy.Symbol("x")</pre>
+<div class="well well-sm">
+\begin{equation*}x\end{equation*}</div>
+
+<pre class="sourceCode julia">@vars x</pre>
+<pre class="output">
+(x,)</pre>
+
+<hr /><p>Either way, we get a Symbol with the name "x" [#symbols-fn]_.  For the number in the expression, 2, we got <code>Integer&#40;2&#41;</code>.  <code>Integer</code> is the SymPy class for integers.  It is similar to the Python built-in type <code>int</code>, except that <code>Integer</code> plays nicely with other SymPy types.</p><p>When we write <code>2**x</code>, this creates a <code>Pow</code> object.  <code>Pow</code> is short for "power".</p><pre class="sourceCode julia">    >>> srepr(2**x)
+    "Pow(Integer(2), Symbol('x'))"</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>we replace <code>**</code> by <code>^</code></p>
+</li>
+</ul><pre class="sourceCode julia">srepr(2^x)</pre>
+<div class="well well-sm">
+Pow(Integer(2), Symbol('x'))</div>
+
+<hr /><p>We could have created the same object by calling <code>Pow&#40;2, x&#41;</code></p><pre class="sourceCode julia">    >>> Pow(2, x)
+    2**x</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p><code>Pow</code> is <em>not</em> a function, rather a managed property, so we must qualify it, as it wasn't brought in when loading the package</p>
+</li>
+</ul><pre class="sourceCode julia">sympy.Pow(2, x)</pre>
+<div class="well well-sm">
+\begin{equation*}2^{x}\end{equation*}</div>
+
+<hr /><p>Note that in the <code>srepr</code> output, we see <code>Integer&#40;2&#41;</code>, the SymPy version of integers, even though technically, we input <code>2</code>, a Python int.  In general, whenever you combine a SymPy object with a non-SymPy object via some function or operation, the non-SymPy object will be converted into a SymPy object.  The function that does this is <code>sympify</code> [#sympify-fn]_.</p><pre class="sourceCode julia">    >>> type(2)
+    <... 'int'>
+    >>> type(sympify(2))
+    <class 'sympy.core.numbers.Integer'></pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">typeof(2)</pre>
+<pre class="output">
+Int64</pre>
+
+<pre class="sourceCode julia">typeof(sympify(2))</pre>
+<pre class="output">
+MethodError(SymPy.sympify, (2,), 0x0000000000006c64)
+</pre>
+
+<hr /><p>We have seen that <code>2**x</code> is represented as <code>Pow&#40;2, x&#41;</code>.  What about <code>x*y</code>?  As we might expect, this is the multiplication of <code>x</code> and <code>y</code>. The SymPy class for multiplication is <code>Mul</code>.</p><pre class="sourceCode julia">    >>> srepr(x*y)
+    "Mul(Symbol('x'), Symbol('y'))"</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">srepr(x*y)</pre>
+<div class="well well-sm">
+Mul(Symbol('x'), Symbol('y'))</div>
+
+<hr /><p>Thus, we could have created the same object by writing <code>Mul&#40;x, y&#41;</code>.</p><pre class="sourceCode julia">    >>> Mul(x, y)
+    x*y</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>Again, <code>Mul</code> is not a function, so it must be qualified</p>
+</li>
+</ul><pre class="sourceCode julia">sympy.Mul(x, y)</pre>
+<div class="well well-sm">
+\begin{equation*}x y\end{equation*}</div>
+
+<hr /><p>Now we get to our final expression, <code>2**x &#43; x*y</code>.  This is the addition of our last two objects, <code>Pow&#40;2, x&#41;</code>, and <code>Mul&#40;x, y&#41;</code>.  The SymPy class for addition is <code>Add</code>, so, as you might expect, to create this object, we use <code>Add&#40;Pow&#40;2, x&#41;, Mul&#40;x, y&#41;&#41;</code>.</p><pre class="sourceCode julia">    >>> Add(Pow(2, x), Mul(x, y))
+    2**x + x*y</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>We <em>can</em> import these operations to avoid qualifying them as done here:</p>
+</li>
+</ul><pre class="sourceCode julia">import_from(sympy, (:Add, :Mul, :Pow))
+Add(Pow(2, x), Mul(x, y))</pre>
+<pre class="output">
+MethodError(SymPy.Pow, (2, x), 0x0000000000006c6d)
+</pre>
+
+<hr /><p>SymPy expression trees can have many branches, and can be quite deep or quite broad.  Here is a more complicated example</p><pre class="sourceCode julia">    >>> expr = sin(x*y)/2 - x**2 + 1/y
+    >>> srepr(expr)
+    "Add(Mul(Integer(-1), Pow(Symbol('x'), Integer(2))), Mul(Rational(1, 2),
+    sin(Mul(Symbol('x'), Symbol('y')))), Pow(Symbol('y'), Integer(-1)))"</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = sin(x*y)/2 - x^2 + 1/y
+srepr(expr)</pre>
+<div class="well well-sm">
+Add(Mul(Integer(-1), Pow(Symbol('x'), Integer(2))), Mul(Rational(1, 2), sin(Mul(Symbol('x'), Symbol('y')))), Pow(Symbol('y'), Integer(-1)))</div>
+
+<hr /><p>Here is a <a href="https://docs.sympy.org/latest/tutorial/manipulation.html#understanding-expression-trees">diagram</a></p><div class="admonition note"><p class="admonition-title">Note</p><p>produced with <code>dotprint&#40;sin&#40;x*y&#41;/2 - x**2 &#43; 1/y, labelfunc&#61;srepr&#41;</code>, but not rendered here</p>
+</div><p>This expression reveals some interesting things about SymPy expression trees. Let's go through them one by one.</p><p>Let's first look at the term <code>x**2</code>.  As we expected, we see <code>Pow&#40;x, 2&#41;</code>. One level up, we see we have <code>Mul&#40;-1, Pow&#40;x, 2&#41;&#41;</code>.  There is no subtraction class in SymPy.  <code>x - y</code> is represented as <code>x &#43; -y</code>, or, more completely, <code>x &#43; -1*y</code>, i.e., <code>Add&#40;x, Mul&#40;-1, y&#41;&#41;</code>.</p><pre class="sourceCode julia">    >>> srepr(x - y)
+    "Add(Symbol('x'), Mul(Integer(-1), Symbol('y')))"</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">srepr(x - y)</pre>
+<div class="well well-sm">
+Add(Symbol('x'), Mul(Integer(-1), Symbol('y')))</div>
+
+<hr /><p>Next, look at <code>1/y</code>.  We might expect to see something like <code>Div&#40;1, y&#41;</code>, but similar to subtraction, there is no class in SymPy for division.  Rather, division is represented by a power of -1.  Hence, we have <code>Pow&#40;y, -1&#41;</code>. What if we had divided something other than 1 by <code>y</code>, like <code>x/y</code>?  Let's see.</p><pre class="sourceCode julia">    >>> expr = x/y
+    >>> srepr(expr)
+    "Mul(Symbol('x'), Pow(Symbol('y'), Integer(-1)))"</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = x/y
+srepr(expr)</pre>
+<div class="well well-sm">
+Mul(Symbol('x'), Pow(Symbol('y'), Integer(-1)))</div>
+
+<hr /><p>We see that <code>x/y</code> is represented as <code>x*y**-1</code>, i.e., <code>Mul&#40;x, Pow&#40;y, -1&#41;&#41;</code>.</p><p>Finally, let's look at the <code>sin&#40;x*y&#41;/2</code> term.  Following the pattern of the previous example, we might expect to see <code>Mul&#40;sin&#40;x*y&#41;, Pow&#40;Integer&#40;2&#41;, -1&#41;&#41;</code>.  But instead, we have <code>Mul&#40;Rational&#40;1, 2&#41;, sin&#40;x*y&#41;&#41;</code>.  Rational numbers are always combined into a single term in a multiplication, so that when we divide by 2, it is represented as multiplying by 1/2.</p><p>Finally, one last note.  You may have noticed that the order we entered our expression and the order that it came out from <code>srepr</code> or in the graph were different.  You may have also noticed this phenomenon earlier in the tutorial.  For example</p><pre class="sourceCode julia">     >>> 1 + x
+     x + 1</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">1 + x</pre>
+<div class="well well-sm">
+\begin{equation*}x + 1\end{equation*}</div>
+
+<hr /><p>This because in SymPy, the arguments of the commutative operations <code>Add</code> and <code>Mul</code> are stored in an arbitrary (but consistent!) order, which is independent of the order inputted (if you're worried about noncommutative multiplication, don't be.  In SymPy, you can create noncommutative Symbols using <code>Symbol&#40;&#39;A&#39;, commutative&#61;False&#41;</code>, and the order of multiplication for noncommutative Symbols is kept the same as the input).  Furthermore, as we shall see in the next section, the printing order and the order in which things are stored internally need not be the same either.</p><div class="admonition note"><p class="admonition-title">Quick Tip</p></div><p>The way an expression is represented internally and the way it is printed    are often not the same.</p><p>In general, an important thing to keep in mind when working with SymPy expression trees is this:  the internal representation of an expression and the way it is printed need not be the same.  The same is true for the input form.   If some expression manipulation algorithm is not working in the way you expected it to, chances are, the internal representation of the object is different from what you thought it was.</p><h2>Recursing through an Expression Tree</h2><p>Now that you know how expression trees work in SymPy, let's look at how to dig our way through an expression tree.  Every object in SymPy has two very important attributes, <code>func</code>, and <code>args</code>.</p><h3><code>func</code></h3><p><code>func</code> is the head of the object. For example, <code>&#40;x*y&#41;.func</code> is <code>Mul</code>. Usually it is the same as the class of the object (though there are exceptions to this rule).</p><p>Two notes about <code>func</code>.  First, the class of an object need not be the same as the one used to create it.  For example</p><pre class="sourceCode julia">    >>> expr = Add(x, x)
+    >>> expr.func
+    <class 'sympy.core.mul.Mul'></pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = Add(x, x)
+expr.func</pre>
+<pre class="output">
+PyObject <class 'sympy.core.mul.Mul'></pre>
+
+<ul>
+<li><p>The output isn't as desired, as <code>PyObject</code>s don't show nicely here. We can ask for the name, which does display as desired:</p>
+</li>
+</ul><pre class="sourceCode julia">expr.func.__name__</pre>
+<div class="well well-sm">
+Mul</div>
+
+<ul>
+<li><p>In <code>SymPy</code> the <code>func</code> and <code>args</code> properties are exported as functions in the module <code>SymPyLite.Introspection</code>.</p>
+</li>
+</ul><hr /><p>We created <code>Add&#40;x, x&#41;</code>, so we might expect <code>expr.func</code> to be <code>Add</code>, but instead we got <code>Mul</code>.  Why is that?  Let's take a closer look at <code>expr</code>.</p><pre class="sourceCode julia">    >>> expr
+    2*x</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr</pre>
+<div class="well well-sm">
+\begin{equation*}2 x\end{equation*}</div>
+
+<hr /><p><code>Add&#40;x, x&#41;</code>, i.e., <code>x &#43; x</code>, was automatically converted into <code>Mul&#40;2, x&#41;</code>, i.e., <code>2*x</code>, which is a <code>Mul</code>.   SymPy classes make heavy use of the <code>__new__</code> class constructor, which, unlike <code>__init__</code>, allows a different class to be returned from the constructor.</p><p>Second, some classes are special-cased, usually for efficiency reasons [#singleton-fn]_.</p><pre class="sourceCode julia">    >>> Integer(2).func
+    <class 'sympy.core.numbers.Integer'>
+    >>> Integer(0).func
+    <class 'sympy.core.numbers.Zero'>
+    >>> Integer(-1).func
+    <class 'sympy.core.numbers.NegativeOne'></pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">sympy.Integer(2).func.__name__</pre>
+<div class="well well-sm">
+Integer</div>
+
+<pre class="sourceCode julia">sympy.Integer(0).func.__name__</pre>
+<div class="well well-sm">
+Zero</div>
+
+<pre class="sourceCode julia">sympy.Integer(-1).func.__name__</pre>
+<div class="well well-sm">
+NegativeOne</div>
+
+<hr /><p>For the most part, these issues will not bother us.  The special classes <code>Zero</code>, <code>One</code>, <code>NegativeOne</code>, and so on are subclasses of <code>Integer</code>, so as long as you use <code>isinstance</code>, it will not be an issue.</p><h3>args</h3><p><code>args</code> are the top-level arguments of the object.  <code>&#40;x*y&#41;.args</code> would be <code>&#40;x, y&#41;</code>.  Let's look at some examples</p><pre class="sourceCode julia">    >>> expr = 3*y**2*x
+    >>> expr.func
+    <class 'sympy.core.mul.Mul'>
+    >>> expr.args
+    (3, x, y**2)</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>The <code>args</code> property can be accessed exactly as <code>func</code></p>
+</li>
+</ul><pre class="sourceCode julia">expr = 3*y^2*x
+expr.func.__name__</pre>
+<div class="well well-sm">
+Mul</div>
+
+<pre class="sourceCode julia">expr.args</pre>
+<pre class="output">
+(3, x, y^2)</pre>
+
+<hr /><p>From this, we can see that <code>expr &#61;&#61; Mul&#40;3, y**2, x&#41;</code>.  In fact, we can see that we can completely reconstruct <code>expr</code> from its <code>func</code> and its <code>args</code>.</p><pre class="sourceCode julia">    >>> expr.func(*expr.args)
+    3*x*y**2
+    >>> expr == expr.func(*expr.args)
+    True</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr.func(expr.args...)</pre>
+<div class="well well-sm">
+\begin{equation*}3 x y^{2}\end{equation*}</div>
+
+<pre class="sourceCode julia">expr == expr.func(expr.args...)</pre>
+<pre class="output">
+true</pre>
+
+<hr /><p>Note that although we entered <code>3*y**2*x</code>, the <code>args</code> are <code>&#40;3, x, y**2&#41;</code>. In a <code>Mul</code>, the Rational coefficient will come first in the <code>args</code>, but other than that, the order of everything else follows no special pattern.  To be sure, though, there is an order.</p><pre class="sourceCode julia">    >>> expr = y**2*3*x
+    >>> expr.args
+    (3, x, y**2)</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = y^2*3*x
+expr.args</pre>
+<pre class="output">
+(3, x, y^2)</pre>
+
+<hr /><p>Mul's <code>args</code> are sorted, so that the same <code>Mul</code> will have the same <code>args</code>.  But the sorting is based on some criteria designed to make the sorting unique and efficient that has no mathematical significance.</p><p>The <code>srepr</code> form of our <code>expr</code> is <code>Mul&#40;3, x, Pow&#40;y, 2&#41;&#41;</code>.  What if we want to get at the <code>args</code> of <code>Pow&#40;y, 2&#41;</code>.  Notice that the <code>y**2</code> is in the third slot of <code>expr.args</code>, i.e., <code>expr.args&#91;2&#93;</code>.</p><pre class="sourceCode julia">    >>> expr.args[2]
+    y**2</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr.args[2]</pre>
+<div class="well well-sm">
+\begin{equation*}x\end{equation*}</div>
+
+<hr /><p>So to get the <code>args</code> of this, we call <code>expr.args&#91;2&#93;.args</code>.</p><pre class="sourceCode julia">    >>> expr.args[2].args
+    (y, 2)</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>Python uses 0-based indexing, so we bump the index by 1</p>
+</li>
+</ul><pre class="sourceCode julia">expr.args[3].args</pre>
+<pre class="output">
+(y, 2)</pre>
+
+<hr /><p>Now what if we try to go deeper.  What are the args of <code>y</code>.  Or <code>2</code>. Let's see.</p><pre class="sourceCode julia">    >>> y.args
+    ()
+    >>> Integer(2).args
+    ()</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">y.args</pre>
+<pre class="output">
+()</pre>
+
+<pre class="sourceCode julia">sympy.Integer(2).args</pre>
+<pre class="output">
+()</pre>
+
+<hr /><p>They both have empty <code>args</code>.  In SymPy, empty <code>args</code> signal that we have hit a leaf of the expression tree.</p><p>So there are two possibilities for a SymPy expression. Either it has empty <code>args</code>, in which case it is a leaf node in any expression tree, or it has <code>args</code>, in which case, it is a branch node of any expression tree.  When it has <code>args</code>, it can be completely rebuilt from its <code>func</code> and its <code>args</code>. This is expressed in the key invariant.</p><div class="admonition note"><p class="admonition-title">Key Invariant</p></div><p>Every well-formed SymPy expression must either have empty <code>args</code> or    satisfy <code>expr &#61;&#61; expr.func&#40;expr.args...&#41;</code>.</p><p>(Recall that in Python if <code>a</code> is a tuple, then <code>f&#40;*a&#41;</code> means to call <code>f</code> with arguments from the elements of <code>a</code>, e.g., <code>f&#40;*&#40;1, 2, 3&#41;&#41;</code> is the same as <code>f&#40;1, 2, 3&#41;</code>.)</p><p>This key invariant allows us to write simple algorithms that walk expression trees, change them, and rebuild them into new expressions.</p><h5>In <code>Julia</code>:</h5><ul>
+<li><p>Splatting replaces the <code>*a</code> term above, or <code>f&#40;a...&#41;</code>.</p>
+</li>
+</ul><hr /><h3>Walking the Tree</h3><p>With this knowledge, let's look at how we can recurse through an expression tree.  The nested nature of <code>args</code> is a perfect fit for recursive functions. The base case will be empty <code>args</code>.  Let's write a simple function that goes through an expression and prints all the <code>args</code> at each level.</p><pre class="sourceCode julia">    >>> def pre(expr):
+    ...     print(expr)
+    ...     for arg in expr.args:
+    ...         pre(arg)</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">function pre(expr)
+    @show expr
+    for arg in expr.args
+    	pre(arg)
+	end
+end</pre>
+<pre class="output">
+pre (generic function with 1 method)</pre>
+
+<hr /><p>See how nice it is that <code>&#40;&#41;</code> signals leaves in the expression tree.  We don't even have to write a base case for our recursion; it is handled automatically by the for loop.</p><p>Let's test our function.</p><pre class="sourceCode julia">    >>> expr = x*y + 1
+    >>> pre(expr)
+    x*y + 1
+    1
+    x*y
+    x
+    y</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p><code>@show</code> does not work in these notes; this would need copy-and-pasting to be verified</p>
+</li>
+</ul><pre class="sourceCode julia">expr = x*y + 1
+pre(expr)</pre>
+<hr /><p>Can you guess why we called our function <code>pre</code>?  We just wrote a pre-order traversal function for our expression tree.   See if you can write a post-order traversal function.</p><p>Such traversals are so common in SymPy that the generator functions <code>preorder_traversal</code> and <code>postorder_traversal</code> are provided to make such traversals easy.  We could have also written our algorithm as</p><pre class="sourceCode julia">    >>> for arg in preorder_traversal(expr):
+    ...     print(arg)
+    x*y + 1
+    1
+    x*y
+    x
+    y</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>The <code>preorder_traversal</code> function is not a function, so needs to be qualified:</p>
+</li>
+</ul><pre class="sourceCode julia">for arg in sympy.preorder_traversal(expr)
+   @show arg
+end</pre>
+<hr /><h2>Prevent expression evaluation</h2><p>There are generally two ways to prevent the evaluation, either pass an <code>evaluate&#61;False</code> parameter while constructing the expression, or create an evaluation stopper by wrapping the expression with <code>UnevaluatedExpr</code>.</p><p>For example:</p><pre class="sourceCode julia">    >>> from sympy import Add
+    >>> from sympy.abc import x, y, z
+    >>> x + x
+    2*x
+    >>> Add(x, x)
+    2*x
+    >>> Add(x, x, evaluate=False)
+    x + x</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">@vars x y z
+x + x</pre>
+<div class="well well-sm">
+\begin{equation*}2 x\end{equation*}</div>
+
+<pre class="sourceCode julia">Add(x, x)</pre>
+<div class="well well-sm">
+\begin{equation*}2 x\end{equation*}</div>
+
+<pre class="sourceCode julia">Add(x, x, evaluate=False)</pre>
+<div class="well well-sm">
+\begin{equation*}x + x\end{equation*}</div>
+
+<hr /><p>If you don't remember the class corresponding to the expression you want to build (operator overloading usually assumes <code>evaluate&#61;True</code>), just use <code>sympify</code> and pass a string:</p><pre class="sourceCode julia">    >>> from sympy import sympify
+    >>> sympify("x + x", evaluate=False)
+    x + x</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">sympify("x + x", evaluate=false)
+    x + x</pre>
+<div class="well well-sm">
+\begin{equation*}2 x\end{equation*}</div>
+
+<hr /><p>Note that <code>evaluate&#61;False</code> won't prevent future evaluation in later usages of the expression:</p><pre class="sourceCode julia">    >>> expr = Add(x, x, evaluate=False)
+    >>> expr
+    x + x
+    >>> expr + x
+    3*x</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = Add(x, x, evaluate=false)
+expr</pre>
+<div class="well well-sm">
+\begin{equation*}x + x\end{equation*}</div>
+
+<pre class="sourceCode julia">expr + x</pre>
+<div class="well well-sm">
+\begin{equation*}3 x\end{equation*}</div>
+
+<hr /><p>That's why the class <code>UnevaluatedExpr</code> comes handy. <code>UnevaluatedExpr</code> is a method provided by SymPy which lets the user keep an expression unevaluated. By <em>unevaluated</em> it is meant that the value inside of it will not interact with the expressions outside of it to give simplified outputs. For example:</p><pre class="sourceCode julia">    >>> from sympy import UnevaluatedExpr
+    >>> expr = x + UnevaluatedExpr(x)
+    >>> expr
+    x + x
+    >>> x + expr
+    2*x + x</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">import_from(sympy, (:UnevaluatedExpr,))
+expr = x + UnevaluatedExpr(x)
+expr</pre>
+<div class="well well-sm">
+\begin{equation*}x + x\end{equation*}</div>
+
+<pre class="sourceCode julia">x + expr</pre>
+<div class="well well-sm">
+\begin{equation*}2 x + x\end{equation*}</div>
+
+<hr /><p>The <code>x</code> remaining alone is the <code>x</code> wrapped by <code>UnevaluatedExpr</code>. To release it:</p><pre class="sourceCode julia">    >>> (x + expr).doit()
+    3*x</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">(x + expr).doit()</pre>
+<div class="well well-sm">
+\begin{equation*}3 x\end{equation*}</div>
+
+<hr /><p>Other examples:</p><pre class="sourceCode julia">    >>> from sympy import *
+    >>> from sympy.abc import x, y, z
+    >>> uexpr = UnevaluatedExpr(S.One*5/7)*UnevaluatedExpr(S.One*3/4)
+    >>> uexpr
+    (5/7)*(3/4)
+    >>> x*UnevaluatedExpr(1/x)
+    x*1/x</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">@vars x y z
+const S = sympy.S
+uexpr = UnevaluatedExpr(S.One * 5/7) * UnevaluatedExpr(S.One * 3/4)
+uexpr</pre>
+<div class="well well-sm">
+\begin{equation*}\frac{5}{7} \frac{3}{4}\end{equation*}</div>
+
+<pre class="sourceCode julia">x * UnevaluatedExpr(1/x)</pre>
+<div class="well well-sm">
+\begin{equation*}x \frac{1}{x}\end{equation*}</div>
+
+<hr /><p>A point to be noted is that  <code>UnevaluatedExpr</code> cannot prevent the evaluation of an expression which is given as argument. For example:</p><pre class="sourceCode julia">    >>> expr1 = UnevaluatedExpr(x + x)
+    >>> expr1
+    2*x
+    >>> expr2 = sympify('x + x', evaluate=False)
+    >>> expr2
+    x + x</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr1 = UnevaluatedExpr(x + x)
+expr1</pre>
+<div class="well well-sm">
+\begin{equation*}2 x\end{equation*}</div>
+
+<pre class="sourceCode julia">expr2 = sympify("x + x", evaluate=False)
+expr2</pre>
+<div class="well well-sm">
+\begin{equation*}x + x\end{equation*}</div>
+
+<hr /><p>Remember that <code>expr2</code> will be evaluated if included into another expression. Combine both of the methods to prevent both inside and outside evaluations:</p><pre class="sourceCode julia">    >>> UnevaluatedExpr(sympify("x + x", evaluate=False)) + y
+    y + x + x</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">UnevaluatedExpr(sympify("x + x", evaluate=False)) + y</pre>
+<div class="well well-sm">
+\begin{equation*}y + x + x\end{equation*}</div>
+
+<hr /><p><code>UnevalutedExpr</code> is supported by SymPy printers and can be used to print the result in different output forms. For example</p><pre class="sourceCode julia">    >>> from sympy import latex
+    >>> uexpr = UnevaluatedExpr(S.One*5/7)*UnevaluatedExpr(S.One*3/4)
+    >>> print(latex(uexpr))
+    \frac{5}{7} \frac{3}{4}</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>The printing support is through <code>show</code>, but we can use SymPy's:</p>
+</li>
+</ul><pre class="sourceCode julia">uexpr = UnevaluatedExpr(S.One*5/7)*UnevaluatedExpr(S.One*3/4)
+sympy.latex(uexpr)</pre>
+<div class="well well-sm">
+\frac{5}{7} \frac{3}{4}</div>
+
+<hr /><p>In order to release the expression and get the evaluated LaTeX form, just use <code>.doit&#40;&#41;</code>:</p><pre class="sourceCode julia">    >>> print(latex(uexpr.doit()))
+    \frac{15}{28}</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">sympy.latex(uexpr.doit())</pre>
+<div class="well well-sm">
+\frac{15}{28}</div>
+
+<hr /><div class="admonition note"><p class="admonition-title">Footnotes</p></div><ul>
+<li><p>[#symbols-fn] We have been using <code>symbols</code> instead of <code>Symbol</code> because it automatically splits apart strings into multiple <code>Symbol</code>\ s. <code>symbols&#40;&#39;x y z&#39;&#41;</code> returns a tuple of three <code>Symbol</code>\ s.  <code>Symbol&#40;&#39;x y z&#39;&#41;</code> returns a single <code>Symbol</code> called <code>x y z</code>.</p>
+</li>
+<li><p>[#sympify-fn] Technically, it is an internal function called <code>_sympify</code>, which differs from <code>sympify</code> in that it does not convert strings.  <code>x &#43; &#39;2&#39;</code> is not allowed.</p>
+</li>
+<li><p>[#singleton-fn] Classes like <code>One</code> and <code>Zero</code> are singletonized, meaning that only one object is ever created, no matter how many times the class is called.  This is done for space efficiency, as these classes are very common.  For example, <code>Zero</code> might occur very often in a sparse matrix represented densely.  As we have seen, <code>NegativeOne</code> occurs any time we have <code>-x</code> or <code>1/x</code>.  It is also done for speed efficiency because singletonized objects can be compared by <code>is</code>.  The unique objects for each singletonized class can be accessed from the <code>S</code> object.</p>
+</li>
+</ul>
+  </div>
+</div>
+
+</body>
+</html>
