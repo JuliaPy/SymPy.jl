@@ -8,9 +8,7 @@ using PyCall
 
 using SpecialFunctions
 using LinearAlgebra
-using Random
-using Statistics
-
+using OffsetArrays
 
 
 import Base: show
@@ -25,7 +23,7 @@ export @vars, Sym, sympify, SymMatrix, SymFunction, @symfuns
 export PI, IM, oo, zoo, True, False
 export N
 
-export sympy, import_from
+export sympy, import_from#, import_sympy
 export free_symbols
 
 include("types.jl")
@@ -44,49 +42,6 @@ include("patternmatch.jl")
 include("permutations.jl")
 include("plot_recipes.jl")
 
-
-# ## string
-# convert(::Type{Sym}, o::AbstractString) = sympy_meth(:sympify, o)
-# convert(::Type{Sym}, o::Symbol) = sympy_meth(:sympify, string(o))
-
-# ## function
-# convert(::Type{Function}, ex::Sym) = lambdify(ex)
-
-# ## we usually promote to Sym objects, but here we want to promote to functions
-# ## so [x, sin] -> will be plottable as two functions
-# promote_rule(::Type{T}, ::Type{S}) where {T<:SymbolicObject, S<:Function} = S
-
-##################################################
-
-
-
-
-# ## length of object
-# function length(x::SymbolicObject)
-#     haskey(PyObject(x), :length) && return PyObject(x)[:length]
-#     sz = size(x)
-#     length(sz) == 0 && return(0)
-#     *(sz...)
-# end
-
-# ## size
-# function size(x::SymbolicObject)
-#     return ()
-# end
-
-# function size(x::SymbolicObject, dim::Integer)
-#     if dim <= 0
-#         error("dimension out of range")
-
-#     else
-#         return 1
-#     end
-# end
-
-
-# ## Iterator for Sym
-# iterate(x::Sym) = (x.x, 0)
-# iterate(x::Sym, state) = nothing
 ##################################################
 
 pynull() = PyCall.PyNULL()
@@ -108,17 +63,8 @@ global True = Sym(pynull())
 global False = Sym(pynull())
 
 
-## Need a structure like this
-#import_fn=((:sin, Base), ...)
-#rename_sympy_fn = ((:Abs, :abs, Base), ...)
-#extend_fn = (:Abs2, :(abs(x)^2))
 
-
-
-
-
-
-# Can actually initiate many things until `sympy` is defined, so not until runtime
+# Can not actually initiate many things until `sympy` is defined, so not until runtime
 function __init__()
 
     ## Define sympy, mpmath, ...
@@ -156,7 +102,7 @@ function __init__()
 
     ## is this a good idea?
     ## could leave this out
-    import_sympy()
+   # import_sympy()
 
 end
 
@@ -169,6 +115,7 @@ function import_sympy()
     import_from(sympy, (:Ne, :Lt, :Le, :Eq, :Ge, :Gt)) ## Lt fails to come in?
 
 end
+## oddity???
 Lt(x::SymbolicObject, args...;kwargs...) = sympy.Lt(x, args...; kwargs...)
 export(Lt)
 

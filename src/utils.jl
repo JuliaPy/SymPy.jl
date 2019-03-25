@@ -148,7 +148,7 @@ end
 ## end
 
 base_Ms = (Base, SpecialFunctions, Base.MathConstants,
-           LinearAlgebra, Random, Statistics
+           LinearAlgebra, OffsetArrays
            )
 
 base_exclude=("C", "lambdify",
@@ -249,7 +249,7 @@ module Introspection
 
 import SymPy: Sym
 import PyCall: PyObject, hasproperty
-export funcname, args
+export func, args, funcname
 
 
 # utilities
@@ -271,20 +271,19 @@ end
 """
    func(x)
 
-Return funciton head from an expression
-
+Return function head from an expression
 
 [Invariant:](http://docs.sympy.org/dev/tutorial/manipulation.html)
 
 Every well-formed SymPy expression `ex` must either have `length(args(ex)) == 0` or
 `func(ex)(args(ex)...) = ex`.
 """
-func(x::Sym) = Sym(PyObject(x))
+func(ex::Sym) = return ex.func
 
 """
     args(x)
 
-Return arguments of `x`, as a tuple. (Empty if no args)
+Return arguments of `x`, as a tuple. (Empty if no `:args` property.)
 """
 function args(x::Sym)
     if hasproperty(PyObject(x), :args)
