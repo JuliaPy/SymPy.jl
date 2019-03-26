@@ -24,8 +24,8 @@ using OffsetArrays
 
 SymMatrix is 0-based, like python, not Julia. Use Matrix{Sym} for that.
 
-Unlike the underlying SymPy object, `SymMatrix` objects are mutable and have 'getindex' and `setindex!` defined using 0-based indexing.
 
+Unlike the underlying SymPy object, `SymMatrix` objects are mutable and have 'getindex' and `setindex!` defined using 0-based indexing.
 This is not performant.
 """
 function Base.getindex(M::SymMatrix, i::Int, j::Int)
@@ -106,14 +106,17 @@ function Base.getproperty(A::AbstractArray{T}, k::Symbol) where {T <: SymbolicOb
 end
 
 
+
 ## special case generic methods that fail on Array{Sym}:
 function LinearAlgebra.norm(a::AbstractArray{Sym})
     a.norm()
 end
 
+
 function Base.inv(A::Array{T}) where {T <: SymbolicObject}
     convert(Matrix{T}, A.inv())
 end
+
 
 function LinearAlgebra.eigvals(a::Matrix{Sym})
     Sym[k for k in keys(a.eigenvals())]
