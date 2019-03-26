@@ -7,13 +7,13 @@ using Test
     F = SymFunction("F")
     ex = diff(F(x), x) - a*F(x)
     ex1 = dsolve(ex)
-    ex2 = rhs(ex1) |> subs(Sym(:C1), 1) |> subs(a, 2)
+    ex2 = ex1.rhs()(Sym("C1") => 1, a => 2)
     @test ex2 == exp(2x)
 
-    t, = @syms t
+    t, = @vars t
     X, Y = SymFunction("X, Y")
     eq = [Eq(diff(X(t),t), 12*t*X(t) + 8*Y(t)), Eq(diff(Y(t),t), 21*X(t) + 7*t*Y(t))]
-    dsolve(eq)
+    sympy.dsolve(eq)  # array is not SymbolicObject
 
 
     ## version 0.4+ allow use of u'(x) in lieu of diff(u(x), x) and `ivpsolve`

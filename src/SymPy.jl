@@ -47,6 +47,7 @@ include("plot_recipes.jl")
 pynull() = PyCall.PyNULL()
 const sympy  = PyCall.PyNULL()
 const mpmath = PyCall.PyNULL()
+const combinatorics  = PyCall.PyNULL()
 
 # core.sympy.numbers.*
 "PI is symbolic `pi`"
@@ -85,12 +86,19 @@ function __init__()
        # can't load
     end
 
+    # pull in alibrary
+    copy!(combinatorics, PyCall.pyimport_conda("sympy.combinatorics", "sympy"))
+
 
     ## mappings from PyObjects to types.
     basictype = sympy.basic.Basic
     pytype_mapping(basictype, Sym)
     pytype_mapping(sympy.Matrix, SymMatrix)
     pytype_mapping(sympy.FiniteSet, Set)
+
+
+    pytype_mapping(sympy.combinatorics.permutations.Permutation, SymPermutation)
+    pytype_mapping(combinatorics.perm_groups.PermutationGroup, SymPermutationGroup)
 
     if mpmath != PyCall.PyNULL()
         ## ignore warnings for now...
@@ -102,7 +110,7 @@ function __init__()
 
     ## is this a good idea?
     ## could leave this out
-   # import_sympy()
+    import_sympy()
 
 end
 
@@ -112,11 +120,15 @@ function import_sympy()
         import_from(mpmath)
     end
     import_from(sympy)
-    import_from(sympy, (:Ne, :Lt, :Le, :Eq, :Ge, :Gt)) ## Lt fails to come in?
+    import_from(sympy, (:Ne, :Lt, :Le, :Eq, :Ge, :Gt,
+                        :GreaterThan, :LessThan,
+                        :StrictGreaterThan, :StrictLessThan,
+                        :Equality, :Unequality
+                        ), typ=:Number) ## Lt fails to come in?
 
 end
 ## oddity???
-Lt(x::SymbolicObject, args...;kwargs...) = sympy.Lt(x, args...; kwargs...)
+Lt(x::Number, args...;kwargs...) = sympy.Lt(x, args...; kwargs...)
 export(Lt)
 
 end # module

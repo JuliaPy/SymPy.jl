@@ -87,9 +87,9 @@ replace(ex, sin(a), sin(2a))
 """
 function Base.replace(ex::Sym, query::Sym, fn::Function; kwargs...)
     ## XXX this is failing!
-    replace(ex, query, PyCall.PyObject((args...) ->fn(args...)); kwargs...)
+    ex.replace(query, PyCall.PyObject((args...) ->fn(args...)); kwargs...)
 end
 
-function Base.replace(ex::Sym, query::Sym, value; kwargs...)
+function Base.replace(ex::Sym, query::Any, value; kwargs...)
     ex.replace(query, value; kwargs...)
 end

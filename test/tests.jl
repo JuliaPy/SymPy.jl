@@ -1,25 +1,25 @@
-using SymPy
 using SpecialFunctions
-using SymPy.SpecialFuncs
 using Test
 using LinearAlgebra
 using Base.MathConstants
-
+using SymPy
+using SymPy.Introspection
+import PyCall
 
 @testset "Core" begin
     ## Symbol creation
     x = Sym("x")
     #x = sym"x" # deprecated
     x = Sym(:x)
-    x,y = Sym(:x, :y)
+     x,y = Sym(:x, :y)
     x,y = symbols("x,y")
 
-    @syms u1 u2 u3
-    @syms u positive=true
+    @vars u1 u2 u3
+    @vars u positive=true
     @test length(solve(u+1)) == 0
-    # make sure @syms defines in a local scope
+    # make sure @vars defines in a local scope
     let
-        @syms w
+        @vars w
     end
     @test_throws UndefVarError isdefined(w)
     @vars a b c
@@ -38,9 +38,9 @@ using Base.MathConstants
     @test Sym(1 + 2im) == 1 + 2im
 
     pi, e, catalan = Base.MathConstants.pi, Base.MathConstants.e, Base.MathConstants.catalan
-    @test N(Sym(pi)) == Float64(pi)
-    @test N(Sym(e)) == Float64(e)
-    @test N(Sym(catalan)) == Float64(catalan)
+    @test N(Sym(pi)) == pi
+    @test N(Sym(ℯ)) ==  ℯ
+    @test N(Sym(catalan)) == catalan
 
 
     ## function conversion
@@ -51,19 +51,21 @@ using Base.MathConstants
     ## subs, |> (x == number)
     f(x) = x^2 - 2
     y = f(x)
-    @test float(subs(y, x, 1)) == f(1)
-    @test float( y |> subs(x,1) ) == f(1)
+    @test float(y.subs( x, 1)) == f(1)
+    ### @test float( y |> subs(x,1) ) == f(1) no subs method
 
     ## interfaces
     ex = (x-1)*(y-2)
-    @test subs(ex, x, 1) == 0
-    @test subs(ex, (x,1)) == 0
-    @test subs(ex, (x,2),(y,2)) == 0
+    @test ex.subs(x, 1) == 0
+    ## @test ex.subs((x,1)) == 0   ## XXX removed
+    ## @test ex.subs((x,2),(y,2)) == 0 ## XXX removed
 
-    @test subs(ex, x=>1) == 0
-    @test subs(ex, x=>2, y=>2) == 0
-    @test subs(ex, Dict(x=>1)) == 0
+    ##@test subs(ex, x=>1) == 0       # removed
+    ##@test subs(ex, x=>2, y=>2) == 0
+    ##@test subs(ex, Dict(x=>1)) == 0
     @test ex(x=>1) == 0
+    @test ex(x=>2, y=>2) == 0
+    @test ex.subs(Dict(x=>1)) == 0
 
     ## match, replace, xreplace, rewrite
     x,y,z = symbols("x, y, z")
@@ -77,26 +79,27 @@ using Base.MathConstants
     pat = a*b^c
     d = match(pat, ex)
     @test d[a] == 4 && d[b] == x && d[c] == 2
-    @test xreplace(pat, d) == 4x^2
+    @test pat.xreplace(d) == 4x^2
 
     ## replace
     a = Wild("a")
     ex = log(sin(x)) + tan(sin(x^2))
-    @test replace(ex, func(sin(x)), func(cos(x))) == log(cos(x)) + tan(cos(x^2))
-    #XXX@test replace(ex, func(sin(x)), u ->  sin(2u)) == log(sin(2x)) + tan(sin(2x^2))
+    ##XXX    @test replace(ex, func(sin(x)), u ->  sin(2u)) == log(sin(2x)) + tan(sin(2x^2))
+    @test replace(ex, func(sin(x)), func(tan(x))) == log(tan(x)) + tan(tan(x^2))
     @test replace(ex, sin(a), tan(a)) ==  log(tan(x)) + tan(tan(x^2))
     @test replace(ex, sin(a), a) == log(x) + tan(x^2)
     @test replace(x*y, a*x, a) == y
 
     ## xreplace
-    @test xreplace(1 + x*y, x => PI) == 1 + PI*y
-    @test xreplace(x*y + z, x*y => PI) == z + PI
-    @test xreplace(x*y * z, x*y => PI) == x* y * z
-    @test xreplace(x +2 + exp(x + 2), x+2=>y) == x + exp(y) + 2
+    @test (1 + x*y).xreplace(Dict(x => PI)) == 1 + PI*y
+    @test (x*y + z).xreplace(Dict(x*y => PI)) == z + PI
+    @test (x*y * z).xreplace(Dict(x*y => PI)) == x* y * z
+    @test (x + 2 + exp(x + 2)).xreplace(Dict(x+2=>y)) == x + exp(y) + 2
+
 
     # Test subs on simple numbers
-    @syms x y
-    @test subs(2, x=>300, y=>1.2) == 2.0
+    @vars x y
+    @test Sym(2)(x=>300, y=>1.2) == 2
 
     #Test subs for pars and dicts
     ex = 1
@@ -110,10 +113,10 @@ using Base.MathConstants
         dict1[string(x)] = i
     end
     for d in [dict1, dict2]
-        @test ex |> subs(d) == factorial(4)
-        @test subs(ex, d) == factorial(4)
-        @test subs(ex, d...) == factorial(4)
-        @test ex |> subs(d...) == factorial(4)
+##XXX        @test ex |> subs(d) == factorial(4)
+##XXX        @test subs(ex, d) == factorial(4)
+##XXX        @test subs(ex, d...) == factorial(4)
+##XXX        @test ex |> subs(d...) == factorial(4)
         @test ex(d) == factorial(4)
         @test ex(d...) == factorial(4)
     end
@@ -123,18 +126,17 @@ using Base.MathConstants
     line = x -> a + b * x
     sol = solve([line(0)-1, line(1)-2],[a,b])
     ex = line(10)
-    @test ex |> subs(sol) == 11
     @test ex(sol) == ex(sol...) == 11
 
     ## Conversion
     x = Sym("x")
-    p = subs(x,x,pi)
-    q = subs(x,x,1//2)
-    r = subs(x,x,1.2)
-    z = subs(x,x,1)
+    p = x.subs(x,pi)
+    q = x.subs(x,Sym(1)/2)
+    r = x.subs(x,1.2)
+    z = x.subs(x,1)
     @test isa(N(p), Float64)
-    @test isa(N(p, 60), BigFloat)
-    @test isa(evalf(p), Sym)
+##XXX    @test isa(N(p, 60), BigFloat)
+    @test isa(p.evalf(), Sym)
     @test isa(N(x), Sym)
     @test isa(N(q), Rational)
     @test isa(N(r), Float64)
@@ -143,7 +145,7 @@ using Base.MathConstants
     ## method calls via getproperty
     p = (x-1)*(x-2)
     @test sympy.roots(p) == Dict{Any,Any}(Sym(1) => 1, Sym(2)=> 1) # sympy.roots
-    p = Poly(p, x)
+    p = sympy.Poly(p, x)
     @test p.coeffs() == Any[1,-3,2] # p.coeffs
 
     ## algebra
@@ -169,12 +171,12 @@ using Base.MathConstants
     exs = [x-y-1, x+y-2]
     di = solve(exs)
     @test di[x] == 3//2
-    @test map(ex -> subs(ex, di), exs) == [0,0]
+##XXX    @test map(ex -> subs(ex, di), exs) == [0,0]
     solve([x-y-a, x+y], [x,y])
 
     ## linsolve
     M=Sym[1 2 3; 2 3 4]
-    as = linsolve(M, x, y)
+    as = linsolve(convert(SymMatrix, M), x, y)
     @test length(elements(as)) == 1
     @vars a b; eqs = (a*x+2y-3, 2b*x + 3y - 4)
     as = linsolve(eqs, x, y)
@@ -184,39 +186,40 @@ using Base.MathConstants
     @test limit(x -> sin(x)/x, 0) == 1
     @test limit(sin(x)/x, x, 0) |> float == 1
     @test limit(sin(x)/x, x => 0) == 1
-    (x, h) = @syms x h
+    @vars x h
     out = limit((sin(x+h) - sin(x))/h, h, 0)
-    @test (out |> replace(x, pi) |> float) == -1.0
+    @test (out.replace(x, pi) |> float) == -1.0
 
 
     ## diff
     diff(sin(x), x)
     out = diff(sin(x), x, 2)
-    @test abs((out |> replace(x, pi/4) |> float) - - sin(pi/4)) < sqrt(eps())
+    @test abs((out.replace(x, pi/4) |> float) - - sin(pi/4)) < sqrt(eps())
 
     # partial derivatives
-    @syms x y
+    @vars x y
     @test diff(x^2 + x*y^2, x, 1) == 2x + y^2
 
     t = symbols("t", real=true)     # vector-valued functions
     r1(t) = [sin(t), cos(t), t]
     u = r1(t)
-    kappa = norm(diff(u) × diff(u,t,2)) / norm(diff(u))^3 |> simplify
+    kappa = norm(diff.(u) × diff.(u,t,2)) / norm(diff.(u))^3 |> simplify
     @test convert(Rational,kappa) == 1//2
 
     u = SymFunction("u")
     eqn = Eq(x^2 + u(x)^2, x^3 - u(x))
-    @test diff(eqn, x) == Eq(2x + 2u(x) * diff(u(x),x), 3x^2 - diff(u(x),x))
+    # diff(eqn) doesn't evaluate over Eq:
+    @test func(eqn)(diff.(args(eqn))...) == Eq(2x + 2u(x) * diff(u(x),x), 3x^2 - diff(u(x),x))
 
     ## integrate
     @test integrate(sin(x)) == -cos(x)
     @test integrate(sin(x), (x, 0, pi)) == 2.0
     a, b, t = symbols("a, b, t")
     @test integrate(sin(x), (x, a, b)) == cos(a) - cos(b)
-    @test integrate(sin(x), (x, a, b)) |> replace(a, 0) |> replace(b, pi) == 2.0
+    @test integrate(sin(x), (x, a, b)).replace(a, 0).replace(b, pi) == 2.0
     @test integrate(sin(x) * DiracDelta(x)) == sin(Sym(0))
     @test integrate(Heaviside(x), (x, -1, 1)) == 1
-    curv = Curve([exp(t)-1, exp(t)+1], (t, 0, log(Sym(2))))
+    curv = sympy.Curve([exp(t)-1, exp(t)+1], (t, 0, log(Sym(2))))
     @test line_integrate(x + y, curv, [x,y]) == 3 * sqrt(Sym(2))
 
 
@@ -362,38 +365,40 @@ using Base.MathConstants
 
 
     ## polynomials
-    @syms x y
+    @vars x y
     f1 = 5x^2  + 10x + 3
     g1 = 2x + 2
-    q,r = polydiv(f1,g1, domain="QQ") # not div, as can't disambiguate div(Sym(7), 5)) to do integer division
+    q,r = sympy.div(f1,g1, domain="QQ") # use sympy.div to dispatch; o/w we can't disambiguate div(Sym(7), 5)) to do integer division
     @test r == Sym(-2)
     @test simplify(q*g1 + r - f1) == Sym(0)
-    @test interpolate([1,2,4], x) == interpolate([1,2,3], [1,2,4], x)
-    @test interpolate([-1,0,1], [0,1,0], x) == 1 - x^2
+    ## sympy.interpolate as first arg is not symbolic
+    @test sympy.interpolate([1,2,4], x) == sympy.interpolate(collect(zip([1,2,3], [1,2,4])), x)
+    @test sympy.interpolate(collect(zip([-1,0,1], [0,1,0])), x) == 1 - x^2
 
     ## piecewise
     x = Sym("x")
-    p = piecewise((x, Ge(x,0)), (0, Lt(x,0)), (1, Eq(x,0)))
+    # sympy.Piecewise is a FunctionClass,  we qualify, as args not Symbolic
+    p = sympy.Piecewise((x, Ge(x,0)), (0, Lt(x,0)), (1, Eq(x,0)))
     ## using infix \ll<tab>, \gt<tab>, \Equal<tab>
-    p = piecewise((x, (x ≫ 0)), (0, x ≪ 0), (1, x ⩵ 0))
-    @test subs(p,x,2) == 2
-    @test subs(p,x,-1) == 0
-    @test subs(p,x,0) == 1
+    p = sympy.Piecewise((x, (x ≫ 0)), (0, x ≪ 0), (1, x ⩵ 0))
+    @test p.subs(x,2) == 2
+    @test p.subs(x,-1) == 0
+    @test p.subs(x,0) == 1
 
-    if VERSION < v"0.7.0-" # ifelse changed
-        u = ifelse(Lt(x, 0), "neg", ifelse(Gt(x, 0), "pos", "zero"))
-        @test subs(u,x,-1) == Sym("neg")
-        @test subs(u,x, 0) == Sym("zero")
-        @test subs(u,x, 1) == Sym("pos")
-    end
-    p = piecewise((-x, x ≪ 0), (x, x ≧ 0))
+    ## if VERSION < v"0.7.0-" # ifelse changed
+    ##     u = ifelse(Lt(x, 0), "neg", ifelse(Gt(x, 0), "pos", "zero"))
+    ##     @test u.subs(u,x,-1) == Sym("neg")
+    ##     @test subs(u,x, 0) == Sym("zero")
+    ##     @test subs(u,x, 1) == Sym("pos")
+    ## end
+    p = sympy.Piecewise((-x, x ≪ 0), (x, x ≧ 0))
 
 
     ## relations
     x,y=symbols("x, y")
     ex = Eq(x^2, x)
-    @test lhs(ex) == x^2
-    @test rhs(ex) == x
+    @test ex.lhs() == x^2
+    @test ex.rhs() == x
     @test args(ex) == (x^2, x)
 
     ## mpmath functions
@@ -403,10 +408,10 @@ using Base.MathConstants
         Sym(big(2))
         Sym(big(2.0))                   # may need mpmath (e.g., conda install mpmath)
 
-        @test limit(besselj(1,1/x), x, 0) == Sym(0)
+        @test limit(besselj(Sym(1),1/x), x, 0) == Sym(0)
         complex(N(SymPy.mpmath.hankel2(2, pi)))
-        bei(2, 3.5)
-        bei(1+im, 2+3im)
+        SymPy.mpmath.bei(2, 3.5)
+        SymPy.mpmath.bei(1+im, 2+3im)
     end
 
     ## Assumptions
@@ -423,36 +428,38 @@ using Base.MathConstants
 
 
               ## sets
-    s = FiniteSet("H","T")
-    s1 = powerset(s)
+    s = sympy.FiniteSet("H","T")
+    s1 = s.powerset()
     VERSION >= v"0.4.0" && @test length(collect(convert(Set, s1))) == length(collect(s1.x))
-    a, b = Interval(0,1), Interval(2,3)
-    @test is_disjoint(a, b) == true
-    @test measure(union(a, b)) == 2
+    a, b = sympy.Interval(0,1), sympy.Interval(2,3)
+    @test a.is_disjoint(b) == true
+    @test a.union(b).measure() == 2
 
 
 
     ## test cse output
-    @test cse(x) == (Any[], x)
-    @test cse([x]) == (Any[], [x])
-    @test cse([x, x]) == (Any[], [x, x])
-    @test cse([x x; x x]) == (Any[], [x x; x x])
+    @test cse(x) == (Any[], Sym[x])
+    @test sympy.cse([x]) == (Any[], [convert(SymMatrix,[x])])
+    @test sympy.cse([x, x]) == (Any[],  [convert(SymMatrix, [x, x])] )
+    @test sympy.cse([x x; x x]) == (Any[], [convert(SymMatrix, [x x; x x])])
 
     ## sympy"..."(...)
-    @vars x
-    @test sympy"sin"(1) == sin(Sym(1))
+    ## removed
+    #@vars x
+    #@test sympy"sin"(1) == sin(Sym(1))
 end
 
 @testset "Fix past issues" begin
     @vars x y z
     ## Issue # 56
     @test Sym(1+2im) == 1+2IM
+    @test convert(Sym, 1 + 2im) == 1 + 2IM
 
 
     ## Issue #59
     cse(sin(x)+sin(x)*cos(x))
-    cse([sin(x), sin(x)*cos(x)])
-    cse([sin(x), sin(x)*cos(x), cos(x), sin(x)*cos(x)])
+    sympy.cse([sin(x), sin(x)*cos(x)])
+    sympy.cse( [sin(x), sin(x)*cos(x), cos(x), sin(x)*cos(x)])
 
     ## Issue #60, lambidfy
     x, y = symbols("x, y")
@@ -466,19 +473,21 @@ end
     ex = x - y
     #@test lambdify(ex)(3,2) == 1
 
+    Indicator(x, a, b) = sympy.Piecewise((1, Lt(x, b) & Gt(x,a)), (0, Le(x,a)), (0, Ge(x,b)))
     i = Indicator(x, 0, 1)
     u = lambdify(i)
     @test u(.5) == 1
     @test u(1.5) == 0
 
-    i2 = SymPy.lambdify_expr(x^2,name=:square)
-    @test i2.head == :function
-    @test i2.args[1].args[1] == :square
+#    i2 = SymPy.lambdify_expr(x^2,name=:square)
+#    @test i2.head == :function
+#    @test i2.args[1].args[1] == :square
     ## @test i2.args[2] == :(x.^2) # too fussy
 
 
     ## issue #67
-    @test N(Sym(4//3)) == 4//3
+    @test N(Sym(4)/3) == 4//3
+    @test N(convert(Sym, 4//3)) == 4//3
 
     ## issue #71
     @test log(Sym(3), Sym(4)) == log(Sym(4)) / log(Sym(3))
@@ -489,13 +498,13 @@ end
     end
 
     ## properties (Issue #119)
-    @test is_odd(Sym(3)) == true
-    @test is_monic(Poly(x^2 -2, x)) == true
+    @test (sympify(3).is_odd) == true
+    @test sympy.Poly(x^2 -2, x).is_monic == true
 
     ## test round (Issue #153)
     y = Sym(eps())
-    @test round(y, 5) == 0
-    @test round(y, 16) != 0
+    @test round(N(y), digits=5) == 0
+    @test round(N(y), digits=16) != 0
 
     ## lambdify over a matrix #218
     @vars x y
@@ -536,8 +545,8 @@ end
     # arose in issue 223
     @vars xreal real=true
     @vars xcomplex
-    zreal = Sym(1)
-    zcomplex = Sym(1) + Sym(2)*IM
+    zreal = sympify(1)
+    zcomplex = sympify(1) + sympify(2)*IM
 
     @test isreal(xreal)     # is_real(xreal) is also true, but xreal is Sym, not a Julia object
     @test !isreal(xcomplex) # is_real(xcomplex) is nothing

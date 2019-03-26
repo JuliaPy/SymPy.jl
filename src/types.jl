@@ -7,8 +7,23 @@ struct Sym <: SymbolicObject
 end
 
 
+
+
 ## Matrices
 ## mutable so setindex! can work
+## cf. matrix.jl
+"""
+    SymMatrix
+
+Type to store a SymPy matrix, as created by `sympy.Matrix`.
+
+These have 0-based indexing defined for them to match SymPy
+
+The traditional infix mathmatical operations are defined, but no dot broadcasting.
+
+The `convert(Matrix{Sym}, M)` call is useful to covert to a Julia matrix
+
+"""
 mutable struct SymMatrix <: SymbolicObject
     x::PyCall.PyObject
 end
@@ -19,7 +34,7 @@ struct SymPermutation <: SymbolicObject
   x::PyCall.PyObject
 end
 export SymPermutation
-
+Base.convert(::Type{SymPermutation}, o::PyCall.PyObject) = SymPermutation(o)
 
 
 ## A permutation of {0, 1, 2, ..., n} -- 0-based
@@ -27,7 +42,7 @@ struct SymPermutationGroup <: SymbolicObject
   x::PyCall.PyObject
 end
 export SymPermutationGroup
-
+Base.convert(::Type{SymPermutationGroup}, o::PyCall.PyObject) = SymPermutationGroup(o)
 
 
 

@@ -1,8 +1,8 @@
 ## Matrix operations on SymMatrix
 
-## we support Array{Sym} using Julia's generic matrix functions
-## we support SymMatrix using SymPy's methods
-## Here we define some helpers
+## * we support Array{Sym} using Julia's generic matrix functions
+## * we support SymMatrix using SymPy's methods. These use dot call style.
+## * we overload getproperty to allow dot call style on Array{Sym} objects
 
 #### basic matrix operations must be delegated
 
@@ -11,11 +11,12 @@ Base.inv(x::SymMatrix) = x.inv()
 *(x::SymMatrix, y::SymMatrix) = x.multiply(y)
 *(x::Number, y::SymMatrix) = y.multiply(x)
 *(x::SymMatrix, y::Number) = x.multiply(y)
+/(x::SymMatrix, y::Number) = x.multiply(1/Sym(y))
+/(x::SymMatrix, y::Sym) = x.multiply(1/y)
 +(x::SymMatrix, y::SymMatrix) = x.add(y)
 -(x::SymMatrix, y::SymMatrix) = x + y.multiply(-1)
 
 #### Add 0-based getindex, setindex! methods
-
 using OffsetArrays
 
 """
@@ -43,8 +44,9 @@ function Base.getindex(M::SymMatrix, I...)
     end
 end
 
-# method for vectors
+# method for vectors, linear indexing
 Base.getindex(V::SymMatrix, i::Int) = V[i,0]
+Base.getindex(M::SymMatrix) = M
 
 function Base.setindex!(M::SymMatrix, X, I...)
     sh = M.shape
@@ -72,27 +74,52 @@ function Base.convert(::Type{Matrix{T}}, M::SymMatrix) where {T <: SymbolicObjec
 end
 Base.convert(::Type{Vector{T}}, M::SymMatrix) where {T <: SymbolicObject} = M.tolist()[:,1]
 
-function Base.convert(::Type{SymMatrix}, M::Matrix{T}) where {T <: SymbolicObject}
+function Base.convert(::Type{SymMatrix}, M::AbstractArray{T, N}) where {T <: Number, N}
     m,n = size(M)
-    sympy.Matrix([M[i,:] for i in 1:m])
+    sympy.Matrix([PyCall.PyObject.(M[i,:]) for i in 1:m])
 end
 
-function Base.convert(::Type{SymMatrix}, V::Vector{T}) where {T <: SymbolicObject}
+function Base.convert(::Type{SymMatrix}, V::Vector{T}) where {T <: Number}
     convert(SymMatrix, hcat(V))
 end
 
-#PyCall.PyObject(M::Matrix{Sym}) = PyCall.PyObject(sympy.Matrix(M[i,:] for i in 1:size(M)[1]))
-#
-#    PyCall.PyObject(V::Vector{Sym}) = PyCall.PyObject(hcat(V)).x
+
+## This allows abstract arrays of Sym Objects to slip through sympy.meth() calls
+PyCall.PyObject(A::AbstractArray{Sym,2}) =
+    PyCall.pycall(sympy.Matrix, PyCall.PyObject, [PyCall.PyObject.(A[i,:]) for i in 1:size(A)[1]])
+
+PyCall.PyObject(V::AbstractArray{Sym,1}) =
+    PyCall.pycall(sympy.Matrix, PyCall.PyObject,[[PyCall.PyObject(v)] for v in V])
 
 
-## Generic methods fails
+
+# call SymMatrix method on Matrix{Sym}
+## Eg. A.norm() where A = [x 1; 1 x], say
+function Base.getproperty(A::AbstractArray{T}, k::Symbol) where {T <: SymbolicObject}
+    if k in fieldnames(typeof(A))
+        return getfield(A,k)
+    else
+        M = convert(SymMatrix, A)
+        M1 = getproperty(M, k)
+        M1
+    end
+end
+
+
+## special case generic methods that fail on Array{Sym}:
+function LinearAlgebra.norm(a::AbstractArray{Sym})
+    a.norm()
+end
+
+function Base.inv(A::Array{T}) where {T <: SymbolicObject}
+    convert(Matrix{T}, A.inv())
+end
+
 function LinearAlgebra.eigvals(a::Matrix{Sym})
-    M = convert(SymMatrix, a)
-    Sym[k for k in keys(M.eigenvals())]
+    Sym[k for k in keys(a.eigenvals())]
 end
 
 function LinearAlgebra.eigvecs(a::Matrix{Sym})
-    ds =  convert(SymMatrix,a).eigenvects()
-    hcat((vcat((convert(Vector{Sym}, d) for d in di[3])...) for di in ds)...)
+    ds =  a.eigenvects()
+    hcat((hcat((convert(Vector{Sym}, d) for d in di[3])...) for di in ds)...)
 end

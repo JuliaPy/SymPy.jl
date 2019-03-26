@@ -15,9 +15,8 @@ Base.asech(z::Sym) = log(sqrt(1/z-1)*sqrt(1/z+1) + 1/z)
 Base.acsch(z::Sym) = log(sqrt(1+1/z^2) + 1/z) ## http://mathworld.wolfram.com/InverseHyperbolicCosecant.html
 Base.atan(y::Sym, x) = sympy.atan2(y,x)
 
-sinc(x::Sym) = Piecewise((Sym(1), sympy.Eq(x, 0)),
-                         (sin(PI*x)/(PI*x), sympy.Gt(abs(x), 0))
-                         ) # Julia's sinc is defined to be zero at x=1
+
+Base.sinc(x::Sym) = sympy.sinc(PI*x)
 cosc(x::Sym) = diff(sinc(x))
 
 Base.sincos(x::Sym) = (sin(x), cos(x))
@@ -26,6 +25,7 @@ Base.rad2deg(x::Sym) = (x * 180) / PI
 Base.deg2rad(x::Sym) = (x * PI) / 180
 
 ## exponential
+Base.log(x::Sym) = sympy.log(x)
 Base.log(b::Number, x::Sym) = sympy.log(x, b)
 
 
@@ -128,7 +128,7 @@ export dsolve
 function _solve_ivp(out, var, args, o)
 
     eqns = Sym[(diff(out.rhs(), var, f.n))(var=>x0) - y0 for (f, x0, y0) in args]
-    sols = solve(eqns, Sym["C$i" for i in 1:o])
+    sols = solve(eqns, Sym["C$i" for i in 1:o], dict=true)
     if length(sols) == 0
        return nothing
     end

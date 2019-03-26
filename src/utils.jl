@@ -153,7 +153,7 @@ base_Ms = (Base, SpecialFunctions, Base.MathConstants,
 
 base_exclude=("C", "lambdify",
               "latex", "eye", "sympify",
-              "div",
+              "div", "log", "sinc",
               "dsolve",
               "ask",
               "plot")

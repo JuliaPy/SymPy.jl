@@ -1,3 +1,7 @@
+function _check_permutation_format(x::Vector{Vector{T}}) where {T}
+    nothing
+end
+_check_permutation_format(x) = nothing
 
 """
 
@@ -68,7 +72,7 @@ wheres a rotation is not (as it has order 4)
 
 ```
 rotate * rotate
-order(rotate)
+rotate.order()
 ```
 
 These do not commute:
@@ -91,7 +95,7 @@ We can check that `flip` and `rotate^2` do commute:
 
 ```
 id = Permutation(3)   # (n) is the identify
-commutator(flip, rotate^2) == id
+flip.commutator(rotate^2) == id
 ```
 
 The conjugate for flip and rotate does the inverse of the flip, then rotates, then flips:
@@ -116,28 +120,31 @@ function Permutation(x; kwargs...)
         x = collect(x)
     end
     _check_permutation_format(x)
-    SymPy.combinatorics.permutations.Permutation(x; kwargs...)
+    SymPermutation(sympy.combinatorics.permutations.Permutation(x; kwargs...))
 end
 function Permutation(i, j, xs...; kwargs...)
     Permutation([vcat(i,j,xs...)]; kwargs...)
 end
-Permutation(;kwargs...) = SymPy.combinatorics.permutations.Permutation(; kwargs...)
+Permutation(;kwargs...) = SymPermutation(sympy.combinatorics.permutations.Permutation(; kwargs...))
 export Permutation
 
 # left right
 # check commutative
-*(p::SymPermutation, q::SymPermutation) = PyCall.py"$p * $q"
-+(p::SymPermutation, i::Integer) = PyCall.py"$p + $i"
--(p::SymPermutation, i::Integer) = PyCall.py"$p - $i"
-^(p::SymPermutation, i::Integer) = PyCall.py"$p**$i"
+*(p::SymPermutation, q::SymPermutation)::SymPermutation = PyCall.py"$p * $q"
++(p::SymPermutation, i::Integer)::SymPermutation = PyCall.py"$p + $i"
+-(p::SymPermutation, i::Integer)::SymPermutation = PyCall.py"$p - $i"
+^(p::SymPermutation, i::Integer)::SymPermutation = PyCall.py"$p**$i"
 ^(p::SymPermutation, i::Sym) = p^N(i)
 ^(i::Integer, p::SymPermutation) = p(i)   # python has i^p = p(i)
 ^(i::Sym, p::SymPermutation) = p(i)       # SymPy has i^p = p(i)
-^(p::SymPermutation, q::SymPermutation)  = PyCall.py"$p^$q" # conjugate
-inv(p::SymPermutation) = PyCall.py"$p**(-1)"
-/(p::SymPermutation, q::SymPermutation) = p * inv(q)
+^(p::SymPermutation, q::SymPermutation)::SymPermutation  = PyCall.py"$p^$q" # conjugate
+inv(p::SymPermutation)::SymPermutation = PyCall.py"$p**(-1)"
+/(p::SymPermutation, q::SymPermutation)::SymPermutation = p * inv(q)
+import Base: ~
+~(p::SymPermutation) = SymPermutation(~(PyCall.PyObject(p)))
+Base.inv(p::SymPermutation) = ~p
 
-function +(p::SymPermutation, q::SymPermutation)
+function +(p::SymPermutation, q::SymPermutation)::SymPermutation
     !is_Identity(commutator(p,q)) && throw(DomainError("p and q do not commute"))
     p * q
 end
@@ -193,7 +200,7 @@ export PermutationGroup
 
 ## Algebra therof
 import Base: *
-G1::SymPermutationGroup *  G2::SymPermutationGroup = PyCall.py"$G1*$G2"
+*(G1::SymPermutationGroup, G2::SymPermutationGroup)::SymPermutationGroup = PyCall.py"$G1*$G2"
 
 ## Indexing into group
 Base.getindex(Gp::SymPermutationGroup, i::Int) = PyCall.py"$(Gp.x)[$(i-1)]"  # 1-base

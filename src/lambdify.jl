@@ -51,7 +51,9 @@ fn_map = Dict(
               "Or" => :(|),
               "Less" => :(<),
               "LessThan" => :(<=),
+              "StrictLessThan" => :(<),
               "Equal" => :(==),
+              "StrictGreaterThan" => :(>),
               "GreaterThan" => :(>=),
 "Greater" => :(>),
 "conjugate" => :conj
@@ -136,7 +138,7 @@ function lambdify(ex::Sym, vars=free_symbols(ex);
                   )
     # if :julia_code printer is there, use it
     if use_julia_code
-        body = Meta.parse(sympy_meth(:julia_code, ex)) # issue here with 2.*...
+        body = Meta.parse(sympy.julia_code(ex)) # issue here with 2.*...
     else
         body = walk_expression(ex, fns=fns, values=values)
     end
@@ -176,3 +178,5 @@ function lambdify(exs::Array{S, N}, vars = union(free_symbols.(exs)...); T::Data
 end
 
 export(lambdify)
+
+Base.convert(::Type{Function}, ex::Sym) = lambdify(ex)

@@ -32,7 +32,7 @@ convert(::Type{Complex{T}}, x::Sym) where {T} = complex(map(x -> convert(T, x), 
 
 ## Irrationals
 Base.convert(::Type{Sym}, x::Irrational{:π}) = PI
-Base.convert(::Type{Sym}, x::Irrational{:e}) = E
+Base.convert(::Type{Sym}, x::Irrational{:ℯ}) = sympy.exp(1)
 Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy.EulerGamma)
 Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy.Catalan)
 Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
@@ -40,16 +40,16 @@ Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
 
 
 
-## properties
-number_properties = (:is_even, :is_odd,
-                     :is_number, :is_integer, :is_real,
-                     :is_complex, :is_rational,
-                     :is_commutative)
-for prop in number_properties
-    prop_name = string(prop)
-    @eval ($prop)(ex::SymbolicObject) = PyCall.hasproperty(PyObject(ex), Symbol($prop_name)) &&  getproperty(PyObject(ex), Symbol($prop_name))
-    eval(Expr(:export, prop))
-end
+## ## properties
+## number_properties = (:is_even, :is_odd,
+##                      :is_number, :is_integer, :is_real,
+##                      :is_complex, :is_rational,
+##                      :is_commutative)
+## for prop in number_properties
+##     prop_name = string(prop)
+##     @eval ($prop)(ex::SymbolicObject) = PyCall.hasproperty(PyObject(ex), Symbol($prop_name)) &&  getproperty(PyObject(ex), Symbol($prop_name))
+##     eval(Expr(:export, prop))
+## end
 
 """
 
@@ -128,12 +128,18 @@ function N(x::Sym)
                 return convert(BigInt, x)
             end
         elseif x.__class__.__name__ == "Float"
-            return convert(BigFloat, x)
+            if x._prec <= 64
+                return convert(Float64, x)
+            else
+                return convert(BigFloat, x)
+            end
         elseif is_(:rational, x)
             return N(numer(x)) // N(denom(x))
         elseif pycall_hasproperty(x, :args) && length(x.args) > 1
             def_precision_decimal = ceil(Int, log10(big"2"^Base.MPFR.DEFAULT_PRECISION.x))
             convert(BigFloat, x.evalf(def_precision_decimal))
+        elseif length(x.args) > 0
+            return N(x.evalf())
         else
             return convert(BigFloat, x)
         end
@@ -196,7 +202,7 @@ function N(x::Sym, digits::Int)
         return( N(out, digits) )
     end
 
-    ex = evalf(x, digits)
+    ex = x.evalf(digits)
     if is_integer(x)
         return(convert(BigInt, x))
     elseif _is_rational(x)
@@ -220,19 +226,19 @@ end
 
 
 
-const relational_sympy_values = (:GreaterThan, :LessThan,
-                                 :StrictGreaterThan, :StrictLessThan,
-                                 :Equality, :Unequality)
-for meth in relational_sympy_values
-    meth_name = string(meth)
-    @eval begin
-#         @doc """
-# `$($meth_name)`: a SymPy function. [cf.](http://docs.sympy.org/dev/_modules/sympy/core/relational.html)
-# """ ->
-        ($meth)(a::Real, b::Real) = _sympy_meth($meth_name,a, b)
-    end
-#    eval(Expr(:export, meth))
-end
+## const relational_sympy_values = (:GreaterThan, :LessThan,
+##                                  :StrictGreaterThan, :StrictLessThan,
+##                                  :Equality, :Unequality)
+## for meth in relational_sympy_values
+##     meth_name = string(meth)
+##     @eval begin
+## #         @doc """
+## # `$($meth_name)`: a SymPy function. [cf.](http://docs.sympy.org/dev/_modules/sympy/core/relational.html)
+## # """ ->
+##         ($meth)(a::Real, b::Real) = getproperty($sympy,$meth_name)(a, b)
+##     end
+## #    eval(Expr(:export, meth))
+## end
 
 
 ##################################################
@@ -250,7 +256,7 @@ Base.:|(x::Sym, y::Sym) =  PyCall.pycall(PyObject(x).__or__, Sym, y)
 ∨(x::Sym, y::Sym) = x | y
 ∧(x::Sym, y::Sym) = x & y
 ¬(x::Sym) = !x
-
+export ∨, ∧, ¬
 
 
 ## In SymPy, symbolic equations are not represented by `=` or `==`

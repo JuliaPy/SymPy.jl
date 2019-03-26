@@ -35,8 +35,20 @@ macro vars(x...)
     q
 end
 
+## avoid PyObject conversion as possible
+Sym(x::T) where {T <: Number} = sympy.sympify(x)
+Sym(x::Rational{T}) where {T} = Sym(numerator(x))/Sym(denominator(x))
+function Sym(x::Complex{Bool})
+    !x.re && x.im && return IM
+    !x.re && !x.im && return zero(Sym)
+    x.re && !x.im && return Sym(1)
+    x.re && x.im && return Sym(1) + IM
+end
+Sym(xs::Symbol...) = Tuple(Sym.((string(x) for x in xs)))
+Sym(x::AbstractString) = sympy.symbols(x)
 Sym(s::SymbolicObject) = s
-Sym(s::AbstractString) = sympy.sympify(s)
+Sym(x::Irrational{T}) where {T} = convert(Sym, x)
+
 convert(::Type{Sym}, s::AbstractString) = Sym(s)
 
 sympify(s, args...; kwargs...) = sympy.sympify(s, args...; kwargs...)

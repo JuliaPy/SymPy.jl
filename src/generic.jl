@@ -20,7 +20,7 @@ Base.isequal(a::Number, b::Sym) = Eq(promote(a,b)...) == True
 
 
 # Floating point bits
-Base.copysign(x::Sym, y::Sym) = abs(x) * sign(y)
+Base.copysign(x::Sym, y::Number) = abs(x) * sign(y)
 Base.eps(::Type{Sym}) = zero(Sym)
 Base.flipsign(x::Sym, y) = signbit(y) ? -x : x
 Base.signbit(x::Sym) = x < 0
@@ -34,6 +34,7 @@ Base.isinf(x::Sym) = is_(:infinite, x)
 Base.isnan(x::Sym) = x == sympy.nan
 Base.isinteger(x::Sym) = is_(:integer, x)
 Base.iseven(x::Sym) = is_(:even, x)
+Base.isreal(x::Sym) = is_(:real, x)
 Base.isodd(x::Sym) = is_(:odd, x)
 
 
@@ -72,16 +73,24 @@ Base.conj(x::SymbolicObject) = x.conjugate()
 
 Base.real(::Type{Sym}) = Sym
 Base.real(x::Sym) = _real(N(x))
-_real(x::Sym) = _sympy_meth(:re, x)
+_real(x::Sym) = sympy.:re(x)
 _real(x) = real(x)
 
 
 
 Base.imag(x::Sym) = _imag(N(x))
-_imag(x::Sym) = _sympy_meth(:im, x)
+_imag(x::Sym) = sympy.im(x)
 _imag(x) = imag(x)
 
 
+
+function Base.round(x::Sym; digits=1, kwargs...)
+    if is_(:Float, x)
+        return x.round(digits)
+    else
+        return round(N(x); digits=digits, kwargs...)
+    end
+end
 
 
 
