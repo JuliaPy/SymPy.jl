@@ -4,6 +4,8 @@
 ## ex(x=>val)
 ## how to do from any symbolic object?
 (ex::Sym)() = ex
+
+## without specification, variables to substitute for come from ordering of `free_symbols`:
 function (ex::Sym)(args...)
     xs = ex.free_symbols
     for (var, val) in zip(xs, args)
@@ -11,20 +13,21 @@ function (ex::Sym)(args...)
     end
     ex
 end
+
+## can use a Dict or pairs to specify:
 function (ex::Sym)(x::Dict)
     for (k,v) in x
         ex = ex.subs(k, v)
     end
     ex
 end
-function (ex::Sym)(x::Pair...)
-    for (k,v) in x
+function (ex::Sym)(kvs::Pair...)
+    for (k,v) in kvs
         ex = ex.subs(k, v)
     end
     ex
 end
 
-## use python iteration
 
 ##################################################
 # avoid type piracy. After we call `pytype` mappings, some
@@ -39,14 +42,6 @@ pycall_hasproperty(x, k) = false
 function is_(k::Symbol, x::Sym)::Bool
     key = Symbol("is_$k")
     pycall_hasproperty(x, key) && getproperty(x, key) == Sym(true)
-end
-## name of symbolic object
-function __name__(x)
-    try
-        x.__class__.__name__
-    catch err
-        ""
-    end
 end
 
 
@@ -147,11 +142,22 @@ end
 ##     from_import_all(sm; Ms=Ms, fns=fns)
 ## end
 
-base_Ms = (Base, SpecialFunctions, Base.MathConstants,
+# default list of modules to search for namespace collicsions
+const base_Ms = (Base, SpecialFunctions, Base.MathConstants,
            LinearAlgebra, OffsetArrays
            )
 
-base_exclude=("C", "lambdify",
+# default list of methods to exclude from importing
+#
+# In addition to issues (such as "C") this should list
+#
+# * julia methods for which the sympy method is different from julia's generic usage (e.g. `div`)
+# * `julia` methods that are clearly issues with the package system, though not in base_Ms (e.g., `plot`, `latex`)
+# * sympy methods for which a substitute is used (e.g. `lambdify`)
+#
+# these are still accesible through dot-call syntax.
+#
+const base_exclude=("C", "lambdify",
               "latex", "eye", "sympify",
               "div", "log", "sinc",
               "dsolve",
@@ -164,9 +170,9 @@ base_exclude=("C", "lambdify",
 Import methods from python module
 
 * `module`: a python module, such as `sympy`
-* `meths`: nothing or a tuple of symbols to import. If `nothing`, then all member functions of the module are imported (but not constructors and other objects)
+* `meths`: nothing or a tuple of symbols to import. If `nothing`, then all member functions of the module are imported (but not constructors or other objects)
 * `Ms`: additional Julia Modules to import from. By default, a few base modules are searched for to avoid namespace collisions.
-* `typ`: a symbol indicating variable type first argument of new function should be restricted to. For most, the default, `:SymbolicObject` will be appropriate
+* `typ`: a symbol indicating variable type for first argument that the new function should be restricted to. For most, the default, `:SymbolicObject` will be appropriate
 * `exclude`: when importing all (`meths=nothing`), this can be used to avoid importing some methods by name. The default has a few to avoid.
 
 Examples:
@@ -248,8 +254,8 @@ end
 module Introspection
 
 import SymPy: Sym
-import PyCall: PyObject, hasproperty
-export func, args, funcname
+import PyCall: PyObject, hasproperty, PyNULL, inspect
+export args, func, funcname, class, classname, getmembers
 
 
 # utilities
@@ -293,6 +299,25 @@ function args(x::Sym)
     end
 end
 
+function class(x::T) where {T <: Union{Sym, PyObject}}
+    if hasproperty(PyObject(x), :__class__)
+        return x.__class__
+    else
+        return PyNull()
+    end
+end
 
+function classname(x::T) where {T <: Union{Sym, PyObject}}
+    cls = class(x)
+    if cls == PyNULL()
+        "NULL"
+    else
+        cls.__name__
+    end
+end
+
+function getmembers(x::T) where {T <: Union{Sym, PyObject}}
+    Dict(u=>v for (u,v) in inspect.getmembers(x))
+end
 
 end

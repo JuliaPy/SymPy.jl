@@ -1654,3 +1654,8 @@ at each stage (hint: think of what happens to $a_0$ in the formula $a_0 +
 !!! note
 
     Answer: a0 is the only symbol that does not appear in the denominator
+
+
+----
+
+[return to index](./index.html)

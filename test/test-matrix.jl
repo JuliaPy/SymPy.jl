@@ -25,15 +25,13 @@ using LinearAlgebra
 
 
     A1 = Sym[25 15 -5; 15 18 0; -5 0 11]
-    M1 = convert(SymMatrix, A1)
     r = A1.cholesky()
-    @test r*r.transpose() == M1
+    @test r*r.transpose() == A1
 
 
     #    s = LUsolve(A, v)
-    M, V = convert.(SymMatrix, (A, v))
-    s = M.LUsolve(V)
-    @test simplify(M * s) == V
+    s = A.LUsolve(B)
+    @test simplify.(A * s) == B
 
     # norm
     @test norm(A) == sqrt(2 * abs(x)^2 + 2)
@@ -64,9 +62,8 @@ using LinearAlgebra
 
 
     A = Sym[1 2 3; 3 6 2; 2 0 1]
-    M = convert(SymMatrix, A)
     q, r = A.QRdecomposition()
-    @test q * r == M
+    @test q * r == A
     @test abs(det(q)) == 1
 
 
@@ -79,18 +76,16 @@ using LinearAlgebra
         @test out[i].dot(out[j]) == (i == j ? 1 : 0)
     end
 
-    A = convert(SymMatrix, Sym[4 3; 6 3])
+    A = Sym[4 3; 6 3]
     L, U, _ = A.LUdecomposition()
-    @test L == convert(SymMatrix, Sym[1 0; 3//2 1])
+    @test L == Sym[1 0; 3//2 1]
 
     A = Sym[1 0; 0 1] * 2
     B = Sym[1 2; 3 4]
-    A1, B1 = convert.(SymMatrix, (A,B))
-    @test A.diagonal_solve(B) == B1/2
+    @test A.diagonal_solve(B) == B/2
 
     M = Sym[1 2 0; 0 3 0; 2 -4 2]
-    P1, D1 = M.diagonalize()
-    P, D = convert.(Matrix{Sym}, (P1, D1))
+    P, D = M.diagonalize()
     @test D == [1 0 0; 0 2 0; 0 0 3]
     @test P == [-1 0 -1; 0 0 -1; 2 1  2]
     @test D == inv(P) * M * P
@@ -98,9 +93,8 @@ using LinearAlgebra
     # test SymPy's expm against Julia's expm
     A = [1 2 0; 0 3 0; 2 -4 2]
     M = Sym.(A)
-    M1 = convert(SymMatrix,M)
     ## no exp(M)!
-    U = convert(Matrix{Sym}, M.exp()) - exp(A)
+    U = M.exp() - exp(A)
     @test maximum(abs.(N.(U))) <= 1e-12
 
     M = [x y; 1 0]
@@ -109,11 +103,13 @@ using LinearAlgebra
 
 
     M = Sym[1 3 0; -2 -6 0; 3 9 6]
-    @test M.nullspace()[1] == convert(SymMatrix, [-3, 1, 0])
+    @test M.nullspace()[1] ==  reshape(Sym[-3, 1, 0], 3, 1)
 
 
     M = Sym[1 2 0; 0 3 0; 2 -4 2]
-    @test M.cofactor(1, 2) / M.det() == M.inv()[2, 1]
+    # M.cofactor  uses 0-based indexing!
+    i, j = 1, 2
+    @test M.cofactor(i, j) == (-1)^(i+j) * det(M[setdiff(1:3, i+1), setdiff(1:3, j+1)])
     @test M.adjugate() / M.det() == M.inv()
 
     M = Sym[ 6  5 -2 -3;
@@ -121,8 +117,7 @@ using LinearAlgebra
              2  1 -2 -3;
             -1  1  5  5]
 
-    P1, J1 = M.jordan_form()
-    P, J = convert.(Matrix{Sym}, (P1, J1))
+    P, J = M.jordan_form()
     @test J == [2 1 0 0;
                 0 2 0 0;
                 0 0 2 1;
@@ -132,11 +127,9 @@ using LinearAlgebra
     ρ, ϕ = symbols("rho, phi")
     X = [ρ*cos(ϕ), ρ*sin(ϕ), ρ^2]
     Y = [ρ, ϕ]
-    X1, Y1 = convert.(SymMatrix, (X,Y))
-    @test X.jacobian(Y) == convert(SymMatrix,
-                                    [cos(ϕ) -ρ*sin(ϕ);
-                                     sin(ϕ)  ρ*cos(ϕ);
-                                     2ρ       0])
+    @test X.jacobian(Y) ==   [cos(ϕ) -ρ*sin(ϕ);
+                              sin(ϕ)  ρ*cos(ϕ);
+                                  2ρ       0]
     X = [ρ*cos(ϕ), ρ*sin(ϕ)]
     @test convert(Matrix{Sym}, X.jacobian(Y)) == [cos(ϕ) -ρ*sin(ϕ);
                                                   sin(ϕ)  ρ*cos(ϕ)]

@@ -473,3 +473,8 @@ There are other symbolic packages for `Julia`:
 * Nemo.jl
 
 SymPy is an attractive alternative as `PyCall` makes most all of its functinality directly available and SymPy is fairly feature rich.
+
+
+----
+
+[return to index](./index.html)

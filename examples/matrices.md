@@ -9,7 +9,17 @@
 
 ##### In `Julia`:
 
-* In `SymPy`, matrices can be store using `Julia`'s *generic* `Matrix{T}` type where `T <: Sym` *or* using SymPy's matrix type, wrapped in a `SymMatrix` type by `SymPyLite`. This tutorial shows how to use the underlying `SymMatrix` values. To construct a matrix of symbolic values is identical to construction a matrix of numeric values within `Julia`, and will be illustrated at the end.
+* In `SymPy`, matrices can be store using `Julia`'s *generic*
+  `Matrix{T}` type where `T <: Sym` *or* using SymPy's matrix type,
+  wrapped in a `SymMatrix` type by `SymPy`. This tutorial shows
+  how to use the underlying `SymMatrix` values. To construct a matrix
+  of symbolic values is identical to construction a matrix of numeric
+  values within `Julia`, and will be illustrated at the end.
+
+
+* methods for `SymMatrix` objects use the dot call syntax. As a
+  convenience, this will also work for `Array{Sym}` objects. The
+  returned value may be a `SymMatrix`, not an `Array{Sym}`.
 
 
 ```
@@ -45,6 +55,26 @@ use
 sympy.Matrix([[1, -1], [3, 4], [0, 2]])
 ```
 
+*However*, through the magic of `PyCall`, such matrices are converted into `Julia` matrices, of type `Array{Sym}`, so the familiar matrix operations for `Julia` users are available.
+
+
+In fact, the above could be done in the more `Julia`n manner through
+
+```
+Sym[1 -1; 3 4; 0 2]
+```
+
+using an annotation to ensure the type. Alternatively, through promotion, just a single symbolic object will result in the same:
+
+```
+[Sym(1) -1; 3 4; 0 2]
+```
+
+!!! note "Alert"
+
+   The use of `sympy.Matrix` is strongly discouraged, as it does not work as desired when used with symbolic values.
+
+
 ----
 
 To make it easy to make column vectors, a list of elements is considered to be
@@ -65,6 +95,16 @@ a column vector.
 sympy.Matrix([1, 2, 3])
 ```
 
+* Again, this is converted into a `Vector{Sym}` object or entered directly:
+
+```
+Sym[1,2,3]
+```
+
+!!! note "And again:"
+
+    Using `sympy.Matrix` is strongly discouraged.
+
 ----
 
 Matrices are manipulated just like any other object in SymPy or Python.
@@ -81,9 +121,11 @@ Matrices are manipulated just like any other object in SymPy or Python.
 
 ##### In `Julia`:
 
+* In `Julia`, matrices are just matrices, and inherit all of the operations defined on them:
+
 ```
-M = sympy.Matrix([[1, 2, 3], [3, 2, 1]])
-N = sympy.Matrix([0, 1, 1])
+M = Sym[1 2 3; 3 2 1]
+N = Sym[0, 1, 1]
 M*N
 ```
 
@@ -95,6 +137,12 @@ place, as we will see below.  The downside to this is that `Matrix` cannot
 be used in places that require immutability, such as inside other SymPy
 expressions or as keys to dictionaries.  If you need an immutable version of
 `Matrix`, use `ImmutableMatrix`.
+
+##### In `Julia`:
+
+A distinction is made between `ImmutableMatrix` and a mutable one. Mutable ones are mapped to `Julia` arrays, immutable ones are left as a symbolic object of type `SymMatrix`. The usual infix mathematical operations (but not dot broadcasting), 0-based indexing, and dot call syntax for methods are used with these objects.
+
+
 
 ## Basic Operations
 
@@ -118,12 +166,18 @@ use `shape`
 ##### In `Julia`:
 
 ```
-M = sympy.Matrix([[1, 2, 3], [-2, 0, 4]])
+M = Sym[1 2 3; -2 0 4]
 M
 ```
 
 ```
 M.shape
+```
+
+Or, the `Julia`n counterpart:
+
+```
+size(M)
 ```
 
 ----
@@ -146,10 +200,19 @@ column.
 
 ##### In `Julia`:
 
+* these 0-based operations are supported:
+
 ```
 M.row(0)
 M.col(-1)
 ```
+
+The more familiar counterparts would be:
+
+```
+M[1,:], M[:, end]
+```
+
 
 ----
 
@@ -169,6 +232,39 @@ will modify the Matrix **in place**.
     >>> M
     [2  3]
 ```
+
+##### In `Julia`:
+
+These methods do **not** work on `Array{Sym}` objects, use `Julia's` indexing notation to remove a row or column.
+
+However, these methods **do** work on the `ImmutableMatrix` class:
+
+```
+M = sympy.ImmutableMatrix([[1, 2, 3], [-2, 0, 4]])
+M.col_del(0)
+```
+
+```
+M.row_del(1)
+```
+
+!!! note "Alert"
+
+    If used with symbolic values, these must be converted to `PyObjects` to work:
+
+```
+import PyCall: PyObject
+@vars x
+o = PyObject(x)
+sympy.ImmutableMatrix([[x,1],[1,x]])  # wrong shape
+```
+
+```
+sympy.ImmutableMatrix([[o,1],[1,o]])
+```
+
+
+----
 
 !!! note "TODO"
 
@@ -211,6 +307,12 @@ Unless explicitly stated, the methods mentioned below do not operate in
 place. In general, a method that does not operate in place will return a new
 `Matrix` and a method that does operate in place will return `None`.
 
+##### In `Julia`
+
+This would be the case for the immutable matrices.
+
+----
+
 ## Basic Methods
 
 
@@ -250,13 +352,13 @@ raise it to the `-1` power.
 ##### In `Julia`:
 
 ```
-M = sympy.Matrix([[1, 3], [-2, 3]])
-M1 = sympy.Matrix([[0, 3], [0, 7]])
+M = Sym[1 3; -2 3]
+M1 = Sym[0 3; 0 7]
 M + M1
 ```
 
 ```
-M*N1
+M*M1
 ```
 
 ```
@@ -274,6 +376,39 @@ M^-1
 ```
 M1^-1
 ```
+
+The above (except for the inverses) are using generic `Julia` definitions. For immutable matrices, we would have:
+
+
+
+```
+M = sympy.ImmutableMatrix([[1, 3], [-2, 3]])
+M1 = sympy.ImmutableMatrix([[0, 3], [0, 7]])
+M + M1
+```
+
+```
+M*M1
+```
+
+```
+3*M
+```
+
+```
+M^2
+```
+
+```
+M^-1
+```
+
+```
+M1^-1
+```
+
+
+* There is no broadcasting defined for the `SymMatrix` type.
 
 -----
 
@@ -296,7 +431,7 @@ To take the transpose of a Matrix, use `T`.
 ##### In `Julia`:
 
 ```
-M = sympy.Matrix([[1, 2, 3], [4, 5, 6]])
+M = Sym[1 2 3; 4 5 6]
 M
 ```
 
@@ -364,6 +499,12 @@ sympy.zeros(2, 3)
 zeros(Sym(2), 3)
 ```
 
+*or* use the `Julia` constructor:
+
+```
+zeros(Sym, 2, 3)
+```
+
 ----
 
 Similarly, `ones` creates a matrix of ones.
@@ -425,6 +566,14 @@ sympy.diag(1, 2, 3)
 sympy.diag(-1, sympy.ones(2, 2), sympy.Matrix([5, 7, 5]))
 ```
 
+* The first one, could also use `Julia`'s `diagm` function:
+
+```
+using LinearAlgebra
+diagm(0 => Sym[1,2,3])
+```
+
+
 ----
 
 ## Advanced Methods
@@ -450,13 +599,36 @@ To compute the determinant of a matrix, use `det`.
 ##### In `Julia`:
 
 ```
-M = sympy.Matrix([[1, 0, 1], [2, -1, 3], [4, 3, 2]])
+using LinearAlgebra
+M = Sym[1 0 1; 2 -1 3; 4 3 2]
 M
 ```
 
 ```
 M.det()
 ```
+
+
+Let
+
+```
+@vars x
+A = Sym[x 1; 1 x]
+```
+
+Then we can compute the determinant using `Julia`'s generic implementation:
+
+```
+det(A)
+```
+
+*or* using SymPy's:
+
+```
+A.det()
+```
+
+The answer is identical, though not necessarily being done in a similar manner.
 
 
 
@@ -486,7 +658,7 @@ second is a tuple of indices of the pivot columns.
 ##### In `Julia`:
 
 ```
-M = sympy.Matrix([[1, 0, 1, 3], [2, 3, 4, 7], [-1, -3, -3, -4]])
+M = Sym[1 0 1 3; 2 3 4 7; -1 -3 -3 -4]
 M
 ```
 
@@ -527,9 +699,10 @@ To find the nullspace of a matrix, use `nullspace`. `nullspace` returns a
 
 ##### In `Julia`:
 
+* the list is mapped to an array of vectors, otherwise this is identical:
 
 ```
-M = sympy.Matrix([[1, 2, 3, 0, 0], [4, 10, 0, 0, 1]])
+M = Sym[1 2 3 0 0; 4 10 0 0 1]
 M
 ```
 
@@ -563,8 +736,10 @@ To find the columnspace of a matrix, use `columnspace`. `columnspace` returns a
 
 ##### In `Julia`:
 
+* as with `nullspace`, the return value is a vector of vectors:
+
 ```
-M = sympy.Matrix([[1, 1, 2], [2 ,1 , 3], [3 , 1, 4]])
+M = Sym[1 1 2; 2 1 3; 3 1 4]
 M
 ```
 
@@ -598,7 +773,7 @@ output of :ref:`roots <tutorial-roots>`).
 ##### In `Julia`:
 
 ```
-M = sympy.Matrix([[3, -2,  4, -2], [5,  3, -3, -2], [5, -2,  2, -2], [5, -2, -3,  3]])
+M = Sym[3 -2  4 -2; 5  3 -3 -2; 5 -2  2 -2; 5 -2 -3  3]
 M
 ```
 
@@ -631,8 +806,16 @@ returns a list of tuples of the form `(eigenvalue:algebraic multiplicity,
 
 * the output is less than desirable, as there is no special `show` method
 
+* the `eigvals` and `eigvecs` methods present the output in the manner that `Julia`'s generic functions do:
+
 ```
 M.eigenvects()
+```
+
+compare with
+
+```
+eigvecs(M)
 ```
 
 
@@ -724,11 +907,11 @@ expensive to calculate.
 
 ##### In `Julia`:
 
-* note missing `b` here:
+* note missing `b` is not needed with `Julia`:
 
 ```
-lamda = symbols("lamda")
-p = M.charpoly(lamda)
+lambda = symbols("lambda")
+p = M.charpoly(lambda)
 factor(p)
 ```
 
@@ -784,10 +967,10 @@ Here is an example of solving an issue caused by undertested zero.
 
 ```
 q = sympy.Symbol("q", positive = true)
-m = sympy.Matrix([
-[-2*cosh(q/3),      exp(-q),            1],
-[      exp(q), -2*cosh(q/3),            1],
-[           1,            1, -2*cosh(q/3)]])
+m = Sym[
+-2*cosh(q/3)      exp(-q)            1;
+      exp(q) -2*cosh(q/3)            1;
+           1            1 -2*cosh(q/3)]
 m.nullspace()
 ```
 
@@ -916,3 +1099,7 @@ SymPy issue tracker [#sympyissues-fn]_ to get detailed help from the community.
 * [#matlabzero-fn] How matlab tests zero https://www.mathworks.com/help/symbolic/mupad_ref/iszero.html
 
 * [#sympyissues-fn] https://github.com/sympy/sympy/issues
+
+----
+
+[return to index](./index.html)

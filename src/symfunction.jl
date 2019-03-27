@@ -12,10 +12,7 @@ mutable struct SymFunction <: SymbolicObject
     n::Int
 end
 
-
-
-
-Base.show(io::IO, u::SymFunction) = println("$(string(Sym(u.x)))" * repeat("'", u.n))
+Base.show(io::IO, u::SymFunction) = print(io, "$(string(Sym(u.x)))" * repeat("'", u.n))
 
 """
 

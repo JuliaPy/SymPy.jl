@@ -20,18 +20,18 @@ using Test
     u = SymFunction("u")
     a, x, y, y0, y1 = symbols("a, x, y, y0, y1")
 
-    @test dsolve(u'(x) - a*u(x), x, (u, 0, 1)) == Eq(u(x), exp(a*x))
-    @test dsolve(u'(x) - a*u(x), x, (u, 0, y1)) == Eq(u(x), y1*exp(a*x))
-    dsolve(u'(x) - a*u(x), x, (u, y0, y1)) # == Eq(u(x), y1 * exp(a*(x - y0)))
-    dsolve(x*u'(x) + x*u(x) + 1, x, (u, 1, 1))
-    dsolve((u'(x))^2 - a*u(x), x, (u, 0, 1))
-    dsolve(u''(x) - a * u(x), x, (u, 0, 1), (u', 0, 0))
+    @test dsolve(u'(x) - a*u(x), u(x), ics=(u, 0, 1)) == Eq(u(x), exp(a*x))
+    @test dsolve(u'(x) - a*u(x), u(x), ics=(u, 0, y1)) == Eq(u(x), y1*exp(a*x))
+    dsolve(u'(x) - a*u(x), u(x), ics=(u, y0, y1)) # == Eq(u(x), y1 * exp(a*(x - y0)))
+    dsolve(x*u'(x) + x*u(x) + 1, u(x), ics=(u, 1, 1))
+    dsolve((u'(x))^2 - a*u(x), u(x), ics=(u, 0, 1))
+    dsolve(u''(x) - a * u(x), u(x), ics=((u, 0, 1), (u', 0, 0)))
 
     F, G, K = SymFunction("F, G, K")
     eqn = F(x)*u'(y)*y + G(x)*u(y) + K(x)
-    dsolve(eqn, y, (u, 1, 0))
+    dsolve(eqn, u(y), ics=(u, 1, 0))
 
     ## dsolve eqn has two answers, but we want to eliminate one
     # based on initial condition
-    dsolve(u'(x) - (u(x)-1)*u(x)*(u(x)+1), x, (u, 0, 1//2))
+    dsolve(u'(x) - (u(x)-1)*u(x)*(u(x)+1), u(x), ics=(u, 0, 1//2))
 end

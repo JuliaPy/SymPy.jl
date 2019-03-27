@@ -784,3 +784,5 @@ sympy.apply_finite_diff(1, x_list, y_list, 0)
 ```
 
 ----
+
+[return to index](./index.html)

@@ -56,5 +56,5 @@ sympify(s, args...; kwargs...) = sympy.sympify(s, args...; kwargs...)
 
 
 SymMatrix(s::SymMatrix) = s
-SymMatrix(s::Sym) = sympy.Matrix([s])
-SymMatrix(A::Matrix) = sympy.Matrix([A[i,:] for i in 1:size(A)[1]])
+SymMatrix(s::Sym) = sympy.ImmutableMatrix([s])
+SymMatrix(A::Matrix) = sympy.ImmutableMatrix([A[i,:] for i in 1:size(A)[1]])

@@ -197,11 +197,9 @@ linsolve(system, x, y, z)
 
 ----
 
-```
-note("""
-   The order of solution corresponds the order of given symbols.
-""")
-```
+!!! note
+
+    The order of solution corresponds the order of given symbols.
 
 In the `solveset` module, the non linear system of equations is solved using
 `nonlinsolve`. Following are examples of `nonlinsolve`.
@@ -218,9 +216,11 @@ In the `solveset` module, the non linear system of equations is solved using
 
 ##### In `Julia`:
 
+* we pass `[a,b]` as either `a, b` or using a tuple, as in `(a,b)`, but *not* as a vector, as this gets mapped into a vector of symbolic objects which causes issues with `nonlinsolve`:
+
 ```
 a, b, c, d = symbols("a, b, c, d", real=true)
-nonlinsolve([a^2 + a, a - b], [a, b])
+nonlinsolve([a^2 + a, a - b], a, b)
 ```
 
 ```
@@ -239,7 +239,7 @@ nonlinsolve([x*y - 1, x - 2], x, y)
 ##### In `Julia`:
 
 ```
-nonlinsolve([x^2 + 1, y^2 + 1], [x, y])
+nonlinsolve([x^2 + 1, y^2 + 1], (x, y))
 ```
 
 ----
@@ -265,11 +265,12 @@ nonlinsolve([x^2 + 1, y^2 + 1], [x, y])
 
 ##### In `Julia`:
 
-* we must remove the spaces within `[]`:
+* we must remove the spaces within `[]`
+* we must pass vars as a tuple:
 
 ```
 system = [x^2-2*y^2-2, x*y-2]
-vars = [x, y]
+vars = (x, y)
 nonlinsolve(system, vars)
 ```
 
@@ -286,7 +287,7 @@ real_soln = (log(sin(S(1)/3)), S(1)/3)
 img_lamda = sympy.Lambda(n, 2*n*IM*PI + sympy.Mod(log(sin(S(1)/3)), 2*IM*PI))
 complex_soln = (sympy.ImageSet(img_lamda, S.Integers), S(1)/3)
 soln = sympy.FiniteSet(real_soln, complex_soln)
-nonlinsolve(system, [x, y]) == soln
+nonlinsolve(system, (x, y)) == soln
 ```
 
 ----
@@ -305,13 +306,15 @@ infinitely many solutions is said to be positive-dimensional):
 
 ##### In `Julia`:
 
+* again, we use a tuple for the variables:
+
 ```
-nonlinsolve([x*y, x*y-x], [x, y])
+nonlinsolve([x*y, x*y-x], (x, y))
 ```
 
 ```
 system = [a^2+a*c, a-b]
-nonlinsolve(system, [a, b])
+nonlinsolve(system, (a, b))
 ```
 
 
@@ -387,7 +390,7 @@ solveset(x^3 - 6*x^2 + 9*x, x)
 ```
 
 ```
-roots(x^3 - 6*x^2 + 9*x, x)
+roots(x^3 - 6*x^2 + 9*x, x)  |>  d -> convert(Dict{Sym, Any}, d) # prettier priting
 ```
 
 ----
@@ -505,6 +508,8 @@ To solve the ODE, pass it and the function to solve for to `dsolve`.
 
 ##### In `Julia`:
 
+* we use `dsolve` for initial value proplems
+
 ```
 dsolve(diffeq, f(x))
 ```
@@ -536,9 +541,7 @@ The arbitrary constants in the solutions from dsolve are symbols of the form
 ## Julia alternative interface
 
 
-```
-note("This may change")
-```
+
 
 `SymPy.jl` adds a `SymFunction` class, that makes it a bit easier to set up a differential equation, though not as general.
 
@@ -562,3 +565,27 @@ Or:
 ```
 dsolve(f'(x)*(1 - sin(f(x))), f(x))
 ```
+
+This interface allows a different specification of initial conditions than does `sympy.dsolve`.
+
+For the initial condition `f'(x0) = y0`, this would be specified with a tuple `(f', x0, y0)`.
+
+For example, to solve the exponential equation $f'(x) = f(x), f(0) = a$ we would have:
+
+```
+f = SymFunction("f")
+x, a = symbols("x, a")
+dsolve(f'(x) - f(x), f(x), ics = (f, 0, a))
+```
+
+To solve the simple harmonic equation, where two initial conditions are specified, we combine the tuple for each within another tuple:
+
+```
+ics = ((f, 0, 1), (f', 0, 2))
+dsolve(f''(x) - f(x), f(x), ics=ics)
+```
+
+
+----
+
+[return to index](./index.html)

@@ -176,7 +176,7 @@ import PyCall
 
     ## linsolve
     M=Sym[1 2 3; 2 3 4]
-    as = linsolve(convert(SymMatrix, M), x, y)
+    as = linsolve(M, x, y)
     @test length(elements(as)) == 1
     @vars a b; eqs = (a*x+2y-3, 2b*x + 3y - 4)
     as = linsolve(eqs, x, y)
@@ -439,9 +439,9 @@ import PyCall
 
     ## test cse output
     @test cse(x) == (Any[], Sym[x])
-    @test sympy.cse([x]) == (Any[], [convert(SymMatrix,[x])])
-    @test sympy.cse([x, x]) == (Any[],  [convert(SymMatrix, [x, x])] )
-    @test sympy.cse([x x; x x]) == (Any[], [convert(SymMatrix, [x x; x x])])
+    @test sympy.cse([x]) == (Any[], [reshape([x],1,1)])
+    @test sympy.cse([x, x]) == (Any[],  [reshape([x,x], 2, 1)] )
+    @test sympy.cse([x x; x x]) == (Any[], [[x x; x x]])
 
     ## sympy"..."(...)
     ## removed
@@ -466,12 +466,12 @@ end
     lambdify(sin(x)*cos(2x) * exp(x^2/2))
     fn = lambdify(sin(x)*asin(x)*sinh(x)); fn(0.25)
     lambdify(real(x)*imag(x))
-    #    @test lambdify(Min(x,y))(3,2) == 2
+    @test lambdify(Min(x,y))(3,2) == 2
 
     ex = 2 * x^2/(3-x)*exp(x)*sin(x)*sind(x)
     fn = lambdify(ex); map(fn, rand(10))
     ex = x - y
-    #@test lambdify(ex)(3,2) == 1
+    @test lambdify(ex, (x,y))(3,2) == 1
 
     Indicator(x, a, b) = sympy.Piecewise((1, Lt(x, b) & Gt(x,a)), (0, Le(x,a)), (0, Ge(x,b)))
     i = Indicator(x, 0, 1)
@@ -494,7 +494,7 @@ end
 
     ## issue #103 # this does not work for `x` (which has `classname(x) == "Symbol"`), but should work for other expressions
     for ex in (sin(x), x*y^2*x, sqrt(x^2 - 2y))
-        @test func(ex)(args(ex)...) == ex
+        @test SymPy.Introspection.func(ex)(SymPy.Introspection.args(ex)...) == ex
     end
 
     ## properties (Issue #119)
@@ -543,7 +543,7 @@ end
     @vars rho phi theta real=true
     xs = [rho*cos(theta)*sin(phi), rho*sin(theta)*sin(phi), rho*cos(phi)]
     J = [diff(x, u) for x in xs, u in (rho, phi, theta)]
-    det(J)
+    J.det()
 
 
 end

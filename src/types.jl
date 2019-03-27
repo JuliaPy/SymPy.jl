@@ -10,12 +10,13 @@ end
 
 
 ## Matrices
-## mutable so setindex! can work
+## We use this class for `ImmutableMatrices`
+## Mutable matrices are mapped to `AbstractArray{Sym,N}`
 ## cf. matrix.jl
 """
     SymMatrix
 
-Type to store a SymPy matrix, as created by `sympy.Matrix`.
+Type to store a SymPy matrix, as created by `sympy.ImmutableMatrix`.
 
 These have 0-based indexing defined for them to match SymPy
 

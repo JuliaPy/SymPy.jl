@@ -91,11 +91,17 @@ function __init__()
 
 
     ## mappings from PyObjects to types.
+    ## order here is fussy, as we needed ImmutableMatrix before Basic
+    pytype_mapping(sympy.ImmutableMatrix, SymMatrix)
+    pytype_mapping(sympy.ImmutableDenseMatrix, SymMatrix)
+
     basictype = sympy.basic.Basic
     pytype_mapping(basictype, Sym)
-    pytype_mapping(sympy.Matrix, SymMatrix)
-    pytype_mapping(sympy.FiniteSet, Set)
 
+    pytype_mapping(sympy.Matrix, Array{Sym})
+    pytype_mapping(sympy.matrices.MatrixBase, Array{Sym})
+
+    pytype_mapping(sympy.FiniteSet, Set)
 
     pytype_mapping(sympy.combinatorics.permutations.Permutation, SymPermutation)
     pytype_mapping(combinatorics.perm_groups.PermutationGroup, SymPermutationGroup)
@@ -108,13 +114,32 @@ function __init__()
         pytype_mapping(mpctype, Complex{BigFloat})
     end
 
+
+
     ## is this a good idea?
     ## could leave this out
     import_sympy()
 
 end
 
-## Import all from sympy, mpmath
+"""
+    import_sympy
+
+This method imports all functions from both `mpmath` and `sympy` as well as the relational operators, which
+don't get swept up by `import_from`.
+
+These functions are specialized on their first argument being of type `SymbolicObject`.
+
+It checks a few modules for namespace collisions.
+
+If a function naturally takes an non-Symbolic argument as a first argument, then it can be qualified: e.g.
+`sympy.sin(2)` (as opposed to `sin(Sym(2))`).
+
+If a constructor is needed (which is not a function) then it must be
+qualified. (E.g. `sympy.Function("F")`, though for this particular
+case, there is `SymFunction` defined for convenience.)
+
+"""
 function import_sympy()
     if mpmath != PyCall.PyNULL()
         import_from(mpmath)

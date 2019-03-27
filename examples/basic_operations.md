@@ -167,12 +167,10 @@ x
 
 ----
 
-> Quick Tip
-```
-note("""
+!!! note "Quick Tip"
+
    SymPy expressions are immutable.  No function will change them in-place.
-""")
-```
+
 
 Here, we see that performing `expr.subs(x, 0)` leaves `expr` unchanged.
 In fact, since SymPy expressions are immutable, no function will change them
@@ -257,11 +255,9 @@ expr.subs(x, 2)
 
 ----
 
-```
-alert("""
-`sympify` uses `eval`.  Don't use it on unsanitized input.
-""")
-```
+!!! note "Alert:"
+
+    `sympify` uses `eval`.  Don't use it on unsanitized input.
 
 ## `evalf`
 
@@ -277,12 +273,30 @@ To evaluate a numerical expression into a floating point number, use
 
 ##### In `Julia`:
 
-We must use a symbolic value for `8`:
+* We must use a symbolic value for `8`:
 
 ```
 expr = sqrt(Sym(8))
 expr.evalf()
 ```
+
+!!! note "N"
+
+    More importantly, `SymPy.jl` treats `N` differently from
+    `evalf`. `N` is used to convert a SymPy numeric (or Boolean) value
+    to a `Julia`n counterpart. The main difference between `N(x)` and
+    `convert(T, x)`, is that rather than specify the `Julia` type as
+    `T`, `N` works to guess the appropriate type for the `SymPy`
+    object.
+
+```
+N(sqrt(8))   # brings back as BigFloat
+```
+
+```
+N(sqrt(9))   # an Int
+```
+
 
 ----
 
@@ -457,3 +471,8 @@ fn(0)
 !!! note "TODO"
 
     Write an advanced numerics section
+
+
+----
+
+[return to index](./index.html)

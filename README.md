@@ -94,20 +94,33 @@ the math constant is coerced to a floating point value before it
 encounters a symbolic object. It is better to just use the symbolic
 value `PI`, an alias for `sympy.pi` used above.)
 
-However, for some tasks the `PyCall` interface is still needed, as
-only a portion of the `SymPy` interface is exposed. To call an
-underlying SymPy method, the `getproperty` method is overloaded so
-that `ex.meth_name(...)` dispatches the method of the object and
-`sympy.meth_name(...)` calls a function in the SymPy module.
 
-For example, we could have been more explicit and used:
+----
+
+
+SymPy has a mix of function calls (as in `sin(x)`) and method calls (as in `y.subs(x,1)`). The function calls are from objects in the base `sympy` class. When `SymPy` is loaded, the function calls in `sympy` are imported as functions specialized on their first argument being a symbolic object, as constructed by `Sym` or `sympify`. So, these two are different, the latter dispatching to the `sin` function, `sympy.sin`, of SymPy and returning a symbolic value.
 
 ```
-y = sympy.sin(pi * x)
+sin(1), sin(Sym(1))
+```
+
+The latter effectively dispatches to
+
+```
+sympy.sin(1)
+```
+
+which does not require a symbolic first argument.
+
+
+Symbolic values have python's dot-call syntax defined, so that methods can be called as they would within SymPy or Python. Such as:
+
+```
+@vars x
+y = sin(pi(x))
 y.subs(x, 1)
 ```
 
-As calling the underlying SymPy function is not difficult, the
-interface exposed through overloading `Julia`'s methods attempts to
-keep similar functionality to the familiar `Julia` method when there is
-a discrepancy between conventions.
+Classes and other objects from SymPy are not brought in by default,
+and can be accessed using qualification, as in `sympy.Function` (used
+to define symbolic functions).

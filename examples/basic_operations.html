@@ -192,15 +192,7 @@ expr(x => 0)</pre>
 <div class="well well-sm">
 \begin{equation*}x\end{equation*}</div>
 
-<hr /><blockquote>
-<p>Quick Tip</p>
-</blockquote><div class="alert alert-info" role="alert">
-
-<div class="markdown"><p>SymPy expressions are immutable.  No function will change them in-place.</p>
-</div>
-
-</div>
-<p>Here, we see that performing <code>expr.subs&#40;x, 0&#41;</code> leaves <code>expr</code> unchanged. In fact, since SymPy expressions are immutable, no function will change them in-place.  All functions will return new expressions.</p><p>To perform multiple substitutions at once, pass a list of <code>&#40;old, new&#41;</code> pairs to <code>subs</code>.</p><pre class="sourceCode julia">    >>> expr = x**3 + 4*x*y - z
+<hr /><div class="admonition note"><p class="admonition-title">Quick Tip</p></div><p>SymPy expressions are immutable.  No function will change them in-place.</p><p>Here, we see that performing <code>expr.subs&#40;x, 0&#41;</code> leaves <code>expr</code> unchanged. In fact, since SymPy expressions are immutable, no function will change them in-place.  All functions will return new expressions.</p><p>To perform multiple substitutions at once, pass a list of <code>&#40;old, new&#41;</code> pairs to <code>subs</code>.</p><pre class="sourceCode julia">    >>> expr = x**3 + 4*x*y - z
     >>> expr.subs([(x, 2), (y, 4), (z, 0)])
     40</pre>
 <h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = x^3 + 4*x*y - z
@@ -238,19 +230,26 @@ expr</pre>
 <div class="well well-sm">
 \begin{equation*}\frac{19}{2}\end{equation*}</div>
 
-<hr /><div class="alert alert-success" role="alert">
-
-<div class="markdown"><p><code>sympify</code> uses <code>eval</code>.  Don't use it on unsanitized input.</p>
-</div>
-
-</div>
-<h2><code>evalf</code></h2><p>To evaluate a numerical expression into a floating point number, use <code>evalf</code>.</p><pre class="sourceCode julia">    >>> expr = sqrt(8)
+<hr /><div class="admonition note"><p class="admonition-title">Alert:</p><p><code>sympify</code> uses <code>eval</code>.  Don't use it on unsanitized input.</p>
+</div><h2><code>evalf</code></h2><p>To evaluate a numerical expression into a floating point number, use <code>evalf</code>.</p><pre class="sourceCode julia">    >>> expr = sqrt(8)
     >>> expr.evalf()
     2.82842712474619</pre>
-<h5>In <code>Julia</code>:</h5><p>We must use a symbolic value for <code>8</code>:</p><pre class="sourceCode julia">expr = sqrt(Sym(8))
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>We must use a symbolic value for <code>8</code>:</p>
+</li>
+</ul><pre class="sourceCode julia">expr = sqrt(Sym(8))
 expr.evalf()</pre>
 <div class="well well-sm">
 \begin{equation*}2.82842712474619\end{equation*}</div>
+
+<div class="admonition note"><p class="admonition-title">N</p><p>More importantly, <code>SymPy.jl</code> treats <code>N</code> differently from <code>evalf</code>. <code>N</code> is used to convert a SymPy numeric (or Boolean) value to a <code>Julia</code>n counterpart. The main difference between <code>N&#40;x&#41;</code> and <code>convert&#40;T, x&#41;</code>, is that rather than specify the <code>Julia</code> type as <code>T</code>, <code>N</code> works to guess the appropriate type for the <code>SymPy</code> object.</p>
+</div><pre class="sourceCode julia">N(sqrt(8))   # brings back as BigFloat</pre>
+<pre class="output">
+2.8284271247461903</pre>
+
+<pre class="sourceCode julia">N(sqrt(9))   # an Int</pre>
+<pre class="output">
+3.0</pre>
 
 <hr /><p>SymPy can evaluate floating point expressions to arbitrary precision.  By default, 15 digits of precision are used, but you can pass any number as the argument to <code>evalf</code>.  Let's compute the first 100 digits of <code>\pi</code>.</p><pre class="sourceCode julia">    >>> pi.evalf(100)
 3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068</pre>
@@ -351,7 +350,7 @@ fn(0)</pre>
 1.0</pre>
 
 <hr /><div class="admonition note"><p class="admonition-title">TODO</p><p>Write an advanced numerics section</p>
-</div>
+</div><hr /><p><a href="./index.html">return to index</a></p>
   </div>
 </div>
 

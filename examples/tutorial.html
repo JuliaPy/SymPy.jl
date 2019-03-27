@@ -157,14 +157,9 @@ ex.subs((x,1), (y,pi))</pre>
 <div class="well well-sm">
 \begin{equation*}x + y + z\end{equation*}</div>
 
-<div class="alert alert-info" role="alert">
-
-<div class="markdown"><p>The calling pattern for <code>subs</code> is different from a typical <code>Julia</code> function call. The <code>subs</code> call is <code>object.method&#40;arguments&#41;</code> whereas a more "<code>Julia</code>n" function call is <code>method&#40;objects, other objects....&#41;</code>, as <code>Julia</code> offers multiple dispatch of methods. <code>SymPy</code> uses the Python calling method, adding in <code>Julia</code>n style when appropriate for generic usage within <code>Julia</code>. In addition, <code>SymPy</code> imports all functions from the underlying <code>sympy</code> module and specializes them on a symbolic first argument.</p>
+<div class="admonition note"><p class="admonition-title">Note</p><p>The calling pattern for <code>subs</code> is different from a typical <code>Julia</code> function call. The <code>subs</code> call is <code>object.method&#40;arguments&#41;</code> whereas a more "<code>Julia</code>n" function call is <code>method&#40;objects, other objects....&#41;</code>, as <code>Julia</code> offers multiple dispatch of methods. <code>SymPy</code> uses the Python calling method, adding in <code>Julia</code>n style when appropriate for generic usage within <code>Julia</code>. In addition, <code>SymPy</code> imports all functions from the underlying <code>sympy</code> module and specializes them on a symbolic first argument.</p>
 <p>For <code>subs</code>, the simple substitution <code>ex.object&#40;x,a&#41;</code> is similar to simple function evaluation, so <code>Julia</code>'s call notation will work. To specify the pairing off of <code>x</code> and <code>a</code>, the <code>&#61;&gt;</code>  pairs notation is used.</p>
-</div>
-
-</div>
-<p>This calling style will be equivalent to the last:</p><pre class="sourceCode julia">ex(x=>1, y=>pi)</pre>
+</div><p>This calling style will be equivalent to the last:</p><pre class="sourceCode julia">ex(x=>1, y=>pi)</pre>
 <div class="well well-sm">
 \begin{equation*}z + 4.14159265358979\end{equation*}</div>
 
@@ -329,13 +324,8 @@ q.coeffs()</pre>
 <div class="well well-sm">
 \[ \left[ \begin{array}{r}a\\b\\c\end{array} \right] \]</div>
 
-<div class="alert alert-info" role="alert">
-
-<div class="markdown"><p>The <code>Poly</code> constructor from SymPy is <em>not</em> a function, so is not exported when <code>SymPy</code> is loaded. To access it, the object must be qualified by its containing module, in this case <code>Poly</code>. Were it to be used frequently, an alias could be used, as in <code>const Poly&#61;sympy.Poly</code> <em>or</em> the <code>import_from</code> function, as in <code>import_from&#40;sympy, :Poly&#41;</code>. The latter has some attempt to avoid naming collisions.</p>
-</div>
-
-</div>
-<h2>Polynomial roots: solve, real_roots, polyroots, nroots</h2><p>SymPy provides functions to find the roots of a polynomial. In general, a polynomial with real coefficients of degree $n$ will have $n$ roots when multiplicities and complex roots are accounted for. The number of real roots is consequently between $0$ and $n$.</p><p>For a <em>univariate</em> polynomial expression (a single variable), the real roots, when available, are returned by <code>roots</code>. For example,</p><pre class="sourceCode julia">real_roots(x^2 - 2)</pre>
+<div class="admonition note"><p class="admonition-title">Note</p><p>The <code>Poly</code> constructor from SymPy is <em>not</em> a function, so is not exported when <code>SymPy</code> is loaded. To access it, the object must be qualified by its containing module, in this case <code>Poly</code>. Were it to be used frequently, an alias could be used, as in <code>const Poly&#61;sympy.Poly</code> <em>or</em> the <code>import_from</code> function, as in <code>import_from&#40;sympy, :Poly&#41;</code>. The latter has some attempt to avoid naming collisions.</p>
+</div><h2>Polynomial roots: solve, real_roots, polyroots, nroots</h2><p>SymPy provides functions to find the roots of a polynomial. In general, a polynomial with real coefficients of degree $n$ will have $n$ roots when multiplicities and complex roots are accounted for. The number of real roots is consequently between $0$ and $n$.</p><p>For a <em>univariate</em> polynomial expression (a single variable), the real roots, when available, are returned by <code>roots</code>. For example,</p><pre class="sourceCode julia">real_roots(x^2 - 2)</pre>
 <div class="well well-sm">
 \[ \left[ \begin{array}{r}- \sqrt{2}\\\sqrt{2}\end{array} \right] \]</div>
 
@@ -352,11 +342,11 @@ real_roots(p)</pre>
 <pre class="output">
 Dict{Any,Any} with 7 entries:
   1 => 1
-  -1/2 - sqrt(3)*I/2 => 1
   3 => 2
+  -1/2 + sqrt(3)*I/2 => 1
   0 => 1
   -1 => 1
-  -1/2 + sqrt(3)*I/2 => 1
+  -1/2 - sqrt(3)*I/2 => 1
   2 => 1</pre>
 
 <p>When exact answers are not provided, the <code>roots</code> call is contentless:</p><pre class="sourceCode julia">p = x^5 - x + 1
@@ -371,11 +361,11 @@ Dict{Any,Any} with 0 entries</pre>
 <p>But in fact, <code>rts</code> contains lots of information. We can extract numeric values quite easily with <code>N</code>:</p><pre class="sourceCode julia">N.(rts)</pre>
 <pre class="output">
 5-element Array{Number,1}:
-                                                                                   -1.167303978261418684256045899854842180720560371525489039140082449275651903429536     
- -0.1812324444698754000000000000000000000000000000000000000000000000000000000000002 - 1.083954101317711000000000000000000000000000000000000000000000000000000000000005im 
- -0.1812324444698754000000000000000000000000000000000000000000000000000000000000002 + 1.083954101317711000000000000000000000000000000000000000000000000000000000000005im 
-  0.7648844336005846999999999999999999999999999999999999999999999999999999999999979 - 0.3524715460317263000000000000000000000000000000000000000000000000000000000000007im
-  0.7648844336005846999999999999999999999999999999999999999999999999999999999999979 + 0.3524715460317263000000000000000000000000000000000000000000000000000000000000007im</pre>
+                     -1.167303978261418684256045899854842180720560371525489039140082449275651903429536
+ -0.18123244446987538 - 1.0839541013177107im                                                          
+ -0.18123244446987538 + 1.0839541013177107im                                                          
+   0.7648844336005847 - 0.35247154603172626im                                                         
+   0.7648844336005847 + 0.35247154603172626im                                                         </pre>
 
 <p>These are numeric approximations to irrational values. For numeric approximations to polynomial roots, the <code>nroots</code> function is also provided, though with this call the answers are still symbolic:</p><pre class="sourceCode julia">nroots(p)</pre>
 <div class="well well-sm">
@@ -450,8 +440,8 @@ d = solve(exs, [a,b,c])</pre>
 <pre class="output">
 Dict{Any,Any} with 3 entries:
   c => 1
-  b => (4*cos(h) - cos(2*h) - 3)/(2*h)
-  a => (-2*cos(h) + cos(2*h) + 1)/(2*h^2)</pre>
+  a => (-2*cos(h) + cos(2*h) + 1)/(2*h^2)
+  b => (4*cos(h) - cos(2*h) - 3)/(2*h)</pre>
 
 <p>Again, a dictionary is returned. The polynomial itself can be found by substituting back in for <code>a</code>, <code>b</code>, and <code>c</code>:</p><pre class="sourceCode julia">quad_approx = p.subs(d)</pre>
 <div class="well well-sm">
@@ -628,7 +618,7 @@ y^4 - x^4 -y^2 + 2x^2 = 0
 ~$$
 <p>As with the mathematical solution, the key is to treat one of the variables as depending on the other. In this case, we think of $y$ locally as a function of $x$. SymPy allows us to create symbolic functions, and we will use one to substitute in for <code>y</code>.</p><p>In SymPy, symbolic functions use the class name  "Function", but in <code>SymPy</code> we use <code>SymFunction</code> to avoid a name collision with one of <code>Julia</code>'s primary types. The constructor can be used as <code>SymFunction&#40;:F&#41;</code>:</p><pre class="sourceCode julia">F, G = SymFunction("F"), SymFunction("G")</pre>
 <pre class="output">
-(, )</pre>
+(F, G)</pre>
 
 <p>We can call these functions, but we get a function expression:</p><pre class="sourceCode julia">F(x)</pre>
 <div class="well well-sm">
@@ -810,22 +800,19 @@ Sym[diff(ex,var) for var in (x,y)]</pre>
 
 <p>For this task, SymPy provides the <code>hessian</code> method:</p><pre class="sourceCode julia">hessian(ex, (x,y))</pre>
 <div class="well well-sm">
-\begin{equation*}\left[\begin{matrix}2 y & 2 x - 2 y\\2 x - 2 y & - 2 x\end{matrix}\right]\end{equation*}</div>
+\[\left[ \begin{array}{rr}2 y&2 x - 2 y\\2 x - 2 y&- 2 x\end{array}\right]\]</div>
 
-<h2>Matrices</h2><p><code>Julia</code> has excellent infrastructure to work with generic matrices, such as <code>Matrix&#123;Sym&#125;</code> objects (matrices with symbolic entries). As well, SymPy has a class for matrices. <code>SymPy</code> supports both, the latter with $0$-based indexing and type <code>SymMatrix</code>.</p><p>Constructing matrices with symbolic entries follows <code>Julia</code>'s conventions:</p><pre class="sourceCode julia">x,y = symbols("x,y")
+<h2>Matrices</h2><p><code>Julia</code> has excellent infrastructure to work with generic matrices, such as <code>Matrix&#123;Sym&#125;</code> objects (matrices with symbolic entries). As well, SymPy has a class for matrices. <code>SymPy</code>, through <code>PyCall</code>, automatically maps mutable SymPy matrices into <code>Julia</code>n matrices of type <code>Array&#123;Sym&#125;</code>.</p><p>Constructing matrices with symbolic entries follows <code>Julia</code>'s conventions:</p><pre class="sourceCode julia">x,y = symbols("x,y")
 M = [1 x; x 1]</pre>
 <div class="well well-sm">
 \[\left[ \begin{array}{rr}1&x\\x&1\end{array}\right]\]</div>
 
-<p>Construction symbolic matrices is done through the <code>Matrix</code> constructor, which must be qualified. It is passed a vector or row vectors:</p><pre class="sourceCode julia">A = sympy.Matrix([[1,x], [x, 1]])</pre>
+<p>Construction of symbolic matrices can <em>also</em> be done through the <code>Matrix</code> constructor, which must be qualified. It is passed a vector or row vectors but any symbolic values <em>must</em> be converted into <code>PyObject</code>s:</p><pre class="sourceCode julia">import PyCall: PyObject
+A = sympy.Matrix([[1,PyObject(x)], [PyObject(x), 1]])</pre>
 <div class="well well-sm">
-\begin{equation*}\left[\begin{matrix}1 & x\\x & 1\end{matrix}\right]\end{equation*}</div>
+\[\left[ \begin{array}{rr}1&x\\x&1\end{array}\right]\]</div>
 
-<p>We could also have converted <code>M</code> to get <code>A</code>:</p><pre class="sourceCode julia">convert(SymMatrix, M)</pre>
-<div class="well well-sm">
-\begin{equation*}\left[\begin{matrix}1 & x\\x & 1\end{matrix}\right]\end{equation*}</div>
-
-<pre class="sourceCode julia">diagm(0=>ones(Sym, 5))
+<p>(otherwise, an entry like <code>&#91;1,x&#93;</code> will be mapped to a <code>Vector&#123;Sym&#125;</code> prior to passing to <code>sympy.Matrix</code> and the processing get's done differently, and not as desired.)</p><p>This is useful if copying SymPy examples, but otherwise unneccesary, these are immediately mapped into <code>Julia</code> arrays by <code>PyCall. **Unless** an immutable array is desired, and then the</code>sympy.ImmutableMatrix<code>constructor is used. &#40;Though it is *still* necessary to convert symbolic values to</code>PyObject`s.)</p><pre class="sourceCode julia">diagm(0=>ones(Sym, 5))
 M^2
 det(M)</pre>
 <div class="well well-sm">
@@ -833,9 +820,13 @@ det(M)</pre>
 
 <p>Similarly,</p><pre class="sourceCode julia">A^2</pre>
 <div class="well well-sm">
-\begin{equation*}\left[\begin{matrix}x^{2} + 1 & 2 x\\2 x & x^{2} + 1\end{matrix}\right]\end{equation*}</div>
+\[\left[ \begin{array}{rr}x^{2} + 1&2 x\\2 x&x^{2} + 1\end{array}\right]\]</div>
 
-<pre class="sourceCode julia">A.det()</pre>
+<p>We can call <code>Julia</code>'s generic matrix functions in the usual manner, e.g:</p><pre class="sourceCode julia">det(A)</pre>
+<div class="well well-sm">
+\begin{equation*}- x^{2} + 1\end{equation*}</div>
+
+<p>We can also call SymPy's matrix methods using the dot-call syntax:</p><pre class="sourceCode julia">A.det()</pre>
 <div class="well well-sm">
 \begin{equation*}- x^{2} + 1\end{equation*}</div>
 
@@ -845,57 +836,30 @@ det(M)</pre>
 
 <p>As compared to SymPy's <code>eigenvects</code> which yields:</p><pre class="sourceCode julia">A.eigenvects()</pre>
 <pre class="output">
-2-element Array{Tuple{SymPy.Sym,Int64,Array{SymPy.SymMatrix,1}},1}:
- (-x + 1, 1, [SymPy.SymMatrix(PyObject Matrix([
-[-1],
-[ 1]]))])
- (x + 1, 1, [SymPy.SymMatrix(PyObject Matrix([
-[1],
-[1]]))])   </pre>
+2-element Array{Tuple{SymPy.Sym,Int64,Array{Array{SymPy.Sym,2},1}},1}:
+ (-x + 1, 1, [[-1; 1]])
+ (x + 1, 1, [[1; 1]])  </pre>
 
-<p>(This is a bit misleading, as the generic <code>eigvecs</code> fails on <code>M</code>, so the value is basically just repackaged from <code>A.eigenvects&#40;&#41;</code>.)</p><p>This example from the tutorial shows the <code>nullspace</code> function:</p><pre class="sourceCode julia">M = Sym[1 2 3 0 0; 4 10 0 0 1]
-A = convert(SymMatrix, M)
+<p>(This is a bit misleading, as the generic <code>eigvecs</code> fails on <code>M</code>, so the value is basically just repackaged from <code>A.eigenvects&#40;&#41;</code>.)</p><p>This example from the tutorial shows the <code>nullspace</code> function:</p><pre class="sourceCode julia">A = Sym[1 2 3 0 0; 4 10 0 0 1]
 vs = A.nullspace()</pre>
 <pre class="output">
-3-element Array{SymPy.SymMatrix,1}:
-      SymPy.SymMatrix(PyObject Matrix([
-[-15],
-[  6],
-[  1],
-[  0],
-[  0]]))
-                SymPy.SymMatrix(PyObject Matrix([
-[0],
-[0],
-[0],
-[1],
-[0]]))
- SymPy.SymMatrix(PyObject Matrix([
-[   1],
-[-1/2],
-[   0],
-[   0],
-[   1]]))</pre>
+3-element Array{Array{SymPy.Sym,2},1}:
+ [-15; 6; 1; 0; 0] 
+ [0; 0; 0; 1; 0]   
+ [1; -1/2; 0; 0; 1]</pre>
 
 <p>And this shows that they are indeed in the null space of <code>M</code>:</p><pre class="sourceCode julia">[A*vs[i] for i in 1:3]</pre>
 <pre class="output">
-3-element Array{SymPy.SymMatrix,1}:
- SymPy.SymMatrix(PyObject Matrix([
-[0],
-[0]]))
- SymPy.SymMatrix(PyObject Matrix([
-[0],
-[0]]))
- SymPy.SymMatrix(PyObject Matrix([
-[0],
-[0]]))</pre>
+3-element Array{Array{SymPy.Sym,2},1}:
+ [0; 0]
+ [0; 0]
+ [0; 0]</pre>
 
-<p>Symbolic expressions can be included in the matrices:</p><pre class="sourceCode julia">M = [1 x; x 1]
-A = convert(SymMatrix, M)
+<p>Symbolic expressions can be included in the matrices:</p><pre class="sourceCode julia">A = [1 x; x 1]
 P, D = A.diagonalize()  # M = PDP^-1
 A - P*D*inv(P)</pre>
 <div class="well well-sm">
-\begin{equation*}\left[\begin{matrix}0 & 0\\0 & 0\end{matrix}\right]\end{equation*}</div>
+\[\left[ \begin{array}{rr}0&0\\0&0\end{array}\right]\]</div>
 
 <h2>Differential equations</h2><p>SymPy has facilities for solving ordinary differential <a href="http://docs.sympy.org/latest/modules/solvers/ode.html">equations</a>. The key is to create a symbolic function expression using <code>SymFunction</code>. Again, this may be done through:</p><pre class="sourceCode julia">F = SymFunction("F")</pre>
 <div class="well well-sm">
@@ -905,11 +869,11 @@ A - P*D*inv(P)</pre>
 <div class="well well-sm">
 \begin{equation*}F{\left (x \right )} - 2 \frac{d}{d x} F{\left (x \right )} + \frac{d^{2}}{d x^{2}} F{\left (x \right )} = \sin{\left (x \right )}\end{equation*}</div>
 
-<p>With this, we just need the <code>dsolve</code> function. This is called as <code>dsolve&#40;eq&#41;</code>:</p><pre class="sourceCode julia">ex = sympy.dsolve(diffeq, F(x))</pre>
+<p>With this, we just need the <code>dsolve</code> function. This is called as <code>dsolve&#40;eq&#41;</code> or <code>dsolve&#40;eq, F&#40;x&#41;&#41;</code>:</p><pre class="sourceCode julia">ex = dsolve(diffeq, F(x))</pre>
 <div class="well well-sm">
 \begin{equation*}F{\left (x \right )} = \left(C_{1} + C_{2} x\right) e^{x} + \frac{\cos{\left (x \right )}}{2}\end{equation*}</div>
 
-<p>(We can use just <code>dsolve</code> here, but will reserve that for initial-value problems, where <code>SymPy</code> provides a convenient interface for some problems.)</p><p>The <code>dsolve</code> function in SymPy has an extensive list of named arguments to control the underlying algorithm. These can be passed through with the appropriate keyword arguments.</p><p>More clearly, the <code>SymFunction</code> objects have the <code>&#39;</code> method defined to find a derivative, so the above could also have been:</p><pre class="sourceCode julia">diffeq = F''(x) - 2F'(x) + F(x) - sin(x)
+<p>The <code>dsolve</code> function in SymPy has an extensive list of named arguments to control the underlying algorithm. These can be passed through with the appropriate keyword arguments. (To use SymPy's <code>ics</code> argument, the <code>sympy.dsolve</code> method must be called directly.)</p><p>More clearly, the <code>SymFunction</code> objects have the <code>&#39;</code> method defined to find a derivative, so the above could also have been:</p><pre class="sourceCode julia">diffeq = F''(x) - 2F'(x) + F(x) - sin(x)
 sympy.dsolve(diffeq, F(x))</pre>
 <div class="well well-sm">
 \begin{equation*}F{\left (x \right )} = \left(C_{1} + C_{2} x\right) e^{x} + \frac{\cos{\left (x \right )}}{2}\end{equation*}</div>
@@ -949,18 +913,18 @@ ex = Eq( (m/k)*v'(t), alpha^2 - v(t)^2 )</pre>
 <pre class="output">
 ("separable", "1st_power_series", "lie_group", "separable_Integral")</pre>
 
-<p>It is linear, but not solvable. Proceeding with <code>dsolve</code> gives:</p><pre class="sourceCode julia">sympy.dsolve(ex, v(t))</pre>
+<p>It is linear, but not solvable. Proceeding with <code>dsolve</code> gives:</p><pre class="sourceCode julia">dsolve(ex, v(t))</pre>
 <div class="well well-sm">
 \begin{equation*}v{\left (t \right )} = - \frac{\alpha}{\tanh{\left (\frac{\log{\left (e^{\alpha k \left(C_{1} - 2 t\right)} \right )}}{2 m} \right )}}\end{equation*}</div>
 
-<h3>Initial Value Problems</h3><p>Solving an initial value problem can be a bit tedious with <code>SymPy</code>. The first example shows the steps. This is because the <code>ics</code> argument for <code>dsolve</code> only works for a few types of equations. These do not include, by default, the familiar "book" examples, such as $y'(x) = a\cdot y(x)$.</p><p>To work around this, <code>SymPy.jl</code> extends the function <code>dsolve</code> to allow a specification of the initial conditions when solving.  The new ingredients are the independent variable (<code>x</code> in the examples) and tuples to specify each condition. The are conditions on the values of <code>u</code>, <code>u&#39;</code>', ....  To illustrate, we follow an example from <a href="https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html">Wolfram</a>.</p><pre class="sourceCode julia">y = SymFunction("y")
+<h3>Initial Value Problems</h3><p>Solving an initial value problem can be a bit tedious with <code>SymPy</code>. The first example shows the steps. This is because the <code>ics</code> argument for <code>sympy.dsolve</code> only works for a few types of equations. These do not include, by default, the familiar "book" examples, such as $y'(x) = a\cdot y(x)$.</p><p>To work around this, <code>SymPy.jl</code> extends the function <code>dsolve</code> to allow a specification of the initial conditions when solving.  Each initial condition is specified with 3-tuple. For example, <code>v&#40;t0&#41;&#61;v0</code> is specified with <code>&#40;v, t0, v0&#41;</code>.  The conditions on the values functions may use <code>v</code>, <code>v&#39;</code>, ... To illustrate, we follow an example from <a href="https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html">Wolfram</a>.</p><pre class="sourceCode julia">y = SymFunction("y")
 a, x = symbols("a,x")
 eqn = y'(x) - 3*x*y(x) - 1</pre>
 <div class="well well-sm">
 \begin{equation*}- 3 x y{\left (x \right )} + \frac{d}{d x} y{\left (x \right )} - 1\end{equation*}</div>
 
 <p>We solve the initial value problem with $y(0) = 4$ as follows:</p><pre class="sourceCode julia">x0, y0 = 0, 4
-out = dsolve(eqn, x, (y, x0, y0))</pre>
+out = dsolve(eqn, x, ics = (y, x0, y0))</pre>
 <div class="well well-sm">
 \begin{equation*}y{\left (x \right )} = \left(\frac{\sqrt{6} \sqrt{\pi} \operatorname{erf}{\left (\frac{\sqrt{6} x}{2} \right )}}{6} + 4\right) e^{\frac{3 x^{2}}{2}}\end{equation*}</div>
 
@@ -970,7 +934,7 @@ diff(u, x) - 3*x*u - 1</pre>
 \begin{equation*}0\end{equation*}</div>
 
 <p>To solve with a general initial condition is similar:</p><pre class="sourceCode julia">x0, y0 = 0, a
-out = dsolve(eqn, x, (y, x0, y0))</pre>
+out = dsolve(eqn, x, ics=(y, x0, y0))</pre>
 <div class="well well-sm">
 \begin{equation*}y{\left (x \right )} = \left(a + \frac{\sqrt{6} \sqrt{\pi} \operatorname{erf}{\left (\frac{\sqrt{6} x}{2} \right )}}{6}\right) e^{\frac{3 x^{2}}{2}}\end{equation*}</div>
 
@@ -986,14 +950,14 @@ eqn = y''(x) + 5y'(x) + 6y(x)</pre>
 <div class="well well-sm">
 \begin{equation*}6 y{\left (x \right )} + 5 \frac{d}{d x} y{\left (x \right )} + \frac{d^{2}}{d x^{2}} y{\left (x \right )}\end{equation*}</div>
 
-<p>To solve with $y(0) = 1$ and $y'(0) = 1$ we have:</p><pre class="sourceCode julia">out = dsolve(eqn, x, (y, 0, 1), (y', 0, 1))</pre>
+<p>To solve with $y(0) = 1$ and $y'(0) = 1$ we have:</p><pre class="sourceCode julia">out = dsolve(eqn, x, ics=((y, 0, 1), (y', 0, 1)))</pre>
 <div class="well well-sm">
 \begin{equation*}y{\left (x \right )} = \left(4 - 3 e^{- x}\right) e^{- 2 x}\end{equation*}</div>
 
-<p>To make a plot, we only need the right-hand-side of the answer:</p><pre class="sourceCode julia">plot(out.rhs(), -1/3, 2)</pre>
+<p>(That is we combine <em>all</em> initial conditions into a tuple.)</p><p>To make a plot, we only need the right-hand-side of the answer:</p><pre class="sourceCode julia">plot(out.rhs(), -1/3, 2)</pre>
 <img alt="Embedded Image" src="data:image/png;base64,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">
 <h5>Example</h5><p>Boundary value problems can be solved for, as well, through a similar syntax. Continuing with examples from the <a href="https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html">Wolfram</a> page, we solve $y''(x) +y(x) = e^x$ over $[0,1]$ with conditions $y(0)=1$, $y(1) = 1/2$:</p><pre class="sourceCode julia">eqn = y''(x) + y(x) - exp(x)
-dsolve(eqn, x, (y, 0, 1), (y, 1, 1//2))</pre>
+dsolve(eqn, x, ics=((y, 0, 1), (y, 1, 1//2)))</pre>
 <div class="well well-sm">
 \begin{equation*}y{\left (x \right )} = \frac{e^{x}}{2} + \frac{\left(- e - \cos{\left (1 \right )} + 1\right) \sin{\left (x \right )}}{2 \sin{\left (1 \right )}} + \frac{\cos{\left (x \right )}}{2}\end{equation*}</div>
 

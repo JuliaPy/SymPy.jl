@@ -193,7 +193,7 @@ addition is `Add`, so, as you might expect, to create this object, we use
 * We *can* import these operations to avoid qualifying them as done here:
 
 ```
-import_from(sympy, (:Add, :Mul, :Pow))
+import_from(sympy, (:Add, :Mul, :Pow), typ=:Any)
 Add(Pow(2, x), Mul(x, y))
 ```
 
@@ -348,7 +348,7 @@ expr.func
 expr.func.__name__
 ```
 
-* In `SymPy` the `func` and `args` properties are exported as functions in the module `SymPyLite.Introspection`.
+* In `SymPy` the `func` and `args` properties are exported as functions in the module `SymPy.Introspection`.
 
 
 ----
@@ -892,3 +892,8 @@ sympy.latex(uexpr.doit())
   have `-x` or `1/x`.  It is also done for speed efficiency because
   singletonized objects can be compared by `is`.  The unique objects for
   each singletonized class can be accessed from the `S` object.
+
+
+----
+
+[return to index](./index.html)

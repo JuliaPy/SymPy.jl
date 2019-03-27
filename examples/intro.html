@@ -247,18 +247,16 @@ expanded_expr</pre>
 </li>
 </ul><pre class="sourceCode julia">y = sympy.Function("y")
 dsolve(Eq(y(t).diff(t, t) - y(t), exp(t)), y(t))</pre>
-<pre class="output">
-ArgumentError("Some initial value specification is needed.\nSpecifying the function, as in `dsolve(ex, f(x))`, is deprecated.\nUse `sympy.dsolve(ex, f(x); kwargs...)` directly for that underlying interface.\n")
-</pre>
+<div class="well well-sm">
+\begin{equation*}y{\left (t \right )} = C_{2} e^{- t} + \left(C_{1} + \frac{t}{2}\right) e^{t}\end{equation*}</div>
 
 <ul>
 <li><p>This is made more familiar looking with the <code>SymFunction</code> class:</p>
 </li>
 </ul><pre class="sourceCode julia">y = SymFunction("y")
 dsolve(y''(t) - y(t) - exp(t), y(t))</pre>
-<pre class="output">
-ArgumentError("Some initial value specification is needed.\nSpecifying the function, as in `dsolve(ex, f(x))`, is deprecated.\nUse `sympy.dsolve(ex, f(x); kwargs...)` directly for that underlying interface.\n")
-</pre>
+<div class="well well-sm">
+\begin{equation*}y{\left (t \right )} = C_{2} e^{- t} + \left(C_{1} + \frac{t}{2}\right) e^{t}\end{equation*}</div>
 
 <hr /><p>Find the eigenvalues of <code>\left&#91;\begin&#123;smallmatrix&#125;1 &amp; 2\\2 &amp; 2\end&#123;smallmatrix&#125;\right&#93;</code>.</p><pre class="sourceCode julia"> >>> Matrix([[1, 2], [2, 2]]).eigenvals()
  ⎧3   √17       √17   3   ⎫
@@ -318,7 +316,7 @@ besselj(nu, z).rewrite(sympy.jn)</pre>
 </li>
 <li><p>Nemo.jl</p>
 </li>
-</ul><p>SymPy is an attractive alternative as <code>PyCall</code> makes most all of its functinality directly available and SymPy is fairly feature rich.</p>
+</ul><p>SymPy is an attractive alternative as <code>PyCall</code> makes most all of its functinality directly available and SymPy is fairly feature rich.</p><hr /><p><a href="./index.html">return to index</a></p>
   </div>
 </div>
 

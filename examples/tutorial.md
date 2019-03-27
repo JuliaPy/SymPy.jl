@@ -130,13 +130,11 @@ ex = x + y + z
 ex.subs((x,1), (y,pi))
 ```
 
-```
-note("""
-The calling pattern for `subs` is different from a typical `Julia` function call. The `subs` call is `object.method(arguments)` whereas a more "`Julia`n" function call is `method(objects, other objects....)`, as `Julia` offers multiple dispatch of methods. `SymPy` uses the Python calling method, adding in `Julia`n style when appropriate for generic usage within `Julia`. In addition, `SymPy` imports all functions from the underlying `sympy` module and specializes them on a symbolic first argument.
+!!! note
 
-For `subs`, the simple substitution `ex.object(x,a)` is similar to simple function evaluation, so `Julia`'s call notation will work. To specify the pairing off of `x` and `a`, the `=>`  pairs notation is used.
-""")
-```
+    The calling pattern for `subs` is different from a typical `Julia` function call. The `subs` call is `object.method(arguments)` whereas a more "`Julia`n" function call is `method(objects, other objects....)`, as `Julia` offers multiple dispatch of methods. `SymPy` uses the Python calling method, adding in `Julia`n style when appropriate for generic usage within `Julia`. In addition, `SymPy` imports all functions from the underlying `sympy` module and specializes them on a symbolic first argument.
+
+    For `subs`, the simple substitution `ex.object(x,a)` is similar to simple function evaluation, so `Julia`'s call notation will work. To specify the pairing off of `x` and `a`, the `=>`  pairs notation is used.
 
 This calling style will be equivalent to the last:
 
@@ -438,11 +436,10 @@ q = sympy.Poly(p, x)
 q.coeffs()
 ```
 
-```
-note("""
-The `Poly` constructor from SymPy is *not* a function, so is not exported when `SymPy` is loaded. To access it, the object must be qualified by its containing module, in this case `Poly`. Were it to be used frequently, an alias could be used, as in `const Poly=sympy.Poly` *or* the `import_from` function, as in `import_from(sympy, :Poly)`. The latter has some attempt to avoid naming collisions.
-""")
-```
+!!! note
+
+    The `Poly` constructor from SymPy is *not* a function, so is not exported when `SymPy` is loaded. To access it, the object must be qualified by its containing module, in this case `Poly`. Were it to be used frequently, an alias could be used, as in `const Poly=sympy.Poly` *or* the `import_from` function, as in `import_from(sympy, :Poly)`. The latter has some attempt to avoid naming collisions.
+
 
 ## Polynomial roots: solve, real_roots, polyroots, nroots
 
@@ -1270,8 +1267,7 @@ hessian(ex, (x,y))
 
 `Julia` has excellent infrastructure to work with generic matrices,
 such as `Matrix{Sym}` objects (matrices with symbolic entries). As
-well, SymPy has a class for matrices. `SymPy` supports both, the
-latter with $0$-based indexing and type `SymMatrix`.
+well, SymPy has a class for matrices. `SymPy`, through `PyCall`, automatically maps mutable SymPy matrices into `Julia`n matrices of type `Array{Sym}`.
 
 
 
@@ -1282,17 +1278,18 @@ x,y = symbols("x,y")
 M = [1 x; x 1]
 ```
 
-Construction symbolic matrices is done through the `Matrix` constructor, which must be qualified. It is passed a vector or row vectors:
+Construction of symbolic matrices can *also* be done through the `Matrix` constructor, which must be qualified. It is passed a vector or row vectors but any symbolic values *must* be converted into `PyObject`s:
 
 ```
-A = sympy.Matrix([[1,x], [x, 1]])
+import PyCall: PyObject
+A = sympy.Matrix([[1,PyObject(x)], [PyObject(x), 1]])
 ```
 
-We could also have converted `M` to get `A`:
+(otherwise, an entry like `[1,x]` will be mapped to a `Vector{Sym}` prior to passing to `sympy.Matrix` and the processing get's done differently, and not as desired.)
 
-```
-convert(SymMatrix, M)
-```
+This is useful if copying SymPy examples, but otherwise unneccesary, these are immediately mapped into `Julia` arrays by `PyCall.
+**Unless** an immutable array is desired, and then the `sympy.ImmutableMatrix` constructor is used. (Though it is *still* necessary to convert symbolic values to `PyObject`s.)
+
 
 
 ```
@@ -1306,6 +1303,15 @@ Similarly,
 ```
 A^2
 ```
+
+We can call `Julia`'s generic matrix functions in the usual manner, e.g:
+
+```
+det(A)
+```
+
+We can also call SymPy's matrix methods using the dot-call syntax:
+
 
 ```
 A.det()
@@ -1329,8 +1335,7 @@ A.eigenvects()
 This example from the tutorial shows the `nullspace` function:
 
 ```
-M = Sym[1 2 3 0 0; 4 10 0 0 1]
-A = convert(SymMatrix, M)
+A = Sym[1 2 3 0 0; 4 10 0 0 1]
 vs = A.nullspace()
 ```
 
@@ -1343,8 +1348,7 @@ And this shows that they are indeed in the null space of `M`:
 Symbolic expressions can be included in the matrices:
 
 ```
-M = [1 x; x 1]
-A = convert(SymMatrix, M)
+A = [1 x; x 1]
 P, D = A.diagonalize()  # M = PDP^-1
 A - P*D*inv(P)
 ```
@@ -1368,18 +1372,16 @@ diffeq = Eq(diff(F(x), x, 2) - 2*diff(F(x)) + F(x), sin(x))
 ```
 
 
-With this, we just need the `dsolve` function. This is called as `dsolve(eq)`:
+With this, we just need the `dsolve` function. This is called as `dsolve(eq)` or `dsolve(eq, F(x))`:
 
 ```
-ex = sympy.dsolve(diffeq, F(x))
+ex = dsolve(diffeq, F(x))
 ```
-
-(We can use just `dsolve` here, but will reserve that for initial-value problems, where `SymPy` provides a convenient interface for some problems.)
 
 
 The `dsolve` function in SymPy has an extensive list of named
 arguments to control the underlying algorithm. These can be passed
-through with the appropriate keyword arguments.
+through with the appropriate keyword arguments. (To use SymPy's `ics` argument, the `sympy.dsolve` method must be called directly.)
 
 More clearly, the `SymFunction` objects have the `'` method defined to
 find a derivative, so the above could also have been:
@@ -1454,7 +1456,7 @@ classify_ode(ex)
 It is linear, but not solvable. Proceeding with `dsolve` gives:
 
 ```
-sympy.dsolve(ex, v(t))
+dsolve(ex, v(t))
 ```
 
 
@@ -1462,15 +1464,13 @@ sympy.dsolve(ex, v(t))
 
 Solving an initial value problem can be a bit tedious with `SymPy`.
 The first example shows the steps. This is because the `ics` argument
-for `dsolve` only works for a few types of equations. These do not
+for `sympy.dsolve` only works for a few types of equations. These do not
 include, by default, the familiar "book" examples, such as $y'(x) =
 a\cdot y(x)$.
 
 To work around this, `SymPy.jl` extends the function `dsolve` to allow
-a specification of the initial conditions when solving.  The new
-ingredients are the independent variable (`x` in the examples) and
-tuples to specify each condition. The are conditions on the values of
-`u`, `u'`', ....  To illustrate, we follow an example from
+a specification of the initial conditions when solving.  Each initial condition is specified with 3-tuple. For example, `v(t0)=v0` is specified with `(v, t0, v0)`.  The conditions on the values functions may use `v`, `v'`, ...
+To illustrate, we follow an example from
 [Wolfram](https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html).
 
 ```
@@ -1485,7 +1485,7 @@ We solve the initial value problem with $y(0) = 4$ as follows:
 
 ```
 x0, y0 = 0, 4
-out = dsolve(eqn, x, (y, x0, y0))
+out = dsolve(eqn, x, ics = (y, x0, y0))
 ```
 
 Verifying this requires combining some operations:
@@ -1499,7 +1499,7 @@ To solve with a general initial condition is similar:
 
 ```
 x0, y0 = 0, a
-out = dsolve(eqn, x, (y, x0, y0))
+out = dsolve(eqn, x, ics=(y, x0, y0))
 ```
 
 
@@ -1531,8 +1531,10 @@ eqn = y''(x) + 5y'(x) + 6y(x)
 To solve with $y(0) = 1$ and $y'(0) = 1$ we have:
 
 ```
-out = dsolve(eqn, x, (y, 0, 1), (y', 0, 1))
+out = dsolve(eqn, x, ics=((y, 0, 1), (y', 0, 1)))
 ```
+
+(That is we combine *all* initial conditions into a tuple.)
 
 To make a plot, we only need the right-hand-side of the answer:
 
@@ -1550,5 +1552,5 @@ $y(0)=1$, $y(1) = 1/2$:
 
 ```
 eqn = y''(x) + y(x) - exp(x)
-dsolve(eqn, x, (y, 0, 1), (y, 1, 1//2))
+dsolve(eqn, x, ics=((y, 0, 1), (y, 1, 1//2)))
 ```

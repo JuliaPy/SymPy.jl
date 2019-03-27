@@ -632,3 +632,7 @@ document.
 ## Further Reading
 
 For more discussion on the topics covered in this section, see :ref:`gotchas`.
+
+----
+
+[return to index](./index.html)

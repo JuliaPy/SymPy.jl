@@ -166,8 +166,7 @@ Int64</pre>
 
 <pre class="sourceCode julia">typeof(sympify(2))</pre>
 <pre class="output">
-MethodError(SymPy.sympify, (2,), 0x0000000000006c64)
-</pre>
+SymPy.Sym</pre>
 
 <hr /><p>We have seen that <code>2**x</code> is represented as <code>Pow&#40;2, x&#41;</code>.  What about <code>x*y</code>?  As we might expect, this is the multiplication of <code>x</code> and <code>y</code>. The SymPy class for multiplication is <code>Mul</code>.</p><pre class="sourceCode julia">    >>> srepr(x*y)
     "Mul(Symbol('x'), Symbol('y'))"</pre>
@@ -189,11 +188,10 @@ Mul(Symbol('x'), Symbol('y'))</div>
 <h5>In <code>Julia</code>:</h5><ul>
 <li><p>We <em>can</em> import these operations to avoid qualifying them as done here:</p>
 </li>
-</ul><pre class="sourceCode julia">import_from(sympy, (:Add, :Mul, :Pow))
+</ul><pre class="sourceCode julia">import_from(sympy, (:Add, :Mul, :Pow), typ=:Any)
 Add(Pow(2, x), Mul(x, y))</pre>
-<pre class="output">
-MethodError(SymPy.Pow, (2, x), 0x0000000000006c6d)
-</pre>
+<div class="well well-sm">
+\begin{equation*}2^{x} + x y\end{equation*}</div>
 
 <hr /><p>SymPy expression trees can have many branches, and can be quite deep or quite broad.  Here is a more complicated example</p><pre class="sourceCode julia">    >>> expr = sin(x*y)/2 - x**2 + 1/y
     >>> srepr(expr)
@@ -241,7 +239,7 @@ PyObject <class 'sympy.core.mul.Mul'></pre>
 Mul</div>
 
 <ul>
-<li><p>In <code>SymPy</code> the <code>func</code> and <code>args</code> properties are exported as functions in the module <code>SymPyLite.Introspection</code>.</p>
+<li><p>In <code>SymPy</code> the <code>func</code> and <code>args</code> properties are exported as functions in the module <code>SymPy.Introspection</code>.</p>
 </li>
 </ul><hr /><p>We created <code>Add&#40;x, x&#41;</code>, so we might expect <code>expr.func</code> to be <code>Add</code>, but instead we got <code>Mul</code>.  Why is that?  Let's take a closer look at <code>expr</code>.</p><pre class="sourceCode julia">    >>> expr
     2*x</pre>
@@ -502,7 +500,7 @@ sympy.latex(uexpr)</pre>
 </li>
 <li><p>[#singleton-fn] Classes like <code>One</code> and <code>Zero</code> are singletonized, meaning that only one object is ever created, no matter how many times the class is called.  This is done for space efficiency, as these classes are very common.  For example, <code>Zero</code> might occur very often in a sparse matrix represented densely.  As we have seen, <code>NegativeOne</code> occurs any time we have <code>-x</code> or <code>1/x</code>.  It is also done for speed efficiency because singletonized objects can be compared by <code>is</code>.  The unique objects for each singletonized class can be accessed from the <code>S</code> object.</p>
 </li>
-</ul>
+</ul><hr /><p><a href="./index.html">return to index</a></p>
   </div>
 </div>
 

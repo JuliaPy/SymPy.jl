@@ -67,24 +67,33 @@ end
 
 ## Add interfaces for solve, nonlinsolve when vector of equations passed in
 solve(V::Vector{T}, args...; kwargs...) where {T <: SymbolicObject} =
-    sympy.solve(convert(SymMatrix, V), args...; kwargs...)
+    sympy.solve(V, args...; kwargs...)
 
-nonlinsolve(V::Vector{T}, args...; kwargs...) where {T <: SymbolicObject} =
-    sympy.nonlinsolve(convert(SymMatrix, V), args...; kwargs...)
+"""
+    nonlinsolve
 
-linsolve(V::Vector{T}, args...; kwargs...) where {T <: SymbolicObject} =
-    sympy.linsolve(convert(SymMatrix, V), args...; kwargs...)
+Note: if passing variables in use a tuple (e.g., `(x,y)`) and *not* a vector (e.g., `[x,y]`).
+"""
+nonlinsolve(V::AbstractArray{T,N}, args...; kwargs...) where {T <: SymbolicObject, N} =
+    sympy.nonlinsolve(V, args...; kwargs...)
+
+linsolve(V::AbstractArray{T,N}, args...; kwargs...) where {T <: SymbolicObject, N} =
+    sympy.linsolve(V, args...; kwargs...)
 linsolve(Ts::Tuple, args...; kwargs...) where {T <: SymbolicObject} =
     sympy.linsolve(Ts, args...; kwargs...)
 
 
-## dsolve
-dsolve(eqn::Sym; kwargs...) = sympy.dsolve(eqn; kwargs...)
+## dsolve allowing initial condiation to be specified
 
 """
-   dsolve(eqn, var, args..,; kwargs...)
+   dsolve(eqn, var, args..,; ics=nothing, kwargs...)
 
-Solve IVP problem.
+Call `sympy.dsolve` with possible difference for initial condition specification.
+
+For problems with an initial condition, the `ics` argument may be specified. This is *different* from the `ics` argument of `sympy.dsolve`. (Call directly if that is preferred.)
+
+Here `ics` allows the specification of a term like `f(x0) = y0` as a tuple `(f, x0, y0)`. Similarly, a term like `f''(x0)=y0` is specified through `(f'', x0, y0)`. If more than one initial condition is needed, a tuple of tuples is used, as in `((f,x0,y0), (f',x0,z0))`.
+
 
 Example:
 
@@ -92,12 +101,34 @@ Example:
 x = Sym("x")
 y = SymFunction("y")
 eqn = y''(x) - y(x) - exp(x)
-dsolve(eqn, x, (y,0,1), (y, 1, 1//2))
+dsolve(eqn, y(x), ics=((y,0,1), (y, 1, 1//2)))
 ```
 """
-function dsolve(eqn::Sym, var::Sym, args::Tuple...; kwargs...)
+function dsolve(eqn::Sym, args...; ics=nothing, kwargs...)
+    if isa(ics, Nothing)
+        sympy.dsolve(eqn, args...; kwargs...)
+    else
+        if isempty(args)
+            var = first(free_symbols(eqn))
+        else
+            var = first(args)
+        end
+        # var might be f(x) or x, we want `x`
+        if Introspection.classname(var) != "Symbol"
+            var = first(var.args)
+        end
+        ## if we have one initial condition, can be passed in a (u,x0,y0) *or* ((u,x0,y0),)
+        ## if more than one a tuple of tuples
+        if eltype(ics) <: Tuple
+            _dsolve(eqn, var, ics; kwargs...)
+        else
+            _dsolve(eqn, var, (ics,); kwargs...)
+        end
+    end
+end
 
-    if length(args) == 0
+function _dsolve(eqn::Sym, var::Sym, ics; kwargs...)
+    if length(ics) == 0
         throw(ArgumentError("""Some initial value specification is needed.
 Specifying the function, as in `dsolve(ex, f(x))`, is deprecated.
 Use `sympy.dsolve(ex, f(x); kwargs...)` directly for that underlying interface.
@@ -110,11 +141,11 @@ Use `sympy.dsolve(ex, f(x); kwargs...)` directly for that underlying interface.
     ## `out` may be an array of solutions. If so we do each one.
     ## we want to use an array for output only if needed
     if !isa(out, Array)
-        return _solve_ivp(out, var, args,ord)
+        return _solve_ivp(out, var, ics,ord)
     else
         output = Sym[]
         for o in out
-            a = _solve_ivp(o, var, args,ord)
+            a = _solve_ivp(o, var, ics,ord)
             a != nothing && push!(output, a)
         end
         return length(output) == 1 ? output[1] : output

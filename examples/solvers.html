@@ -198,17 +198,11 @@ solveset(x^2 - x, x)</pre>
 <h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">M = sympy.Matrix(((1, 1, 1, 1), (1, 1, 2, 3)))
 system = A, b = M[:, 1:end-1], M[:, end]
 linsolve(system, x, y, z)</pre>
-<pre class="output">
-UndefVarError(:system)
-</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{\left ( - y - 1, \quad y, \quad 2\right )\right\}\end{equation*}</div>
 
-<hr /><div class="alert alert-info" role="alert">
-
-<div class="markdown"><p>The order of solution corresponds the order of given symbols.</p>
-</div>
-
-</div>
-<p>In the <code>solveset</code> module, the non linear system of equations is solved using <code>nonlinsolve</code>. Following are examples of <code>nonlinsolve</code>.</p><ol>
+<hr /><div class="admonition note"><p class="admonition-title">Note</p><p>The order of solution corresponds the order of given symbols.</p>
+</div><p>In the <code>solveset</code> module, the non linear system of equations is solved using <code>nonlinsolve</code>. Following are examples of <code>nonlinsolve</code>.</p><ol>
 <li><p>When only real solution is present:</p>
 </li>
 </ol><pre class="sourceCode julia">	>>> a, b, c, d = symbols('a, b, c, d', real=True)
@@ -216,8 +210,11 @@ UndefVarError(:system)
 	{(-1, -1), (0, 0)}
 	>>> nonlinsolve([x*y - 1, x - 2], x, y)
 	{(2, 1/2)}</pre>
-<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">a, b, c, d = symbols("a, b, c, d", real=true)
-nonlinsolve([a^2 + a, a - b], [a, b])</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>we pass <code>&#91;a,b&#93;</code> as either <code>a, b</code> or using a tuple, as in <code>&#40;a,b&#41;</code>, but <em>not</em> as a vector, as this gets mapped into a vector of symbolic objects which causes issues with <code>nonlinsolve</code>:</p>
+</li>
+</ul><pre class="sourceCode julia">a, b, c, d = symbols("a, b, c, d", real=true)
+nonlinsolve([a^2 + a, a - b], a, b)</pre>
 <div class="well well-sm">
 \begin{equation*}\left\{\left ( -1, \quad -1\right ), \left ( 0, \quad 0\right )\right\}\end{equation*}</div>
 
@@ -230,7 +227,7 @@ nonlinsolve([a^2 + a, a - b], [a, b])</pre>
 </li>
 </ol><pre class="sourceCode julia">	>>> nonlinsolve([x**2 + 1, y**2 + 1], [x, y])
 	{(-ⅈ, -ⅈ), (-ⅈ, ⅈ), (ⅈ, -ⅈ), (ⅈ, ⅈ)}</pre>
-<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">nonlinsolve([x^2 + 1, y^2 + 1], [x, y])</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">nonlinsolve([x^2 + 1, y^2 + 1], (x, y))</pre>
 <div class="well well-sm">
 \begin{equation*}\left\{\left ( - i, \quad - i\right ), \left ( - i, \quad i\right ), \left ( i, \quad - i\right ), \left ( i, \quad i\right )\right\}\end{equation*}</div>
 
@@ -252,10 +249,12 @@ nonlinsolve([a^2 + a, a - b], [a, b])</pre>
 	>>> nonlinsolve(system, [x, y]) == soln
 	True</pre>
 <h5>In <code>Julia</code>:</h5><ul>
-<li><p>we must remove the spaces within <code>&#91;&#93;</code>:</p>
+<li><p>we must remove the spaces within <code>&#91;&#93;</code></p>
+</li>
+<li><p>we must pass vars as a tuple:</p>
 </li>
 </ul><pre class="sourceCode julia">system = [x^2-2*y^2-2, x*y-2]
-vars = [x, y]
+vars = (x, y)
 nonlinsolve(system, vars)</pre>
 <div class="well well-sm">
 \begin{equation*}\left\{\left ( -2, \quad -1\right ), \left ( 2, \quad 1\right ), \left ( - \sqrt{2} i, \quad \sqrt{2} i\right ), \left ( \sqrt{2} i, \quad - \sqrt{2} i\right )\right\}\end{equation*}</div>
@@ -273,7 +272,7 @@ real_soln = (log(sin(S(1)/3)), S(1)/3)
 img_lamda = sympy.Lambda(n, 2*n*IM*PI + sympy.Mod(log(sin(S(1)/3)), 2*IM*PI))
 complex_soln = (sympy.ImageSet(img_lamda, S.Integers), S(1)/3)
 soln = sympy.FiniteSet(real_soln, complex_soln)
-nonlinsolve(system, [x, y]) == soln</pre>
+nonlinsolve(system, (x, y)) == soln</pre>
 <pre class="output">
 true</pre>
 
@@ -286,12 +285,15 @@ true</pre>
 	>>> system = [a**2 + a*c, a - b]
 	>>> nonlinsolve(system, [a, b])
 	{(0, 0), (-c, -c)}</pre>
-<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">nonlinsolve([x*y, x*y-x], [x, y])</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>again, we use a tuple for the variables:</p>
+</li>
+</ul><pre class="sourceCode julia">nonlinsolve([x*y, x*y-x], (x, y))</pre>
 <div class="well well-sm">
 \begin{equation*}\left\{\left ( 0, \quad y\right )\right\}\end{equation*}</div>
 
 <pre class="sourceCode julia">system = [a^2+a*c, a-b]
-nonlinsolve(system, [a, b])</pre>
+nonlinsolve(system, (a, b))</pre>
 <div class="well well-sm">
 \begin{equation*}\left\{\left ( 0, \quad 0\right ), \left ( - c, \quad - c\right )\right\}\end{equation*}</div>
 
@@ -338,11 +340,9 @@ nonlinsolve(system, [a, b])</pre>
 <div class="well well-sm">
 \begin{equation*}\left\{0, 3\right\}\end{equation*}</div>
 
-<pre class="sourceCode julia">roots(x^3 - 6*x^2 + 9*x, x)</pre>
-<pre class="output">
-Dict{Any,Any} with 2 entries:
-  3 => 2
-  0 => 1</pre>
+<pre class="sourceCode julia">roots(x^3 - 6*x^2 + 9*x, x)  |>  d -> convert(Dict{Sym, Any}, d) # prettier priting</pre>
+<div class="well well-sm">
+\begin{equation*}\begin{cases}3 & \text{=>} &2\\0 & \text{=>} &1\\\end{cases}\end{equation*}</div>
 
 <hr /><p>The output <code>&#123;0: 1, 3: 2&#125;</code> of <code>roots</code> means that <code>0</code> is a root of multiplicity 1 and <code>3</code> is a root of multiplicity 2.</p><blockquote>
 <p>Note:</p>
@@ -390,40 +390,44 @@ diffeq</pre>
                         x   cos(x)
     f(x) = (C₁ + C₂⋅x)⋅ℯ  + ──────
                               2</pre>
-<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">dsolve(diffeq, f(x))</pre>
-<pre class="output">
-ArgumentError("Some initial value specification is needed.\nSpecifying the function, as in `dsolve(ex, f(x))`, is deprecated.\nUse `sympy.dsolve(ex, f(x); kwargs...)` directly for that underlying interface.\n")
-</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>we use <code>dsolve</code> for initial value proplems</p>
+</li>
+</ul><pre class="sourceCode julia">dsolve(diffeq, f(x))</pre>
+<div class="well well-sm">
+\begin{equation*}f{\left (x \right )} = \left(C_{1} + C_{2} x\right) e^{x} + \frac{\cos{\left (x \right )}}{2}\end{equation*}</div>
 
 <hr /><p><code>dsolve</code> returns an instance of <code>Eq</code>.  This is because in general, solutions to differential equations cannot be solved explicitly for the function.</p><pre class="sourceCode julia">    >>> dsolve(f(x).diff(x)*(1 - sin(f(x))), f(x))
     f(x) + cos(f(x)) = C₁</pre>
 <h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">dsolve(f(x).diff(x)*(1 - sin(f(x))), f(x))</pre>
-<pre class="output">
-ArgumentError("Some initial value specification is needed.\nSpecifying the function, as in `dsolve(ex, f(x))`, is deprecated.\nUse `sympy.dsolve(ex, f(x); kwargs...)` directly for that underlying interface.\n")
-</pre>
+<div class="well well-sm">
+\begin{equation*}f{\left (x \right )} + \cos{\left (f{\left (x \right )} \right )} = C_{1}\end{equation*}</div>
 
-<hr /><p>The arbitrary constants in the solutions from dsolve are symbols of the form <code>C1</code>, <code>C2</code>, <code>C3</code>, and so on.</p><h2>Julia alternative interface</h2><div class="alert alert-info" role="alert">
-
-<div class="markdown"><p>This may change</p>
-</div>
-
-</div>
-<p><code>SymPy.jl</code> adds a <code>SymFunction</code> class, that makes it a bit easier to set up a differential equation, though not as general.</p><p>We use either the <code>SymFunction</code> constructor</p><pre class="sourceCode julia">f = SymFunction("f")</pre>
+<hr /><p>The arbitrary constants in the solutions from dsolve are symbols of the form <code>C1</code>, <code>C2</code>, <code>C3</code>, and so on.</p><h2>Julia alternative interface</h2><p><code>SymPy.jl</code> adds a <code>SymFunction</code> class, that makes it a bit easier to set up a differential equation, though not as general.</p><p>We use either the <code>SymFunction</code> constructor</p><pre class="sourceCode julia">f = SymFunction("f")</pre>
 <div class="well well-sm">
 \begin{equation*}f\end{equation*}</div>
 
 <p>or the <code>@symfuns</code> macro, as in <code>@symfuns f</code>.</p><p>to define symbolic functions. For these, rather than use <code>diff</code> to specify derivatives, the prime notation can be used. We then have, with <code>f</code> defined above:</p><pre class="sourceCode julia">diffeq = Eq(f''(x) - 2*f'(x) + f(x), sin(x))
 dsolve(diffeq, f(x))</pre>
-<pre class="output">
-ArgumentError("Some initial value specification is needed.\nSpecifying the function, as in `dsolve(ex, f(x))`, is deprecated.\nUse `sympy.dsolve(ex, f(x); kwargs...)` directly for that underlying interface.\n")
-</pre>
+<div class="well well-sm">
+\begin{equation*}f{\left (x \right )} = \left(C_{1} + C_{2} x\right) e^{x} + \frac{\cos{\left (x \right )}}{2}\end{equation*}</div>
 
 <p>Or:</p><pre class="sourceCode julia">dsolve(f'(x)*(1 - sin(f(x))), f(x))</pre>
-<pre class="output">
-ArgumentError("Some initial value specification is needed.\nSpecifying the function, as in `dsolve(ex, f(x))`, is deprecated.\nUse `sympy.dsolve(ex, f(x); kwargs...)` directly for that underlying interface.\n")
-</pre>
+<div class="well well-sm">
+\begin{equation*}f{\left (x \right )} + \cos{\left (f{\left (x \right )} \right )} = C_{1}\end{equation*}</div>
 
+<p>This interface allows a different specification of initial conditions than does <code>sympy.dsolve</code>.</p><p>For the initial condition <code>f&#39;&#40;x0&#41; &#61; y0</code>, this would be specified with a tuple <code>&#40;f&#39;, x0, y0&#41;</code>.</p><p>For example, to solve the exponential equation $f'(x) = f(x), f(0) = a$ we would have:</p><pre class="sourceCode julia">f = SymFunction("f")
+x, a = symbols("x, a")
+dsolve(f'(x) - f(x), f(x), ics = (f, 0, a))</pre>
+<div class="well well-sm">
+\begin{equation*}f{\left (x \right )} = a e^{x}\end{equation*}</div>
 
+<p>To solve the simple harmonic equation, where two initial conditions are specified, we combine the tuple for each within another tuple:</p><pre class="sourceCode julia">ics = ((f, 0, 1), (f', 0, 2))
+dsolve(f''(x) - f(x), f(x), ics=ics)</pre>
+<div class="well well-sm">
+\begin{equation*}f{\left (x \right )} = \frac{3 e^{x}}{2} - \frac{e^{- x}}{2}\end{equation*}</div>
+
+<hr /><p><a href="./index.html">return to index</a></p>
   </div>
 </div>
 
