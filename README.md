@@ -98,29 +98,34 @@ value `PI`, an alias for `sympy.pi` used above.)
 ----
 
 
-SymPy has a mix of function calls (as in `sin(x)`) and method calls (as in `y.subs(x,1)`). The function calls are from objects in the base `sympy` class. When `SymPy` is loaded, the function calls in `sympy` are imported as functions specialized on their first argument being a symbolic object, as constructed by `Sym` or `sympify`. So, these two are different, the latter dispatching to the `sin` function, `sympy.sin`, of SymPy and returning a symbolic value.
+SymPy has a mix of function calls (as in `sin(x)`) and method calls (as in `y.subs(x,1)`). The function calls are from objects in the base `sympy` class. When `SymPy` is loaded, the function calls in `sympy` are imported as generic functions narrowed on their first argument being a symbolic object, as constructed by `Sym` or `sympify`. The basic usage follows these points:
+
+* generic methods from `Julia` and functions in the `sympy` namespace are called through `fn(object)`
+
+* SymPy methods are called through Python's dot-call syntax: `object.fn(...)`
+
+* Contructors and other non-function calls from `sympy` are qualified with `sympy.Constructor(...)`. Such qualified calls are also useful when the first argument is not symbolic.=
+
+
+So, these three calls are different,
 
 ```
-sin(1), sin(Sym(1))
+sin(1), sin(Sym(1)), sympy.sin(1)
 ```
 
-The latter effectively dispatches to
+The first involves no symbolic values. The second and third are related and return a symbolic value for `sin(1)`. The second dispatches on the symbolic argument `Sym(1)`, the third has no dispatch, but refers to a SymPy function from the `sympy` object. Its argument, `1`, is converted by `PyCall` into a Python object for the function to process.
+
+In the initial example, slightly rewritten, we could have written:
 
 ```
-sympy.sin(1)
-```
-
-which does not require a symbolic first argument.
-
-
-Symbolic values have python's dot-call syntax defined, so that methods can be called as they would within SymPy or Python. Such as:
-
-```
-@vars x
-y = sin(pi(x))
+x = symbols("x")
+y = sin(pi*x)
 y.subs(x, 1)
 ```
 
-Classes and other objects from SymPy are not brought in by default,
-and can be accessed using qualification, as in `sympy.Function` (used
-to define symbolic functions).
+The first line calls a provided alias for `sympy.symbols` which is defined to allow a string (or a symbol) as an argument. The second, dispatches to `sympy.sin`, as `pi*x` is symbolic, since `x` is and multiplication promotes to a symbolic value. The third line uses the dot-call syntax of `PyCall` to call the `subs` method of the symbolic `y` object.
+
+
+Not illustrated above, but classes and other objects from SymPy are
+not brought in by default, and can be accessed using qualification, as
+in `sympy.Function` (used to define symbolic functions).

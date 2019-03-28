@@ -1,3 +1,25 @@
+
+"""
+
+`SymPy` package to interface with Python's [SymPy library](http://www.sympy.org) through `PyCall`.
+
+The basic idea is that a new type -- `Sym` -- is made to hold symbolic
+objects.  For this type, the basic functions from SymPy and appropriate functions
+of `Julia` are overloaded for `Sym` objects so that the expressions
+are treated symbolically and not evaluated immediately. Instances of
+this type are created by the constructor `Sym`, the function `symbols` or the macro
+`@vars`.
+
+Almost all the basic functions from the `sympy` module are defined a generic functions with their first argument narrowed to symbolic types. SyMpy methods are called through Python's dot-call syntax.
+To find documentation on SymPy functions and methods, one should refer to
+SymPy's [website](http://docs.sympy.org/latest/index.html).
+
+Plotting is provided through the `Plots` interface. For details, see the help page for `sympy_plotting`.
+
+The package tutorial provides many examples. This can be read on
+[GitHub](https://github.com/PyCall/SymPy.jl/blob/master/examples/tutorial.ipynb).
+
+"""
 module SymPy
 
 
@@ -19,7 +41,8 @@ import Base: length, size
 import Base.iterate
 import Base: +, -, *, /, //, \, ^
 
-export @vars, Sym, sympify, SymMatrix, SymFunction, @symfuns
+export @vars, Sym, sympify, symbols, @symfuns, @syms
+export SymMatrix, SymFunction
 export PI, IM, oo, zoo, True, False
 export N
 
@@ -128,9 +151,9 @@ end
 This method imports all functions from both `mpmath` and `sympy` as well as the relational operators, which
 don't get swept up by `import_from`.
 
-These functions are specialized on their first argument being of type `SymbolicObject`.
+These functions are narrowed on their first argument being of type `SymbolicObject`.
 
-It checks a few modules for namespace collisions.
+A few modules are checked for namespace collisions.
 
 If a function naturally takes an non-Symbolic argument as a first argument, then it can be qualified: e.g.
 `sympy.sin(2)` (as opposed to `sin(Sym(2))`).
@@ -145,15 +168,16 @@ function import_sympy()
         import_from(mpmath)
     end
     import_from(sympy)
-    import_from(sympy, (:Ne, :Lt, :Le, :Eq, :Ge, :Gt,
+    import_from(sympy, (:Ne,  :Le, :Eq, :Ge, :Gt,
                         :GreaterThan, :LessThan,
                         :StrictGreaterThan, :StrictLessThan,
                         :Equality, :Unequality
-                        ), typ=:Number) ## Lt fails to come in?
+                        ), typ=:Number) ## :Lt is in Base.Order
 
 end
-## oddity???
-Lt(x::Number, args...;kwargs...) = sympy.Lt(x, args...; kwargs...)
+
+## :Lt is in Base.Order
+Base.Order.Lt(x::Number, args...;kwargs...) = sympy.Lt(x, args...; kwargs...)
 export(Lt)
 
 end # module

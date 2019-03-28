@@ -131,24 +131,6 @@ end
 # method for vectors, linear indexing
 Base.getindex(V::SymMatrix, i::Int) = V[i,0]
 Base.getindex(M::SymMatrix) = M
-
-## function Base.setindex!(M::SymMatrix, X, I...)
-##     sh = M.shape
-##     if length(sh) >= 2 && sh[2] > 1
-##         m,n = sh
-##         U = OffsetArray(convert(Matrix{Sym}, M), 0:m-1, 0:n-1)
-##         setindex!(U, X, I...)
-##         U1 = collect(U) #[U[i,j] for i in 0:(m-1), j in 0:(n-1)]
-##         M1 = convert(SymMatrix, U1)
-##     else
-##         n = sh[1]
-##         U = OffsetVector(convert(Vector{Sym}, M), 0:n-1)
-##         setindex!(U, X, I...)
-##         U1 = collect(U)
-##         M1 = convert(SymMatrix, U1)
-##     end
-##     copy!(M.x, M1.x)
-## end
 Base.lastindex(M::SymMatrix, i::Int) = M.shape[i]
 
 function Base.convert(::Type{SymMatrix}, M::AbstractArray{T, N}) where {T <: Number, N}

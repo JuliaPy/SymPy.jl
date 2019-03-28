@@ -1,4 +1,5 @@
 ##################################################
+## SymbolicObject types have field x::PyCall.PyObject
 
 ## Symbol class for controlling dispatch
 abstract type SymbolicObject <: Number end
@@ -46,7 +47,7 @@ export SymPermutationGroup
 Base.convert(::Type{SymPermutationGroup}, o::PyCall.PyObject) = SymPermutationGroup(o)
 
 
-
+##################################################
 
 ## important override
 ## this allows most things to flow though PyCall
@@ -56,6 +57,9 @@ PyCall.PyObject(x::SymbolicObject) = x.x
 ## Override this so that using symbols as keys in a dict works
 hash(x::SymbolicObject) = hash(PyObject(x))
 ==(x::SymbolicObject, y::SymbolicObject) = PyObject(x) == PyObject(y)
+
+##################################################
+
 
 ## Show methods
 "create basic printed output"

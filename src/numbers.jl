@@ -38,19 +38,6 @@ Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy.Catalan)
 Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
 
 
-
-
-## ## properties
-## number_properties = (:is_even, :is_odd,
-##                      :is_number, :is_integer, :is_real,
-##                      :is_complex, :is_rational,
-##                      :is_commutative)
-## for prop in number_properties
-##     prop_name = string(prop)
-##     @eval ($prop)(ex::SymbolicObject) = PyCall.hasproperty(PyObject(ex), Symbol($prop_name)) &&  getproperty(PyObject(ex), Symbol($prop_name))
-##     eval(Expr(:export, prop))
-## end
-
 """
 
 Convert a `Sym` value to a numeric Julian value.
@@ -226,19 +213,6 @@ end
 
 
 
-## const relational_sympy_values = (:GreaterThan, :LessThan,
-##                                  :StrictGreaterThan, :StrictLessThan,
-##                                  :Equality, :Unequality)
-## for meth in relational_sympy_values
-##     meth_name = string(meth)
-##     @eval begin
-## #         @doc """
-## # `$($meth_name)`: a SymPy function. [cf.](http://docs.sympy.org/dev/_modules/sympy/core/relational.html)
-## # """ ->
-##         ($meth)(a::Real, b::Real) = getproperty($sympy,$meth_name)(a, b)
-##     end
-## #    eval(Expr(:export, meth))
-## end
 
 
 ##################################################

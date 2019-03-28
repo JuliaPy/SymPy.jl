@@ -20,6 +20,17 @@ Base.sinc(x::Sym) = sympy.sinc(PI*x)
 cosc(x::Sym) = diff(sinc(x))
 
 Base.sincos(x::Sym) = (sin(x), cos(x))
+Base.sinpi(x::Sym) = sympy.sin(x*PI)
+Base.cospi(x::Sym) = sympy.cos(x*PI)
+degree_variants = (:sind, :cosd, :tand, :cotd, :secd, :cscd,
+                   :asind, :acosd, :atand, :acotd, :asecd, :acscd)
+
+for  methvar in degree_variants
+    meth = Symbol(String(methvar)[1:end-1])
+    @eval begin
+        (Base.$methvar)(ex::SymbolicObject) = ($meth)(PI*ex)
+    end
+end
 
 Base.rad2deg(x::Sym) = (x * 180) / PI
 Base.deg2rad(x::Sym) = (x * PI) / 180
@@ -27,8 +38,8 @@ Base.deg2rad(x::Sym) = (x * PI) / 180
 ## exponential
 Base.log(x::Sym) = sympy.log(x)
 Base.log(b::Number, x::Sym) = sympy.log(x, b)
-
-
+Base.log2(x::SymbolicObject) = log(2,x)
+Base.log10(x::SymbolicObject) = log(10,x)
 
 
 

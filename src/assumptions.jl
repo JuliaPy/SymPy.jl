@@ -31,14 +31,6 @@ export ask
 ## these are in logic module
 
 
-## simple methods (x, args) -> y (y coercion happens via PyCall)
-logic_sympy_methods = (
-                     :And, :Or, :Not,
-                     :Xor, :Nand, :Nor, :Implies,
-                     :Equivalent,
-                     :satisfiable
-                     )
-
 
 ## We make a module Q to hold the assumptions
 ## this follows this page http://docs.sympy.org/0.7.5/_modules/sympy/assumptions/ask.html
@@ -139,10 +131,6 @@ Q_predicates = (:antihermitian,
 for meth in Q_predicates
    nm = string(meth)
       @eval begin
-#             @doc """
-# `$($nm)`: a SymPy function.
-# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($nm)
-# """ ->
             ($meth)(x) = PyCall.pycall(SymPy.sympy.Q.$nm, SymPy.Sym, x)::SymPy.Sym
    end
 end

@@ -20,12 +20,31 @@ Base.isequal(a::Number, b::Sym) = Eq(promote(a,b)...) == True
 
 
 # Floating point bits
-Base.copysign(x::Sym, y::Number) = abs(x) * sign(y)
 Base.eps(::Type{Sym}) = zero(Sym)
-Base.flipsign(x::Sym, y) = signbit(y) ? -x : x
+Base.eps(::Sym) = zero(Sym)
 Base.signbit(x::Sym) = x < 0
+Base.copysign(x::Sym, y::Number) = abs(x) * sign(y)
+Base.flipsign(x::Sym, y) = signbit(y) ? -x : x
 Base.typemax(::Type{Sym}) = oo
 Base.typemin(::Type{Sym}) = -oo
+
+Base.fld(x::SymbolicObject, y) = floor(x/y)
+Base.cld(x::SymbolicObject, y) = ceil(x/y)
+Base.mod(x::SymbolicObject, args...)= Mod(x, args...)
+#Base.mod1
+#Base.mod2pi
+#Base.fldmod
+
+
+function Base.round(x::Sym; kwargs...)
+    length(free_symbols(x)) > 0 && throw(ArgumentError("can't round a symbolic expression"))
+    round(N(x); kwargs...)
+end
+
+function Base.trunc(x::Sym; kwargs...)
+    length(free_symbols(x)) > 0 && throw(ArgumentError("can't truncate a symbolic expression"))
+    trunc(N(x); kwargs...)
+end
 
 # check on type of number
 # these are boolean: true/false; not tru/false/nothing,as in SymPy
@@ -82,15 +101,6 @@ Base.imag(x::Sym) = _imag(N(x))
 _imag(x::Sym) = sympy.im(x)
 _imag(x) = imag(x)
 
-
-
-function Base.round(x::Sym; digits=1, kwargs...)
-    if is_(:Float, x)
-        return x.round(digits)
-    else
-        return round(N(x); digits=digits, kwargs...)
-    end
-end
 
 
 

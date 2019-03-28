@@ -7,13 +7,6 @@ function Base.convert(::Type{Set}, s::Sym)
     is_(:FiniteSet,s) || throw(ArgumentError("`s` must be a finite set"))
     s1 = Set(u for u in s.x)
 
-      ## for el in copy(s1)
-      ##     if !isa(el, Set) && !(el.x.is_Symbol) && is_FiniteSet(s) && length(el.x) > 1
-      ##         ## replace python FiniteSet with julian Set
-      ##         setdiff!(s1, Set([el]))
-      ##         push!(s1, Set(convert(Set, el)))
-  ##     end
-  ## end
     s1
 end
 

@@ -80,68 +80,6 @@ function loaded_modules()
     eval.(Ms)
 end
 
-## """
-##     from_import(PyCallModule; Ms, fns)
-
-## Mimic `from module import *` within `Julia`
-
-## * searches for all functions in PyCallModule, and creates a Julia function specialized on the first argument being a symbolic object.
-## * If this function is exported by a module in Ms, it is extended, if not, it is exported.
-
-## This only imports function objects. Classes are not imported. For example, `sympy.Matrix` is needed and not `Matrix`.
-## """
-## function from_import_all(sm;
-##                          Ms=(Base, LinearAlgebra, SpecialFunctions,Base.MathConstants),
-##                          fns=nothing,
-##                          exclude = ()
-##                          )
-
-
-##     for (k,v) in (fns == nothing ? _get_member_functions(sm, exclude) : fns)
-##         meth = Symbol(k)
-##         inMs = false
-##         for M in Ms
-##             if isdefined(M, meth)
-##                 inMs = true
-## #                @show k
-##                 @eval begin
-##                     ($M.$meth)(ex::SymbolicObject, args...; kwargs...) =
-##                         getproperty($sm,$k)(ex, args...; kwargs...)
-##                 end
-##                 break
-##             end
-##         end
-##         if !inMs
-##             ## need to export
-## #            @show "export", k
-##             @eval begin
-##                 ($meth)(ex::SymbolicObject, args...; kwargs...) =
-##                     getproperty($sm,$k)(ex, args...; kwargs...)
-##             end
-##             eval(Expr(:export, meth))
-##         end
-##     end
-## end
-
-## """
-##     from_import(PyCallModule, meths; Ms)
-
-## Mimics `from module import a, b, c`.
-
-## This is similar to `from_import` only just those specified methods in `meths` are considered.
-## """
-## function from_import(sm, meths;
-##                      Ms=(Base, LinearAlgebra, SpecialFunctions, Base.MathConstants))
-##     mems = PyCall.inspect.getmembers(sm)
-##     fns = Dict()
-##     for (m,p) in mems
-##         if Symbol(m) in meths
-##             fns[m] = p
-##         end
-##     end
-##     from_import_all(sm; Ms=Ms, fns=fns)
-## end
-
 # default list of modules to search for namespace collicsions
 const base_Ms = (Base, SpecialFunctions, Base.MathConstants,
            LinearAlgebra, OffsetArrays
@@ -158,7 +96,7 @@ const base_Ms = (Base, SpecialFunctions, Base.MathConstants,
 # these are still accesible through dot-call syntax.
 #
 const base_exclude=("C", "lambdify",
-              "latex", "eye", "sympify",
+              "latex", "eye", "sympify","symbols",
               "div", "log", "sinc",
               "dsolve",
               "ask",
