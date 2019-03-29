@@ -342,11 +342,11 @@ real_roots(p)</pre>
 <pre class="output">
 Dict{Any,Any} with 7 entries:
   1 => 1
-  3 => 2
+  -1/2 - sqrt(3)*I/2 => 1
   -1/2 + sqrt(3)*I/2 => 1
+  3 => 2
   0 => 1
   -1 => 1
-  -1/2 - sqrt(3)*I/2 => 1
   2 => 1</pre>
 
 <p>When exact answers are not provided, the <code>roots</code> call is contentless:</p><pre class="sourceCode julia">p = x^5 - x + 1
@@ -392,7 +392,7 @@ collect(Set(v...))</pre>
 
 <p>The <code>elements</code> function does not work for more complicated (non-finite) sets, such as <code>u</code>. For these, the <code>contains</code> method may be useful to query the underlying elements</p><p>Solving within Sympy has limits. For example, there is no symbolic solution here:</p><pre class="sourceCode julia">solve(cos(x) - x)</pre>
 <pre class="output">
-PyError ($(Expr(:escape, :(ccall(#= /Users/verzani/.julia/packages/PyCall/RQjD7/src/pyfncall.jl:44 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'NotImplementedError'>
+PyError ($(Expr(:escape, :(ccall(#= /Users/verzani/.julia/packages/PyCall/a5Jd3/src/pyfncall.jl:44 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'NotImplementedError'>
 NotImplementedError('multiple generators [x, cos(x)]\nNo algorithms are implemented to solve equation -x + cos(x)')
   File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/solvers/solvers.py", line 1162, in solve
     solution = _solve(f[0], *symbols, **flags)
@@ -439,9 +439,9 @@ exs = [fn(0*h)-p(x=>0), fn(h)-p(x => h), fn(2h)-p(x => 2h)]
 d = solve(exs, [a,b,c])</pre>
 <pre class="output">
 Dict{Any,Any} with 3 entries:
-  c => 1
   a => (-2*cos(h) + cos(2*h) + 1)/(2*h^2)
-  b => (4*cos(h) - cos(2*h) - 3)/(2*h)</pre>
+  b => (4*cos(h) - cos(2*h) - 3)/(2*h)
+  c => 1</pre>
 
 <p>Again, a dictionary is returned. The polynomial itself can be found by substituting back in for <code>a</code>, <code>b</code>, and <code>c</code>:</p><pre class="sourceCode julia">quad_approx = p.subs(d)</pre>
 <div class="well well-sm">
@@ -456,9 +456,9 @@ q = sum([bs[i+1]*(x-c)^i for i in 0:(n-1)])
 solve(p-q, bs)</pre>
 <pre class="output">
 Dict{Any,Any} with 3 entries:
+  b2 => a2
   b0 => a0 + a1*c + a2*c^2
-  b1 => a1 + 2*a2*c
-  b2 => a2</pre>
+  b1 => a1 + 2*a2*c</pre>
 
 <h3>Solving using logical operators</h3><p>The <code>solve</code> function does not need to just solve <code>ex &#61; 0</code>. There are other means to specify an equation. Ideally, it would be nice to say <code>ex1 &#61;&#61; ex2</code>, but the interpretation of <code>&#61;&#61;</code> is not for this. Rather, <code>SymPy</code> introduces <code>Eq</code> for equality. So this expression</p><pre class="sourceCode julia">solve(Eq(x, 1))</pre>
 <div class="well well-sm">
@@ -769,10 +769,9 @@ sn.doit()</pre>
 <div class="well well-sm">
 \begin{equation*}\operatorname{harmonic}{\left (n,2 \right )}\end{equation*}</div>
 
-<p>And from this a limit is available:</p><pre class="sourceCode julia">limit(doit(sn), n, oo)</pre>
-<pre class="output">
-UndefVarError(:doit)
-</pre>
+<p>And from this a limit is available:</p><pre class="sourceCode julia">limit(sn.doit(), n, oo)</pre>
+<div class="well well-sm">
+\begin{equation*}\frac{\pi^{2}}{6}\end{equation*}</div>
 
 <p>This would have also been possible through <code>summation&#40;1/i^2, &#40;i, 1, oo&#41;&#41;</code>.</p><h3>Vector-valued functions</h3><p>Julia makes constructing a vector of symbolic objects easy:</p><pre class="sourceCode julia">x,y = symbols("x,y")
 v = [1,2,x]
@@ -909,7 +908,7 @@ ex = Eq( (m/k)*v'(t), alpha^2 - v(t)^2 )</pre>
 <div class="well well-sm">
 \begin{equation*}\frac{m \frac{d}{d t} v{\left (t \right )}}{k} = \alpha^{2} - v^{2}{\left (t \right )}\end{equation*}</div>
 
-<p>We can "classify" this ODE with the method <code>classify_ode</code> function.</p><pre class="sourceCode julia">classify_ode(ex)</pre>
+<p>We can "classify" this ODE with the method <code>classify_ode</code> function.</p><pre class="sourceCode julia">sympy.classify_ode(ex)</pre>
 <pre class="output">
 ("separable", "1st_power_series", "lie_group", "separable_Integral")</pre>
 

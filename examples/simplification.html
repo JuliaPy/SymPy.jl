@@ -111,7 +111,10 @@ $( document ).ready(function() {
 </li>
 <li><p>pretty printing in enable by default</p>
 </li>
+<li><p>we input extra functions from <code>sympy</code> such as <code>powsimp</code>, ...</p>
+</li>
 </ul><pre class="sourceCode julia">using SymPy
+import_from(sympy)
 x, y, z = symbols("x y z")</pre>
 <pre class="output">
 (x, y, z)</pre>
@@ -683,7 +686,7 @@ k, m, n = symbols("k m n")</pre>
 </li>
 </ul><pre class="sourceCode julia">sympy.hyperexpand(hyper([1, 1], [2], z))</pre>
 <pre class="output">
-MethodError(SymPy.hyper, ([1, 1], [2], z), 0x0000000000006d19)
+MethodError(SymPy.hyper, ([1, 1], [2], z), 0x0000000000007b9f)
 </pre>
 
 <hr /><p><code>hyperexpand&#40;&#41;</code> also works on the more general Meijer G-function (see :py:meth:<code>its documentation &lt;sympy.functions.special.hyper.meijerg&gt;</code> for more information).</p><pre class="sourceCode julia">    >>> expr = meijerg([[1],[1]], [[1],[]], -z)
@@ -921,7 +924,7 @@ l = symbols("a0:5")
 l = l[randperm(length(l))]
 orig_frac = frac = cancel(list_to_frac(l))</pre>
 <div class="well well-sm">
-\begin{equation*}\frac{a_{0} a_{1} a_{2} a_{3}^{2} a_{4} + a_{0} a_{1} a_{2} a_{3} + a_{0} a_{1} a_{2} a_{4} + a_{0} a_{2} a_{3}^{2} + a_{0} a_{2} + a_{0} a_{3}^{2} a_{4} + a_{0} a_{3} + a_{0} a_{4} + a_{1} a_{3}^{2} a_{4} + a_{1} a_{3} + a_{1} a_{4} + a_{3}^{2} + 1}{a_{0} a_{1} a_{2} a_{3} a_{4} + a_{0} a_{1} a_{2} + a_{0} a_{2} a_{3} + a_{0} a_{3} a_{4} + a_{0} + a_{1} a_{3} a_{4} + a_{1} + a_{3}}\end{equation*}</div>
+\begin{equation*}\frac{a_{0} a_{1} a_{2} a_{3} a_{4}^{2} + a_{0} a_{1} a_{2} a_{3} + a_{0} a_{1} a_{2} a_{4} + a_{0} a_{2} a_{4}^{2} + a_{0} a_{2} + a_{0} a_{3} a_{4}^{2} + a_{0} a_{3} + a_{0} a_{4} + a_{1} a_{3} a_{4}^{2} + a_{1} a_{3} + a_{1} a_{4} + a_{4}^{2} + 1}{a_{0} a_{1} a_{2} a_{3} a_{4} + a_{0} a_{1} a_{2} + a_{0} a_{2} a_{4} + a_{0} a_{3} a_{4} + a_{0} + a_{1} a_{3} a_{4} + a_{1} + a_{4}}\end{equation*}</div>
 
 <hr /><p>Click on "Run code block in SymPy Live" on the definition of <code>list_to_frac&#40;&#41;</code> above, and then on the above example, and try to reproduce <code>l</code> from <code>frac</code>.  I have deleted <code>l</code> at the end to remove the temptation for peeking (you can check your answer at the end by calling <code>cancel&#40;list_to_frac&#40;l&#41;&#41;</code> on the list that you generate at the end, and comparing it to <code>orig_frac</code>.</p><p>See if you can think of a way to figure out what symbol to pass to <code>apart&#40;&#41;</code> at each stage (hint: think of what happens to $a_0$ in the formula $a_0 + \frac{1}{a_1 + \cdots}$ when it is canceled).</p><div class="admonition note"><p class="admonition-title">Note</p><p>Answer: a0 is the only symbol that does not appear in the denominator</p>
 </div><hr /><p><a href="./index.html">return to index</a></p>

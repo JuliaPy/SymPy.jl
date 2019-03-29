@@ -147,7 +147,7 @@ Use `sympy.dsolve(ex, f(x); kwargs...)` directly for that underlying interface.
     end
 
     out = sympy.dsolve(eqn; kwargs...)
-    ord = ode_order(eqn, var)
+    ord = sympy.ode_order(eqn, var)
 
     ## `out` may be an array of solutions. If so we do each one.
     ## we want to use an array for output only if needed

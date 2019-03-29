@@ -268,15 +268,15 @@ dsolve(y''(t) - y(t) - exp(t), y(t))</pre>
 </ul><pre class="sourceCode julia">out = sympy.Matrix([[1, 2], [2, 2]]).eigenvals()</pre>
 <pre class="output">
 Dict{Any,Any} with 2 entries:
-  3/2 + sqrt(17)/2 => 1
-  -sqrt(17)/2 + 3/2 => 1</pre>
+  -sqrt(17)/2 + 3/2 => 1
+  3/2 + sqrt(17)/2 => 1</pre>
 
 <ul>
 <li><p>This can be pretty printed if the keys become symbolic:</p>
 </li>
 </ul><pre class="sourceCode julia">convert(Dict{Sym, Any}, out)</pre>
 <div class="well well-sm">
-\begin{equation*}\begin{cases}\frac{3}{2} + \frac{\sqrt{17}}{2} & \text{=>} &1\\- \frac{\sqrt{17}}{2} + \frac{3}{2} & \text{=>} &1\\\end{cases}\end{equation*}</div>
+\begin{equation*}\begin{cases}- \frac{\sqrt{17}}{2} + \frac{3}{2} & \text{=>} &1\\\frac{3}{2} + \frac{\sqrt{17}}{2} & \text{=>} &1\\\end{cases}\end{equation*}</div>
 
 <hr /><p>Rewrite the Bessel function $J_{\nu}\left(z\right)$ in terms of the spherical Bessel function $j_\nu(z)$.</p><pre class="sourceCode julia">  >>> besselj(nu, z).rewrite(jn)
   √2⋅√z⋅jn(ν - 1/2, z)

@@ -292,7 +292,7 @@ operations **do not** operate in place.
 
 ```
 M
-M = M.row_insert(1, Matrix([[0, 4]]))
+M = M.row_insert(1, Sym[0 4])
 M
 ```
 

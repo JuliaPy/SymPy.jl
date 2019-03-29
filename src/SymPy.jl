@@ -10,14 +10,19 @@ are treated symbolically and not evaluated immediately. Instances of
 this type are created by the constructor `Sym`, the function `symbols` or the macro
 `@vars`.
 
-Almost all the basic functions from the `sympy` module are defined a generic functions with their first argument narrowed to symbolic types. SyMpy methods are called through Python's dot-call syntax.
-To find documentation on SymPy functions and methods, one should refer to
+On loading, a priviledged set of the functions from the `sympy` module
+are defined as generic functions with their first argument narrowed to
+symbolic types. Others may be accessed by qualification, as in
+`sympy.trigsimp`. Calling `import_from(sympy)` will import the
+rest. SymPy methods are called through Python's dot-call syntax.  To
+find documentation on SymPy functions and methods, one should refer to
 SymPy's [website](http://docs.sympy.org/latest/index.html).
 
-Plotting is provided through the `Plots` interface. For details, see the help page for `sympy_plotting`.
+Plotting is provided through the `Plots` interface. For details, see
+the help page for `sympy_plotting`.
 
 The package tutorial provides many examples. This can be read on
-[GitHub](https://github.com/PyCall/SymPy.jl/blob/master/examples/tutorial.ipynb).
+[GitHub](http://nbviewer.ipython.org/github/JuliaPy/SymPy.jl/blob/master/examples/tutorial.ipynb).
 
 """
 module SymPy
@@ -44,7 +49,7 @@ import Base: +, -, *, /, //, \, ^
 export @vars, Sym, sympify, symbols, @symfuns, @syms
 export SymMatrix, SymFunction
 export PI, IM, oo, zoo, True, False
-export N
+export N, subs
 
 export sympy, import_from#, import_sympy
 export free_symbols
@@ -145,11 +150,51 @@ function __init__()
 
 end
 
+
+## On load, generic functions in the base modules that match a function in sympy.* are
+## defined on `Sym` objects, as are those listed here:
+##
+priviledged = (:And, :Or, :Not, :Xor,
+               #
+               :apart, :cancel, :cse, :expand, :factor, :flatten, :nsimplify,
+               :isolate, :simplify, :together, :unflatten,
+               #
+               :srepr,:doit,
+               #
+               :integrate, :line_integrate, :interpolate, :limit, :series, :summation,
+               :hessian,
+               #
+               :prime, :multiplicity, :degree, :coeffs,
+               #
+               :DiracDelta, :Heaviside,
+               #
+               :linsolve, :nonlinsolve, :nroots, :nsolve, :pdsolve, :real_root,
+               :real_roots, :root, :rootof, :roots, :rsolve, :solve, :solveset,
+               :ode_order,
+               #
+               :Min, :Max, :Abs,:numer, :denom, :conjugate, :ln,
+               #
+               :intersection, :intervals, :isprime
+
+               )
+
+
+function in_base(uv)
+    u = Symbol(uv[1])
+    for M in base_Ms
+        isdefined(M, u) && return true
+    end
+    false
+end
+is_function(uv) = SymPy.pycall_hasproperty(uv[2], :__class__) &&  occursin("unction", uv[2].__class__.__name__)
+
+
+
 """
     import_sympy
 
-This method imports all functions from both `mpmath` and `sympy` as well as the relational operators, which
-don't get swept up by `import_from`.
+This method imports all functions from `mpmath` and a priviledged set
+of functions from `sympy`, as well as the relational operators.
 
 These functions are narrowed on their first argument being of type `SymbolicObject`.
 
@@ -167,17 +212,22 @@ function import_sympy()
     if mpmath != PyCall.PyNULL()
         import_from(mpmath)
     end
-    import_from(sympy)
+    ## import from
+    ## import_from(sympy)
+    d = Introspection.getmembers(sympy)
+    d1 = filter(uv -> in_base(uv) && is_function(uv), d)
+    import_from(sympy, setdiff(Symbol.(collect(keys(d1))),  Symbol.(base_exclude)))
+    import_from(sympy, priviledged)
     import_from(sympy, (:Ne,  :Le, :Eq, :Ge, :Gt,
                         :GreaterThan, :LessThan,
                         :StrictGreaterThan, :StrictLessThan,
                         :Equality, :Unequality
-                        ), typ=:Number) ## :Lt is in Base.Order
-
+                        ), typ=:Number)
 end
 
 ## :Lt is in Base.Order
-Base.Order.Lt(x::Number, args...;kwargs...) = sympy.Lt(x, args...; kwargs...)
+import Base.Order: Lt
+Lt(x::Number, args...;kwargs...) = sympy.Lt(x, args...; kwargs...)
 export(Lt)
 
 end # module

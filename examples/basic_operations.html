@@ -110,7 +110,12 @@ x, y, z = symbols("x y z")</pre>
 <pre class="output">
 (x, y, z)</pre>
 
-<hr /><h2>Substitution</h2><p>One of the most common things you might want to do with a mathematical expression is substitution.  Substitution replaces all instances of something in an expression with something else.  It is done using the <code>subs</code> method. For example</p><pre class="sourceCode julia">    >>> expr = cos(x) + 1
+<ul>
+<li><p>We didn't replicate <code>from sympy import *</code>, though this is mostly done through the command <code>import_from&#40;sympy&#41;</code>.  By default, <code>SymPy</code> only makes available a priviledged collection of the functions available through the <code>sympy</code> object. The <code>import_from</code> imports most all of the rest.</p>
+</li>
+<li><p>If a function is not imported, it may be referenced through qualification, asin <code>sympy.expand_trig</code>, as will be seen in the following.</p>
+</li>
+</ul><hr /><h2>Substitution</h2><p>One of the most common things you might want to do with a mathematical expression is substitution.  Substitution replaces all instances of something in an expression with something else.  It is done using the <code>subs</code> method. For example</p><pre class="sourceCode julia">    >>> expr = cos(x) + 1
     >>> expr.subs(x, y)
     cos(y) + 1</pre>
 <h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = cos(x) + 1
@@ -163,8 +168,11 @@ expr</pre>
    2*sin(x)*cos(x) + 2*cos(x)**2 - 1
    >>> expr.subs(sin(2*x), 2*sin(x)*cos(x))
    2*sin(x)*cos(x) + cos(2*x)</pre>
-<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = sin(2*x) + cos(2*x)
-expand_trig(expr)</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p><code>expand_trig</code> is not exported, so we qualify it:</p>
+</li>
+</ul><pre class="sourceCode julia">expr = sin(2*x) + cos(2*x)
+sympy.expand_trig(expr)</pre>
 <div class="well well-sm">
 \begin{equation*}2 \sin{\left (x \right )} \cos{\left (x \right )} + 2 \cos^{2}{\left (x \right )} - 1\end{equation*}</div>
 

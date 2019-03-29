@@ -21,9 +21,11 @@ To make this document easier to read, we are going to enable pretty printing.
 
 * " not ' are used for strings:
 * pretty printing in enable by default
+* we input extra functions from `sympy` such as `powsimp`, ...
 
 ```
 using SymPy
+import_from(sympy)
 x, y, z = symbols("x y z")
 ```
 

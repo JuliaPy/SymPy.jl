@@ -28,6 +28,61 @@ function (ex::Sym)(kvs::Pair...)
     ex
 end
 
+##################################################
+## subs
+##
+"""
+`subs` is used to subsitute a value in an expression with another
+value.
+Examples:
+
+```
+x,y = symbols("x,y")
+ex = (x-y)*(x+2y)
+subs(ex, (y, y^2))
+subs(ex, (x,1), (y,2))
+subs(ex, (x,y^3), (y,2))
+subs(ex, y, 3)
+```
+
+There is a curried form of `subs` to use with the chaining `|>` operator
+
+```
+ex |> subs(x,e)
+```
+The use of pairs gives a convenient alternative:
+
+```
+subs(ex, x=>1, y=>2)
+ex |> subs(x=>1, y=>2)
+```
+
+Examples:
+
+```
+subs(ex, :y, pi)    # using a symbol, not a symbolic object
+subs(ex, x=1, y=pi) # using keyword argument, and not pairs
+## or their curried or call forms
+ex |> subs(:x, e)
+ex |> subs(x=e)
+ex(x=2, y=3)
+```
+
+"""
+subs(ex::T, y::Tuple{Any, Any}; kwargs...)          where {T <: SymbolicObject} = ex.subs(y[1], Sym(y[2]), kwargs...)
+subs(ex::T, y::Tuple{Any, Any}, args...; kwargs...) where {T <: SymbolicObject} = subs(subs(ex, y), args...)
+subs(ex::T, y::S, val; kwargs...)                   where {T <: SymbolicObject, S<:SymbolicObject} = subs(ex, (y,val))
+subs(ex::T, dict::Dict; kwargs...)                  where {T <: SymbolicObject} = subs(ex, dict...)
+subs(ex::T, d::Pair...; kwargs...)                  where {T <: SymbolicObject} = subs(ex, ((p.first, p.second) for p in d)...)
+subs(exs::Tuple{T, N}, args...; kwargs...)          where {T <: SymbolicObject, N} = map(u -> subs(u, args...;kwargs...), exs)
+subs(x::Number, args...; kwargs...) = x
+
+## curried versions to use with |>
+subs(x::SymbolicObject, y; kwargs...) = ex -> subs(ex, x, y; kwargs...)
+subs(;kwargs...)                      = ex -> subs(ex; kwargs...)
+subs(dict::Dict; kwargs...)           = ex -> subs(ex, dict...; kwargs...)
+subs(d::Pair...; kwargs...)           = ex -> subs(ex, [(p.first, p.second) for p in d]...; kwargs...)
+
 
 ##################################################
 # avoid type piracy. After we call `pytype` mappings, some
@@ -96,7 +151,7 @@ const base_Ms = (Base, SpecialFunctions, Base.MathConstants,
 # these are still accesible through dot-call syntax.
 #
 const base_exclude=("C", "lambdify",
-              "latex", "eye", "sympify","symbols",
+              "latex", "eye", "sympify","symbols", "subs",
               "div", "log", "sinc",
               "dsolve",
               "ask",

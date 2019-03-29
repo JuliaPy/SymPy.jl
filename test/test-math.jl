@@ -16,8 +16,8 @@ using SpecialFunctions
     @test factorial(Sym(0)) == 1
     @test factorial(Sym(7)) == 5040
 
-    @test factorial2(Sym(5)) == 15
-    @test factorial2(Sym(-5)) == Sym(1)/3
+    @test sympy.factorial2(Sym(5)) == 15
+    @test sympy.factorial2(Sym(-5)) == Sym(1)/3
 
     @test erf(Sym(0)) == 0
     @test erf(Sym(oo)) == 1

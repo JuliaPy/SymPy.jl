@@ -656,9 +656,11 @@ the `differentiate_finite` function:
 
 ##### In `Julia`:
 
+* `differentiate_finite` is not exported
+
 ```
 f, g = symbols("f g", cls=sympy.Function)
-differentiate_finite(f(x)*g(x))
+sympy.differentiate_finite(f(x)*g(x))
 ```
 
 (The functions `f` and `g` can also be created with the command `@symfuns f g`, using the `@symfuns` macro.)
@@ -676,7 +678,7 @@ flag `evaluate=True`:
 ##### In `Julia`:
 
 ```
-differentiate_finite(f(x)*g(x), evaluate=true)
+sympy.differentiate_finite(f(x)*g(x), evaluate=true)
 ```
 
 ----
@@ -741,11 +743,8 @@ manually:
 
 ##### In `Julia`:
 
-the `finite_diff_weights` function that is exported requires a symbolic first argument. We can wrap it in `Sym` or qualify the function usage:
+the `finite_diff_weights` function that is not exported:
 
-```
-finite_diff_weights(Sym(2), [-3, -1, 2], 0)[end][end]
-```
 
 ```
 sympy.finite_diff_weights(2, [-3, -1, 2], 0)[end][end]
@@ -775,7 +774,7 @@ takes `order`, `x_list`, `y_list` and `x0` as parameters:
 
 ##### In `Julia`,
 
-again, we qualify `apply_finite_diff` as the first argument used is not symbolic:
+* `apply_finite_diff` is not exported:
 
 ```
 x_list = [-3, 1, 2]

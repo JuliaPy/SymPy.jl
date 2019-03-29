@@ -19,6 +19,14 @@ using SymPy
 x, y, z = symbols("x y z")
 ```
 
+* We didn't replicate `from sympy import *`, though this is mostly
+  done through the command `import_from(sympy)`.  By default, `SymPy`
+  only makes available a priviledged collection of the functions
+  available through the `sympy` object. The `import_from` imports most
+  all of the rest.
+
+* If a function is not imported, it may be referenced through qualification, asin `sympy.expand_trig`, as will be seen in the following.
+
 ----
 
 ## Substitution
@@ -127,9 +135,11 @@ The second is if we want to perform a very controlled simplification, or
 
 ##### In `Julia`:
 
+* `expand_trig` is not exported, so we qualify it:
+
 ```
 expr = sin(2*x) + cos(2*x)
-expand_trig(expr)
+sympy.expand_trig(expr)
 ```
 
 ```

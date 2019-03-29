@@ -1216,7 +1216,7 @@ sn.doit()
 And from this a limit is available:
 
 ```
-limit(doit(sn), n, oo)
+limit(sn.doit(), n, oo)
 ```
 
 This would have also been possible through `summation(1/i^2, (i, 1, oo))`.
@@ -1450,7 +1450,7 @@ ex = Eq( (m/k)*v'(t), alpha^2 - v(t)^2 )
 We can "classify" this ODE with the method `classify_ode` function.
 
 ```
-classify_ode(ex)
+sympy.classify_ode(ex)
 ```
 
 It is linear, but not solvable. Proceeding with `dsolve` gives:

@@ -57,12 +57,12 @@ import PyCall
     ## interfaces
     ex = (x-1)*(y-2)
     @test ex.subs(x, 1) == 0
-    ## @test ex.subs((x,1)) == 0   ## XXX removed
-    ## @test ex.subs((x,2),(y,2)) == 0 ## XXX removed
+    @test ex.subs(((x,1),)) == 0
+    @test ex.subs(((x,2),(y,2))) == 0
 
-    ##@test subs(ex, x=>1) == 0       # removed
-    ##@test subs(ex, x=>2, y=>2) == 0
-    ##@test subs(ex, Dict(x=>1)) == 0
+    @test subs(ex, x=>1) == 0       # removed
+    @test subs(ex, x=>2, y=>2) == 0
+    @test subs(ex, Dict(x=>1)) == 0
     @test ex(x=>1) == 0
     @test ex(x=>2, y=>2) == 0
     @test ex.subs(Dict(x=>1)) == 0
@@ -113,10 +113,10 @@ import PyCall
         dict1[string(x)] = i
     end
     for d in [dict1, dict2]
-##XXX        @test ex |> subs(d) == factorial(4)
-##XXX        @test subs(ex, d) == factorial(4)
-##XXX        @test subs(ex, d...) == factorial(4)
-##XXX        @test ex |> subs(d...) == factorial(4)
+        @test ex |> subs(d) == factorial(4)
+        @test subs(ex, d) == factorial(4)
+        @test subs(ex, d...) == factorial(4)
+        @test ex |> subs(d...) == factorial(4)
         @test ex(d) == factorial(4)
         @test ex(d...) == factorial(4)
     end
@@ -149,10 +149,10 @@ import PyCall
     @test p.coeffs() == Any[1,-3,2] # p.coeffs
 
     ## algebra
-    @test SymPy.expand((x + 1)*(x + 2)) == x^2 + 3x + 2  # v0.7 deprecates expand, in v1.0 this is fine w/o qualifacation
+    @test expand((x + 1)*(x + 2)) == x^2 + 3x + 2  # v0.7 deprecates expand, in v1.0 this is fine w/o qualifacation
     x1 = (x + 1)*(x + 2)
-    @test SymPy.expand(x1) == x^2 + 3x + 2
-    @test expand_trig(sin(2x)) == 2sin(x)*cos(x)
+    @test expand(x1) == x^2 + 3x + 2
+    @test sympy.expand_trig(sin(2x)) == 2sin(x)*cos(x)
 
     ## math functions
     u = abs(x^2 - 2)
@@ -171,7 +171,7 @@ import PyCall
     exs = [x-y-1, x+y-2]
     di = solve(exs)
     @test di[x] == 3//2
-##XXX    @test map(ex -> subs(ex, di), exs) == [0,0]
+    @test map(ex -> subs(ex, di), exs) == [0,0]
     solve([x-y-a, x+y], [x,y])
 
     ## linsolve
