@@ -1,0 +1,435 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+
+<!-- not TeX-AMS-MML_HTMLorMML-->
+<script type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) {
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Solvers</h1><p><a href="https://docs.sympy.org/latest/tutorial/solvers.html">From</a></p><pre class="sourceCode julia">    >>> from sympy import *
+    >>> x, y, z = symbols("x y z")
+    >>> init_printing(use_unicode=True)</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">using SymPy
+x, y, z = symbols("x y z")</pre>
+<pre class="output">
+(x, y, z)</pre>
+
+<hr /><h2>A Note about Equations</h2><p>Recall from the :ref:<code>gotchas &lt;tutorial_gotchas_equals&gt;</code> section of this tutorial that symbolic equations in SymPy are not represented by <code>&#61;</code> or <code>&#61;&#61;</code>, but by <code>Eq</code>.</p><pre class="sourceCode julia">    >>> Eq(x, y)
+    x = y</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">Eq(x, y)</pre>
+<div class="well well-sm">
+\begin{equation*}x = y\end{equation*}</div>
+
+<hr /><p>However, there is an even easier way.  In SymPy, any expression not in an <code>Eq</code> is automatically assumed to equal 0 by the solving functions.  Since <code>a &#61; b</code> if and only if <code>a - b &#61; 0</code>, this means that instead of using <code>x &#61;&#61; y</code>, you can just use <code>x - y</code>.  For example</p><pre class="sourceCode julia">    >>> solveset(Eq(x**2, 1), x)
+    {-1, 1}
+    >>> solveset(Eq(x**2 - 1, 0), x)
+    {-1, 1}
+    >>> solveset(x**2 - 1, x)
+    {-1, 1}</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">solveset(Eq(x^2, 1), x)</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{-1, 1\right\}\end{equation*}</div>
+
+<pre class="sourceCode julia">solveset(Eq(x^2 - 1, 0), x)</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{-1, 1\right\}\end{equation*}</div>
+
+<pre class="sourceCode julia">solveset(x^2 - 1, x)</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{-1, 1\right\}\end{equation*}</div>
+
+<hr /><p>This is particularly useful if the equation you wish to solve is already equal to 0. Instead of typing <code>solveset&#40;Eq&#40;expr, 0&#41;, x&#41;</code>, you can just use <code>solveset&#40;expr, x&#41;</code>.</p><h2>Solving Equations Algebraically</h2><p>The main function for solving algebraic equations is <code>solveset</code>. The syntax for <code>solveset</code> is <code>solveset&#40;equation, variable&#61;None, domain&#61;S.Complexes&#41;</code> Where <code>equations</code> may be in the form of <code>Eq</code> instances or expressions that are assumed to be equal to zero.</p><p>Please note that there is another function called <code>solve</code> which can also be used to solve equations. The syntax is <code>solve&#40;equations, variables&#41;</code> However, it is recommended to use <code>solveset</code> instead.</p><p>When solving a single equation, the output of <code>solveset</code> is a <code>FiniteSet</code> or an <code>Interval</code> or <code>ImageSet</code> of the solutions.</p><pre class="sourceCode julia">    >>> solveset(x**2 - x, x)
+    {0, 1}
+    >>> solveset(x - x, x, domain=S.Reals)
+    ℝ
+    >>> solveset(sin(x) - 1, x, domain=S.Reals)
+    ⎧        π        ⎫
+    ⎨2⋅n⋅π + ─ | n ∊ ℤ⎬
+    ⎩        2        ⎭</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p><code>S</code> is not exported, as it is not a function, so we create an alias:</p>
+</li>
+</ul><pre class="sourceCode julia">const S = sympy.S
+solveset(x^2 - x, x)</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{0, 1\right\}\end{equation*}</div>
+
+<pre class="sourceCode julia">solveset(x - x, x, domain=S.Reals)</pre>
+<div class="well well-sm">
+\begin{equation*}\mathbb{R}\end{equation*}</div>
+
+<pre class="sourceCode julia">solveset(sin(x) - 1, x, domain=S.Reals)</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{2 n \pi + \frac{\pi}{2}\; |\; n \in \mathbb{Z}\right\}\end{equation*}</div>
+
+<hr /><p>If there are no solutions, an <code>EmptySet</code> is returned and if it is not able to find solutions then a <code>ConditionSet</code> is returned.</p><pre class="sourceCode julia">    >>> solveset(exp(x), x)     # No solution exists
+    ∅
+    >>> solveset(cos(x) - x, x)  # Not able to find solution
+    {x | x ∊ ℂ ∧ -x + cos(x) = 0}</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">solveset(exp(x), x)     # No solution exists</pre>
+<div class="well well-sm">
+\begin{equation*}\emptyset\end{equation*}</div>
+
+<pre class="sourceCode julia">solveset(cos(x) - x, x)  # Not able to find solution</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{x \mid x \in \mathbb{C} \wedge - x + \cos{\left (x \right )} = 0 \right\}\end{equation*}</div>
+
+<hr /><p>In the <code>solveset</code> module, the linear system of equations is solved using <code>linsolve</code>. In future we would be able to use linsolve directly from <code>solveset</code>. Following is an example of the syntax of <code>linsolve</code>.</p><ul>
+<li><p>List of Equations Form:</p>
+</li>
+</ul><pre class="sourceCode julia">    >>> linsolve([x + y + z - 1, x + y + 2*z - 3 ], (x, y, z))</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">linsolve([x + y + z - 1, x + y + 2*z - 3 ], (x, y, z))</pre>
+<div class="well well-sm">
+\begin{equation*}\emptyset\end{equation*}</div>
+
+<hr /><ul>
+<li><p>Augmented</p>
+</li>
+</ul><p>Matrix Form:</p><pre class="sourceCode julia">	>>> linsolve(Matrix(([1, 1, 1, 1], [1, 1, 2, 3])), (x, y, z))
+	{(-y - 1, y, 2)}</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">linsolve(sympy.Matrix(([1, 1, 1, 1], [1, 1, 2, 3])), (x, y, z))</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{\left ( - y - 1, \quad y, \quad 2\right )\right\}\end{equation*}</div>
+
+<hr /><ul>
+<li><p>A*x = b Form</p>
+</li>
+</ul><pre class="sourceCode julia">	>>> M = Matrix(((1, 1, 1, 1), (1, 1, 2, 3)))
+	>>> system = A, b = M[:, :-1], M[:, -1]
+	>>> linsolve(system, x, y, z)
+	{(-y - 1, y, 2)}</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">M = sympy.Matrix(((1, 1, 1, 1), (1, 1, 2, 3)))
+system = A, b = M[:, 1:end-1], M[:, end]
+linsolve(system, x, y, z)</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{\left ( - y - 1, \quad y, \quad 2\right )\right\}\end{equation*}</div>
+
+<hr /><div class="admonition note"><p class="admonition-title">Note</p><p>The order of solution corresponds the order of given symbols.</p>
+</div><p>In the <code>solveset</code> module, the non linear system of equations is solved using <code>nonlinsolve</code>. Following are examples of <code>nonlinsolve</code>.</p><ol>
+<li><p>When only real solution is present:</p>
+</li>
+</ol><pre class="sourceCode julia">	>>> a, b, c, d = symbols('a, b, c, d', real=True)
+	>>> nonlinsolve([a**2 + a, a - b], [a, b])
+	{(-1, -1), (0, 0)}
+	>>> nonlinsolve([x*y - 1, x - 2], x, y)
+	{(2, 1/2)}</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>we pass <code>&#91;a,b&#93;</code> as either <code>a, b</code> or using a tuple, as in <code>&#40;a,b&#41;</code>, but <em>not</em> as a vector, as this gets mapped into a vector of symbolic objects which causes issues with <code>nonlinsolve</code>:</p>
+</li>
+</ul><pre class="sourceCode julia">a, b, c, d = symbols("a, b, c, d", real=true)
+nonlinsolve([a^2 + a, a - b], a, b)</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{\left ( -1, \quad -1\right ), \left ( 0, \quad 0\right )\right\}\end{equation*}</div>
+
+<pre class="sourceCode julia">nonlinsolve([x*y - 1, x - 2], x, y)</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{\left ( 2, \quad \frac{1}{2}\right )\right\}\end{equation*}</div>
+
+<hr /><ol start="2">
+<li><p>When only complex solution is present:</p>
+</li>
+</ol><pre class="sourceCode julia">	>>> nonlinsolve([x**2 + 1, y**2 + 1], [x, y])
+	{(-ⅈ, -ⅈ), (-ⅈ, ⅈ), (ⅈ, -ⅈ), (ⅈ, ⅈ)}</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">nonlinsolve([x^2 + 1, y^2 + 1], (x, y))</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{\left ( - i, \quad - i\right ), \left ( - i, \quad i\right ), \left ( i, \quad - i\right ), \left ( i, \quad i\right )\right\}\end{equation*}</div>
+
+<hr /><ol start="3">
+<li><p>When both real and complex solution is present:</p>
+</li>
+</ol><pre class="sourceCode julia">	>>> from sympy import sqrt
+	>>> system = [x**2 - 2*y**2 -2, x*y - 2]
+	>>> vars = [x, y]
+	>>> nonlinsolve(system, vars)
+	{(-2, -1), (2, 1), (-√2⋅ⅈ, √2⋅ⅈ), (√2⋅ⅈ, -√2⋅ⅈ)}
+
+	>>> n = Dummy('n')
+	>>> system = [exp(x) - sin(y), 1/y - 3]
+	>>> real_soln = (log(sin(S(1)/3)), S(1)/3)
+	>>> img_lamda = Lambda(n, 2*n*I*pi + Mod(log(sin(S(1)/3)), 2*I*pi))
+	>>> complex_soln = (ImageSet(img_lamda, S.Integers), S(1)/3)
+	>>> soln = FiniteSet(real_soln, complex_soln)
+	>>> nonlinsolve(system, [x, y]) == soln
+	True</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>we must remove the spaces within <code>&#91;&#93;</code></p>
+</li>
+<li><p>we must pass vars as a tuple:</p>
+</li>
+</ul><pre class="sourceCode julia">system = [x^2-2*y^2-2, x*y-2]
+vars = (x, y)
+nonlinsolve(system, vars)</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{\left ( -2, \quad -1\right ), \left ( 2, \quad 1\right ), \left ( - \sqrt{2} i, \quad \sqrt{2} i\right ), \left ( \sqrt{2} i, \quad - \sqrt{2} i\right )\right\}\end{equation*}</div>
+
+<p>However, the next bit requires some modifications to run:</p><ul>
+<li><p>the <code>system</code> array definition must have extra spaces removed</p>
+</li>
+<li><p><code>Dummy</code>, <code>Lambda</code>, <code>Mod</code>, <code>ImageSet</code>, <code>FiniteSet</code> aren't exported</p>
+</li>
+<li><p>we need <code>PI</code>, not <code>pi</code> to have a symbolic value</p>
+</li>
+</ul><pre class="sourceCode julia">n = sympy.Dummy("n")
+system = [exp(x)-sin(y), 1/y-3]
+real_soln = (log(sin(S(1)/3)), S(1)/3)
+img_lamda = sympy.Lambda(n, 2*n*IM*PI + sympy.Mod(log(sin(S(1)/3)), 2*IM*PI))
+complex_soln = (sympy.ImageSet(img_lamda, S.Integers), S(1)/3)
+soln = sympy.FiniteSet(real_soln, complex_soln)
+nonlinsolve(system, (x, y)) == soln</pre>
+<pre class="output">
+true</pre>
+
+<hr /><ol start="4">
+<li><p>If non linear system of equations is Positive dimensional system (A system with</p>
+</li>
+</ol><p>infinitely many solutions is said to be positive-dimensional):</p><pre class="sourceCode julia">	>>> nonlinsolve([x*y, x*y - x], [x, y])
+	{(0, y)}
+
+	>>> system = [a**2 + a*c, a - b]
+	>>> nonlinsolve(system, [a, b])
+	{(0, 0), (-c, -c)}</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>again, we use a tuple for the variables:</p>
+</li>
+</ul><pre class="sourceCode julia">nonlinsolve([x*y, x*y-x], (x, y))</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{\left ( 0, \quad y\right )\right\}\end{equation*}</div>
+
+<pre class="sourceCode julia">system = [a^2+a*c, a-b]
+nonlinsolve(system, (a, b))</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{\left ( 0, \quad 0\right ), \left ( - c, \quad - c\right )\right\}\end{equation*}</div>
+
+<hr /><blockquote>
+<p>Note:</p>
+</blockquote><ol>
+<li><p>The order of solution corresponds the order of given symbols.</p>
+</li>
+<li><p>Currently <code>nonlinsolve</code> doesn't return solution in form of <code>LambertW</code> (if there</p>
+</li>
+</ol><p>is solution present in the form of <code>LambertW</code>).</p><p><code>solve</code> can be used for such cases:</p><pre class="sourceCode julia">   >>> solve([x**2 - y**2/exp(x)], [x, y], dict=True)
+   ⎡⎧             ⎛y⎞⎫⎤
+   ⎢⎨x: 2⋅LambertW⎜─⎟⎬⎥
+   ⎣⎩             ⎝2⎠⎭⎦</pre>
+<h5>In <code>Julia</code>:</h5><p>it is similar</p><pre class="sourceCode julia">u = solve([x^2 - y^2/exp(x)], [x, y], dict=true)</pre>
+<pre class="output">
+1-element Array{Dict{Any,Any},1}:
+ Dict(x => 2*LambertW(y/2))</pre>
+
+<p>To get prettier output, the dict may be converted to have one with symbolic keys:</p><pre class="sourceCode julia">convert(Dict{SymPy.Sym, Any}, first(u))</pre>
+<div class="well well-sm">
+\begin{equation*}\begin{cases}x & \text{=>} &2 \operatorname{LambertW}{\left (\frac{y}{2} \right )}\\\end{cases}\end{equation*}</div>
+
+<hr /><ol start="3">
+<li><p>Currently <code>nonlinsolve</code> is not properly capable of solving the system of equations</p>
+</li>
+</ol><p>having trigonometric functions.</p><p><code>solve</code> can be used for such cases(not all solution):</p><pre class="sourceCode julia">   >>> solve([sin(x + y), cos(x - y)], [x, y])
+   ⎡⎛-3⋅π   3⋅π⎞  ⎛-π   π⎞  ⎛π  3⋅π⎞  ⎛3⋅π  π⎞⎤
+   ⎢⎜─────, ───⎟, ⎜───, ─⎟, ⎜─, ───⎟, ⎜───, ─⎟⎥
+   ⎣⎝  4     4 ⎠  ⎝ 4   4⎠  ⎝4   4 ⎠  ⎝ 4   4⎠⎦</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">solve([sin(x + y), cos(x - y)], [x, y])</pre>
+<pre class="output">
+4-element Array{Tuple{SymPy.Sym,SymPy.Sym},1}:
+ (-3*pi/4, 3*pi/4)
+ (-pi/4, pi/4)    
+ (pi/4, 3*pi/4)   
+ (3*pi/4, pi/4)   </pre>
+
+<hr /><p><code>solveset</code> reports each solution only once.  To get the solutions of a polynomial including multiplicity use <code>roots</code>.</p><pre class="sourceCode julia">    >>> solveset(x**3 - 6*x**2 + 9*x, x)
+    {0, 3}
+    >>> roots(x**3 - 6*x**2 + 9*x, x)
+    {0: 1, 3: 2}</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">solveset(x^3 - 6*x^2 + 9*x, x)</pre>
+<div class="well well-sm">
+\begin{equation*}\left\{0, 3\right\}\end{equation*}</div>
+
+<pre class="sourceCode julia">roots(x^3 - 6*x^2 + 9*x, x)  |>  d -> convert(Dict{Sym, Any}, d) # prettier priting</pre>
+<div class="well well-sm">
+\begin{equation*}\begin{cases}3 & \text{=>} &2\\0 & \text{=>} &1\\\end{cases}\end{equation*}</div>
+
+<hr /><p>The output <code>&#123;0: 1, 3: 2&#125;</code> of <code>roots</code> means that <code>0</code> is a root of multiplicity 1 and <code>3</code> is a root of multiplicity 2.</p><blockquote>
+<p>Note:</p>
+</blockquote><p>Currently <code>solveset</code> is not capable of solving the following types of equations:</p><ul>
+<li><p>Equations solvable by LambertW (Transcendental equation solver).</p>
+</li>
+</ul><p><code>solve</code> can be used for such cases:</p><pre class="sourceCode julia">   >>> solve(x*exp(x) - 1, x )
+   [LambertW(1)]</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">solve(x*exp(x) - 1, x )</pre>
+<div class="well well-sm">
+\[ \left[ \begin{array}{r}\operatorname{LambertW}{\left (1 \right )}\end{array} \right] \]</div>
+
+<hr /><h2>Solving Differential Equations</h2><p>To solve differential equations, use <code>dsolve</code>.  First, create an undefined function by passing <code>cls&#61;Function</code> to the <code>symbols</code> function.</p><pre class="sourceCode julia">    >>> f, g = symbols('f g', cls=Function)</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">f, g = symbols("f g", cls=sympy.Function)</pre>
+<pre class="output">
+(PyObject f, PyObject g)</pre>
+
+<hr /><p><code>f</code> and <code>g</code> are now undefined functions.  We can call <code>f&#40;x&#41;</code>, and it will represent an unknown function.</p><pre class="sourceCode julia">    >>> f(x)
+    f(x)</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">f(x)</pre>
+<div class="well well-sm">
+\begin{equation*}f{\left (x \right )}\end{equation*}</div>
+
+<hr /><p>Derivatives of <code>f&#40;x&#41;</code> are unevaluated.</p><pre class="sourceCode julia">    >>> f(x).diff(x)
+    d
+    ──(f(x))
+    dx</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">f(x).diff(x)</pre>
+<div class="well well-sm">
+\begin{equation*}\frac{d}{d x} f{\left (x \right )}\end{equation*}</div>
+
+<hr /><p>(see the :ref:<code>Derivatives &lt;tutorial-derivatives&gt;</code> section for more on derivatives).</p><p>To represent the differential equation $f''(x) - 2f'(x) + f(x) = \sin(x)$, we would thus use</p><pre class="sourceCode julia">    >>> diffeq = Eq(f(x).diff(x, x) - 2*f(x).diff(x) + f(x), sin(x))
+    >>> diffeq
+                          2
+             d           d
+    f(x) - 2⋅──(f(x)) + ───(f(x)) = sin(x)
+             dx           2
+                        dx</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">diffeq = Eq(f(x).diff(x, x) - 2*f(x).diff(x) + f(x), sin(x))
+diffeq</pre>
+<div class="well well-sm">
+\begin{equation*}f{\left (x \right )} - 2 \frac{d}{d x} f{\left (x \right )} + \frac{d^{2}}{d x^{2}} f{\left (x \right )} = \sin{\left (x \right )}\end{equation*}</div>
+
+<hr /><p>To solve the ODE, pass it and the function to solve for to <code>dsolve</code>.</p><pre class="sourceCode julia">    >>> dsolve(diffeq, f(x))
+                        x   cos(x)
+    f(x) = (C₁ + C₂⋅x)⋅ℯ  + ──────
+                              2</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>we use <code>dsolve</code> for initial value proplems</p>
+</li>
+</ul><pre class="sourceCode julia">dsolve(diffeq, f(x))</pre>
+<div class="well well-sm">
+\begin{equation*}f{\left (x \right )} = \left(C_{1} + C_{2} x\right) e^{x} + \frac{\cos{\left (x \right )}}{2}\end{equation*}</div>
+
+<hr /><p><code>dsolve</code> returns an instance of <code>Eq</code>.  This is because in general, solutions to differential equations cannot be solved explicitly for the function.</p><pre class="sourceCode julia">    >>> dsolve(f(x).diff(x)*(1 - sin(f(x))), f(x))
+    f(x) + cos(f(x)) = C₁</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">dsolve(f(x).diff(x)*(1 - sin(f(x))), f(x))</pre>
+<div class="well well-sm">
+\begin{equation*}f{\left (x \right )} + \cos{\left (f{\left (x \right )} \right )} = C_{1}\end{equation*}</div>
+
+<hr /><p>The arbitrary constants in the solutions from dsolve are symbols of the form <code>C1</code>, <code>C2</code>, <code>C3</code>, and so on.</p><h2>Julia alternative interface</h2><p><code>SymPy.jl</code> adds a <code>SymFunction</code> class, that makes it a bit easier to set up a differential equation, though not as general.</p><p>We use either the <code>SymFunction</code> constructor</p><pre class="sourceCode julia">f = SymFunction("f")</pre>
+<div class="well well-sm">
+\begin{equation*}f\end{equation*}</div>
+
+<p>or the <code>@symfuns</code> macro, as in <code>@symfuns f</code>.</p><p>to define symbolic functions. For these, rather than use <code>diff</code> to specify derivatives, the prime notation can be used. We then have, with <code>f</code> defined above:</p><pre class="sourceCode julia">diffeq = Eq(f''(x) - 2*f'(x) + f(x), sin(x))
+dsolve(diffeq, f(x))</pre>
+<div class="well well-sm">
+\begin{equation*}f{\left (x \right )} = \left(C_{1} + C_{2} x\right) e^{x} + \frac{\cos{\left (x \right )}}{2}\end{equation*}</div>
+
+<p>Or:</p><pre class="sourceCode julia">dsolve(f'(x)*(1 - sin(f(x))), f(x))</pre>
+<div class="well well-sm">
+\begin{equation*}f{\left (x \right )} + \cos{\left (f{\left (x \right )} \right )} = C_{1}\end{equation*}</div>
+
+<p>This interface allows a different specification of initial conditions than does <code>sympy.dsolve</code>.</p><p>For the initial condition <code>f&#39;&#40;x0&#41; &#61; y0</code>, this would be specified with a tuple <code>&#40;f&#39;, x0, y0&#41;</code>.</p><p>For example, to solve the exponential equation $f'(x) = f(x), f(0) = a$ we would have:</p><pre class="sourceCode julia">f = SymFunction("f")
+x, a = symbols("x, a")
+dsolve(f'(x) - f(x), f(x), ics = (f, 0, a))</pre>
+<div class="well well-sm">
+\begin{equation*}f{\left (x \right )} = a e^{x}\end{equation*}</div>
+
+<p>To solve the simple harmonic equation, where two initial conditions are specified, we combine the tuple for each within another tuple:</p><pre class="sourceCode julia">ics = ((f, 0, 1), (f', 0, 2))
+dsolve(f''(x) - f(x), f(x), ics=ics)</pre>
+<div class="well well-sm">
+\begin{equation*}f{\left (x \right )} = \frac{3 e^{x}}{2} - \frac{e^{- x}}{2}\end{equation*}</div>
+
+<hr /><p><a href="./index.html">return to index</a></p>
+  </div>
+</div>
+
+</body>
+</html>

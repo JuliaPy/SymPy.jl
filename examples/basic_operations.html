@@ -1,0 +1,366 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+
+<link
+  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css"
+  rel="stylesheet">
+
+<style>
+.julia {font-family: "Source Code Pro";
+        color:#0033CC;
+        }
+body { padding-top: 60px; }
+h5:before {content:"\2746\ ";}
+h6:before {content:"\2742\ ";}
+pre {display: block;}
+</style>
+
+<script src="https://code.jquery.com/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+<!-- .julia:before {content: "julia> "} -->
+
+<style></style>
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+
+<!-- not TeX-AMS-MML_HTMLorMML-->
+<script type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_SVG">
+</script>
+<script>
+MathJax.Hub.Config({
+  tex2jax: {
+    inlineMath: [ ["\$","\$"], ["\\(","\\)"]]
+  },
+  displayAlign: "left",
+  displayIndent: "5%"
+});
+</script>
+
+
+<script type="text/javascript">
+$( document ).ready(function() {
+  $("h1").each(function(index) {
+       var title = $( this ).text()
+       $("#page_title").html("<strong>" + title + "</strong>");
+       document.title = title
+  });
+  $( "h2" ).each(function( index ) {
+    var nm =  $( this ).text();
+    var id = $.trim(nm).replace(/ /g,'');
+    this.id = id
+    $("#page_dropdown").append("<li><a href='#" + id + "'>" + nm + "</a></li>");
+  });
+  $('[data-toggle="popover"]').popover();
+});
+</script>
+
+</head>
+
+
+<body data-spy="scroll" >
+
+<nav class="navbar navbar-default  navbar-fixed-top">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+         
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li><a href="#" id="page_title"></a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+         <li class="dropdown">
+           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+           Jump to... <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu" id="page_dropdown"></ul>
+        </li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+
+<header>
+</header>
+
+<div class="container-fluid">
+  <div class="span10 offset1">
+<h1>Basic Operations</h1><p><a href="https://docs.sympy.org/latest/tutorial/basic_operations.html">From</a></p><p>Here we discuss some of the most basic operations needed for expression manipulation in SymPy.  Some more advanced operations will be discussed later in the :ref:<code>advanced expression manipulation &lt;tutorial-manipulation&gt;</code> section.</p><pre class="sourceCode julia">    >>> from sympy import *
+    >>> x, y, z = symbols("x y z")</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">using SymPy
+x, y, z = symbols("x y z")</pre>
+<pre class="output">
+(x, y, z)</pre>
+
+<ul>
+<li><p>We didn't replicate <code>from sympy import *</code>, though this is mostly done through the command <code>import_from&#40;sympy&#41;</code>.  By default, <code>SymPy</code> only makes available a priviledged collection of the functions available through the <code>sympy</code> object. The <code>import_from</code> imports most all of the rest.</p>
+</li>
+<li><p>If a function is not imported, it may be referenced through qualification, asin <code>sympy.expand_trig</code>, as will be seen in the following.</p>
+</li>
+</ul><hr /><h2>Substitution</h2><p>One of the most common things you might want to do with a mathematical expression is substitution.  Substitution replaces all instances of something in an expression with something else.  It is done using the <code>subs</code> method. For example</p><pre class="sourceCode julia">    >>> expr = cos(x) + 1
+    >>> expr.subs(x, y)
+    cos(y) + 1</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = cos(x) + 1
+expr.subs(x, y)</pre>
+<div class="well well-sm">
+\begin{equation*}\cos{\left (y \right )} + 1\end{equation*}</div>
+
+<p>Julia also allows "call" notation using a pairs to indicate the substitution:</p><pre class="sourceCode julia">expr(x => y)</pre>
+<div class="well well-sm">
+\begin{equation*}\cos{\left (y \right )} + 1\end{equation*}</div>
+
+<hr /><p>Substitution is usually done for one of two reasons:</p><ol>
+<li><p>Evaluating an expression at a point. For example, if our expression is <code>cos&#40;x&#41; &#43; 1</code> and we want to evaluate it at the point <code>x &#61; 0</code>, so that we get <code>cos&#40;0&#41; &#43; 1</code>, which is 2.</p>
+</li>
+</ol><pre class="sourceCode julia">   >>> expr.subs(x, 0)
+   2</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr(x => 0)</pre>
+<div class="well well-sm">
+\begin{equation*}2\end{equation*}</div>
+
+<hr /><ol start="2">
+<li><p>Replacing a subexpression with another subexpression.  There are two reasons we might want to do this.  The first is if we are trying to build an expression that has some symmetry, such as <code>x^&#123;x^&#123;x^x&#125;&#125;</code>.  To build this, we might start with <code>x**y</code>, and replace <code>y</code> with <code>x**y</code>.  We would then get <code>x**&#40;x**y&#41;</code>.  If we replaced <code>y</code> in this new expression with <code>x**x</code>, we would get <code>x**&#40;x**&#40;x**x&#41;&#41;</code>, the desired expression.</p>
+</li>
+</ol><pre class="sourceCode julia">   >>> expr = x**y
+   >>> expr
+   x**y
+   >>> expr = expr.subs(y, x**y)
+   >>> expr
+   x**(x**y)
+   >>> expr = expr.subs(y, x**x)
+   >>> expr
+   x**(x**(x**x))</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = x^y
+expr</pre>
+<div class="well well-sm">
+\begin{equation*}x^{y}\end{equation*}</div>
+
+<pre class="sourceCode julia">expr = expr(y => x^y)
+expr</pre>
+<div class="well well-sm">
+\begin{equation*}x^{x^{y}}\end{equation*}</div>
+
+<pre class="sourceCode julia">expr = expr(y => x^x)
+expr</pre>
+<div class="well well-sm">
+\begin{equation*}x^{x^{x^{x}}}\end{equation*}</div>
+
+<hr /><p>The second is if we want to perform a very controlled simplification, or    perhaps a simplification that SymPy is otherwise unable to do.  For    example, say we have <code>\sin&#40;2x&#41; &#43; \cos&#40;2x&#41;</code>, and we want to replace    <code>\sin&#40;2x&#41;</code> with <code>2\sin&#40;x&#41;\cos&#40;x&#41;</code>.  As we will learn later, the function    <code>expand_trig</code> does this.  However, this function will also expand    <code>\cos&#40;2x&#41;</code>, which we may not want.  While there are ways to perform such    precise simplification, and we will learn some of them in the    :ref:<code>advanced expression manipulation &lt;tutorial-manipulation&gt;</code> section, an    easy way is to just replace <code>\sin&#40;2x&#41;</code> with <code>2\sin&#40;x&#41;\cos&#40;x&#41;</code>.</p><pre class="sourceCode julia">   >>> expr = sin(2*x) + cos(2*x)
+   >>> expand_trig(expr)
+   2*sin(x)*cos(x) + 2*cos(x)**2 - 1
+   >>> expr.subs(sin(2*x), 2*sin(x)*cos(x))
+   2*sin(x)*cos(x) + cos(2*x)</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p><code>expand_trig</code> is not exported, so we qualify it:</p>
+</li>
+</ul><pre class="sourceCode julia">expr = sin(2*x) + cos(2*x)
+sympy.expand_trig(expr)</pre>
+<div class="well well-sm">
+\begin{equation*}2 \sin{\left (x \right )} \cos{\left (x \right )} + 2 \cos^{2}{\left (x \right )} - 1\end{equation*}</div>
+
+<pre class="sourceCode julia">expr(sin(2*x) => 2*sin(x)*cos(x))</pre>
+<div class="well well-sm">
+\begin{equation*}2 \sin{\left (x \right )} \cos{\left (x \right )} + \cos{\left (2 x \right )}\end{equation*}</div>
+
+<hr /><p>There are two important things to note about <code>subs</code>.  First, it returns a new expression.  SymPy objects are immutable.  That means that <code>subs</code> does not modify it in-place.  For example</p><pre class="sourceCode julia">   >>> expr = cos(x)
+   >>> expr.subs(x, 0)
+   1
+   >>> expr
+   cos(x)
+   >>> x
+   x</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = cos(x)
+expr(x => 0)</pre>
+<div class="well well-sm">
+\begin{equation*}1\end{equation*}</div>
+
+<pre class="sourceCode julia">expr</pre>
+<div class="well well-sm">
+\begin{equation*}\cos{\left (x \right )}\end{equation*}</div>
+
+<pre class="sourceCode julia">x</pre>
+<div class="well well-sm">
+\begin{equation*}x\end{equation*}</div>
+
+<hr /><div class="admonition note"><p class="admonition-title">Quick Tip</p></div><p>SymPy expressions are immutable.  No function will change them in-place.</p><p>Here, we see that performing <code>expr.subs&#40;x, 0&#41;</code> leaves <code>expr</code> unchanged. In fact, since SymPy expressions are immutable, no function will change them in-place.  All functions will return new expressions.</p><p>To perform multiple substitutions at once, pass a list of <code>&#40;old, new&#41;</code> pairs to <code>subs</code>.</p><pre class="sourceCode julia">    >>> expr = x**3 + 4*x*y - z
+    >>> expr.subs([(x, 2), (y, 4), (z, 0)])
+    40</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = x^3 + 4*x*y - z
+expr.subs([(x, 2), (y, 4), (z, 0)])</pre>
+<div class="well well-sm">
+\begin{equation*}40\end{equation*}</div>
+
+<p>Or, using pairs:</p><pre class="sourceCode julia">expr(x => 2, y=>4, z => 0)</pre>
+<div class="well well-sm">
+\begin{equation*}40\end{equation*}</div>
+
+<hr /><p>It is often useful to combine this with a list comprehension to do a large set of similar replacements all at once.  For example, say we had <code>x^4 - 4x^3 &#43; 4x^2 - 2x &#43; 3</code> and we wanted to replace all instances of <code>x</code> that have an even power with <code>y</code>, to get <code>y^4 - 4x^3 &#43; 4y^2 - 2x &#43; 3</code>.</p><pre class="sourceCode julia">    >>> expr = x**4 - 4*x**3 + 4*x**2 - 2*x + 3
+    >>> replacements = [(x**i, y**i) for i in range(5) if i % 2 == 0]
+    >>> expr.subs(replacements)
+    -4*x**3 - 2*x + y**4 + 4*y**2 + 3</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">expr = x^4 - 4*x^3 + 4*x^2 - 2*x + 3
+replacements = [(x^i, y^i) for i in 1:5 if iseven(i)]
+expr.subs(replacements)</pre>
+<div class="well well-sm">
+\begin{equation*}- 4 x^{3} - 2 x + y^{4} + 4 y^{2} + 3\end{equation*}</div>
+
+<hr /><h2>Converting Strings to SymPy Expressions</h2><p>The <code>sympify</code> function (that's <code>sympify</code>, not to be confused with <code>simplify</code>) can be used to convert strings into SymPy expressions.</p><p>For example</p><pre class="sourceCode julia">    >>> str_expr = "x**2 + 3*x - 1/2"
+    >>> expr = sympify(str_expr)
+    >>> expr
+    x**2 + 3*x - 1/2
+    >>> expr.subs(x, 2)
+    19/2</pre>
+<h5>In <code>Julia</code>:</h5><p>As <code>sympify</code> is not passed a symbolic value, it is qualified:</p><pre class="sourceCode julia">str_expr = "x^2 + 3*x - 1/2"
+expr = sympy.sympify(str_expr)
+expr</pre>
+<div class="well well-sm">
+\begin{equation*}x^{2} + 3 x - \frac{1}{2}\end{equation*}</div>
+
+<pre class="sourceCode julia">expr.subs(x, 2)</pre>
+<div class="well well-sm">
+\begin{equation*}\frac{19}{2}\end{equation*}</div>
+
+<hr /><div class="admonition note"><p class="admonition-title">Alert:</p><p><code>sympify</code> uses <code>eval</code>.  Don't use it on unsanitized input.</p>
+</div><h2><code>evalf</code></h2><p>To evaluate a numerical expression into a floating point number, use <code>evalf</code>.</p><pre class="sourceCode julia">    >>> expr = sqrt(8)
+    >>> expr.evalf()
+    2.82842712474619</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>We must use a symbolic value for <code>8</code>:</p>
+</li>
+</ul><pre class="sourceCode julia">expr = sqrt(Sym(8))
+expr.evalf()</pre>
+<div class="well well-sm">
+\begin{equation*}2.82842712474619\end{equation*}</div>
+
+<div class="admonition note"><p class="admonition-title">N</p><p>More importantly, <code>SymPy.jl</code> treats <code>N</code> differently from <code>evalf</code>. <code>N</code> is used to convert a SymPy numeric (or Boolean) value to a <code>Julia</code>n counterpart. The main difference between <code>N&#40;x&#41;</code> and <code>convert&#40;T, x&#41;</code>, is that rather than specify the <code>Julia</code> type as <code>T</code>, <code>N</code> works to guess the appropriate type for the <code>SymPy</code> object.</p>
+</div><pre class="sourceCode julia">N(sqrt(8))   # brings back as BigFloat</pre>
+<pre class="output">
+2.8284271247461903</pre>
+
+<pre class="sourceCode julia">N(sqrt(9))   # an Int</pre>
+<pre class="output">
+3.0</pre>
+
+<hr /><p>SymPy can evaluate floating point expressions to arbitrary precision.  By default, 15 digits of precision are used, but you can pass any number as the argument to <code>evalf</code>.  Let's compute the first 100 digits of <code>\pi</code>.</p><pre class="sourceCode julia">    >>> pi.evalf(100)
+3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068</pre>
+<h5>In <code>Julia</code>:</h5><pre class="sourceCode julia">PI.evalf(100)</pre>
+<div class="well well-sm">
+\begin{equation*}3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068\end{equation*}</div>
+
+<hr /><p>To numerically evaluate an expression with a Symbol at a point, we might use <code>subs</code> followed by <code>evalf</code>, but it is more efficient and numerically stable to pass the substitution to <code>evalf</code> using the <code>subs</code> flag, which takes a dictionary of <code>Symbol: point</code> pairs.</p><pre class="sourceCode julia">    >>> expr = cos(2*x)
+    >>> expr.evalf(subs={x: 2.4})
+    0.0874989834394464</pre>
+<h5>In <code>Julia</code>:</h5><p>A Dict can be used:</p><pre class="sourceCode julia">expr = cos(2*x)
+expr.evalf(subs=Dict(x => 2.4))</pre>
+<div class="well well-sm">
+\begin{equation*}0.0874989834394464\end{equation*}</div>
+
+<hr /><p>Sometimes there are roundoff errors smaller than the desired precision that remain after an expression is evaluated. Such numbers can be removed at the user's discretion by setting the <code>chop</code> flag to True.</p><pre class="sourceCode julia">    >>> one = cos(1)**2 + sin(1)**2
+    >>> (one - 1).evalf()
+    -0.e-124
+    >>> (one - 1).evalf(chop=True)
+    0</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>we need to use symbolic values for <code>1</code>:</p>
+</li>
+</ul><pre class="sourceCode julia">_one = cos(Sym(1))^2 + sin(Sym(1))^2
+(_one - 1).evalf()</pre>
+<div class="well well-sm">
+\begin{equation*}-4.0 \cdot 10^{-124}\end{equation*}</div>
+
+<pre class="sourceCode julia">(_one - 1).evalf(chop=true)</pre>
+<div class="well well-sm">
+\begin{equation*}0\end{equation*}</div>
+
+<hr /><h2><code>N</code> with <code>Julia</code></h2><p>The <code>N</code> function is used to convert a symbolic number or boolean into a <code>Julia</code> counterpart.</p><pre class="sourceCode julia">two = Sym(2)
+a,b,c,d = two, sqrt(two), two^20, two^100
+N.((a,b,c,d))</pre>
+<pre class="output">
+(2, 1.414213562373095048801688724209698078569671875376948073176679737990732478462102, 1048576, 1267650600228229401496703205376)</pre>
+
+<h2><code>lambdify</code></h2><p><code>subs</code> and <code>evalf</code> are good if you want to do simple evaluation, but if you intend to evaluate an expression at many points, there are more efficient ways.  For example, if you wanted to evaluate an expression at a thousand points, using SymPy would be far slower than it needs to be, especially if you only care about machine precision.  Instead, you should use libraries like <code>NumPy &lt;http://www.numpy.org/&gt;</code>_ and <code>SciPy &lt;http://www.scipy.org/&gt;</code>_.</p><p>The easiest way to convert a SymPy expression to an expression that can be numerically evaluated is to use the <code>lambdify</code> function.  <code>lambdify</code> acts like a <code>lambda</code> function, except it converts the SymPy names to the names of the given numerical library, usually NumPy.  For example</p><pre class="sourceCode julia">    >>> import numpy # doctest:+SKIP
+    >>> a = numpy.arange(10) # doctest:+SKIP
+    >>> expr = sin(x)
+    >>> f = lambdify(x, expr, "numpy") # doctest:+SKIP
+    >>> f(a) # doctest:+SKIP
+    [ 0.          0.84147098  0.90929743  0.14112001 -0.7568025  -0.95892427
+     -0.2794155   0.6569866   0.98935825  0.41211849]</pre>
+<div class="alert alert-success" role="alert">
+
+<div class="markdown"><p><code>lambdify</code> uses <code>eval</code>.  Don't use it on unsanitized input.</p>
+</div>
+
+</div>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p><code>lambdify</code> is defined seperately and with a different argument order: <code>lambdify&#40;ex, vars&#61;free_symbols&#40;ex&#41;&#41;</code>.</p>
+</li>
+</ul><pre class="sourceCode julia">a = 0:10
+@vars x
+expr = sin(x)
+fn = lambdify(expr)
+fn.(a)</pre>
+<pre class="output">
+11-element Array{Float64,1}:
+  0.0                
+  0.8414709848078965 
+  0.9092974268256817 
+  0.1411200080598672 
+ -0.7568024953079282 
+ -0.9589242746631385 
+ -0.27941549819892586
+  0.6569865987187891 
+  0.9893582466233818 
+  0.4121184852417566 
+ -0.5440211108893698 </pre>
+
+<hr /><p>You can use other libraries than NumPy. For example, to use the standard library math module, use <code>&quot;math&quot;</code>.</p><pre class="sourceCode julia">    >>> f = lambdify(x, expr, "math")
+    >>> f(0.1)
+    0.0998334166468</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>this doesn't apply, so is not implemented.</p>
+</li>
+</ul><hr /><p>To use lambdify with numerical libraries that it does not know about, pass a dictionary of <code>sympy_name:numerical_function</code> pairs.  For example</p><pre class="sourceCode julia">    >>> def mysin(x):
+    ...     """
+    ...     My sine. Note that this is only accurate for small x.
+    ...     """
+    ...     return x
+    >>> f = lambdify(x, expr, {"sin":mysin})
+    >>> f(0.1)
+    0.1</pre>
+<h5>In <code>Julia</code>:</h5><ul>
+<li><p>The <code>fns</code> dictionary coud be used to do this, though due to the call of <code>eval</code>, we must do this in the proper module:</p>
+</li>
+</ul><pre class="sourceCode julia">mysin(x) = cos(x)
+ex = sin(x)
+body = SymPy.walk_expression(ex, fns=Dict("sin" => :mysin))
+syms = (:x,)
+fn = eval(Expr(:function, Expr(:call, gensym(), syms...), body))
+fn(0)</pre>
+<pre class="output">
+1.0</pre>
+
+<hr /><div class="admonition note"><p class="admonition-title">TODO</p><p>Write an advanced numerics section</p>
+</div><hr /><p><a href="./index.html">return to index</a></p>
+  </div>
+</div>
+
+</body>
+</html>

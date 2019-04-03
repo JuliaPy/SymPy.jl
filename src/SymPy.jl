@@ -1,382 +1,234 @@
-## TODO:
-## * tidy up code
 
+"""
+
+`SymPy` package to interface with Python's [SymPy library](http://www.sympy.org) through `PyCall`.
+
+The basic idea is that a new type -- `Sym` -- is made to hold symbolic
+objects.  For this type, the basic functions from SymPy and appropriate functions
+of `Julia` are overloaded for `Sym` objects so that the expressions
+are treated symbolically and not evaluated immediately. Instances of
+this type are created by the constructor `Sym`, the function `symbols` or the macro
+`@vars`.
+
+On loading, a priviledged set of the functions from the `sympy` module
+are defined as generic functions with their first argument narrowed to
+symbolic types. Others may be accessed by qualification, as in
+`sympy.trigsimp`. Calling `import_from(sympy)` will import the
+rest. SymPy methods are called through Python's dot-call syntax.  To
+find documentation on SymPy functions and methods, one should refer to
+SymPy's [website](http://docs.sympy.org/latest/index.html).
+
+Plotting is provided through the `Plots` interface. For details, see
+the help page for `sympy_plotting`.
+
+The package tutorial provides many examples. This can be read on
+[GitHub](http://nbviewer.ipython.org/github/JuliaPy/SymPy.jl/blob/master/examples/tutorial.ipynb).
+
+"""
 module SymPy
 
 
-"""
-
-SymPy package to interface with Python's [SymPy package](http://www.sympy.org) through `PyCall`.
-
-The basic idea is that a new type -- `Sym` -- is made to hold symbolic
-objects.  For this type, the basic operators and appropriate functions
-of `Julia` are overloaded for `Sym` objects so that the expressions
-are treated symbolically and not evaluated immediately. Instances of
-this type are created by the constructor `Sym` or `symbols` or the macro
-`@vars`.
-
-As well, many -- but not all -- of the SymPy functions are ported to
-allow them to be called on `Sym` objects. Mostly these are implemented
-through metaprogramming, so adding missing functions is not hard. They
-are not generated automatically though, rather added by hand.
-
-To find documentation on SymPy functions, one should refer to
-SymPy's [website](http://docs.sympy.org/latest/index.html).
-
-Plotting is provided through the `Plots` interface. For details, see the help page for `sympy_plotting`.
-
-The package tutorial provides many examples. This can be read on
-[GitHub](https://github.com/jverzani/SymPy.jl/blob/master/examples/tutorial.ipynb).
-
-"""
-SymPy
-
+## minimal version of conveniently using SymPy in Julia
+## uses getfield overloading to access sympy methods of Sym object
 
 using PyCall
 
+using SpecialFunctions
+using LinearAlgebra
+using OffsetArrays
+
+
 import Base: show
 import Base: convert, promote_rule
-import Base: getindex
-import Base: iterate
-import Base: complex, real, imag, float
-import Base: eps
-import Base: sin, cos, tan, sinh, cosh, tanh, asin, acos,
-       atan, asinh, acosh, atanh, sec, csc, cot, asec,
-       acsc, acot, sech, csch, coth, asech, acsch, acoth,
-       sinc, cosc, cosd, cotd, cscd, secd, sind, tand,
-       acosd, acotd, acscd, asecd, asind, atand,
-       sinpi, cospi,
-       log, log2,
-       log10, log1p, exponent, exp, exp2, expm1, cbrt, sqrt,
-       ceil, floor,
-       trunc, round, significand,
-       abs, abs2, max, min, maximum, minimum, diff,
-       sign,
-       zero, one,
-       hypot
-import Base: transpose
-import Base: diff
-import Base: factorial, gcd, lcm, isqrt
-import Base: length,  size
-import Base: collect
-import Base: inv, conj
-import Base: match, replace, round
-import Base: intersect, union, symdiff
-import Base: +, -, *, /, //, \
-import Base: ^
-import Base: !=, ==
-import Base: &, |, !, >, >=, ==, <=, <
-import Base: isless, isequal
-import Base: rad2deg, deg2rad
-import Base: copysign, signbit, flipsign, isinf, isnan, typemax, typemin
-import Base: zero, zeros, one, ones
-import Base: in, replace, match
-import Base: promote_rule
+import Base: getproperty
+import Base: hash, ==
+import Base: length, size
+import Base.iterate
+import Base: +, -, *, /, //, \, ^
 
-## poly.jl
-import Base: div, rem, divrem
-import Base: trunc
-import Base: isinf, isnan
-import Base: real, imag
+export @vars, Sym, sympify, symbols, @symfuns, @syms
+export SymMatrix, SymFunction
+export PI, IM, oo, zoo, True, False
+export N, subs
+
+export sympy, import_from#, import_sympy
+export free_symbols
 
 
-using  LinearAlgebra
-import LinearAlgebra: norm, cholesky, tr, eigvals, eigvecs, rank, nullspace, dot, det, cross
-import SpecialFunctions: erf, erfc, erfcx, erfi, erfinv, erfcinv, dawson
+include("types.jl")
+include("constructors.jl")
+include("utils.jl")
+include("numbers.jl")
+include("mathops.jl")
+include("mathfuns.jl")
+include("generic.jl")
+include("matrix.jl")
+include("sets.jl")
+include("symfunction.jl")
+include("assumptions.jl")
+include("lambdify.jl")
+include("patternmatch.jl")
+include("permutations.jl")
+include("plot_recipes.jl")
 
+##################################################
 
-export sympy, sympy_meth, @sympy_str, object_meth, call_matrix_meth
-export Sym, @syms, @vars, symbols
-export pprint,  jprint
-export SymFunction, @symfuns,
-       evalf, N,  subs,
-       simplify, nsimplify,
-       expand, factor, trunc,
-       collect, separate,
-       fraction,
-       primitive, sqf, resultant, cancel,
-       together,
-       solve,
-       limit,
-       series, integrate,
-       summation,
-       dsolve,
-       poly,  nroots, real_roots, polyroots,
-       ∨, ∧, ¬,
-       rhs, lhs, args,
-       jacobian, hessian,
-       Max, Min,
-       rref
-export PI, E, IM, oo
-export relation, piecewise, Piecewise, piecewise_fold
-export members, doc, _str
-
-
-## Following PyPlot, we initialize our variables outside _init_
+pynull() = PyCall.PyNULL()
 const sympy  = PyCall.PyNULL()
 const mpmath = PyCall.PyNULL()
 const combinatorics  = PyCall.PyNULL()
 
-include("types.jl")
-include("utils.jl")
-include("mathops.jl")
-include("core.jl")
-include("logical.jl")
-include("math.jl")
-include("mpmath.jl")
-include("solve.jl")
-include("dsolve.jl")
-include("subs.jl")
-include("patternmatch.jl")
-include("simplify.jl")
-include("series.jl")
-include("integrate.jl")
-include("assumptions.jl")
-include("poly.jl")
-include("matrix.jl")
-include("ntheory.jl")
-include("sets.jl")
-include("display.jl")
-include("lambdify.jl")
-include("call.jl")
-include("plot_recipes.jl") # hook into Plots
-
-## optional modules
-include("permutations.jl")
-include("physics.jl")
-include("specialfuns.jl")
-
-
-## create some methods
-
-## These are base methods, so imported. Important  that first argument is Sym class for dispatch
-for meth in union(
-                  math_sympy_methods_base,
-                  polynomial_sympy_methods_base
-
-                  )
-
-    meth_name = string(meth)
-    @eval begin
-#                 @doc """
-# `$($meth_name)`: a SymPy function.
-# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-#     """ ->
-        ($meth)(ex::Sym, args...; kwargs...) =
-            _sympy_meth($meth_name, ex, args...; kwargs...)
-    end
-end
+# core.sympy.numbers.*
+"PI is symbolic `pi`"
+global PI = Sym(pynull())
+"IM is a symbolic `im`"
+global IM = Sym(pynull())
+"oo is a symbolic infinity. Example: `integrate(exp(-x), x, 0, oo)`."
+global oo = Sym(pynull())
+"zoo complex inifinity"
+global zoo = Sym(pynull())
+"True from SymPy"
+global True = Sym(pynull())
+"False from SymPy"
+global False = Sym(pynull())
 
 
 
-## These are *added*, so exported
-for meth in union(core_sympy_methods,
-                  math_sympy_methods,
-                  simplify_sympy_meths,
-                  expand_sympy_meths,
-                  functions_sympy_methods,
-                  series_sympy_meths,
-                  integrals_sympy_methods,
-                  logical_sympy_methods,
-                  summations_sympy_methods,
-                  logic_sympy_methods,
-                  polynomial_sympy_methods,
-                  ntheory_sympy_methods,
-                  combinatoric_sympy_methods,
-                  solveset_sympy_methods
-                  )
-
-    meth_name = string(meth)
-    @eval begin
-#         @doc """
-# `$($meth_name)`: a SymPy function.
-# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-# """ ->
-        ($meth)(ex::T, args...; kwargs...) where {T<:SymbolicObject} = _sympy_meth($meth_name, ex, args...; kwargs...)
-
-    end
-    eval(Expr(:export, meth))
-end
-
-
-## Thse are object methods that need importing
-for meth in union(math_object_methods_base,
-                  series_object_meths_base
-                  )
-
-    meth_name = string(meth)
-    @eval begin
-#         @doc """
-# `$($meth_name)`: a SymPy function.
-# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-# """ ->
-        ($meth)(ex::SymbolicObject, args...; kwargs...) = object_meth(ex, $meth_name, args...; kwargs...)
-    end
-end
-
-## Thse are object methods that need exporting
-for meth in union(core_object_methods,
-                  integrals_instance_methods,
-                  summations_instance_methods,
-                  polynomial_instance_methods,
-                  series_object_meths
-                  )
-
-    meth_name = string(meth)
-    @eval begin
-#         @doc """
-# `$($meth_name)`: a SymPy function.
-# The SymPy documentation can be found through: http://docs.sympy.org/latest/search.html?q=$($meth_name)
-# """ ->
-        ($meth)(ex::SymbolicObject, args...; kwargs...) = object_meth(ex, $meth_name, args...; kwargs...)
-    end
-    eval(Expr(:export, meth))
-end
-
-
-# These are object properties
-for prop in union(core_object_properties,
-                  summations_object_properties,
-                  polynomial_predicates)
-
-    prop_name = string(prop)
-    @eval ($prop)(ex::SymbolicObject) = getproperty(PyObject(ex), Symbol($prop_name))
-    eval(Expr(:export, prop))
-end
-
-
-
-## Makes it possible to call in a sympy method, witout worrying about Sym objects
-
-global call_sympy_fun(fn::Function, args...; kwargs...) = fn(args...; kwargs...)
-
-global call_sympy_fun(fn::PyCall.PyObject, args...; kwargs...) = PyCall.pycall(fn, PyAny, args...; kwargs...)
-
-## Main interface to methods in sympy
-## sympy_meth(:name, ars, kwars...)
-## These  get coverted to PyAny for conversion via
-## PyCall, others directly call `Sym`, as it is faster
-function sympy_meth(meth, args...; kwargs...)
-    ans = call_sympy_fun(getproperty(sympy, Symbol(string(meth))), args...; kwargs...)
-    ## make nicer...
-    try
-        if isa(ans, Vector)
-            ans = Sym[i for i in ans]
-         end
-    catch err
-    end
-    ans
-end
-
-# bypass PyAny
-## can't do for sympy[:FiniteSet],
-# pybuiltin(:dict),
-# pybuiltin(:list),
-# pybuiltin(:str),
-# pybuiltin(:int) and iterables
-# ## also PyObject(pybuiltin(:None))
-function _sympy_meth(meth, args...; kwargs...)
-    out = PyCall.pycall(getproperty(sympy, Symbol(string(meth))), PyCall.PyObject, args...; kwargs...)
-    Sym(out)
-end
-
-
-
-# """
-
-#    sympy"fn_name"(args...; kwargs...)
-
-# Call a SymPy method using a string macro. The value returned by `sympy"fn_name"` is a function
-# that calls into SymPy via PyCall. This just wraps `sympy_meth`.
-
-# Examples:
-# ```
-# @vars x
-# sympy"integrate"(x^2, (x, 0, 1))
-# ```
-# """
-macro sympy_str(s)
-    (args...; kwargs...) -> _sympy_str(Symbol(s), args...; kwargs...)
-end
-
-"""
-
-    try various ways of calling a sympy function specified as a key
-
-function behind `sympy"key"(...)` interface
-
-"""
-function _sympy_str(fn, args...; kwargs...)
-    try
-        sympy_meth(Symbol(fn), args...; kwargs...)
-    catch err
-        try
-            xs = [args...]
-            x = popfirst!(xs)
-            object_meth(x, fn, xs...; kwargs...)
-        catch err
-            try
-                xs = [args...]
-                x = popfirst!(xs)
-                call_matrix_meth(x, fn, xs...; kwargs...)
-            catch err
-                try
-                    mpmath_meth(fn, args...; kwargs...)
-                catch err
-                    throw(ArgumentError("Can not find this method $fn for the given signature"))
-                end
-            end
-        end
-    end
-end
-
-
-global object_meth(object::SymbolicObject, meth, args...; kwargs...)  =  begin
-    meth_or_prop = getproperty(PyObject(object),Symbol(meth))
-    if isa(meth_or_prop, PyCall.PyObject)
-        call_sympy_fun(meth_or_prop,  args...; kwargs...) # method
-    else
-        meth_or_prop            # property
-    end
-end
-
-
-## For precompilation we must put PyCall instances in __init__:
+# Can not actually initiate many things until `sympy` is defined, so not until runtime
 function __init__()
 
     ## Define sympy, mpmath, ...
     copy!(sympy, PyCall.pyimport_conda("sympy", "sympy"))
+    copy!(PI.x,  sympy.pi)
+    copy!(IM.x, sympy.I)
+    copy!(oo.x, sympy.oo)
+    copy!(zoo.x, sympy.zoo)
+    copy!(True.x, PyCall.PyObject(true))
+    copy!(False.x, PyCall.PyObject(false))
 
+
+    # mpmath
+    try
+        PyCall.mpmath_init()
+        copy!(mpmath, PyCall.pyimport_conda("mpmath", "mpmath"))
+    catch err
+       # can't load
+    end
+
+    # pull in alibrary
+    copy!(combinatorics, PyCall.pyimport_conda("sympy.combinatorics", "sympy"))
 
 
     ## mappings from PyObjects to types.
+    ## order here is fussy, as we needed ImmutableMatrix before Basic
+    pytype_mapping(sympy.ImmutableMatrix, SymMatrix)
+    pytype_mapping(sympy.ImmutableDenseMatrix, SymMatrix)
 
-    copy!(combinatorics, PyCall.pyimport_conda("sympy.combinatorics", "sympy"))
-    pytype_mapping(combinatorics."permutations"."Permutation", SymPermutation)
-    pytype_mapping(combinatorics."perm_groups"."PermutationGroup", SymPermutationGroup)
-    polytype = sympy.polys.polytools.Poly
-    pytype_mapping(polytype, Sym)
+    basictype = sympy.basic.Basic
+    pytype_mapping(basictype, Sym)
 
-    try
-        pytype_mapping(sympy."Matrix", Array{Sym})
-        pytype_mapping(sympy."matrices"."MatrixBase", Array{Sym})
-    catch e
+    pytype_mapping(sympy.Matrix, Array{Sym})
+    pytype_mapping(sympy.matrices.MatrixBase, Array{Sym})
+
+    pytype_mapping(sympy.FiniteSet, Set)
+
+    pytype_mapping(sympy.combinatorics.permutations.Permutation, SymPermutation)
+    pytype_mapping(combinatorics.perm_groups.PermutationGroup, SymPermutationGroup)
+
+    if mpmath != PyCall.PyNULL()
+        ## ignore warnings for now...
+        mpftype = mpmath."mpf"
+        pytype_mapping(mpftype, BigFloat) ## Raises warning!!!
+        mpctype = mpmath."mpc"
+        pytype_mapping(mpctype, Complex{BigFloat})
     end
 
 
-    ## need "" here, as basictype = sympy.basic.Basic will not convert
-    basictype = sympy."basic"."Basic"
-    pytype_mapping(basictype, Sym)
 
-
-
-    ##
-    init_logical()
-    init_math()
-    init_mpmath()
-    init_sets()
-    init_lambdify()
-    init_physics()
-end
+    ## is this a good idea?
+    ## could leave this out
+    import_sympy()
 
 end
+
+
+## On load, generic functions in the base modules that match a function in sympy.* are
+## defined on `Sym` objects, as are those listed here:
+##
+priviledged = (:And, :Or, :Not, :Xor,
+               #
+               :apart, :cancel, :cse, :expand, :factor, :flatten, :nsimplify,
+               :isolate, :simplify, :together, :unflatten,
+               #
+               :srepr,:doit,
+               #
+               :integrate, :line_integrate, :interpolate, :limit, :series, :summation,
+               :hessian,
+               #
+               :prime, :multiplicity, :degree, :coeffs,
+               #
+               :DiracDelta, :Heaviside,
+               #
+               :linsolve, :nonlinsolve, :nroots, :nsolve, :pdsolve, :real_root,
+               :real_roots, :root, :rootof, :roots, :rsolve, :solve, :solveset,
+               :ode_order,
+               #
+               :Min, :Max, :Abs,:numer, :denom, :conjugate, :ln,
+               #
+               :intersection, :intervals, :isprime
+
+               )
+
+
+function in_base(uv)
+    u = Symbol(uv[1])
+    for M in base_Ms
+        isdefined(M, u) && return true
+    end
+    false
+end
+is_function(uv) = SymPy.pycall_hasproperty(uv[2], :__class__) &&  occursin("unction", uv[2].__class__.__name__)
+
+
+
+"""
+    import_sympy
+
+This method imports all functions from `mpmath` and a priviledged set
+of functions from `sympy`, as well as the relational operators.
+
+These functions are narrowed on their first argument being of type `SymbolicObject`.
+
+A few modules are checked for namespace collisions.
+
+If a function naturally takes an non-Symbolic argument as a first argument, then it can be qualified: e.g.
+`sympy.sin(2)` (as opposed to `sin(Sym(2))`).
+
+If a constructor is needed (which is not a function) then it must be
+qualified. (E.g. `sympy.Function("F")`, though for this particular
+case, there is `SymFunction` defined for convenience.)
+
+"""
+function import_sympy()
+    if mpmath != PyCall.PyNULL()
+        import_from(mpmath)
+    end
+    ## import from
+    ## import_from(sympy)
+    d = Introspection.getmembers(sympy)
+    d1 = filter(uv -> in_base(uv) && is_function(uv), d)
+    import_from(sympy, setdiff(Symbol.(collect(keys(d1))),  Symbol.(base_exclude)))
+    import_from(sympy, priviledged)
+    import_from(sympy, (:Ne,  :Le, :Eq, :Ge, :Gt,
+                        :GreaterThan, :LessThan,
+                        :StrictGreaterThan, :StrictLessThan,
+                        :Equality, :Unequality
+                        ), typ=:Number)
+end
+
+## :Lt is in Base.Order
+import Base.Order: Lt
+Lt(x::Number, args...;kwargs...) = sympy.Lt(x, args...; kwargs...)
+export(Lt)
+
+end # module
