@@ -103,7 +103,7 @@ function show(io::IO, ::MIME"text/latex", d::Dict{T,S}) where {T<:SymbolicObject
     print(io, out)
 end
 
-
+latex(x::Sym) = sympy.latex(x)
 
 
 
