@@ -207,24 +207,24 @@ function import_from(sm, meths=nothing;
              M1 = replace("$M",r"^.*\."=>"")
              if isdefined(M, meth)
                  inMs = true
-                 @show "import", M, k
+                 ## @show "import", M, k
 ##                 println("$M.$k(ex::$typ, args...; kwargs...)=getproperty($(sm.__name__), :$k)(ex, args...; kwargs...)")
-                 ## @eval begin
-                 ##     ($M.$meth)(ex::($typ), args...; kwargs...) =
-                 ##         getproperty($sm,$k)(ex, args...; kwargs...)
-                 ## end
-                 ## break
+                 @eval begin
+                     ($M.$meth)(ex::($typ), args...; kwargs...) =
+                         getproperty($sm,$k)(ex, args...; kwargs...)
+                 end
+                 break
              end
         end
         if !inMs
             ## need to export
-            @show "export", k
+            ## @show "export", k
 ##            println("$k(ex::$typ, args...; kwargs...)=getproperty($(sm.__name__), :$k)(ex, args...; kwargs...); export $k")
-            ## @eval begin
-            ##     ($meth)(ex::($typ), args...; kwargs...) =
-            ##         getproperty($sm,$k)(ex, args...; kwargs...)
-            ## end
-            ## eval(Expr(:export, meth))
+            @eval begin
+                ($meth)(ex::($typ), args...; kwargs...) =
+                    getproperty($sm,$k)(ex, args...; kwargs...)
+            end
+            eval(Expr(:export, meth))
         end
     end
 
