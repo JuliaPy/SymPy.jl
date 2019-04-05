@@ -12,8 +12,15 @@ mutable struct SymFunction <: SymbolicObject
     n::Int
 end
 
-Base.show(io::IO, u::SymFunction) = print(io, "$(string(Sym(u.x)))" * repeat("'", u.n))
-
+# these are from https://github.com/OptMist-Tokyo/DAEPreprocessor.jl/blob/sympy_warning/src/symbolic.jl
+derivative(x::SymFunction, d::Int = 1) = SymFunction(x.x, x.n + d)
+Base.transpose(f::Sym) = f
+Base.show(io::IO, ::MIME"text/plain", u::SymFunction) = print(io, "$(string(Sym(u.x)))" * repeat("'", u.n))
+latex(x::SymFunction) = latex(Sym(x.x)) * repeat("'", x.n)
+Base.show(io::IO, ::MIME"text/latex", x::SymFunction) = print(io, "\\begin{align*}" * latex(x) * "\\end{align*}")
+function Base.show(io::IO, ::MIME"text/latex", x::AbstractArray{SymFunction, 1})
+    print(io, "\\begin{align*}\\left[\\begin{array}{c}" * join(latex.(x), "\\\\") * "\\end{array}\\right]\\end{align*}")
+end
 """
 
 

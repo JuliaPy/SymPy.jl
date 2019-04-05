@@ -1,4 +1,3 @@
-
 """
 
 `SymPy` package to interface with Python's [SymPy library](http://www.sympy.org) through `PyCall`.
@@ -145,9 +144,11 @@ function __init__()
 
 
 
-    ## is this a good idea?
-    ## could leave this out
-    import_sympy()
+    ## We *would* like to import some methods from the `sympy` module, but we can't as calling
+    ## @eval to import from a different package causes precompilation issues.
+    ## Rather, we only call `import_sympy` to print a list of commands to add to this file (as
+    ## are added below). This is done by uncommenting the `println` statements in `import_from`.
+    #import_sympy()
 
 end
 
@@ -211,7 +212,10 @@ case, there is `SymFunction` defined for convenience.)
 """
 function import_sympy()
     if mpmath != PyCall.PyNULL()
-        import_from(mpmath)
+        mps = _get_member_functions(mpmath, base_exclude)
+        sps = Introspection.getmembers(sympy)
+        imp = Tuple(Symbol.(setdiff(keys(mps), keys(sps))))
+        import_from(mpmath, imp)
     end
     ## import from
     ## import_from(sympy)
@@ -230,5 +234,9 @@ end
 import Base.Order: Lt
 Lt(x::Number, args...;kwargs...) = sympy.Lt(x, args...; kwargs...)
 export(Lt)
+
+
+### Add generic methods and new methods
+include("importexport.jl")
 
 end # module
