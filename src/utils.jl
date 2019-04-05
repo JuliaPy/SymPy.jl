@@ -200,29 +200,31 @@ function import_from(sm, meths=nothing;
             end
         end
     end
-
      for (k,v) in fns
          meth = Symbol(k)
          inMs = false
          for M in union(base_Ms, Ms)
+             M1 = replace("$M",r"^.*\."=>"")
              if isdefined(M, meth)
-                inMs = true
-#                @show k
-                 @eval begin
-                     ($M.$meth)(ex::($typ), args...; kwargs...) =
-                         getproperty($sm,$k)(ex, args...; kwargs...)
-                 end
-                 break
-            end
+                 inMs = true
+                 @show "import", M, k
+##                 println("$M.$k(ex::$typ, args...; kwargs...)=getproperty($(sm.__name__), :$k)(ex, args...; kwargs...)")
+                 ## @eval begin
+                 ##     ($M.$meth)(ex::($typ), args...; kwargs...) =
+                 ##         getproperty($sm,$k)(ex, args...; kwargs...)
+                 ## end
+                 ## break
+             end
         end
         if !inMs
             ## need to export
-#            @show "export", k
-            @eval begin
-                ($meth)(ex::($typ), args...; kwargs...) =
-                    getproperty($sm,$k)(ex, args...; kwargs...)
-            end
-            eval(Expr(:export, meth))
+            @show "export", k
+##            println("$k(ex::$typ, args...; kwargs...)=getproperty($(sm.__name__), :$k)(ex, args...; kwargs...); export $k")
+            ## @eval begin
+            ##     ($meth)(ex::($typ), args...; kwargs...) =
+            ##         getproperty($sm,$k)(ex, args...; kwargs...)
+            ## end
+            ## eval(Expr(:export, meth))
         end
     end
 
