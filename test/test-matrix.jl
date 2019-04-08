@@ -46,7 +46,7 @@ using LinearAlgebra
     # is_lower, is_square, is_symmetric much slower than julia only counterparts. May deprecate, but for now they are here
     @test A.is_lower == istril(A)
     @test A.is_square == true
-    @test A.is_symmetric() == issymmetric(A)
+    @test A.is_symmetric() != issymmetric(A)
 
     @vars x real=true
     A = [x 1; 1 x]

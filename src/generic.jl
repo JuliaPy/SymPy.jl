@@ -88,7 +88,13 @@ end
 Base.complex(xs::AbstractArray{Sym}) = complex.(xs) # why is this in base?
 
 Base.conj(x::SymbolicObject) = x.conjugate()
-
+function Base.transpose(f::Sym)
+    if pycall_hasproperty(PyObject(f), :transpose)
+        f.transpose()
+    else
+        f
+    end
+end
 
 Base.real(::Type{Sym}) = Sym
 Base.real(x::Sym) = _real(N(x))
