@@ -88,7 +88,7 @@ end
 Base.complex(xs::AbstractArray{Sym}) = complex.(xs) # why is this in base?
 
 Base.conj(x::SymbolicObject) = x.conjugate()
-function Base.transpose(f::Sym)
+function Base.transpose(f::Sym)::Sym
     if pycall_hasproperty(PyObject(f), :transpose)
         f.transpose()
     else

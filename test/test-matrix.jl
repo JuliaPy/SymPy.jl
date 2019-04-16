@@ -54,6 +54,9 @@ using LinearAlgebra
 
     @test Set(eigvals(A)) == Set([x-1, x+1])
 
+    # issue with transpose being non-typestable
+    @test eltype(transpose(A)) == Sym
+    @test eltype(Symmetric(A)) == Sym
 
     #numerical tests
     M = Sym[1 0 0; 0 1 0; 0 0 x]
