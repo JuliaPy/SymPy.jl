@@ -182,6 +182,11 @@ import PyCall
     as = linsolve(eqs, x, y)
     @test length(elements(as)) == 1
 
+    ## nsolve -- not method for arrays, issue 268
+    @vars z1 z2z1 positive=true
+    @test_throws MethodError nsolve([z1^2-1, z1+z2z1-2], [z1,z2z1], [1,1])  # non symbolic first argument
+    @test all(N.(sympy.nsolve([z1^2-1, z1+z2z1-2], [z1,z2z1], (1,1))) .≈ [1.0, 1.0])
+
     ## limits
     @test limit(x -> sin(x)/x, 0) == 1
     @test limit(sin(x)/x, x, 0) |> float == 1
