@@ -1,3 +1,16 @@
+## Getindex default.
+## Is this the proper default?
+function Base.getindex(x::Sym, xs::Sym...)
+    if pycall_hasproperty(x, :__getitem__)
+        return x.__getitem__(xs...)
+    elseif pycall_hasproperty(x, :__getslice__)
+        return x.__getslice__(xs...)
+    else
+        # no indexing defined, but this won't effect broadcasting
+        x
+    end
+end
+
 
 ## Call
 ## Call symbolic object with natural syntax
