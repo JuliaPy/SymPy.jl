@@ -165,7 +165,7 @@ end
 
 # default list of modules to search for namespace collicsions
 const base_Ms = (Base, SpecialFunctions, Base.MathConstants,
-           LinearAlgebra, OffsetArrays
+           LinearAlgebra
            )
 
 # default list of methods to exclude from importing

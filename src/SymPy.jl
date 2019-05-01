@@ -34,7 +34,6 @@ using PyCall
 
 using SpecialFunctions
 using LinearAlgebra
-using OffsetArrays
 
 
 import Base: show
