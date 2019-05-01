@@ -101,9 +101,6 @@ Base.inv(x::SymMatrix) = x.inv()
 -(x::SymMatrix, y::SymMatrix) = x + y.multiply(-1)
 ^(x::SymMatrix, y::Union{Int, SymbolicObject}) = pycall(sympy.Pow, SymMatrix, x, y)
 
-#### Add 0-based getindex, setindex! methods
-using OffsetArrays
-
 """
    M[i,j]
 
@@ -112,26 +109,9 @@ Define `getindex` for SymPy's `ImmutableMatrix` class.
 SymMatrix is 0-based, like python, not Julia. Use Matrix{Sym} for that.
 
 """
-function Base.getindex(M::SymMatrix, i::Int, j::Int)
-    N = M.tolist()[i+1, j+1]
-    N
-end
-function Base.getindex(M::SymMatrix, I...)
-    m, n = M.shape
-    U = OffsetArray(convert(Matrix{Sym}, M), 0:m-1, 0:n-1)
-    V = getindex(U, I...)
-    # V is funny a bit, slices across rows return vectors too!
-    if isa(V, AbstractArray)
-        convert(SymMatrix, collect(V))
-    else
-        V
-    end
-end
-
-# method for vectors, linear indexing
-Base.getindex(V::SymMatrix, i::Int) = V[i,0]
+Base.getindex(M::SymMatrix, i::Int, j::Int) = M.__getitem__((i,j))
+Base.getindex(V::SymMatrix, i::Int) = V.__getitem__((i,0))
 Base.getindex(M::SymMatrix) = M
-Base.lastindex(M::SymMatrix, i::Int) = M.shape[i]
 
 function Base.convert(::Type{SymMatrix}, M::AbstractArray{T, N}) where {T <: Number, N}
     m,n = size(M)

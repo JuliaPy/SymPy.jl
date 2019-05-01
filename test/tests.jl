@@ -550,6 +550,10 @@ end
     J = [diff(x, u) for x in xs, u in (rho, phi, theta)]
     J.det()
 
+    # issue #273 x[i]
+    x = sympy.IndexedBase("x")
+    i,j = sympy.symbols("i j", integer=True)
+    @test x[i] == PyCall.py"$x[$i]"
 
 end
 

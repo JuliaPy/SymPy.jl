@@ -1,3 +1,31 @@
+## Getindex default.
+## Is this the proper default?
+"""
+
+   x[i]
+
+Some SymPy Python objects have index notation provided for them through `__getitem__`. This allows Julia's `getindex` to dispatch to Python's `__getitem__`. The index (indices) must be symbolic. This will use 0-based indexing, as it is a simple pass through to Python.
+
+Examples:
+```
+i,j = sympy.symbols("i j", integer=True)
+x = sympy.IndexedBase("x")
+a = sympy.Sum(x[i], (i, 1, j))
+```
+
+"""
+function Base.getindex(x::Sym, xs::Sym...)
+    if pycall_hasproperty(x, :__getitem__)
+        return x.__getitem__(xs)
+    elseif pycall_hasproperty(x, :__getslice__)
+        return x.__getslice__(xs)
+    else
+
+        # no indexing defined, but this won't effect broadcasting
+        x
+    end
+end
+
 
 ## Call
 ## Call symbolic object with natural syntax
@@ -88,7 +116,7 @@ subs(d::Pair...; kwargs...)           = ex -> subs(ex, [(p.first, p.second) for 
 # avoid type piracy. After we call `pytype` mappings, some
 # objects are automatically converted and no longer PyObjects
 pycall_hasproperty(x::PyCall.PyObject, k) = PyCall.hasproperty(x, k)
-pycall_hasproperty(x::Sym, k) = PyCall.hasproperty(PyCall.PyObject(x), k)
+pycall_hasproperty(x::SymbolicObject, k) = PyCall.hasproperty(PyCall.PyObject(x), k)
 pycall_hasproperty(x, k) = false
 
 # simple helper for boolean properties
@@ -137,7 +165,7 @@ end
 
 # default list of modules to search for namespace collicsions
 const base_Ms = (Base, SpecialFunctions, Base.MathConstants,
-           LinearAlgebra, OffsetArrays
+           LinearAlgebra
            )
 
 # default list of methods to exclude from importing
