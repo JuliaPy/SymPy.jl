@@ -64,7 +64,7 @@ function Base.inv(A::Matrix{T}) where {T <: SymbolicObject}
     A.inv()
 end
 
-function LinearAlgebra.det(A::AbstractArray{T,N}) where {T <: SymbolicObject,N}
+function LinearAlgebra.det(A::Matrix{T}) where {T <: Sym}
     A.det()
 end
 
