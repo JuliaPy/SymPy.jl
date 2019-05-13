@@ -42,54 +42,109 @@ the match pattern.
 
 Differences from SymPy:
 
-* "types" are specified via calling `func` on the head of an expression: `func(sin(x))` -> `sin`
-* functions are supported, but only partially so
+* "types" are specified via calling `func` on the head of an expression: `func(sin(x))` -> `sin`, or directly through `sympy.sin`
+
+* functions are supported, but only with `PyCall` commands.
 
 
 Examples (from the SymPy docs)
+
 ```
 x, y, z = symbols("x, y, z")
 f = log(sin(x)) + tan(sin(x^2))
 ```
 
+## "type" -> "type"
+
 Types are specified through `func`:
 ```
-replace(f, func(sin(x)), func(cos(x))) # log(cos(x)) + tan(cos(x^2));   type -> type
+func = SymPy.Introspection.func
+replace(f, func(sin(x)), func(cos(x))) # log(cos(x)) + tan(cos(x^2))  # type -> type
 ```
 
-Wild terms are supported
-```
-a = Wild("a")
-ex = sin(x)
-replace(ex, sin(a), cos(a^2))  # cos(x^2)
-```
-
-Some patterns allow for functions, but there are subtleties.
-
-The replacement pattern [type -> function](http://docs.sympy.org/dev/modules/core.html#sympy.core.basic.Basic.replace) is case 1.2 and **is not working** (no longer works) as expected:
+The `func` function finds the head of an expression (`sin` and `cos` above). This could also have been written (perhaps more directly) as:
 
 ```
-ex = log(sin(x)) + tan(sin(x^2))
-replace(ex, func(sin(x)), a -> sin(2a))  # log(sin(2x)) + tan(sin(2*x^2)) # fails now
-replace(x*y, func(x*y), (args...) -> sin(2*prod(args)))  # sin(2xy) # fails now
+replace(f, sympy.sin, sympy.cos)
 ```
 
-The pattern "pattern -> pattern" style works as  expected
+## "type" -> "function"
+
+To replace with a more complicated function, requires some assistance from `Python`, as an anonymous function must be defined witin Python, not `Julia`:
 
 ```
-a = sympy.Wild("a")
-@vars x
-ex = cos(sin(x) + sin(2x))
-replace(ex, sin(a), sin(2a))
+import PyCall
+## Anonymous function a -> sin(2a)
+PyCall.py\"\"\"
+from sympy import sin, Mul
+def anonfn(*args):
+    return sin(2*Mul(*args))
+\"\"\"
+
+replace(f, sympy.sin, PyCall.py"anonfn")
 ```
 
+## "pattern" -> "expression"
 
+Using "`Wild`" variables allows a pattern to be replaced by an expression:
+
+```
+a, b = Wild("a"), Wild("b")
+replace(f, sin(a), sin(2a))
+```
+
+In the SymPy docs we have:
+
+Matching is exact by default when more than one Wild symbol is used: matching fails unless the match gives non-zero values for all Wild symbols."
+
+```
+replace(2x + y, a*x+b, b-a)  # y - 2
+replace(2x + y, a*x+b, b-a, exact=false)  # y + 2/x
+```
+
+## "pattern" -> "func"
+
+The function is redefined, as a fixed argument is passed:
+
+```
+PyCall.py\"\"\"
+from sympy import sin
+def anonfn(a):
+    return sin(2*a)
+\"\"\"
+replace(f, sin(a), PyCall.py"anonfn")
+```
+
+## "func" -> "func"
+
+```
+PyCall.py\"\"\"
+def fn1(expr):
+    return expr.is_Number
+
+def fn2(expr):
+    return expr**2
+\"\"\"
+replace(2*sin(x^3), PyCall.py"fn1", PyCall.py"fn2")
+```
+
+```
+PyCall.py\"\"\"
+def fn1(x):
+    return x.is_Mul
+
+def fn2(x):
+    return 2*x
+\"\"\"
+replace(x*(x*y + 1), PyCall.py"fn1", PyCall.py"fn2")
+```
 """
-function Base.replace(ex::Sym, query::Sym, fn::Function; kwargs...)
+function Base.replace(ex::Sym, query::Sym, fn::Function; exact=true, kwargs...)
     ## XXX this is failing!
-    ex.replace(query, PyCall.PyObject((args...) ->fn(args...)); kwargs...)
+    ex.replace(query, PyCall.PyObject((args...) ->fn(args...)); exact=exact, kwargs...)
 end
 
-function Base.replace(ex::Sym, query::Any, value; kwargs...)
-    ex.replace(query, value; kwargs...)
+
+function Base.replace(ex::Sym, query::Any, value; exact=true, kwargs...)
+    ex.replace(query, value; exact=exact, kwargs...)
 end
