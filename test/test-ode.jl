@@ -34,4 +34,15 @@ using Test
     ## dsolve eqn has two answers, but we want to eliminate one
     # based on initial condition
     dsolve(u'(x) - (u(x)-1)*u(x)*(u(x)+1), u(x), ics=(u, 0, 1//2))
+
+    ## rhs works
+    u = SymFunction("u")
+    @vars x y
+    @vars a positive=true
+    eqn = u'(x) - a * u(x) * (1 - u(x))
+    out = dsolve(eqn)
+    eq = rhs(out)    # just the right hand side
+    C1 = first(setdiff(free_symbols(eq), (x,a)))
+    c1 = solve(eq(x=>0) - 1//2, C1)
+    @test c1[1] == Sym(1)
 end

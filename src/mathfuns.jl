@@ -162,7 +162,11 @@ Use `sympy.dsolve(ex, f(x); kwargs...)` directly for that underlying interface.
         return length(output) == 1 ? output[1] : output
     end
 end
-export dsolve
+
+rhs(x::SymbolicObject) = pycall_hasproperty(x, :rhs) ? x.rhs : x
+lhs(x::SymbolicObject) = pycall_hasproperty(x, :lhs) ? x.lhs : x
+
+export dsolve, rhs, lhs
 
 ## Helper.
 ## out is an equation in var with constants. Args are intial conditions
