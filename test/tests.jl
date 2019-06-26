@@ -578,6 +578,14 @@ end
     @test complex(zcomplex) == zcomplex
     @test complex(zcomplex) !== zcomplex
 
+    ## issue 284 N(PI,50)
+    @test N(PI, 50) ≈ pi
+    @test length(string(N(PI,50))) == 2 + 50
+    ## issue 284 lambdify of Pi
+    mpi = SymPy.PyCall.pyimport("sympy.parsing.mathematica")."mathematica"("Pi")
+    @test SymPy.walk_expression(mpi) == :pi
+    @test lambdify(PI^4*xreal)(256) == 256 * pi^4
+
 
 
 

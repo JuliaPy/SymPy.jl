@@ -71,7 +71,8 @@ function walk_expression(ex; values=Dict(), fns=Dict())
     fn = Introspection.funcname(ex)
 
     if fn == "Symbol"
-        return Symbol(string(ex))
+        str_ex = string(ex)
+        return get(vals_map, str_ex, Symbol(str_ex))
     elseif fn in ["Integer" , "Float"]
         return N(ex)
     elseif fn == "Rational"
