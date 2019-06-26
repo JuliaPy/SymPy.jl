@@ -37,6 +37,36 @@ Base.convert(::Type{Sym}, x::Irrational{:γ}) = Sym(sympy.EulerGamma)
 Base.convert(::Type{Sym}, x::Irrational{:catalan}) = Sym(sympy.Catalan)
 Base.convert(::Type{Sym}, x::Irrational{:φ}) = (1 + Sym(5)^(1//2))/2
 
+## utility functions to test type of value
+function is_integer(x::Sym)
+
+    pycall_hasproperty(x, :is_integer) && return x.is_integer
+    x.__class__.__name__ == "int" && return true
+
+    return false
+end
+
+function is_rational(x::Sym)
+    pycall_hasproperty(x, :is_rational) && return x.is_rational
+
+    return false
+end
+
+function is_real(x::Sym)
+    pycall_hasproperty(x, :is_real) && return x.is_real
+    x.__class__.__name__ == "real" && return true
+    x.__class__.__name__ == "mpg" && return true
+
+    return false
+end
+
+function is_complex(x::Sym)
+    pycall_hasproperty(x, :is_complex) && return x.is_complex
+    x.__class__.__name__ == "complex" && return true
+    x.__class__.__name__ == "mpc" && return true
+
+    return false
+end
 
 """
 
@@ -85,6 +115,7 @@ Returns the value unchanged when it has free symbols.
 
 """
 function N(x::Sym)
+
     length(free_symbols(x)) > 0 && return x
     # many different possible types, and not all have some nice property
     # python int
@@ -92,6 +123,8 @@ function N(x::Sym)
     # SymPy big int
     # python float
     # Pi, Half, Rational
+
+
     for  (u,v) in sympy_core_numbers
         if pycall_hasproperty(x, :__class__)
             if x.__class__.__name__ == string(u)
@@ -182,6 +215,8 @@ When given as an integer greater than 16, we try to match the digits of accuracy
 
 """
 function N(x::Sym, digits::Int)
+
+
     ## check
     digits <= 16 && return(N(x))
     if is_integer(x) == nothing
@@ -192,7 +227,7 @@ function N(x::Sym, digits::Int)
     ex = x.evalf(digits)
     if is_integer(x)
         return(convert(BigInt, x))
-    elseif _is_rational(x)
+    elseif is_rational(x)
         return N(numer(x)) / N(denom(x))
     elseif is_real(x) == true
         p = round(Int,log2(10)*digits)
