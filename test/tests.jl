@@ -26,8 +26,10 @@ import PyCall
 
 
     ## extract symbols
-    ex = x*y
+    @vars z
+    ex = x*y*z
     @test isa(free_symbols(ex), Vector{Sym})
+    @test free_symbols(ex) == [x, y, z]
 
     ## number conversions
     @test Sym(2) == 2
