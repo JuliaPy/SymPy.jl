@@ -260,12 +260,23 @@ end
 
 
 
-##
+"""
+   free_symbols(ex)
+
+Return free symbols of expression or vector of expressions. The results are orderded by
+`sortperm(string.(fs))`.
+
+```
+@vars x y z a
+free_symbols(2*x + a*y) # [a, x, y]
+```
+"""
 function free_symbols(ex::Union{T, Vector{T}}) where {T<:SymbolicObject}
     pex = PyObject(ex)
     #fs.__class__.__name__ == "set"
     if PyCall.hasproperty(pex, :free_symbols)
-        convert(Vector{Sym}, collect(pex.free_symbols))
+        fs = convert(Vector{Sym}, collect(pex.free_symbols))
+        fs[sortperm(string.(fs))]   # some sorting order to rely on
     else
         Sym[]
     end
