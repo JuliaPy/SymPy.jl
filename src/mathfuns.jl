@@ -36,6 +36,7 @@ Base.rad2deg(x::Sym) = (x * 180) / PI
 Base.deg2rad(x::Sym) = (x * PI) / 180
 
 ## exponential
+Base.log1p(x::Sym) = sympy.log(1 + x)
 Base.log(x::Sym) = sympy.log(x)
 Base.log(b::Number, x::Sym) = sympy.log(x, b)
 Base.log2(x::SymbolicObject) = log(2,x)
