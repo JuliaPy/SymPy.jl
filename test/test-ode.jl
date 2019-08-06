@@ -45,4 +45,15 @@ using Test
     C1 = first(setdiff(free_symbols(eq), (x,a)))
     c1 = solve(eq(x=>0) - 1//2, C1)
     @test c1[1] == Sym(1)
+
+
+    ## dsolve and system of equations issue #291
+    @vars t real=true
+    x,y = SymFunction("x,y")
+    eq1 = Eq(diff(x(t),t),x(t)*y(t)*sin(t))
+    eq2 = Eq(diff(y(t),t),y(t)^2*sin(t))
+    out = dsolve([eq1, eq2]) # vector
+    out = dsolve((eq1, eq2)) # tuple
+    Dict(lhs.(collect(out)) .=> rhs.(collect(out))) # turn python set into a dictionary
+
 end

@@ -193,3 +193,7 @@ function _solve_ivp(out, var, args, o)
 
     out([Pair(k,v) for (k,v) in sols]...)
 end
+
+# For System Of Ordinary Differential Equations
+# may need to collect return values
+dsolve(eqs::Union{Array, Tuple}, args...; kwargs...) = sympy.dsolve(eqs, args...; kwargs...)
