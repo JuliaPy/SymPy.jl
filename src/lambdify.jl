@@ -53,6 +53,8 @@ fn_map = Dict(
               "LessThan" => :(<=),
               "StrictLessThan" => :(<),
               "Equal" => :(==),
+              "Equality" => :(==),
+              "Unequality" => :(!==),
               "StrictGreaterThan" => :(>),
               "GreaterThan" => :(>=),
 "Greater" => :(>),
