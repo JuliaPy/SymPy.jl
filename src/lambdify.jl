@@ -53,6 +53,8 @@ fn_map = Dict(
               "LessThan" => :(<=),
               "StrictLessThan" => :(<),
               "Equal" => :(==),
+              "Equality" => :(==),
+              "Unequality" => :(!==),
               "StrictGreaterThan" => :(>),
               "GreaterThan" => :(>=),
 "Greater" => :(>),
@@ -79,17 +81,19 @@ function walk_expression(ex; values=Dict(), fns=Dict())
         return convert(Int, numer(ex))//convert(Int, denom(ex))
         ## piecewise requires special treatment
     elseif fn == "Piecewise"
-        return _piecewise([walk_expression(cond) for cond in Introspection.args(ex)]...)
+        return _piecewise([walk_expression(cond, values=values, fns=fns) for cond in Introspection.args(ex)]...)
     elseif fn == "ExprCondPair"
         val, cond = Introspection.args(ex)
-        return (val, walk_expression(cond))
+        return (val, walk_expression(cond, values=values, fns=fns))
+    elseif fn == "Tuple"
+        return walk_expression.(Introspection.args(ex), values=values, fns=fns)
     elseif haskey(vals_map, fn)
         return vals_map[fn]
     end
 
     as = Introspection.args(ex)
 
-    Expr(:call, map_fn(fn, fns_map), [walk_expression(a) for a in as]...)
+    Expr(:call, map_fn(fn, fns_map), [walk_expression(a, values=values, fns=fns) for a in as]...)
 end
 
 """
