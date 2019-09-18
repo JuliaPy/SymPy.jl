@@ -72,6 +72,12 @@ function walk_expression(ex; values=Dict(), fns=Dict())
 
     fn = Introspection.funcname(ex)
 
+    # special case `F(t) = ...` output from ODE
+    # this may be removed if it proves a bad idea....
+    if fn == "Equality" && lhs(ex).is_Function
+        return walk_expression(rhs(ex), values=values, fns=fns)
+    end
+
     if fn == "Symbol"
         str_ex = string(ex)
         return get(vals_map, str_ex, Symbol(str_ex))
