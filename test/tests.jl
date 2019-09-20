@@ -557,6 +557,14 @@ end
     i,j = sympy.symbols("i j", integer=True)
     @test x[i] == PyCall.py"$x[$i]"
 
+
+    # issue 298 lambdify for results of dsolve
+    @vars t
+    F = SymFunction("F")
+    diffeq = F'(t) - 3*F(t)
+    res = dsolve(diffeq, F(t), ics=(F, 0, 2))  # 2exp(3t)
+    @test lambdify(res)(1) ≈ 2*exp(3*1)
+
 end
 
 @testset "generic programming, issue 223" begin
