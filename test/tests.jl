@@ -565,6 +565,10 @@ end
     res = dsolve(diffeq, F(t), ics=(F, 0, 2))  # 2exp(3t)
     @test lambdify(res)(1) ≈ 2*exp(3*1)
 
+    # issue 304 wrong values for sind, ...
+    a = Sym(45)
+    @test sind(a) == sin(PI/4)
+
 end
 
 @testset "generic programming, issue 223" begin

@@ -28,7 +28,7 @@ degree_variants = (:sind, :cosd, :tand, :cotd, :secd, :cscd,
 for  methvar in degree_variants
     meth = Symbol(String(methvar)[1:end-1])
     @eval begin
-        (Base.$methvar)(ex::SymbolicObject) = ($meth)(PI*ex)
+        (Base.$methvar)(ex::SymbolicObject) = ($meth)((PI/180)*ex)
     end
 end
 
