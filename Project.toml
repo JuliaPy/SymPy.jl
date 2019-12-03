@@ -9,10 +9,10 @@ RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
 [compat]
-PyCall = "≥ 1.90.0"
-RecipesBase = "≥ 0.5.0"
-SpecialFunctions = "≥ 0.3.4"
-julia = "≥ 1.0.0"
+PyCall = "1.91"
+RecipesBase = "0.7"
+SpecialFunctions = "0.8"
+julia = "1.0"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
