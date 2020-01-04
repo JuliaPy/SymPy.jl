@@ -8,24 +8,24 @@ Thin wrapper for symbolic functions that allows prime notation in place of using
 Functions constructed through `SymFunction("f")` or `@symfuns f`.
 """
 mutable struct SymFunction <: SymbolicObject
-    x::PyCall.PyObject
+    __x::PyCall.PyObject
     n::Int
 end
 
-Base.:(==)(x::SymFunction, y::SymFunction) = x.x == y.x && x.n == y.n
-Base.hash(x::SymFunction) = hash((hash(x.x),x.n))
+Base.:(==)(x::SymFunction, y::SymFunction) = x.__x == y.__x && x.n == y.n
+Base.hash(x::SymFunction) = hash((hash(x.__x),x.n))
 
 # these are from https://github.com/OptMist-Tokyo/DAEPreprocessor.jl/blob/sympy_warning/src/symbolic.jl
-derivative(x::SymFunction, d::Int = 1) = SymFunction(x.x, x.n + d)
+derivative(x::SymFunction, d::Int = 1) = SymFunction(x.__x, x.n + d)
 
-Base.show(io::IO, u::SymFunction) = print(io, "$(string(Sym(u.x)))" * repeat("'", u.n))
-Base.show(io::IO, ::MIME"text/plain", u::SymFunction) = print(io, "$(string(Sym(u.x)))" * repeat("'", u.n))
+Base.show(io::IO, u::SymFunction) = print(io, "$(string(Sym(u.__x)))" * repeat("'", u.n))
+Base.show(io::IO, ::MIME"text/plain", u::SymFunction) = print(io, "$(string(Sym(u.__x)))" * repeat("'", u.n))
 Base.show(io::IO, ::MIME"text/latex", x::SymFunction) = print(io, "\\begin{align*}" * latex(x) * "\\end{align*}")
 function Base.show(io::IO, ::MIME"text/latex", x::AbstractArray{SymFunction, 1})
     print(io, "\\begin{align*}\\left[\\begin{array}{c}" * join(latex.(x), "\\\\") * "\\end{array}\\right]\\end{align*}")
 end
 
-latex(x::SymFunction) = latex(Sym(x.x)) * repeat("'", x.n)
+latex(x::SymFunction) = latex(Sym(x.__x)) * repeat("'", x.n)
 
 """
 
@@ -84,22 +84,22 @@ end
 
 
 function PyCall.PyObject(f::SymFunction)
-    f.n == 0 && return f.x
+    f.n == 0 && return f.__x
     z = symbols(gensym())
-    f(z).x  #  diff(f(__x__), __x__, f.n).x
+    f(z).__x  #  diff(f(__x__), __x__, f.n).__x
 end
 
-Base.adjoint(x::SymFunction) = SymFunction(x.x, x.n + 1)
+Base.adjoint(x::SymFunction) = SymFunction(x.__x, x.n + 1)
 
 (u::SymFunction)(x::Base.Dict) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
 (u::SymFunction)(x::Base.Pair) = throw(ArgumentError("IVPsolutions can only be called with symbolic objects"))
 function (u::SymFunction)(x)
     if u.n == 0
-        PyObject(u)(x) #u.x(PyObject(x))
+        PyObject(u)(x) #u.__x(PyObject(x))
     else
         __x = Sym("__x")
-        diff(u.x(PyObject(__x)), __x, u.n)(__x => x)
+        diff(u.__x(PyObject(__x)), __x, u.n)(__x => x)
     end
 end
 
-(u::SymFunction)(x, y...) = u.n== 0 ? u.x(map(PyObject, vcat(x, y...))...) : error("Need to implement derivatives of symbolic functions of two or more variables")
+(u::SymFunction)(x, y...) = u.n== 0 ? u.__x(map(PyObject, vcat(x, y...))...) : error("Need to implement derivatives of symbolic functions of two or more variables")

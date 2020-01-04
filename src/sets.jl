@@ -5,7 +5,7 @@
 ## may have wider type, e.g. Any
 function Base.convert(::Type{Set}, s::Sym)
     is_(:FiniteSet,s) || throw(ArgumentError("`s` must be a finite set"))
-    s1 = Set(u for u in s.x)
+    s1 = Set(u for u in s.__x)
 
     s1
 end

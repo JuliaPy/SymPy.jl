@@ -6,7 +6,7 @@
 
 ## Iterator for Sym
 import Base.iterate
-iterate(x::Sym) = (x.x, 0)
+iterate(x::Sym) = (x.__x, 0)
 iterate(x::Sym, state) = nothing
 
 
