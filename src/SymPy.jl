@@ -97,12 +97,12 @@ function __init__()
 
     ## Define sympy, mpmath, ...
     copy!(sympy, PyCall.pyimport_conda("sympy", "sympy"))
-    copy!(PI.__x,  sympy.pi)
-    copy!(IM.__x, sympy.I)
-    copy!(oo.__x, sympy.oo)
-    copy!(zoo.__x, sympy.zoo)
-    copy!(True.__x, PyCall.PyObject(true))
-    copy!(False.__x, PyCall.PyObject(false))
+    copy!(PI.__pyobject__,  sympy.pi)
+    copy!(IM.__pyobject__, sympy.I)
+    copy!(oo.__pyobject__, sympy.oo)
+    copy!(zoo.__pyobject__, sympy.zoo)
+    copy!(True.__pyobject__, PyCall.PyObject(true))
+    copy!(False.__pyobject__, PyCall.PyObject(false))
 
 
     # mpmath
