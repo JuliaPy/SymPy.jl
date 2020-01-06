@@ -72,8 +72,8 @@ using LinearAlgebra
 
     # for v0.4, the vector type is not correctly inferred
     #L = Vector{Sym}[Sym[2,3,5], Sym[3,6,2], Sym[8,3,6]]
-    #out = GramSchmidt(L, true)
-    L = collect(sympy.Matrix.(([[2,3,5]], [[3,6,2]], [[8,3,6]])))
+    # L = collect(sympy.Matrix.(([[2,3,5]], [[3,6,2]], [[8,3,6]]]))
+    L = collect(sympy.Matrix.([[2,3,5], [3,6,2], [8,3,6]]))
     out = sympy.GramSchmidt(L, true)  # qualify, as L not SymbolicObject type
     for i = 1:3, j = i:3
         @test out[i].dot(out[j]) == (i == j ? 1 : 0)
