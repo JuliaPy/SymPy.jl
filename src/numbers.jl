@@ -5,7 +5,7 @@ promote_rule(::Type{T}, ::Type{S})  where {T<:SymbolicObject, S<:Number}= T
 Base.promote_type(::Type{Irrational{T}}, ::Type{Sym}) where {T} = Sym
 ## Conversion
 convert(::Type{T}, o::PyCall.PyObject) where {T <: SymbolicObject} = T(o)
-convert(::Type{PyObject}, s::Sym) = s.x
+convert(::Type{PyObject}, s::Sym) = s.__pyobject__
 
 ## rational
 convert(::Type{T}, x::Rational) where {T<:SymbolicObject} = sympy.Rational(x.num, x.den)::T

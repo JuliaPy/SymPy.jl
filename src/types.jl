@@ -4,7 +4,7 @@
 ## Symbol class for controlling dispatch
 abstract type SymbolicObject <: Number end
 struct Sym <: SymbolicObject
-    x::PyCall.PyObject
+    __pyobject__::PyCall.PyObject
 end
 
 
@@ -27,13 +27,13 @@ The `convert(Matrix{Sym}, M)` call is useful to covert to a Julia matrix
 
 """
 mutable struct SymMatrix <: SymbolicObject
-    x::PyCall.PyObject
+    __pyobject__::PyCall.PyObject
 end
 
 ## Permutations
 ## A permutation of {0, 1, 2, ..., n} -- 0-based
 struct SymPermutation <: SymbolicObject
-  x::PyCall.PyObject
+  __pyobject__::PyCall.PyObject
 end
 export SymPermutation
 Base.convert(::Type{SymPermutation}, o::PyCall.PyObject) = SymPermutation(o)
@@ -41,7 +41,7 @@ Base.convert(::Type{SymPermutation}, o::PyCall.PyObject) = SymPermutation(o)
 
 ## A permutation of {0, 1, 2, ..., n} -- 0-based
 struct SymPermutationGroup <: SymbolicObject
-  x::PyCall.PyObject
+  __pyobject__::PyCall.PyObject
 end
 export SymPermutationGroup
 Base.convert(::Type{SymPermutationGroup}, o::PyCall.PyObject) = SymPermutationGroup(o)
@@ -51,9 +51,7 @@ Base.convert(::Type{SymPermutationGroup}, o::PyCall.PyObject) = SymPermutationGr
 
 ## important override
 ## this allows most things to flow though PyCall
-PyCall.PyObject(x::SymbolicObject) = x.x
-
-
+PyCall.PyObject(x::SymbolicObject) = x.__pyobject__
 ## Override this so that using symbols as keys in a dict works
 hash(x::SymbolicObject) = hash(PyObject(x))
 ==(x::SymbolicObject, y::SymbolicObject) = PyObject(x) == PyObject(y)

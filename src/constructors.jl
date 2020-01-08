@@ -75,6 +75,7 @@ function Sym(x::Complex{Bool})
     x.re && !x.im && return Sym(1)
     x.re && x.im && return Sym(1) + IM
 end
+Sym(x::Complex{T}) where {T} = Sym(real(x)) + Sym(imag(x)) * IM
 Sym(xs::Symbol...) = Tuple(Sym.((string(x) for x in xs)))
 Sym(x::AbstractString) = sympy.symbols(x)
 Sym(s::SymbolicObject) = s

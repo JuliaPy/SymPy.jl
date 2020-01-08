@@ -437,7 +437,7 @@ import PyCall
               ## sets
     s = sympy.FiniteSet("H","T")
     s1 = s.powerset()
-    VERSION >= v"0.4.0" && @test length(collect(convert(Set, s1))) == length(collect(s1.x))
+    VERSION >= v"0.4.0" && @test length(collect(convert(Set, s1))) == length(collect(s1.__pyobject__))
     a, b = sympy.Interval(0,1), sympy.Interval(2,3)
     @test a.is_disjoint(b) == true
     @test a.union(b).measure() == 2

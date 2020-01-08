@@ -150,7 +150,7 @@ function +(p::SymPermutation, q::SymPermutation)::SymPermutation
 end
 
 # evaluation p:i -> j
-(p::SymPermutation)(i::Integer) = p.x(i)
+(p::SymPermutation)(i::Integer) = p.__pyobject__(i)
 function (p::SymPermutation)(i::Integer, j::Integer, xs...)
     q = Permutation([vcat(i, j, xs...)])
     p * q
@@ -203,11 +203,11 @@ import Base: *
 *(G1::SymPermutationGroup, G2::SymPermutationGroup)::SymPermutationGroup = PyCall.py"$G1*$G2"
 
 ## Indexing into group
-Base.getindex(Gp::SymPermutationGroup, i::Int) = PyCall.py"$(Gp.x)[$(i-1)]"  # 1-base
+Base.getindex(Gp::SymPermutationGroup, i::Int) = PyCall.py"$(Gp.__pyobject__)[$(i-1)]"  # 1-base
 
 elements(gp::SymPermutationGroup) = [a for a in gp.elements]
 
-Base.length(G::SymPermutationGroup) =  PyCall.py"len($(G.x))"
+Base.length(G::SymPermutationGroup) =  PyCall.py"len($(G.__pyobject__))"
 
 """
    occursin(x, G::SymPermutationGroup)

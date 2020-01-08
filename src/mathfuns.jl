@@ -16,7 +16,7 @@ Base.acsch(z::Sym) = log(sqrt(1+1/z^2) + 1/z) ## http://mathworld.wolfram.com/In
 Base.atan(y::Sym, x) = sympy.atan2(y,x)
 
 
-Base.sinc(x::Sym) = sympy.sinc(PI*x)
+Base.sinc(x::Sym) = iszero(x) ? one(x) : sin(PI*x)/(PI*x)
 cosc(x::Sym) = diff(sinc(x))
 
 Base.sincos(x::Sym) = (sin(x), cos(x))
