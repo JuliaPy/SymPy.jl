@@ -21,6 +21,8 @@
   convenience, this will also work for `Array{Sym}` objects. The
   returned value may be a `SymMatrix`, not an `Array{Sym}`.
 
+* The matrix constructor in SymPy using a vector of row vectors does *not* work in `SymPy`, as of newer versions (it does not work with version 1.5.1 of sympy and PyCall). This style is used in this document. The user of `SymPy` can eaesily avoid this specification, using Julia's matrix construction techniques.
+
 
 ```
 using SymPy
@@ -49,10 +51,10 @@ use
 
 ##### In `Julia`:
 
-* In `Julia`, the `Matrix` constructor is *not* exported, so must be qualified:
+* In `Julia`, the `Matrix` constructor is *not* exported, so must be qualified. Here we *avoid* thte vector of row vectors above:
 
 ```
-sympy.Matrix([[1, -1], [3, 4], [0, 2]])
+sympy.Matrix([1 -1; 3 4; 0 2])
 ```
 
 *However*, through the magic of `PyCall`, such matrices are converted into `Julia` matrices, of type `Array{Sym}`, so the familiar matrix operations for `Julia` users are available.
@@ -70,11 +72,6 @@ using an annotation to ensure the type. Alternatively, through promotion, just a
 [Sym(1) -1; 3 4; 0 2]
 ```
 
-!!! note "Alert"
-
-   The use of `sympy.Matrix` is strongly discouraged, as it does not work as desired when used with symbolic values.
-
-
 ----
 
 To make it easy to make column vectors, a list of elements is considered to be
@@ -90,6 +87,8 @@ a column vector.
 ```
 
 ##### In `Julia`:
+
+For ths use, `sympy.Matrix` does work, but again its usage is discouraged:
 
 ```
 sympy.Matrix([1, 2, 3])
@@ -240,7 +239,7 @@ These methods do **not** work on `Array{Sym}` objects, use `Julia's` indexing no
 However, these methods **do** work on the `ImmutableMatrix` class:
 
 ```
-M = sympy.ImmutableMatrix([[1, 2, 3], [-2, 0, 4]])
+M = sympy.ImmutableMatrix([1 2 3; -2 0 4])  # avoid vector of row vector construction
 M.col_del(0)
 ```
 
@@ -248,21 +247,16 @@ M.col_del(0)
 M.row_del(1)
 ```
 
-!!! note "Alert"
 
-    If used with symbolic values, these must be converted to `PyObjects` to work:
+!!! Alert
+
+For older versions of sympy, the following did not work (using symbolic  values as matrix entries without reverting to  their PyObjects  had shape issues) but  this should work  now:
+
 
 ```
-import PyCall: PyObject
 @vars x
-o = PyObject(x)
-sympy.ImmutableMatrix([[x,1],[1,x]])  # wrong shape
+sympy.ImmutableMatrix([x 1;  1  x])
 ```
-
-```
-sympy.ImmutableMatrix([[o,1],[1,o]])
-```
-
 
 ----
 
@@ -382,8 +376,8 @@ The above (except for the inverses) are using generic `Julia` definitions. For i
 
 
 ```
-M = sympy.ImmutableMatrix([[1, 3], [-2, 3]])
-M1 = sympy.ImmutableMatrix([[0, 3], [0, 7]])
+M = sympy.ImmutableMatrix([1 3; -2 3])
+M1 = sympy.ImmutableMatrix([0 3; 0 7])
 M + M1
 ```
 
@@ -445,7 +439,7 @@ M.T
 
 
 Several constructors exist for creating common matrices.  To create an
-identity matrix, use `eye`.  `eye(n)` will create an `n\times n` identity matrix.
+identity matrix, use `eye`.  The command `eye(n)` will create an `n x n` identity matrix:
 
 ```verbatim
     >>> eye(3)
@@ -476,7 +470,7 @@ sympy.eye(4)
 ----
 
 To create a matrix of all zeros, use `zeros`.  `zeros(n, m)` creates an
-`n\times m` matrix of `0`\ s.
+`n x m` matrix of `0`s.
 
 ```verbatim
     >>> zeros(2, 3)
@@ -529,7 +523,7 @@ sympy.ones(3, 2)
 ----
 
 To create diagonal matrices, use `diag`.  The arguments to `diag` can be
-either numbers or matrices.  A number is interpreted as a `1\times 1`
+either numbers or matrices.  A number is interpreted as a `1 x 1`
 matrix. The matrices are stacked diagonally.  The remaining elements are
 filled with `0`\ s.
 
