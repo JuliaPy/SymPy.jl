@@ -7,8 +7,8 @@
 +(x::SymbolicObject, y::SymbolicObject) = x.__add__(y)
 *(x::SymbolicObject, y::SymbolicObject) = x.__mul__(y)
 
--(x::SymbolicObject, y::SymbolicObject) = x + (-y)
--(x::SymbolicObject)                    =  (-1) * x
+-(x::SymbolicObject, y::SymbolicObject) = x.__sub__(y)
+-(x::SymbolicObject)                    = x.__neg__()
 /(x::SymbolicObject, y::SymbolicObject) = x.__div__(y)
 ^(x::SymbolicObject, y::SymbolicObject) = x.__pow__(y)
 ^(x::SymbolicObject, y::Rational) = x^convert(Sym,y)
