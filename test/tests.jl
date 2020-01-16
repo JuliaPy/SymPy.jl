@@ -582,6 +582,8 @@ end
     # issue   #320  with integrate(f) when
     # f  is consant
     @test integrate(x -> 1, 0, 1)  == 1
+    @test limit(x->1,  x, 0) == 1
+    @test diff(x->1)  ==   0
 end
 
 @testset "generic programming, issue 223" begin

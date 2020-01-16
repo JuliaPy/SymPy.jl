@@ -49,13 +49,13 @@ Base.log10(x::SymbolicObject) = log(10,x)
 ## use a pair for limit x=>0
 limit(x::SymbolicObject, xc::Pair, args...;kwargs...) = limit(x, xc[1], xc[2], args...;kwargs...)
 ## allow a function
-limit(f::Function, x::Sym, c;kwargs...) = limit(f(x), x, c;kwargs...)
+limit(f::Function, x::Sym, c;kwargs...) = sympy.limit(f(x), x, c;kwargs...)
 limit(f::Function, c;kwargs...) = limit(f, sympy.Dummy("x"), c;kwargs...)
 
-
+## This is  type piracy  and a bad   idea
 function Base.diff(f::Function, n::Int=1)
     x = sympy.Dummy("x")
-    diff(f(x), x, n)
+    sympy.diff(f(x), x, n)
 end
 
 ## integrate(ex,a,b)
