@@ -569,6 +569,19 @@ end
     a = Sym(45)
     @test sind(a) == sin(PI/4)
 
+    # issue #319  with   use   of  Dummy, but
+    #  really  a  lambdify issue
+    dummy = sympy.Dummy
+    # Symbolic differentiation of functions
+    function D(f)
+        x = dummy("x")
+        lambdify(diff.(f(x), x), (x,))
+    end
+    @test D(t -> t^2)(1) == 2
+
+    # issue   #320  with integrate(f) when
+    # f  is consant
+    @test integrate(x -> 1, 0, 1)  == 1
 end
 
 @testset "generic programming, issue 223" begin

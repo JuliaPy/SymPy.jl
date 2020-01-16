@@ -50,11 +50,11 @@ Base.log10(x::SymbolicObject) = log(10,x)
 limit(x::SymbolicObject, xc::Pair, args...;kwargs...) = limit(x, xc[1], xc[2], args...;kwargs...)
 ## allow a function
 limit(f::Function, x::Sym, c;kwargs...) = limit(f(x), x, c;kwargs...)
-limit(f::Function, c;kwargs...) = limit(f, symbols("x"), c;kwargs...)
+limit(f::Function, c;kwargs...) = limit(f, sympy.Dummy("x"), c;kwargs...)
 
 
 function Base.diff(f::Function, n::Int=1)
-    x = symbols("x")
+    x = sympy.Dummy("x")
     diff(f(x), x, n)
 end
 
@@ -68,12 +68,12 @@ function integrate(ex::SymbolicObject, a::Number, b::Number)
     integrate(ex, (fs[1], a, b))
 end
 function integrate(f::Function, a::Number, b::Number)
-    x = symbols("x")
-    integrate(f(x), (x, a, b))
+    x = sympy.Dummy("x")
+    sympy.integrate(f(x), (x, a, b))
 end
 function integrate(f::Function)
-    x = symbols("x")
-    integrate(f(x))
+    x = sympy.Dummy("x")
+    sympy.integrate(f(x), x)
 end
 
 
