@@ -32,11 +32,14 @@ function _piecewise(args...)
     ex
 end
 
+## Hack to avoid Expr(:call,  :*,2, x)  being  2x and  not  2*x
+__prod__(args...) =  prod(args)
+export __prod__
 
 fn_map = Dict(
               "Add" => :+,
               "Sub" => :-,
-              "Mul" => :*,
+              "Mul" => :__prod__,
               "Div" => :/,
               "Pow" => :^,
               "re"  => :real,
@@ -78,7 +81,7 @@ function walk_expression(ex; values=Dict(), fns=Dict())
         return walk_expression(rhs(ex), values=values, fns=fns)
     end
 
-    if fn == "Symbol"
+    if fn == "Symbol" || fn == "Dummy"
         str_ex = string(ex)
         return get(vals_map, str_ex, Symbol(str_ex))
     elseif fn in ["Integer" , "Float"]
