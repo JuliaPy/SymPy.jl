@@ -67,7 +67,7 @@ macro syms(x...)
 end
 
 ## avoid PyObject conversion as possible
-Sym(x::T) where {T <: Number} = sympy.sympify(x)
+Sym(x::T) where {T <: Number} = sympify(x)
 Sym(x::Rational{T}) where {T} = Sym(numerator(x))/Sym(denominator(x))
 function Sym(x::Complex{Bool})
     !x.re && x.im && return IM
@@ -83,7 +83,7 @@ Sym(x::Irrational{T}) where {T} = convert(Sym, x)
 
 convert(::Type{Sym}, s::AbstractString) = Sym(s)
 
-sympify(s, args...; kwargs...) = sympy.sympify(s, args...; kwargs...)
+sympify(s, args...; kwargs...) = pycall(sympy.sympify::PyCall.PyObject, Sym, s) #sympy.sympify(s, args...; kwargs...)
 
 
 
