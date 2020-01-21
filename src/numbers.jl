@@ -15,7 +15,7 @@ convert(::Type{T}, x::BigFloat) where {T<:SymbolicObject} = Sym(PyCall.PyObject(
 convert(::Type{Sym}, x::Complex{BigFloat}) = Sym(PyCall.PyObject(x))::Sym
 
 ## real
-convert(::Type{S}, x::T) where {S<:SymbolicObject, T <: Real}= sympy.sympify(x)::S
+convert(::Type{S}, x::T) where {S<:SymbolicObject, T <: Real}= sympify(x)::S
 convert(::Type{T}, x::Sym) where {T <: Real} = convert(T, PyObject(x))
 
 
