@@ -3,6 +3,10 @@
 ## promote up to symbolic so that math ops work
 promote_rule(::Type{T}, ::Type{S})  where {T<:SymbolicObject, S<:Number}= T
 Base.promote_type(::Type{Irrational{T}}, ::Type{Sym}) where {T} = Sym
+Base.promote_op(::T, ::Type{S}, ::Type{Sym}) where {T, S <: Number} = Sym
+Base.promote_op(::T, ::Type{Sym}, ::Type{S}) where {T, S <: Number} = Sym
+Base.promote_op(::T, ::Type{Sym}, ::Type{Sym}) where {T} = Sym # This helps out linear algebra conversions
+
 ## Conversion
 convert(::Type{T}, o::PyCall.PyObject) where {T <: SymbolicObject} = T(o)
 convert(::Type{PyObject}, s::Sym) = s.__pyobject__

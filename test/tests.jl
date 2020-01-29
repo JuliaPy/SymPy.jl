@@ -584,6 +584,13 @@ end
     @test integrate(x -> 1, 0, 1)  == 1
     @test limit(x->1,  x, 0) == 1
     @test diff(x->1)  ==   0
+
+    ## Issue 324 with inference of matrix operations
+    A = fill(Sym("a"), 2, 2)
+    @test eltype(A*A) == Sym
+    @test eltype(A*ones(2,2)) == Sym
+    @test eltype(A*Diagonal([1,1])) == Sym
+    @test_broken eltype(A * I(2)) == Sym
 end
 
 @testset "generic programming, issue 223" begin

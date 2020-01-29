@@ -6,7 +6,6 @@
 
 +(x::SymbolicObject, y::SymbolicObject) = x.__add__(y)
 *(x::SymbolicObject, y::SymbolicObject) = x.__mul__(y)
-
 -(x::SymbolicObject, y::SymbolicObject) = x.__sub__(y)
 -(x::SymbolicObject)                    = x.__neg__()
 /(x::SymbolicObject, y::SymbolicObject) = x.__div__(y)
