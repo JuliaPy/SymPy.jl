@@ -591,6 +591,12 @@ end
     @test eltype(A*ones(2,2)) == Sym
     @test eltype(A*Diagonal([1,1])) == Sym
     @test_broken eltype(A * I(2)) == Sym
+
+    ## Issue 328 with E -> e
+    @vars x
+    ex = 3 * sympy.E * x
+    fn = lambdify(ex)
+    @test fn(1) ≈ 3*exp(1) * 1
 end
 
 @testset "generic programming, issue 223" begin
