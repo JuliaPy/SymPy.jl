@@ -37,6 +37,17 @@ scientific libraries that can be profitably accessed within `Julia`
 via `PyCall`. (Otherwise, install Python then download the SymPy
 library from https://github.com/sympy/sympy/releases and install.)
 
+To upgrade the underlying `sympy` library, which has new releases at a
+rate similar to `Julia`, when installed with `Conda`, the following commands
+are available:
+
+```
+using Pkg
+Pkg.add("Conda") #  if needed
+using Conda
+Conda.update()
+```
+
 ## The `PyCall` interface to `SymPy`
 
 The only point to this package is that using `PyCall` to access
