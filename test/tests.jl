@@ -597,6 +597,13 @@ end
     ex = 3 * sympy.E * x
     fn = lambdify(ex)
     @test fn(1) ≈ 3*exp(1) * 1
+
+    ## Issue 332 with `abs2`
+    @vars x real=true
+    @test abs2(x) == x*x
+    @vars x
+    @test abs2(x) == x*conj(x)
+
 end
 
 @testset "generic programming, issue 223" begin
