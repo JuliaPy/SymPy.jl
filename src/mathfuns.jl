@@ -2,7 +2,7 @@
 
 
 Base.abs(x::SymbolicObject) = sympy.Abs(x)
-Base.abs2(x::SymbolicObject) = abs(x)^2
+Base.abs2(x::SymbolicObject) = x * conj(x)
 Base.max(x::Sym, a) = sympy.Max(x, a)
 Base.min(x::Sym, a) = sympy.Min(x, a)
 
