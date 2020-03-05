@@ -456,6 +456,17 @@ import PyCall
     #@test sympy"sin"(1) == sin(Sym(1))
 end
 
+@testset "SymFunctions" begin
+    @syms x y real=true
+    @symfuns f g real=true
+
+    @test isreal(f(x))
+    @test isreal(g(y))
+
+    @symfuns h real=true positive=true
+    @test h(x)>0
+end
+
 @testset "Fix past issues" begin
     @vars x y z
     ## Issue # 56

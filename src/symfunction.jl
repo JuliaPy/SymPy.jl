@@ -48,15 +48,13 @@ F,G,H = SymFunction("F, G, H")
 ```
 
 """
-function SymFunction(x::T) where {T<:AbstractString}
+function SymFunction(x::T; kwargs...) where {T<:AbstractString}
     us = split(x, r",\s*")
     if length(us) > 1
-        map(u -> SymFunction(sympy."Function"(u), 0), us)
+        map(u -> SymFunction(sympy."Function"(u; kwargs...), 0), us)
     else
-        SymFunction(sympy."Function"(x), 0)
+        SymFunction(sympy."Function"(x; kwargs...), 0)
     end
-#    u = sympy."Function"(x)
-#    SymFunction(u, 0)
 end
 
 """
@@ -65,20 +63,27 @@ Thanks to `@alhirzel` for the contribution.
 """
 macro symfuns(x...)
     q = Expr(:block)
-    fs = []    # running list of functions created
-    for s in x
-        if isa(s, Expr) && s.head == :(=>) # named function
-            push!(fs, s.args[1])
-            push!(q.args, Expr(:(=), s.args[1], Expr(:call, :SymFunction, s.args[2])))
-        elseif isa(s, Symbol)
+    as = []    # running list of assumptions to be applied
+    fs = []    # running list of symbols created
+    for s in reverse(x)
+        if isa(s, Expr)    # either an assumption or a named variable
+            if s.head == :(=)
+                s.head = :kw
+                push!(as, s)
+            elseif s.head == :(=>)
+                push!(fs, s.args[1])
+                push!(q.args, Expr(:(=), s.args[1], Expr(:call, :SymFunction, s.args[2], map(esc,as)...)))
+            end
+        elseif isa(s, Symbol)   # raw symbol to be created
             push!(fs, s)
-            push!(q.args, Expr(:(=), s, Expr(:call, :SymFunction, string(s))))
+            # @show s
+            push!(q.args, Expr(:(=), esc(s), Expr(:call, :SymFunction, string(s), map(esc,as)...)))
         else
-            throw(AssertionError("@fns expected a list of symbols"))
+            throw(AssertionError("@symfuns expected a list of symbols and assumptions"))
         end
     end
-    push!(q.args, Expr(:tuple, fs...)) # return all of the functions we created
-    Core.eval(Main, q)
+    push!(q.args, Expr(:tuple, map(esc,reverse(fs))...)) # return all of the symbols we created
+    q
 end
 
 
