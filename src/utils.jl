@@ -111,6 +111,15 @@ subs(;kwargs...)                      = ex -> subs(ex; kwargs...)
 subs(dict::Dict; kwargs...)           = ex -> subs(ex, dict...; kwargs...)
 subs(d::Pair...; kwargs...)           = ex -> subs(ex, [(p.first, p.second) for p in d]...; kwargs...)
 
+## simplify(ex::SymbolicObject, ...) is exported
+"""
+    simplify
+
+SymPy has dozens of functions to perform various kinds of simplification. There is also one general function called `simplify` that attempts to apply all of these functions in an intelligent way to arrive at the simplest form of an expression. (See [Simplification](https://docs.sympy.org/latest/tutorial/simplification.html) for details on `simplify` and other related functionality).
+
+For non-symbolic expressions, `simplify` returns its first argument.
+"""
+simplify(x,args...;kwargs...) = x
 
 ##################################################
 # avoid type piracy. After we call `pytype` mappings, some
