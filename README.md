@@ -21,7 +21,7 @@ easier.
 
 The [tutorial](examples/tutorial.md) provides an overview. It is
 viewable as an `IJulia` notebook
-[here](http://nbviewer.ipython.org/github/JuliaPy/SymPy.jl/blob/master/examples/tutorial.ipynb). In addition, most of the SymPy tutorial has the `julia` counterparts illustrated starting from [index.html](http://htmlpreview.github.io/?https://github.com/JuliaPy/SymPy.jl/blob/master/examples/index.html)
+[here](http://nbviewer.ipython.org/github/JuliaPy/SymPy.jl/blob/master/examples/tutorial.ipynb). In addition, most of the SymPy tutorial has the `julia` counterparts illustrated starting from [index.html](http://htmlpreview.github.io/?https://github.com/JuliaPy/SymPy.jl/blob/master/examples/index.html).
 
 ### Installation
 

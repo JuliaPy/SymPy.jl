@@ -130,6 +130,13 @@ import PyCall
     ex = line(10)
     @test ex(sol) == ex(sol...) == 11
 
+    ## Simplify (issue 343)
+    @vars x
+    @test simplify(sin(x)^2 + cos(x)^2) == 1
+    @test simplify(sympy.gamma(x)/sympy.gamma(x-2)) == (x-1)*(x-2)
+    _ones = (1, 1.0, big"1", "1", one)
+    @test simplify.(_ones) == _ones
+
     ## Conversion
     x = Sym("x")
     p = x.subs(x,pi)

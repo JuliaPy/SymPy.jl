@@ -78,6 +78,23 @@ end
 
 
 ## Add interfaces for solve, nonlinsolve when vector of equations passed in
+"""
+    solve
+
+Use `solve` to solve algebraic equations. 
+
+Examples:
+```
+@vars x y a b c d
+solve(x^2 + 2x + 1, x) # [-1]
+solve(x^2 + 2a*x + a^2, x) # [-a]
+solve([a*x + b*y-3, c*x + b*y - 1], [x,y]) # Dict(y => (a - 3*c)/(b*(a - c)),x => 2/(a - c))
+```
+
+!!! Note
+   A very nice example using `solve` is a [blog](https://newptcai.github.io/euclidean-plane-geometry-with-julia.html) entry on [Napolean's theorem](https://en.wikipedia.org/wiki/Napoleon%27s_theorem) by Xing Shi Cai.
+"""
+solve() = ()
 solve(V::Vector{T}, args...; kwargs...) where {T <: SymbolicObject} =
     sympy.solve(V, args...; kwargs...)
 
