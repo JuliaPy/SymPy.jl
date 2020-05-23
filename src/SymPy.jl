@@ -73,6 +73,7 @@ include("plot_recipes.jl")
 
 pynull() = PyCall.PyNULL()
 const sympy  = PyCall.PyNULL()
+const sympy_core =  PyCall.PyNULL()
 const mpmath = PyCall.PyNULL()
 const combinatorics  = PyCall.PyNULL()
 
@@ -97,6 +98,7 @@ function __init__()
 
     ## Define sympy, mpmath, ...
     copy!(sympy, PyCall.pyimport_conda("sympy", "sympy"))
+    copy!(sympy_core, PyCall.pyimport("sympy.core"))
     copy!(PI.__pyobject__,  sympy.pi)
     copy!(IM.__pyobject__, sympy.I)
     copy!(oo.__pyobject__, sympy.oo)
@@ -122,7 +124,7 @@ function __init__()
     pytype_mapping(sympy.ImmutableMatrix, SymMatrix)
     pytype_mapping(sympy.ImmutableDenseMatrix, SymMatrix)
 
-    basictype = sympy.basic.Basic
+    basictype = sympy_core.basic.Basic
     pytype_mapping(basictype, Sym)
 
     pytype_mapping(sympy.Matrix, Array{Sym})
