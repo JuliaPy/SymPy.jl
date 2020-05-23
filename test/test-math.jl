@@ -37,3 +37,14 @@ using SpecialFunctions
     @test eps(Sym) == 0
     #@test rewrite(sinc(x), "jn") == jn(0, PI * x)
 end
+
+@testset  "nan"  begin
+    #  issue  346
+    a=sympy.nan
+    a′ = NaN
+
+    @test (a < 0) == (a′ < 0)
+    @test (a > 0) == (a′ > 0)
+    @test (a == 0) == (a′ == 0)
+
+end
