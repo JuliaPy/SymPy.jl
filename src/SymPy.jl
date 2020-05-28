@@ -74,6 +74,7 @@ include("plot_recipes.jl")
 pynull() = PyCall.PyNULL()
 const sympy  = PyCall.PyNULL()
 const sympy_core =  PyCall.PyNULL()
+const sympy_matrices =  PyCall.PyNULL()
 const mpmath = PyCall.PyNULL()
 const combinatorics  = PyCall.PyNULL()
 
@@ -99,6 +100,7 @@ function __init__()
     ## Define sympy, mpmath, ...
     copy!(sympy, PyCall.pyimport_conda("sympy", "sympy"))
     copy!(sympy_core, PyCall.pyimport("sympy.core"))
+    copy!(sympy_matrices, PyCall.pyimport("sympy.matrices"))    
     copy!(PI.__pyobject__,  sympy.pi)
     copy!(IM.__pyobject__, sympy.I)
     copy!(oo.__pyobject__, sympy.oo)
@@ -121,14 +123,14 @@ function __init__()
 
     ## mappings from PyObjects to types.
     ## order here is fussy, as we needed ImmutableMatrix before Basic
-    pytype_mapping(sympy.ImmutableMatrix, SymMatrix)
-    pytype_mapping(sympy.ImmutableDenseMatrix, SymMatrix)
+    pytype_mapping(sympy_matrices.ImmutableMatrix, SymMatrix)
+    pytype_mapping(sympy_matrices.ImmutableDenseMatrix, SymMatrix)
 
     basictype = sympy_core.basic.Basic
     pytype_mapping(basictype, Sym)
 
-    pytype_mapping(sympy.Matrix, Array{Sym})
-    pytype_mapping(sympy.matrices.MatrixBase, Array{Sym})
+    pytype_mapping(sympy_matrices.Matrix, Array{Sym})
+    pytype_mapping(sympy_matrices.MatrixBase, Array{Sym})
 
     pytype_mapping(sympy.FiniteSet, Set)
 
