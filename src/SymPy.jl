@@ -49,7 +49,7 @@ export SymMatrix, SymFunction
 export PI, IM, oo, zoo, True, False
 export N, subs
 
-export sympy, import_from#, import_sympy
+export sympy, sympy_core, sympy_matrices, import_from#, import_sympy
 export free_symbols
 
 
@@ -72,8 +72,23 @@ include("plot_recipes.jl")
 ##################################################
 
 pynull() = PyCall.PyNULL()
+"""
+    sympy
+
+variable from `pyimport("sympy")`
+"""
 const sympy  = PyCall.PyNULL()
+"""
+    sympy_core
+
+variable from `pyimport("sympy.core")`
+"""
 const sympy_core =  PyCall.PyNULL()
+"""
+    sympy_matrices
+
+variable from `pyimport("sympy.matrices")`
+"""
 const sympy_matrices =  PyCall.PyNULL()
 const mpmath = PyCall.PyNULL()
 const combinatorics  = PyCall.PyNULL()
