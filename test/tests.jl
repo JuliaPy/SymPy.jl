@@ -608,7 +608,7 @@ end
     @test eltype(A*A) == Sym
     @test eltype(A*ones(2,2)) == Sym
     @test eltype(A*Diagonal([1,1])) == Sym
-    @test eltype(A * I(2)) == Sym
+    VERSION >= v"1.2.0"  && @test eltype(A * I(2)) == Sym
 
     ## Issue 328 with E -> e
     @vars x
