@@ -655,10 +655,10 @@ end
 
 
     ## Issue 351 booleans  and arithmetic operations
-    @test 1  + true  ==  2 == true +  1 
-    @test 1 - true  == 0 ==   true -  1
-    @test 1 * true == 1 == true * 1
-    @test 1/true == 1  == true/1
-    @test true^1  ==  1  ==  1^true
+    @test Sym(1) + true == Sym(2) == true +  Sym(1) 
+    @test Sym(1) - true == Sym(0) == true -  Sym(1)
+    @test Sym(1) * true == Sym(1) == true * Sym(1)
+    @test Sym(1) / true == Sym(1) == true / Sym(1)
+    @test true^Sym(1)   == Sym(1) == Sym(1)^true
 
 end
