@@ -608,7 +608,7 @@ end
     @test eltype(A*A) == Sym
     @test eltype(A*ones(2,2)) == Sym
     @test eltype(A*Diagonal([1,1])) == Sym
-    @test_broken eltype(A * I(2)) == Sym
+    @test eltype(A * I(2)) == Sym
 
     ## Issue 328 with E -> e
     @vars x
@@ -654,6 +654,11 @@ end
     @test lambdify(PI^4*xreal)(256) == 256 * pi^4
 
 
-
+    ## Issue 351 booleans  and arithmetic operations
+    @test 1  + true  ==  2 == true +  1 
+    @test 1 - true  == 0 ==   true -  1
+    @test 1 * true == 1 == true * 1
+    @test 1/true == 1  == true/1
+    @test true^1  ==  1  ==  1^true
 
 end

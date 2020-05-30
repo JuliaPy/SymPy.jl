@@ -19,3 +19,16 @@
 \(x::SymbolicObject, y::SymbolicObject) = (y'/x')' # ?
 
 inv(x::Sym) = x.__pow__(Sym(-1))
+
+# special case Boolean; issue   351
+# promotion for Boolean here is to 0 or  1,  not False,  True
++(x::Bool, y::SymbolicObject) = Sym(Int(x)).__add__(y)
++(x::SymbolicObject, y::Bool) = x.__add__(Int(y))
+*(x::Bool, y::SymbolicObject) = Sym(Int(x)).__mul__(y)
+*(x::SymbolicObject, y::Bool) = x.__mul__(Int(y))
+-(x::Bool, y::SymbolicObject) = Sym(Int(x)).__sub__(y)
+-(x::SymbolicObject, y::Bool) = x.__sub__(Int(y))
+/(x::Bool, y::SymbolicObject) = Sym(Int(x)).__div__(y)
+/(x::SymbolicObject, y::Bool) = x.__div__(Int(y))
+^(x::Bool, y::SymbolicObject) = Sym(Int(x)).__pow__(y)
+^(x::SymbolicObject, y::Bool) = x.__pow__(Int(y))
