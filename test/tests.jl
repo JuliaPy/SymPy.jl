@@ -196,7 +196,28 @@ import PyCall
     @test_throws MethodError nsolve([z1^2-1, z1+z2z1-2], [z1,z2z1], [1,1])  # non symbolic first argument
     @test all(N.(sympy.nsolve([z1^2-1, z1+z2z1-2], [z1,z2z1], (1,1))) .≈ [1.0, 1.0])
 
+    ## issue 355: direct definition of LinearAlgebra.:\
+    @test_throws SingularException Sym[1 1; 1 1] \ [1, 2]
+    @vars  a b c d e f
+    A, b= [a b; c d], [e, f]
+    x = A \ b
+    @test  simplify.(A*x-b) == [0,0]
+    out =  Sym[1 1; 1 1] \ [1,1]
+    u =   free_symbols(out)[1]
+    @test out ==  [1-u,u]
+
+    
+    # Just a made-up example to test  if manageable
+    @vars a1 a2
+    n = 7
+    A = diagm(0 => ones(Int, n), 1 => fill(a1, n-1), 2 => fill(1, n-2), -1 => fill(a2, n-1))
+    b = Vector{Sym}(1:n)
+    x = A \ b
+    @test length(free_symbols(x)) ==  2
+    
+    
     ## limits
+    @vars x
     @test limit(x -> sin(x)/x, 0) == 1
     @test limit(sin(x)/x, x, 0) |> float == 1
     @test limit(sin(x)/x, x => 0) == 1
@@ -429,16 +450,16 @@ import PyCall
     end
 
     ## Assumptions
-    @test ask(Q.even(Sym(2))) == true
-    @test ask(Q.even(Sym(3))) == false
-    @test ask(Q.nonzero(Sym(3))) == true
+    @test ask(𝑄.even(Sym(2))) == true
+    @test ask(𝑄.even(Sym(3))) == false
+    @test ask(𝑄.nonzero(Sym(3))) == true
     @vars x_real real=true
     @vars x_real_positive real=true positive=true
-    @test ask(Q.positive(x_real)) == nothing
-    @test ask(Q.positive(x_real_positive)) == true
-    @test ask(Q.nonnegative(x_real^2)) == true
-    @test ask(Q.upper_triangular([x_real 1; 0 x_real])) == true
-    @test ask(Q.positive_definite([x_real 1; 1 x_real])) == nothing
+    @test ask(𝑄.positive(x_real)) == nothing
+    @test ask(𝑄.positive(x_real_positive)) == true
+    @test ask(𝑄.nonnegative(x_real^2)) == true
+    @test ask(𝑄.upper_triangular([x_real 1; 0 x_real])) == true
+    @test ask(𝑄.positive_definite([x_real 1; 1 x_real])) == nothing
 
 
               ## sets
@@ -549,8 +570,8 @@ end
     # issue 231 Q.complex
     @vars x_maybecomplex
     @vars x_imag imaginary=true
-    @test ask(Q.complex(x_maybecomplex)) == nothing
-    @test ask(Q.complex(x_imag)) == true
+    @test ask(𝑄.complex(x_maybecomplex)) == nothing
+    @test ask(𝑄.complex(x_imag)) == true
 
     # issue 242 lambdify and conjugate
     @vars x
