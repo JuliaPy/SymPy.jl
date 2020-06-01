@@ -81,7 +81,26 @@ function LinearAlgebra.eigvecs(a::Matrix{Sym})
     hcat((hcat(di[3]...) for di in ds)...)
 end
 
+# solve Ax=b for x, avoiding generic `lu`, which can be very slow for bigger n values
+# fix suggested by @olof3 in issue 355
+function LinearAlgebra.:\(A::AbstractArray{Sym,2}, b::AbstractArray{S,1}) where {S}
 
+    m,n  = size(A)
+    x =  Sym["x$i" for  i in 1:n]
+    out = solve(A*x-b, x)
+    isempty(out) && throw(SingularException(0)) # Could also return out here?
+    ret = Vector{Sym}(undef, n)
+    for (i,xᵢ)  in enumerate(x)
+        ret[i] =  get(out,  xᵢ, xᵢ)
+    end
+
+    return ret
+
+end
+
+function LinearAlgebra.:\(A::AbstractArray{T,2}, B::AbstractArray{S,2}) where {T <: Sym, S}
+    hcat([A \ bⱼ for bⱼ in eachcol(B)]...)
+end
 
 
 ##################################################

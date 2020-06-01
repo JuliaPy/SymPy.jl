@@ -35,11 +35,13 @@ export ask
 ## We make a module Q to hold the assumptions
 ## this follows this page http://docs.sympy.org/0.7.5/_modules/sympy/assumptions/ask.html
 """
+    𝑄
+    SymPy.Q
 
-Documentation for the `Q` module.
+Documentation for the `SymPy.Q` module, exported as `𝑄`.
 
 SymPy allows for
-[assumptions](http://docs.sympy.org/latest/modules/sympy/assumptions/)
+[assumptions](https://docs.sympy.org/latest/modules/assumptions/index.html)
 on variables. These may be placed on free sympols at construction.
 
 For example, the following creates a real value variable `x` and a postive, real variable `y`:
@@ -53,11 +55,11 @@ The `Q` module exposes a means to *q*uery the assumptions on a
 variable. For example,
 
 ```
-ask(Q.positive(y))  # true
-ask(Q.negative(y))  # false
-ask(Q.positive(x))  # `nothing`
-ask(Q.positive(x^2)) # `nothing` -- might be 0
-ask(Q.positive(1 + x^2) # true  -- must be postive now.
+ask(𝑄.positive(y))  # true
+ask(𝑄.negative(y))  # false
+ask(SymPy.Q.positive(x))  # `nothing`
+ask(SymPy.Q.positive(x^2)) # `nothing` -- might be 0
+ask(SymPy.Q.positive(1 + x^2) # true  -- must be postive now.
 ```
 
 The ask function uses tri-state logic, returning one of 3 values:
@@ -67,14 +69,15 @@ The construction of predicates is done through `Q` methods. These can
 be combined logically. For example, this will be `true`:
 
 ```
-ask(Q.positive(y) & Q.negative(-x^2 - 1))
+ask(𝑄.positive(y) & 𝑄.negative(-x^2 - 1))
 ```
 
 The above use `&` as an infix operation for the binary operator
 `And`. Values can also be combined with `Or`, `Not`, `Xor`, `Nand`,
 `Nor`, `Implies`, `Equivalent`, and `satisfiable`.
 
-Note: As `SymPy.jl` converts symbolic matrices into Julia's `Array`
+!!! note: 
+    As `SymPy.jl` converts symbolic matrices into Julia's `Array`
 type and not as matrices within Python, the predicate functions from SymPy for
 matrices are not used, though a replacement is given.
 """
@@ -315,5 +318,22 @@ end
 
 end
 
+## Issue  #354; request to *not*  export  Q
 ## export
-export Q
+#export Q
+
+const 𝑄 = Q
+
+"""
+    𝑄
+
+Exported  symbol for  [`SymPy.Q`](@ref), a  Julia  module implementing `sympy.Q`. "Questions" can be asked through the patterns
+`𝑄.query(value)` (𝑄 is entered as  [slash]itQ[tab]) or `SymPy.Q.query(value)` *but  not* as `sympy.Q.query(value)`
+
+!!! note
+    At one time, the symbol `Q` was exported for this. To avoid namespace clutter, the unicode alternative is now used. Legacy code would need a definition like `const Q = SymPy.Q`  to work.
+
+"""
+𝑄
+export  𝑄
+
