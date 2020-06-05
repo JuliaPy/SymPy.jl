@@ -38,3 +38,4 @@ jobs:
 after_success:
   - julia -e 'cd(Pkg.dir("SymPy")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
 
+
