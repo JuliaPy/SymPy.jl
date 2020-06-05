@@ -18,9 +18,8 @@ This `SymPy` package provides a light interface for  the
 features of the SymPy library that makes working with SymPy objects a bit
 easier.
 
-The [tutorial](examples/tutorial.md) provides an overview. It is
-viewable as an `IJulia` notebook
-[here](http://nbviewer.ipython.org/github/JuliaPy/SymPy.jl/blob/master/examples/tutorial.ipynb). In addition, most of the SymPy tutorial has the `julia` counterparts illustrated starting from [index.html](http://htmlpreview.github.io/?https://github.com/JuliaPy/SymPy.jl/blob/master/examples/index.html).
+The documentation inludes an introduction document and a version of
+the SymPy tutorial translated from the Python syntax into Julia.
 
 ### Installation
 
