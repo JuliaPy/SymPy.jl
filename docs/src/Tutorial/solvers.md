@@ -165,11 +165,18 @@ is an example of the syntax of `linsolve`.
 
 ##### In `Julia`:
 
+Rather than a vector,  we  pass  a tuple:
+
+
 ```jldoctest solvers
-julia> linsolve([x + y + z - 1, x + y + 2*z - 3 ], (x, y, z))
-∅
+julia> linsolve((x + y + z - 1, x + y + 2*z - 3), (x, y, z))
+{(-y - 1, y, 2)}
 
 ```
+
+A  tuple
+!!! note "Tuples"
+    The `linsolve` function  expects a list of equations, whereas  `PyCall`  is instructed to promote the syntax  to   produce  a  list  in  `Python` into a `Array{Sym}` object. As  such, we pass  the equations in a tuple above. Similar considerations  are necessary at times for the  `sympy.Matrix`  constructor. It is suggested, as in the next example, to work around this by passing `Julia`n arrays to the constructor or bypassing it  altogether.
 
 
 ----
@@ -184,7 +191,8 @@ Matrix Form:
 
 ##### In `Julia`:
 
-We use `Julia`n syntax for matrices
+We use `Julia`n syntax for matrices:
+
 ```jldoctest solvers
 julia> A =  [1 1 1; 1  1  2];  b =  [1,3]
 2-element Array{Int64,1}:
@@ -219,6 +227,15 @@ julia> linsolve(aug, (x,y,z))
 
 ```
 
+Finally,  linear equations  are  solved in `Julia`  with  the `\` (backslash) operator:
+
+```
+A \ b
+```
+
+The variables are generated  within `\` in  the  sequence  `x1`, `x2`,  ...
+
+
 ----
 
 * A*x = b Form
@@ -252,7 +269,6 @@ julia> linsolve(system, x, y, z)
 ----
 
 !!! note
-
     The order of solution corresponds the order of given symbols.
 
 In the `solveset` module, the non linear system of equations is solved using
@@ -346,6 +362,7 @@ However, the next bit requires some modifications to run:
 * the `system` array definition must have extra spaces removed
 * `Dummy`, `Lambda`, `Mod`, `ImageSet`, `FiniteSet` aren't exported
 * we need `PI`, not `pi` to have a symbolic value
+* we compare manually
 
 ```jldoctest solvers
 julia> n = sympy.Dummy("n")
@@ -368,8 +385,9 @@ julia> complex_soln = (sympy.ImageSet(img_lamda, S.Integers), S(1)/3)
 julia> soln = sympy.FiniteSet(real_soln, complex_soln)
 {(log(sin(1/3)), 1/3), ({2⋅n⋅ⅈ⋅π + (log(sin(1/3)) mod 2⋅ⅈ⋅π) | n ∊ ℤ}, 1/3)}
 
-julia> nonlinsolve(system, (x, y)) == soln
-false
+julia> nonlinsolve(system, (x, y)) 
+{({2⋅n⋅ⅈ⋅π + log(sin(1/3)) | n ∊ ℤ}, 1/3)}
+
 
 ```
 
@@ -415,9 +433,8 @@ julia> nonlinsolve(system, (a, b))
 
    1. The order of solution corresponds the order of given symbols.
 
-   2. Currently `nonlinsolve` doesn't return solution in form of `LambertW` (if there
-   is solution present in the form of `LambertW`).
-
+   2. Currently `nonlinsolve` doesn't return solution in form of `LambertW` (if there is solution present in the form of `LambertW`).
+   
    `solve` can be used for such cases:
 
 ```python
@@ -678,9 +695,7 @@ f
 
 ```
 
-or the `@symfuns` macro, as in `@symfuns f`.
-
-to define symbolic functions. For these, rather than use `diff` to specify derivatives, the prime notation can be used. We then have, with `f` defined above:
+or the `@symfuns` macro, as in `@symfuns f` to define symbolic functions. For these, rather than use `diff` to specify derivatives, the prime notation can be used. We then have, with `f` defined above:
 
 ```jldoctest solvers
 julia> diffeq = Eq(f''(x) - 2*f'(x) + f(x), sin(x)); string(diffeq)

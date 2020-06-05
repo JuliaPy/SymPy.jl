@@ -162,8 +162,8 @@ To create an unevaluated derivative, use the `Derivative` class.  It has the sam
     >>> deriv
          7
         ∂     ⎛ x⋅y⋅z⎞
-    ──────────⎝ℯ     ⎠
-      4   2
+    ──────────⎝ℯ    ⎠
+        4   2
       ∂z  ∂y  ∂x
 ```
 
@@ -262,8 +262,7 @@ Note that SymPy does not include the constant of integration.  If you want it,
 you can add one yourself, or rephrase your problem as a differential equation
 and use `dsolve` to solve it, which does add the constant (see :ref:`tutorial-dsolve`).
 
-> Quick Tip:
-
+!!! note "Quick tip"
    $\infty$ in SymPy is `oo` (that's the lowercase letter "oh" twice).  This
    is because `oo` looks like $\infty$, and is easy to type.
 
@@ -519,6 +518,20 @@ In `Julia`, a pair can be used to indicate the limit:
 julia> limit(sin(x)/x, x=>0)
 1
 ```
+
+Sometimes, a  symbolic value  is  needed to have a  proper limit:
+
+```jldoctest calculus
+julia> limit((pi/2-x-acos(x))/x^3, x=>0)
+-∞
+
+julia> limit((PI/2-x-acos(x))/x^3, x=>0)
+1/6
+
+```
+
+(In the  first case, the numerator is not `0`  when `x=0` due  to  roundoff error  in  computing  `pi/2`.)
+
 
 ----
 

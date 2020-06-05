@@ -1,6 +1,6 @@
 # Introduction
 
-[From](https://docs.sympy.org/latest/tutorial/intro.html)
+Taken [from](https://docs.sympy.org/latest/tutorial/intro.html) the  SymPy tutorial (version 1.3).
 
 ```@setup intro
 using SymPy
@@ -371,9 +371,12 @@ Solve the differential equation `y'' - y = e^t`.
 julia> y = sympy.Function("y")
 PyObject y
 
-julia> dsolve(Eq(y(t).diff(t, t) - y(t), exp(t)), y(t)) |> string
+julia> dsolve(Eq(y(t).diff(t, t) - y(t), exp(t)), y(t)) |> string # work around formatting issue
 "Eq(y(t), C2*exp(-t) + (C1 + t/2)*exp(t))"
 ```
+
+!!! note "Why `string`?"
+    The uses of `|> string` above and elsewhere throughout  this translation  of  the SymPy tutorial is only for technical reasons  related to  how `Documenter.jl` parses  the output. It is not idiomatic, or suggested; it  only allows the cell  to  be tested programatically for  regressions.
 
 * This is made more familiar looking with the `SymFunction` class:
 
@@ -381,7 +384,7 @@ julia> dsolve(Eq(y(t).diff(t, t) - y(t), exp(t)), y(t)) |> string
 julia> y = SymFunction("y")
 y
 
-julia> dsolve(y''(t) - y(t) - exp(t), y(t)) |> string  # work around formatting issue
+julia> dsolve(y''(t) - y(t) - exp(t), y(t)) |> string  
 "Eq(y(t), C2*exp(-t) + (C1 + t/2)*exp(t))"
 ```
 

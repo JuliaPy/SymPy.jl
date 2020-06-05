@@ -124,9 +124,11 @@ variable it is assigned to need not have anything to do with one another.
     b
     >>> b
     a
-```jldoctest gotchas
+```
 
 ##### In `Julia`:
+
+The  same  holds:
 
 ```jldoctest gotchas
 julia>  a, b = symbols("b a")
@@ -456,8 +458,6 @@ julia> simplify(a - c)
 4⋅x
 ```
 
-!!! note "Unfortunate parsing"
-    The awkward calls `string(a)`,  `string(b)`, and  `string(c)` are necesssary for technical reasons (Documenter's processing terminates early for   thtese  outputs). They are  not  examples of good style.
 ----
 
 There is also a method called `equals` that tests if two expressions are
@@ -642,10 +642,6 @@ on whether or not you have run `from __future__ import division`:
 
 ----
 
-!! note
-
-   On running the example above in SymPy Live, (1/2) is wrapped
-   by Integer, so it does not show the correct output.
 
 To avoid this, we can construct the rational object explicitly
 

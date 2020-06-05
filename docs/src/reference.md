@@ -14,3 +14,4 @@ end
 
 ```@autodocs
 Modules = [SymPy]
+```

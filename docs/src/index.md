@@ -1,8 +1,6 @@
 # SymPy.jl
 
-TODO:  add  Random, SpecialFunctions
-
-Documentation for [SymPy.jl](https://github.com/JuliaPy/SymPy.jl) a `Julia` interface to Python's [SymPy](https://github.com/JuliaPy/SymPy.jl) library for symbolic mathematics.
+Documentation for [SymPy.jl](https://github.com/JuliaPy/SymPy.jl) a `Julia` interface to Python's [SymPy](https://www.sympy.org/en/index.html) library for symbolic mathematics.
 
 ```@index
 Pages  = ["index.md", "introduction.md", "Tutorial/index.md"]
@@ -23,6 +21,8 @@ This package relies on `PyCall` to provide a link between `Julia` and `Python`. 
 ##  Quick example
 
 This  package  provides a convenient  way  to access the functionality of the  `sympy` library for `Python` from `Julia`, utilizing  the  `PyCall` package to provide the interface. A symbolic type, a wrapper  around a `PyCall.PyObject`, is provided  and, as  much as reasonable,  generic `Julia` methods are created for this type. Many sympy  specific features  are available through a qualified function call, e.g. `sympy.funcname(...)` or a `Python` method call,  e.g., `obj.methname(...)`.
+
+This example from calculus provides an illustation of each.
 
 ```jldoctest index
 julia> using SymPy

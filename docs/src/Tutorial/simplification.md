@@ -1231,9 +1231,8 @@ julia> binomial(n, k)
 
 ----
 
-The factorial function is closely related to the `gamma function
-<http://en.wikipedia.org/wiki/Gamma_function>`_, `gamma`.  `gamma(z)`
-represents $\Gamma(z) = \int_0^\infty t^{z - 1}e^{-t}\,dt$, which for positive integer
+The factorial function is closely related to the [gamma  function](http://en.wikipedia.org/wiki/Gamma_function). 
+$\Gamma(z) = \int_0^\infty t^{z - 1}e^{-t}dt$ is implemented in  `gamma(z)`, which for positive integer has:
 `z` is the same as `(z - 1)!`.
 
 ```python

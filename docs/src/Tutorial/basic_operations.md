@@ -196,7 +196,6 @@ x
 ----
 
 !!! note "Quick Tip"
-
    SymPy expressions are immutable.  No function will change them in-place.
 
 
@@ -499,7 +498,9 @@ julia> fn.(a)
 ```
 
 !!!  note "Technical note"
-    The `lambdify`  function converts a symbolic  expression into  a `Julia`  expression, and then creates a function using `invokelatest`  to avoid  world  age issues. More performant functions can be produced using this pattern:
+    The `lambdify`  function converts a symbolic  expression into  a `Julia`  expression, and then creates a function using `invokelatest`  to avoid  world  age issues.
+	
+More performant functions can be produced using the following pattern:
 	
 ```jldoctest basicoperations
 julia> ex = sin(x)^2 + x^2

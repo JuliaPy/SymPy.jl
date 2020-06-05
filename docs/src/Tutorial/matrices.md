@@ -59,7 +59,7 @@ use
 
 ##### In `Julia`:
 
-* In `Julia`, the `Matrix` constructor is *not* exported, so must be qualified. Here we *avoid* thte vector of row vectors above:
+* In `Julia`, the `Matrix` constructor is *not* exported, so must be qualified. Here we *avoid* the vector of row vectors above:
 
 ```jldoctest matrices
 julia> sympy.Matrix([1 -1; 3 4; 0 2])
@@ -133,9 +133,9 @@ julia> Sym[1,2,3]
 
 ```
 
-!!! note "And again:"
+!!!  note "Avoid `sympy.Matrix`"
+     As shown, it is better to  avoid  the   `sympy.Matrix` constructor when possible, and when not, only pass in a  symbolic  array created through `Julia`'s array semantics.
 
-    Using `sympy.Matrix` is strongly discouraged.
 
 ----
 
@@ -185,7 +185,7 @@ expressions or as keys to dictionaries.  If you need an immutable version of
 
 ##### In `Julia`:
 
-A distinction is made between `ImmutableMatrix` and a mutable one. Mutable ones are mapped to `Julia` arrays, immutable ones are left as a symbolic object of type `SymMatrix`. The usual infix mathematical operations (but not dot broadcasting), 0-based indexing, and dot call syntax for methods are used with these objects.
+A distinction is made between `ImmutableMatrix` and a mutable one. Mutable ones are mapped to `Julia` arrays, immutable ones are left as a symbolic object of type `SymMatrix`. The usual infix mathematical operations (but not dot broadcasting), 0-based indexing, and dot call syntax for methods maay  be used with these objects.
 
 
 
@@ -317,9 +317,8 @@ julia> M.row_del(1)
 ```
 
 
-!!! Alert
-
-For older versions of sympy, the following did not work (using symbolic  values as matrix entries without reverting to  their PyObjects  had shape issues) but  this should work  now:
+!!! note "Alert"
+    For older versions of sympy, the following did not work (using symbolic  values as matrix entries without reverting to  their PyObjects  had shape issues);  this should work  now:
 
 
 ```jldoctest matrices
@@ -428,6 +427,8 @@ raise it to the `-1` power.
 
 ##### In `Julia`:
 
+In `Julia`,  we  use `M1` instead  of `N`, an exported symbol of `SymPy`. Otherise, it  all looks similar:
+
 ```jldoctest matrices
 julia> M = Sym[1 3; -2 3]
 2×2 Array{Sym,2}:
@@ -465,7 +466,7 @@ julia> M^-1
  2/9   1/9
 ```
 
-Attemption to find the inverse of  `M1` will  error (we suppress its lengthy output)
+Attempting to find the inverse of  `M1` will  error (we suppress its lengthy output)
 
 ```jldoctest matrices
 julia> using Test
@@ -520,8 +521,6 @@ julia> M^-1
 ```
 
 Similarly, `M1^(-1)` would yield an  error  for  the non-invertible matrix
-```
-
 
 * There is no broadcasting defined for the `SymMatrix` type.
 
@@ -786,7 +785,7 @@ julia> A = Sym[x 1; 1 x]
 
 ```
 
-Then we can compute the determinant using `Julia`'s generic implementation:
+The method for `det` falls back  the  sympy method:
 
 ```jldoctest matrices
 julia> det(A)
@@ -795,18 +794,24 @@ x  - 1
 
 ```
 
-*or* using SymPy's:
+There is no reason  to,  but generic `Julia` methods  could be used:
 
 ```jldoctest matrices
-julia> A.det()
- 2
-x  - 1
+julia> out  = lu(A)
+LU{Sym,Array{Sym,2}}
+L factor:
+2×2 Array{Sym,2}:
+ 1  0
+ x  1
+U factor:
+2×2 Array{Sym,2}:
+ 1        x
+ 0  1 - x^2
 
+julia> prod(diag(out.L)) * prod(diag(out.U))
+     2
+1 - x 
 ```
-
-The answer is identical, though not necessarily being done in a similar manner.
-
-
 
 ### RREF
 
@@ -1069,15 +1074,15 @@ To diagonalize a matrix, use `diagonalize`. `diagonalize` returns a tuple
 ##### In `Julia`:
 
 ```jldoctest matrices
+julia> P, D = M.diagonalize()
+(Sym[0 1 1 0; 1 1 1 -1; 1 1 1 0; 1 1 0 1], Sym[-2 0 0 0; 0 3 0 0; 0 0 5 0; 0 0 0 5])
+
 julia> P
 4×4 Array{Sym,2}:
  0  1  1   0
  1  1  1  -1
  1  1  1   0
- 1  1  0   1, D = M.diagonalize()
-(Sym[0 1 1 0; 1 1 1 -1; 1 1 1 0; 1 1 0 1], Sym[-2 0 0 0; 0 3 0 0; 0 0 5 0; 0 0 0 5])
-
-julia> P
+ 1  1  0   1
 
 julia> D
 4×4 Array{Sym,2}:
@@ -1101,11 +1106,7 @@ true
 
 
 !!! note "Quick Tip"
-
-   `lambda` is a reserved keyword in Python, so to create a Symbol called
-   $\lambda$, while using the same names for SymPy Symbols and Python
-   variables, use `lamda` (without the `b`).  It will still pretty print
-   as $\lambda$.
+   `lambda` is a reserved keyword in Python, so to create a Symbol called $\lambda$, while using the same names for SymPy Symbols and Python variables, use `lamda` (without the `b`).  It will still pretty print as $\lambda$.
 
 Note that since `eigenvects` also includes the eigenvalues, you should use
 it instead of `eigenvals` if you also want the eigenvectors. However, as
@@ -1135,9 +1136,8 @@ julia> lambda = symbols("lambda")
 julia> p = M.charpoly(lambda)
 PurePoly(lambda**4 - 11*lambda**3 + 29*lambda**2 + 35*lambda - 150, lambda, domain='ZZ')
 
-julia> factor(p)
-       2
-2
+julia> factor(p) |>  string
+"(lambda - 5)^2*(lambda - 3)*(lambda + 2)"
 
 ```
 
@@ -1316,19 +1316,12 @@ SymPy issue tracker [#sympyissues-fn]_ to get detailed help from the community.
 
 !!! note "Footnotes"
 
-* [#zerotestexampleidea-fn] Inspired by https://gitter.im/sympy/sympy?at=5b7c3e8ee5b40332abdb206c
-
-* [#zerotestexamplediscovery-fn] Discovered from https://github.com/sympy/sympy/issues/15141
-
-* [#zerotestsimplifysolution-fn] Suggested from https://github.com/sympy/sympy/issues/10120
-
-* [#zerotestnumerictestsolution-fn] Suggested from https://github.com/sympy/sympy/issues/10279
-
-* [#constantproblemwikilink-fn] https://en.wikipedia.org/wiki/Constant_problem
-
-* [#mathematicazero-fn] How mathematica tests zero https://reference.wolfram.com/language/ref/PossibleZeroQ.html
-
-* [#matlabzero-fn] How matlab tests zero https://www.mathworks.com/help/symbolic/mupad_ref/iszero.html
-
-* [#sympyissues-fn] https://github.com/sympy/sympy/issues
+    * [#zerotestexampleidea-fn] Inspired by https://gitter.im/sympy/sympy?at=5b7c3e8ee5b40332abdb206c
+    * [#zerotestexamplediscovery-fn] Discovered from https://github.com/sympy/sympy/issues/15141
+    * [#zerotestsimplifysolution-fn] Suggested from https://github.com/sympy/sympy/issues/10120
+    * [#zerotestnumerictestsolution-fn] Suggested from https://github.com/sympy/sympy/issues/10279
+    * [#constantproblemwikilink-fn] https://en.wikipedia.org/wiki/Constant_problem
+    * [#mathematicazero-fn] How mathematica tests zero https://reference.wolfram.com/language/ref/PossibleZeroQ.html
+    * [#matlabzero-fn] How matlab tests zero https://www.mathworks.com/help/symbolic/mupad_ref/iszero.html
+	* [#sympyissues-fn] https://github.com/sympy/sympy/issues
 
