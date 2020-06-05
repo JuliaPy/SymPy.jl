@@ -1,5 +1,6 @@
 # The SymPy tutorial (1.3) in `Julia`
 
+Here the  tutorial for  SymPy 1.3 is re-expressed using Julia commands and `SymPy.jl`.
 
 ## About `SymPy.jl`
 
@@ -8,7 +9,7 @@ The `SymPy` package for `Julia` allows `Julia` users to interact with  python's 
 ----
 
 ```@contents
-Pages  = ["intro.md", "gotchas.md", "basic_operations.md", "simplifications.md",  "calculus.md",
+Pages  = ["intro.md", "gotchas.md", "basic_operations.md", "simplification.md",  "calculus.md",
 "solvers.md", "matrices.md", "manipulation.md"]
 ```	
 

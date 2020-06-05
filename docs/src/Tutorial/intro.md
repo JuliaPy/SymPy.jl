@@ -4,6 +4,7 @@
 
 ```@setup intro
 using SymPy
+sympy.init_printing(use_unicode=True)
 ```
 
 
@@ -29,7 +30,8 @@ compute square roots. We might do something like this
 * Of course, `sqrt` is already there:
 
 ```jldoctest intro
-sqrt(9)
+julia> sqrt(9)
+3.0
 ```
 
 ----
@@ -45,7 +47,8 @@ the square root of a number that isn't a perfect square
 ##### In `Julia`:
 
 ```jldoctest intro
-sqrt(8)
+julia> sqrt(8)
+2.8284271247461903
 ```
 
 ----
@@ -71,14 +74,17 @@ left unevaluated by default
 
 
 ```jldoctest intro
-using SymPy
-sympy.sqrt(3)
+julia> using SymPy
+
+julia> sympy.sqrt(3)
+√3
 ```
 
 * When `SymPy` is loaded, the `sqrt` function is overloaded for symbolic objects, so this could also be done through:
 
 ```jldoctest intro
-sqrt(Sym(3))
+julia> sqrt(Sym(3))
+√3
 ```
 
 ----
@@ -94,7 +100,8 @@ computation---symbolic results can be symbolically simplified.
 ##### In `Julia`:
 
 ```jldoctest intro
-sympy.sqrt(8)
+julia> sympy.sqrt(8)
+2⋅√2
 ```
 
 ----
@@ -128,9 +135,11 @@ Let us define a symbolic expression, representing the mathematical expression
 * the command `from sympy import *` is *essentially* run (only functions are "imported", not all objects), so this becomes the same after adjusting the quotes:
 
 ```jldoctest intro
-x, y = symbols("x y")
-expr = x + 2*y
-expr
+julia> x, y = symbols("x y")
+(x, y)
+
+julia> expr = x + 2*y
+x + 2⋅y
 ```
 
 ----
@@ -150,11 +159,13 @@ with it:
 ##### In `Julia`:
 
 ```jldoctest intro
-expr + 1
+julia> expr + 1
+x + 2⋅y + 1
 ```
 
 ```jldoctest intro
-expr - x
+julia> expr - x
+2⋅y
 ```
 
 ----
@@ -173,7 +184,8 @@ SymPy, however:
 ##### In `Julia`:
 
 ```jldoctest intro
-x*expr
+julia> x*expr
+x⋅(x + 2⋅y)
 ```
 
 ----
@@ -198,12 +210,14 @@ In SymPy, there are functions to go from one form to the other
 ##### In `Julia`:
 
 ```jldoctest intro
-expanded_expr = expand(x*expr)
-expanded_expr
+julia> expanded_expr = expand(x*expr)
+ 2
+x  + 2⋅x⋅y
 ```
 
 ```jldoctest intro
-factor(expanded_expr)
+julia> factor(expanded_expr)
+x⋅(x + 2⋅y)
 ```
 
 ----
@@ -229,7 +243,8 @@ of symbolic power SymPy is capable of, to whet your appetite.
 * again, the functions in the `sympy` module are already imported:
 
 ```jldoctest intro
-x, t, z, nu = symbols("x t z nu")
+julia> x, t, z, nu = symbols("x t z nu")
+(x, t, z, nu)
 ```
 
 ----
@@ -257,7 +272,9 @@ Take the derivative of $\sin{(x)}e^x$.
 ##### In `Julia`:
 
 ```jldoctest intro
-diff(sin(x)*exp(x), x)
+julia> diff(sin(x)*exp(x), x)
+ x           x
+ℯ ⋅sin(x) + ℯ ⋅cos(x)
 ```
 
 ----
@@ -273,7 +290,9 @@ Compute $\int(e^x\sin{(x)} + e^x\cos{(x)})\,dx$.
 ##### In `Julia`:
 
 ```jldoctest intro
-integrate(exp(x)*sin(x) + exp(x)*cos(x), x)
+julia> integrate(exp(x)*sin(x) + exp(x)*cos(x), x)
+ x
+ℯ ⋅sin(x)
 ```
 
 ----
@@ -292,7 +311,10 @@ Compute $\int_{-\infty}^\infty \sin{(x^2)}\,dx$.
 * In `Julia` `**` is `^`:
 
 ```jldoctest intro
-integrate(sin(x^2), (x, -oo, oo))
+julia> integrate(sin(x^2), (x, -oo, oo))
+√2⋅√π
+─────
+  2
 ```
 
 ----
@@ -307,7 +329,8 @@ Find $\lim_{x\to 0}\frac{\sin{(x)}}{x}$.
 ##### In `Julia`:
 
 ```jldoctest intro
-limit(sin(x)/x, x, 0)
+julia> limit(sin(x)/x, x, 0)
+1
 ```
 
 ----
@@ -322,7 +345,10 @@ Solve $x^2 - 2 = 0$.
 ##### In `Julia`:
 
 ```jldoctest intro
-solve(x^2 - 2, x)
+julia> solve(x^2 - 2, x)
+2-element Array{Sym,1}:
+ -sqrt(2)
+  sqrt(2)
 ```
 
 ----
@@ -342,15 +368,21 @@ Solve the differential equation `y'' - y = e^t`.
 * `Function` is not a function, so is not exported. We must qualify its use:
 
 ```jldoctest intro
-y = sympy.Function("y")
-dsolve(Eq(y(t).diff(t, t) - y(t), exp(t)), y(t))
+julia> y = sympy.Function("y")
+PyObject y
+
+julia> dsolve(Eq(y(t).diff(t, t) - y(t), exp(t)), y(t)) |> string
+"Eq(y(t), C2*exp(-t) + (C1 + t/2)*exp(t))"
 ```
 
 * This is made more familiar looking with the `SymFunction` class:
 
 ```jldoctest intro
-y = SymFunction("y")
-dsolve(y''(t) - y(t) - exp(t), y(t))
+julia> y = SymFunction("y")
+y
+
+julia> dsolve(y''(t) - y(t) - exp(t), y(t)) |> string  # work around formatting issue
+"Eq(y(t), C2*exp(-t) + (C1 + t/2)*exp(t))"
 ```
 
 ----
@@ -367,18 +399,18 @@ Find the eigenvalues of `\left[\begin{smallmatrix}1 & 2\\2 &
 
 ##### In `Julia`:
 
-* Like `Function`, `Matrix` is not imported and its use must by qualified:
+* Like `Function`, `Matrix` is not imported and its use must by qualified (`Julia` matrix conventions  are used):
 
 ```jldoctest intro
-out = sympy.Matrix([[1, 2], [2, 2]]).eigenvals()
+julia> out = sympy.Matrix([1 2; 2 2]).eigenvals();
+
+julia> sort(collect(keys(out)))
+2-element Array{Any,1}:
+ 3/2 - sqrt(17)/2
+ 3/2 + sqrt(17)/2
 ```
 
-
-* This can be pretty printed if the keys become symbolic:
-
-```jldoctest intro
-convert(Dict{Sym, Any}, out)
-```
+(The keys are returned  as type  `Any`, they may format more nicely if converted, say, through  `convert(Dict{Sym,Sym},out)`.)
 
 ----
 
@@ -398,8 +430,15 @@ spherical Bessel function $j_\nu(z)$.
 * `jn` is imported as a function object and this is not what SymPy expects, instead we pass in the object `sympy.jn`
 
 ```jldoctest intro
-using SpecialFunctions
-besselj(nu, z).rewrite(sympy.jn)
+julia> using SpecialFunctions
+
+julia> @vars ν z
+(ν, z)
+
+julia> besselj(ν, z).rewrite(sympy.jn)
+√2⋅√z⋅jn(ν - 1/2, z)
+────────────────────
+         √π  
 ```
 
 ----
@@ -422,7 +461,8 @@ Print $\int_{0}^{\pi} \cos^{2}{\left (x \right )}\, dx$ using $\LaTeX$.
 * and we use  `PI`, an alias for `sympy.pi`, the symbolic value for $\pi$:
 
 ```jldoctest intro
-sympy.latex(sympy.Integral(cos(x)^2, (x, 0, PI)))
+julia> sympy.latex(sympy.Integral(cos(x)^2, (x, 0, PI)))
+"\\int\\limits_{0}^{\\pi} \\cos^{2}{\\left(x \\right)}\\, dx"
 ```
 
 ----
@@ -473,14 +513,11 @@ to extend it with your own custom functions.
 
 There are other symbolic packages for `Julia`:
 
-* Reduce.jl
-* Symata.jl
-* SymEngine.jl
-* Nemo.jl
+* [Reduce.jl](https://github.com/chakravala/Reduce.jl)
+* [Symata.jl](https://github.com/jlapeyre/Symata.jl)
+* [SymEngine.jl](https://github.com/symengine/SymEngine.jl)
+* [Nemo.jl](https://github.com/Nemocas/Nemo.jl)
+* [SymbolicUtils](https://github.com/JuliaSymbolics/SymbolicUtils.jl)
 
 SymPy is an attractive alternative as `PyCall` makes most all of its functinality directly available and SymPy is fairly feature rich.
 
-
-----
-
-[return to index](./index.html)

@@ -11,7 +11,7 @@
 
 To make this document easier to read, we are going to enable pretty printing.
 
-```verbatim
+```python
     >>> from sympy import *
     >>> x, y, z = symbols('x y z')
     >>> init_printing(use_unicode=True)
@@ -19,14 +19,23 @@ To make this document easier to read, we are going to enable pretty printing.
 
 ##### In `Julia`:
 
-* " not ' are used for strings:
-* pretty printing in enable by default
-* we input extra functions from `sympy` such as `powsimp`, ...
-
-```
+```@setup simplification
 using SymPy
-import_from(sympy)
-x, y, z = symbols("x y z")
+sympy.init_printing(use_unicode=True)
+```
+
+
+* " not ' are used for strings:
+* pretty printing si enable by default
+* we will deliberatately  input extra functions from the `sympy` module such as `powsimp`, ...
+
+```jldoctest simplification
+julia> using SymPy
+
+julia> import_from(sympy)
+
+julia> x, y, z = symbols("x y z")
+(x, y, z)
 ```
 
 ----
@@ -40,7 +49,7 @@ kinds of simplification.  There is also one general function called
 `simplify()` that attempts to apply all of these functions in an intelligent
 way to arrive at the simplest form of an expression.  Here are some examples
 
-```verbatim
+```python
     >>> simplify(sin(x)**2 + cos(x)**2)
     1
     >>> simplify((x**3 + x**2 - x - 1)/(x**2 + 2*x + 1))
@@ -53,17 +62,18 @@ way to arrive at the simplest form of an expression.  Here are some examples
 
 * we need to load in `SpecialFunctions` to have access to `gamma`:
 
-```
-simplify(sin(x)^2 + cos(x)^2)
-```
+```jldoctest simplification
+julia> simplify(sin(x)^2 + cos(x)^2)
+1
 
-```
-simplify((x^3 + x^2 - x - 1)/(x^2 + 2*x + 1))
-```
+julia> simplify((x^3 + x^2 - x - 1)/(x^2 + 2*x + 1))
+x - 1
 
-```
-using SpecialFunctions
-simplify(gamma(x)/gamma(x - 2))
+julia> using SpecialFunctions
+
+julia> simplify(gamma(x)/gamma(x - 2))
+(x - 2)⋅(x - 1)
+
 ```
 
 ----
@@ -77,7 +87,7 @@ simplification operations in SymPy, and uses heuristics to determine the
 simplest result. But "simplest" is not a well-defined term.  For example, say
 we wanted to "simplify" `x^2 + 2x + 1` into `(x + 1)^2`:
 
-```verbatim
+```python
     >>> simplify(x**2 + 2*x + 1)
      2
     x  + 2⋅x + 1
@@ -85,8 +95,9 @@ we wanted to "simplify" `x^2 + 2x + 1` into `(x + 1)^2`:
 
 ##### In `Julia`:
 
-```
-simplify(x^2 + 2*x + 1)
+```jldoctest simplification
+julia> simplify(x^2 + 2*x + 1) |> string
+"x^2 + 2*x + 1"
 ```
 
 ----
@@ -124,7 +135,7 @@ take, and you need a catchall function to simplify it.
 Although it has a lot of scopes, for now, we will consider its function in
 expanding polynomial expressions. For example:
 
-```verbatim
+```python
     >>> expand((x + 1)**2)
      2
     x  + 2⋅x + 1
@@ -135,12 +146,12 @@ expanding polynomial expressions. For example:
 
 ##### In `Julia`:
 
-```
-expand((x + 1)^2)
-```
+```jldoctest simplification
+julia> expand((x + 1)^2) |> string
+"x^2 + 2*x + 1"
 
-```
-expand((x + 2)*(x - 3))
+julia> expand((x + 2)*(x - 3)) |> string
+"x^2 - x - 6"
 ```
 
 ----
@@ -153,15 +164,16 @@ very name, it makes expressions bigger, not smaller.  Usually this is the
 case, but often an expression will become smaller upon calling `expand()` on
 it due to cancellation.
 
-```verbatim
+```python
     >>> expand((x + 1)*(x - 2) - (x - 1)*x)
     -2
 ```
 
 ##### In `Julia`:
 
-```
-expand((x + 1)*(x - 2) - (x - 1)*x)
+```jldoctest simplification
+julia> expand((x + 1)*(x - 2) - (x - 1)*x)
+-2
 ```
 
 ----
@@ -172,7 +184,7 @@ expand((x + 1)*(x - 2) - (x - 1)*x)
 `factor()` takes a polynomial and factors it into irreducible factors over
 the rational numbers.  For example:
 
-```verbatim
+```python
     >>> factor(x**3 - x**2 + x - 1)
             ⎛ 2    ⎞
     (x - 1)⋅⎝x  + 1⎠
@@ -183,12 +195,11 @@ the rational numbers.  For example:
 
 ##### In `Julia`:
 
-```
-factor(x^3 - x^2 + x - 1)
-```
-
-```
-factor(x^2*z + 4*x*y*z + 4*y^2*z)
+```jldoctest simplification
+julia> factor(x^3 - x^2 + x - 1) |> string
+"(x - 1)*(x^2 + 1)"
+julia> factor(x^2*z + 4*x*y*z + 4*y^2*z) |>  string
+"z*(x + 2*y)^2"
 ```
 
 ----
@@ -201,15 +212,16 @@ guaranteed to be irreducible.
 If you are interested in the factors themselves, `factor_list` returns a
 more structured output.
 
-```verbatim
+```python
     >>> factor_list(x**2*z + 4*x*y*z + 4*y**2*z)
     (1, [(z, 1), (x + 2⋅y, 2)])
 ```
 
 ##### In `Julia`:
 
-```
-factor_list(x^2*z + 4*x*y*z + 4*y^2*z)
+```jldoctest simplification
+julia> factor_list(x^2*z + 4*x*y*z + 4*y^2*z)
+(1, Tuple{Sym,Int64}[(z, 1), (x + 2*y, 2)])
 ```
 
 ----
@@ -219,7 +231,7 @@ the strict sense.  They will intelligently factor or expand any kind of
 expression (though note that the factors may not be irreducible if the input
 is no longer a polynomial over the rationals).
 
-```verbatim
+```python
     >>> expand((cos(x) + sin(x))**2)
        2                           2
     sin (x) + 2⋅sin(x)⋅cos(x) + cos (x)
@@ -230,9 +242,12 @@ is no longer a polynomial over the rationals).
 
 ##### In `Julia`:
 
-```
-expand((cos(x) + sin(x))^2)
-factor(cos(x)^2 + 2*cos(x)*sin(x) + sin(x)^2)
+```jldoctest simplification
+julia> expand((cos(x) + sin(x))^2) |> string
+"sin(x)^2 + 2*sin(x)*cos(x) + cos(x)^2"
+
+julia> factor(cos(x)^2 + 2*cos(x)*sin(x) + sin(x)^2) |> string
+"(sin(x) + cos(x))^2"
 ```
 
 ----
@@ -242,7 +257,7 @@ factor(cos(x)^2 + 2*cos(x)*sin(x) + sin(x)^2)
 
 `collect()` collects common powers of a term in an expression.  For example
 
-```verbatim
+```python
     >>> expr = x*y + x - 3 + 2*x**2 - z*x**2 + x**3
     >>> expr
      3    2        2
@@ -255,14 +270,14 @@ factor(cos(x)^2 + 2*cos(x)*sin(x) + sin(x)^2)
 
 ##### In `Julia`:
 
-```
-expr = x*y + x - 3 + 2*x^2 - z*x^2 + x^3
-expr
-```
+```jldoctest simplification
+julia> expr = x*y + x - 3 + 2*x^2 - z*x^2 + x^3
+ 3    2        2
+x  - x ⋅z + 2⋅x  + x⋅y + x - 3
 
-```
-collected_expr = collect(expr, x)
-collected_expr
+julia> collected_expr = collect(expr, x)
+ 3    2
+x  + x ⋅(2 - z) + x⋅(y + 1) - 3
 ```
 
 ----
@@ -270,15 +285,16 @@ collected_expr
 `collect()` is particularly useful in conjunction with the `.coeff()`
 method.  `expr.coeff(x, n)` gives the coefficient of `x**n` in `expr`:
 
-```verbatim
+```python
     >>> collected_expr.coeff(x, 2)
     -z + 2
 ```
 
 ##### In `Julia`:
 
-```
-collected_expr.coeff(x, 2)
+```jldoctest simplification
+julia> collected_expr.coeff(x, 2)
+2 - z
 ```
 
 ----
@@ -296,7 +312,7 @@ no common factors, and the leading coefficients of $p$ and $q$ do not have
 denominators (i.e., are integers).
 
 
-```verbatim
+```python
     >>> cancel((x**2 + 2*x + 1)/(x**2 + x))
     x + 1
     ─────
@@ -332,23 +348,34 @@ denominators (i.e., are integers).
 
 ##### In `Julia`:
 
-```
-cancel((x^2 + 2*x + 1)/(x^2 + x))
-```
+```jldoctest simplification
+julia> cancel((x^2 + 2*x + 1)/(x^2 + x))
+x + 1
+─────
+  x  
 
-```
-expr = 1/x + (3*x/2 - 2)/(x - 4)
-expr
-```
+julia> expr = 1/x + (3*x/2 - 2)/(x - 4)
+3⋅x        
+─── - 2    
+ 2        1
+─────── + ─
+ x - 4    x
 
-```
-cancel(expr)
-```
+julia> cancel(expr) |>  string
+"(3*x^2 - 2*x - 8)/(2*x^2 - 8*x)"
 
-```
-expr = (x*y^2 - 2*x*y*z + x*z^2 + y^2 - 2*y*z + z^2)/(x^2 - 1)
-expr
-cancel(expr)
+julia> expr = (x*y^2 - 2*x*y*z + x*z^2 + y^2 - 2*y*z + z^2)/(x^2 - 1)
+   2                2    2            2
+x⋅y  - 2⋅x⋅y⋅z + x⋅z  + y  - 2⋅y⋅z + z 
+───────────────────────────────────────
+                  2                    
+                 x  - 1     
+
+julia> cancel(expr)
+ 2            2
+y  - 2⋅y⋅z + z 
+───────────────
+     x - 1     
 ```
 
 ----
@@ -356,7 +383,7 @@ cancel(expr)
 Note that since `factor()` will completely factorize both the numerator and
 the denominator of an expression, it can also be used to do the same thing:
 
-```verbatim
+```python
     >>> factor(expr)
            2
     (y - z)
@@ -366,8 +393,9 @@ the denominator of an expression, it can also be used to do the same thing:
 
 ##### In `Julia`:
 
-```
-factor(expr)
+```jldoctest simplification
+julia> factor(expr)  |> string
+"(y - z)^2/(x - 1)"
 ```
 
 ----
@@ -382,7 +410,7 @@ canceled form, `cancel()` is more efficient than `factor()`.
 <http://en.wikipedia.org/wiki/Partial_fraction_decomposition>`_ on a rational
 function.
 
-```verbatim
+```python
     >>> expr = (4*x**3 + 21*x**2 + 10*x + 12)/(x**4 + 5*x**3 + 5*x**2 + 4*x)
     >>> expr
        3       2
@@ -399,13 +427,16 @@ function.
 
 ##### In `Julia`:
 
-```
-expr = (4*x^3 + 21*x^2 + 10*x + 12)/(x^4 + 5*x^3 + 5*x^2 + 4*x)
-expr
-```
+```jldoctest simplification
+julia> expr = (4*x^3 + 21*x^2 + 10*x + 12)/(x^4 + 5*x^3 + 5*x^2 + 4*x);  string(expr)
+"(4*x^3 + 21*x^2 + 10*x + 12)/(x^4 + 5*x^3 + 5*x^2 + 4*x)"
 
-```
-apart(expr)
+julia> apart(expr)
+ 2⋅x - 1       1     3
+────────── - ───── + ─
+ 2           x + 4   x
+x  + x + 1            
+
 ```
 
 ----
@@ -420,7 +451,7 @@ apart(expr)
     name.  For example, the inverse cosine, or arc cosine, is called `acos()`.
 
 
-```verbatim
+```python
    >>> acos(x)
    acos(x)
    >>> cos(acos(x))
@@ -433,16 +464,20 @@ apart(expr)
 
 ##### In `Julia`:
 
-```
+```jldoctest simplification
+julia> acos(x)
 acos(x)
-```
 
-```
-cos(acos(x))
-```
+julia> cos(acos(x))
+x
 
-```
-asin(1)
+julia> asin(1)
+1.5707963267948966
+
+julia> sympy.asin(1)
+π
+─
+2
 ```
 
 ----
@@ -458,7 +493,7 @@ asin(1)
 
 To simplify expressions using trigonometric identities, use `trigsimp()`.
 
-```verbatim
+```python
     >>> trigsimp(sin(x)^2 + cos(x)**2)
     1
     >>> trigsimp(sin(x)**4 - 2*cos(x)**2*sin(x)**2 + cos(x)**4)
@@ -472,23 +507,24 @@ To simplify expressions using trigonometric identities, use `trigsimp()`.
 
 ##### In `Julia`:
 
-```
-trigsimp(sin(x)^2 + cos(x)^2)
-```
+```jldoctest simplification
+julia> trigsimp(sin(x)^2 + cos(x)^2)
+1
 
-```
-trigsimp(sin(x)^4 - 2*cos(x)^2*sin(x)^2 + cos(x)^4)
-```
+julia> trigsimp(sin(x)^4 - 2*cos(x)^2*sin(x)^2 + cos(x)^4)
+cos(4⋅x)   1
+──────── + ─
+   2       2
 
-```
-trigsimp(sin(x)*tan(x)/sec(x))
+julia> trigsimp(sin(x)*tan(x)/sec(x)) |> string
+"sin(x)^2"
 ```
 
 ----
 
 `trigsimp()` also works with hyperbolic trig functions.
 
-```verbatim
+```python
     >>> trigsimp(cosh(x)**2 + sinh(x)**2)
     cosh(2⋅x)
     >>> trigsimp(sinh(x)/tanh(x))
@@ -497,12 +533,12 @@ trigsimp(sin(x)*tan(x)/sec(x))
 
 ##### In `Julia`:
 
-```
-trigsimp(cosh(x)^2 + sinh(x)^2)
-```
+```jldoctest simplification
+julia> trigsimp(cosh(x)^2 + sinh(x)^2)
+cosh(2⋅x)
 
-```
-trigsimp(sinh(x)/tanh(x))
+julia> trigsimp(sinh(x)/tanh(x))
+cosh(x)
 ```
 
 ----
@@ -516,7 +552,7 @@ the input expression, and then uses a heuristic to return the "best" one.
 To expand trigonometric functions, that is, apply the sum or double angle
 identities, use `expand_trig()`.
 
-```verbatim
+```python
     >>> expand_trig(sin(x + y))
     sin(x)⋅cos(y) + sin(y)⋅cos(x)
     >>> expand_trig(tan(2*x))
@@ -528,12 +564,15 @@ identities, use `expand_trig()`.
 
 ##### In `Julia`:
 
-```
-expand_trig(sin(x + y))
-```
+```jldoctest simplification
+julia> expand_trig(sin(x + y))
+sin(x)⋅cos(y) + sin(y)⋅cos(x)
 
-```
-expand_trig(tan(2*x))
+julia> expand_trig(tan(2*x))
+  2⋅tan(x) 
+───────────
+       2   
+1 - tan (x)
 ```
 
 ----
@@ -542,15 +581,16 @@ Because `expand_trig()` tends to make trigonometric expressions larger, and
 `trigsimp()` tends to make them smaller, these identities can be applied in
 reverse using `trigsimp()`
 
-```verbatim
+```python
     >>> trigsimp(sin(x)*cos(y) + sin(y)*cos(x))
     sin(x + y)
 ```
 
 ##### In `Julia`:
 
-```
-trigsimp(sin(x)*cos(y) + sin(y)*cos(x))
+```jldoctest simplification
+julia> trigsimp(sin(x)*cos(y) + sin(y)*cos(x))
+sin(x + y)
 ```
 
 ----
@@ -622,7 +662,7 @@ but for now, all we need to know are the following.
   `z`, `t`, and `c` as arbitrary complex Symbols to demonstrate what
   happens in that case.
 
-```verbatim
+```python
     >>> x, y = symbols('x y', positive=True)
     >>> a, b = symbols('a b', real=True)
     >>> z, t, c = symbols('z t c')
@@ -630,10 +670,15 @@ but for now, all we need to know are the following.
 
 ##### In `Julia`:
 
-```
-x, y = symbols("x y", positive=true)
-a, b = symbols("a b", real=true)
-z, t, c = symbols("z t c")
+```jldoctest simplification
+julia> x, y = symbols("x y", positive=true)
+(x, y)
+
+julia> a, b = symbols("a b", real=true)
+(a, b)
+
+julia> z, t, c = symbols("z t c")
+(z, t, c)
 ```
 
 ----
@@ -649,7 +694,7 @@ z, t, c = symbols("z t c")
     are exactly the same object.
 
 
-```verbatim
+```python
      >>> sqrt(x) == x**Rational(1, 2)
      True
 ```
@@ -658,8 +703,9 @@ z, t, c = symbols("z t c")
 
 * we can construction rational numbers with `//`
 
-```
-sqrt(x) == x^(1//2)
+```jldoctest simplification
+julia> sqrt(x) == x^(1//2)
+true
 ```
 
 ----
@@ -670,7 +716,7 @@ powsimp
 `powsimp()` applies identities 1 and 2 from above, from left to right.
 
 
-```verbatim
+```python
    >>> powsimp(x**a*x**b)
      a + b
     x
@@ -681,16 +727,20 @@ powsimp
 
 ##### In `Julia`:
 
-```
-powsimp(x^a*x^b)
-powsimp(x^a*y^a)
+```jldoctest simplification
+julia> powsimp(x^a*x^b)
+ a + b
+x     
+
+julia> powsimp(x^a*y^a) |> string
+"(x*y)^a"
 ```
 
 ----
 
 Notice that `powsimp()` refuses to do the simplification if it is not valid.
 
-```verbatim
+```python
     >>> powsimp(t**c*z**c)
      c  c
     t ⋅z
@@ -698,8 +748,10 @@ Notice that `powsimp()` refuses to do the simplification if it is not valid.
 
 ##### In `Julia`:
 
-```
-powsimp(t^c*z^c)
+```jldoctest simplification
+julia> powsimp(t^c*z^c)
+ c  c
+t ⋅z
 ```
 
 ----
@@ -708,7 +760,7 @@ If you know that you want to apply this simplification, but you don't want to
 mess with assumptions, you can pass the `force=True` flag.  This will force
 the simplification to take place, regardless of assumptions.
 
-```verbatim
+```python
     >>> powsimp(t**c*z**c, force=True)
          c
     (t⋅z)
@@ -716,8 +768,9 @@ the simplification to take place, regardless of assumptions.
 
 ##### In `Julia`:
 
-```
-powsimp(t^c*z^c, force=true)
+```jldoctest simplification
+julia> powsimp(t^c*z^c, force=true)  |>  string
+"(t*z)^c"
 ```
 
 ----
@@ -725,7 +778,7 @@ powsimp(t^c*z^c, force=true)
 Note that in some instances, in particular, when the exponents are integers or
 rational numbers, and identity 2 holds, it will be applied automatically.
 
-```verbatim
+```python
    >>> (z*t)**2
      2  2
     t ⋅z
@@ -735,12 +788,13 @@ rational numbers, and identity 2 holds, it will be applied automatically.
 
 ##### In `Julia`:
 
-```
-(z*t)^2
-```
+```jldoctest simplification
+julia> (z*t)^2
+ 2  2
+t ⋅z 
 
-```
-sqrt(x*y)
+julia> sqrt(x*y) 
+√x⋅√y
 ```
 
 ----
@@ -749,7 +803,7 @@ This means that it will be impossible to undo this identity with
 `powsimp()`, because even if `powsimp()` were to put the bases together,
 they would be automatically split apart again.
 
-```verbatim
+```python
    >>> powsimp(z**2*t**2)
      2  2
     t ⋅z
@@ -759,12 +813,13 @@ they would be automatically split apart again.
 
 ##### In `Julia`:
 
-```
-powsimp(z^2*t^2)
-```
+```jldoctest simplification
+julia> powsimp(z^2*t^2)
+ 2  2
+t ⋅z 
 
-```
-powsimp(sqrt(x)*sqrt(y))
+julia> powsimp(sqrt(x)*sqrt(y))
+√x⋅√y
 ```
 
 ----
@@ -775,7 +830,7 @@ powsimp(sqrt(x)*sqrt(y))
 `expand_power_exp()` and `expand_power_base()` apply identities 1 and 2
 from right to left, respectively.
 
-```verbatim
+```python
     >>> expand_power_exp(x**(a + b))
      a  b
     x ⋅x
@@ -787,16 +842,21 @@ from right to left, respectively.
 
 ##### In `Julia`:
 
-```
-expand_power_exp(x^(a + b))
-expand_power_base((x*y)^a)
+```jldoctest simplification
+julia> expand_power_exp(x^(a + b))
+ a  b
+x ⋅x 
+
+julia> expand_power_base((x*y)^a)
+ a  a
+x ⋅y 
 ```
 
 ----
 
 As with `powsimp()`, identity 2 is not applied if it is not valid.
 
-```verbatim
+```python
     >>> expand_power_base((z*t)**c)
          c
     (t⋅z)
@@ -804,8 +864,9 @@ As with `powsimp()`, identity 2 is not applied if it is not valid.
 
 ##### In `Julia`:
 
-```include(download("https://raw.githubusercontent.com/mth229/MTH229.jl/master/src/229.jl"))
-expand_power_base((z*t)^c)
+```jldoctest simplification
+julia> expand_power_base((z*t)^c) |> string
+"(t*z)^c"
 ```
 
 ----
@@ -813,7 +874,7 @@ expand_power_base((z*t)^c)
 And as with `powsimp()`, you can force the expansion to happen without
 fiddling with assumptions by using `force=True`.
 
-```verbatim
+```python
    >>> expand_power_base((z*t)**c, force=True)
      c  c
     t ⋅z
@@ -821,8 +882,10 @@ fiddling with assumptions by using `force=True`.
 
 ##### In `Julia`:
 
-```
-expand_power_base((z*t)^c, force=true)
+```jldoctest simplification
+julia> expand_power_base((z*t)^c, force=true)
+ c  c
+t ⋅z
 ```
 
 ----
@@ -830,7 +893,7 @@ expand_power_base((z*t)^c, force=true)
 As with identity 2, identity 1 is applied automatically if the power is a
 number, and hence cannot be undone with `expand_power_exp()`.
 
-```verbatim
+```python
    >>> x**2*x**3
      5
     x
@@ -841,9 +904,12 @@ number, and hence cannot be undone with `expand_power_exp()`.
 
 ##### In `Julia`:
 
-```
-x^2*x^3
-expand_power_exp(x^5)
+```jldoctest simplification
+julia> x^2*x^3  |> string
+"x^5"
+
+julia> expand_power_exp(x^5) |> string
+"x^5"
 ```
 
 ----
@@ -853,7 +919,7 @@ expand_power_exp(x^5)
 
 `powdenest()` applies identity 3, from left to right.
 
-```verbatim
+```python
     >>> powdenest((x**a)**b)
      a⋅b
     x
@@ -861,8 +927,10 @@ expand_power_exp(x^5)
 
 ##### In `Julia`:
 
-```
-powdenest((x^a)^b)
+```jldoctest simplification
+julia> powdenest((x^a)^b)
+ a⋅b
+x  
 ```
 
 ----
@@ -870,7 +938,7 @@ powdenest((x^a)^b)
 As before, the identity is not applied if it is not true under the given
 assumptions.
 
-```verbatim
+```python
     >>> powdenest((z**a)**b)
         b
     ⎛ a⎞
@@ -879,15 +947,16 @@ assumptions.
 
 ##### In `Julia`:
 
-```
-powdenest((z^a)^b)
+```jldoctest simplification
+julia> powdenest((z^a)^b) |> string
+"(z^a)^b"
 ```
 
 ----
 
 And as before, this can be manually overridden with `force=True`.
 
-```verbatim
+```python
     >>> powdenest((z**a)**b, force=True)
      a⋅b
     z
@@ -895,8 +964,10 @@ And as before, this can be manually overridden with `force=True`.
 
 ##### In `Julia`:
 
-```
-powdenest((z^a)^b, force=true)
+```jldoctest simplification
+julia> powdenest((z^a)^b, force=true)
+ a⋅b
+z 
 ```
 
 ----
@@ -911,7 +982,7 @@ powdenest((z^a)^b, force=true)
     alias `ln = log` in case you forget this.
 
 
-```verbatim
+```python
     >>> ln(x)
     log(x)
 ```
@@ -920,8 +991,9 @@ powdenest((z^a)^b, force=true)
 
 * `ln` is exported
 
-```
-ln(x)
+```jldoctest simplification
+julia> ln(x)
+log(x)
 ```
 
 ----
@@ -936,16 +1008,19 @@ cut in the complex plane for the complex logarithm.  However, sufficient
 conditions for the identities to hold are if $x$ and $y$ are positive and $n$
 is real.
 
-```verbatim
+```python
     >>> x, y = symbols('x y', positive=True)
     >>> n = symbols('n', real=True)
 ```
 
 ##### In `Julia`:
 
-```
-x, y = symbols("x y", positive=true)
-n = symbols("n", real=true)
+```jldoctest simplification
+julia> x, y = symbols("x y", positive=true)
+(x, y)
+
+julia> n = symbols("n", real=true)
+n
 ```
 
 ----
@@ -970,7 +1045,7 @@ expand_log
 To apply identities 1 and 2 from left to right, use `expand_log()`.  As
 always, the identities will not be applied unless they are valid.
 
-```verbatim
+```python
     >>> expand_log(log(x*y))
     log(x) + log(y)
     >>> expand_log(log(x/y))
@@ -985,24 +1060,22 @@ always, the identities will not be applied unless they are valid.
 
 ##### In `Julia`:
 
-```
-expand_log(log(x*y))
-```
+```jldoctest simplification
+julia> expand_log(log(x*y))
+log(x) + log(y)
 
-```
-expand_log(log(x/y))
-```
+julia> expand_log(log(x/y))
+log(x) - log(y)
 
-```
-expand_log(log(x^2))
-```
+julia> expand_log(log(x^2))
+2⋅log(x)
 
-```
-expand_log(log(x^n))
-```
+julia> expand_log(log(x^n))
+n⋅log(x)
 
-```
-expand_log(log(z*t))
+julia> expand_log(log(z*t))
+log(t⋅z)
+
 ```
 
 ----
@@ -1010,7 +1083,7 @@ expand_log(log(z*t))
 As with `powsimp()` and `powdenest()`, `expand_log()` has a `force`
 option that can be used to ignore assumptions.
 
-```verbatim
+```python
     >>> expand_log(log(z**2))
        ⎛ 2⎞
     log⎝z ⎠
@@ -1020,12 +1093,15 @@ option that can be used to ignore assumptions.
 
 ##### In `Julia`:
 
-```
-expand_log(log(z^2))
+```jldoctest simplification
+julia> expand_log(log(z^2))
+   ⎛ 2⎞
+log⎝z ⎠
 ```
 
-```
-expand_log(log(z^2), force=true)
+```jldoctest simplification
+julia> expand_log(log(z^2), force=true)
+2⋅log(z)
 ```
 
 ----
@@ -1035,7 +1111,7 @@ logcombine
 
 To apply identities 1 and 2 from right to left, use `logcombine()`.
 
-```verbatim
+```python
     >>> logcombine(log(x) + log(y))
     log(x⋅y)
     >>> logcombine(n*log(x))
@@ -1047,10 +1123,16 @@ To apply identities 1 and 2 from right to left, use `logcombine()`.
 
 ##### In `Julia`:
 
-```
-logcombine(log(x) + log(y))
-logcombine(n*log(x))
-logcombine(n*log(z))
+```jldoctest simplification
+julia> logcombine(log(x) + log(y))
+log(x⋅y)
+
+julia> logcombine(n*log(x))
+   ⎛ n⎞
+log⎝x ⎠
+
+julia> logcombine(n*log(z))
+n⋅log(z)
 ```
 
 ----
@@ -1058,7 +1140,7 @@ logcombine(n*log(z))
 `logcombine()` also has a `force` option that can be used to ignore
 assumptions.
 
-```verbatim
+```python
     >>> logcombine(n*log(z), force=True)
        ⎛ n⎞
     log⎝z ⎠
@@ -1066,8 +1148,10 @@ assumptions.
 
 ##### In `Julia`:
 
-```
-logcombine(n*log(z), force=true)
+```jldoctest simplification
+julia> logcombine(n*log(z), force=true)
+   ⎛ n⎞
+log⎝z ⎠
 ```
 
 ----
@@ -1088,16 +1172,19 @@ Let's define `x`, `y`, and `z` as regular, complex Symbols, removing any
 assumptions we put on them in the previous section.  We will also define `k`,
 `m`, and `n`.
 
-```verbatim
+```python
     >>> x, y, z = symbols('x y z')
     >>> k, m, n = symbols('k m n')
 ```
 
 ##### In `Julia`:
 
-```
-x, y, z = symbols("x y z")
-k, m, n = symbols("k m n")
+```jldoctest simplification
+julia> x, y, z = symbols("x y z")
+(x, y, z)
+
+julia> k, m, n = symbols("k m n")
+(k, m, n)
 ```
 
 ----
@@ -1106,15 +1193,16 @@ The `factorial <http://en.wikipedia.org/wiki/Factorial>`_ function is
 `factorial`.  `factorial(n)` represents $n!= 1\cdot2\cdots(n - 1)\cdot
 n$. `n!` represents the number of permutations of `n` distinct items.
 
-```verbatim
+```python
     >>> factorial(n)
     n!
 ```
 
 ##### In `Julia`:
 
-```
-factorial(n)
+```jldoctest simplification
+julia> factorial(n)
+n!
 ```
 
 ----
@@ -1125,7 +1213,7 @@ The `binomial coefficient
 ways to choose `k` items from a set of `n` distinct items.  It is also often
 written as `nCk`, and is pronounced "`n` choose `k`".
 
-```verbatim
+```python
     >>> binomial(n, k)
     ⎛n⎞
     ⎜ ⎟
@@ -1134,8 +1222,11 @@ written as `nCk`, and is pronounced "`n` choose `k`".
 
 ##### In `Julia`:
 
-```
-binomial(n, k)
+```jldoctest simplification
+julia> binomial(n, k)
+⎛n⎞
+⎜ ⎟
+⎝k⎠
 ```
 
 ----
@@ -1145,7 +1236,7 @@ The factorial function is closely related to the `gamma function
 represents $\Gamma(z) = \int_0^\infty t^{z - 1}e^{-t}\,dt$, which for positive integer
 `z` is the same as `(z - 1)!`.
 
-```verbatim
+```python
     >>> gamma(z)
     Γ(z)
 ```
@@ -1155,8 +1246,9 @@ represents $\Gamma(z) = \int_0^\infty t^{z - 1}e^{-t}\,dt$, which for positive i
 * recall, we need to load `SpecialFunctions` for `gamma` to be available
 
 
-```
-gamma(z)
+```jldoctest simplification
+julia> gamma(z)
+Γ(z)
 ```
 
 ----
@@ -1169,7 +1261,7 @@ ${}_pF_q\left(\begin{matrix} a_1, \cdots, a_p \\ b_1, \cdots, b_q \end{matrix}
 referred to as the `ordinary hypergeometric function
 <http://en.wikipedia.org/wiki/Hypergeometric_function>`.
 
-```verbatim
+```python
     >>> hyper([1, 2], [3], z)
      ┌─  ⎛1, 2 │  ⎞
      ├─  ⎜     │ z⎟
@@ -1180,8 +1272,11 @@ referred to as the `ordinary hypergeometric function
 
 * as `[1,2]` is not symbolic, we qualify `hyper`
 
-```
-sympy.hyper([1, 2], [3], z)
+```jldoctest simplification
+julia> sympy.hyper([1, 2], [3], z)
+ ┌─  ⎛1, 2 │  ⎞
+ ├─  ⎜     │ z⎟
+2╵ 1 ⎝ 3   │  ⎠
 ```
 
 ----
@@ -1194,7 +1289,7 @@ another.  This works for any function in SymPy, not just special functions.
 To rewrite an expression in terms of a function, use
 `expr.rewrite(function)`.  For example,
 
-```verbatim
+```python
     >>> tan(x).rewrite(sin)
          2
     2⋅sin (x)
@@ -1206,12 +1301,14 @@ To rewrite an expression in terms of a function, use
 
 ##### In `Julia`:
 
-```
-tan(x).rewrite(sin)
+```jldoctest simplification
+julia> tan(x).rewrite(sin) |> string
+"2*sin(x)^2/sin(2*x)"
 ```
 
-```
-factorial(x).rewrite(gamma)
+```jldoctest simplification
+julia> factorial(x).rewrite(gamma)
+Γ(x + 1)
 ```
 
 ----
@@ -1225,15 +1322,16 @@ For some tips on applying more targeted rewriting, see the
 To expand special functions in terms of some identities, use
 `expand_func()`.  For example
 
-```verbatim
+```python
     >>> expand_func(gamma(x + 3))
     x⋅(x + 1)⋅(x + 2)⋅Γ(x)
 ```
 
 ##### In `Julia`:
 
-```
-expand_func(gamma(x + 3))
+```jldoctest simplification
+julia> expand_func(gamma(x + 3))
+x⋅(x + 1)⋅(x + 2)⋅Γ(x)
 ```
 
 ----
@@ -1244,7 +1342,7 @@ hyperexpand
 To rewrite `hyper` in terms of more standard functions, use
 `hyperexpand()`.
 
-```verbatim
+```python
     >>> hyperexpand(hyper([1, 1], [2], z))
     -log(-z + 1)
     ─────────────
@@ -1255,8 +1353,11 @@ To rewrite `hyper` in terms of more standard functions, use
 
 * As `[1,1]` is not symbolic, we qualify `hyperexpand`:
 
-```
-sympy.hyperexpand(hyper([1, 1], [2], z))
+```jldoctest simplification
+julia> sympy.hyperexpand(sympy.hyper([1, 1], [2], z))
+-log(1 - z) 
+────────────
+     z
 ```
 
 ----
@@ -1265,7 +1366,7 @@ sympy.hyperexpand(hyper([1, 1], [2], z))
 :py:meth:`its documentation <sympy.functions.special.hyper.meijerg>` for more
 information).
 
-```verbatim
+```python
     >>> expr = meijerg([[1],[1]], [[1],[]], -z)
     >>> expr
     ╭─╮1, 1 ⎛1  1 │   ⎞
@@ -1282,13 +1383,13 @@ information).
 
 * again, we qualify `meijerg`
 
-```
-expr = sympy.meijerg([[1],[1]], [[1],[]], -z)
-expr
-```
-
-```
-hyperexpand(expr)
+```jldoctest simplification
+julia> expr = sympy.meijerg([[1],[1]], [[1],[]], -z)
+╭─╮1, 1 ⎛1  1 │   ⎞
+│╶┐     ⎜     │ -z⎟
+╰─╯2, 1 ⎝1    │   ⎠
+julia> hyperexpand(expr) |> string
+"exp(1/z)"
 ```
 
 ----
@@ -1298,7 +1399,7 @@ hyperexpand(expr)
 
 To simplify combinatorial expressions, use `combsimp()`.
 
-```verbatim
+```python
     >>> n, k = symbols('n k', integer = True)
     >>> combsimp(factorial(n)/factorial(n - 3))
     n⋅(n - 2)⋅(n - 1)
@@ -1310,16 +1411,17 @@ To simplify combinatorial expressions, use `combsimp()`.
 
 ##### In `Julia`:
 
-```
-n, k = symbols("n k", integer = true)
-```
+```jldoctest simplification
+julia> n, k = symbols("n k", integer = true)
+(n, k)
 
-```
-combsimp(factorial(n)/factorial(n - 3))
-```
+julia> combsimp(factorial(n)/factorial(n - 3))
+n⋅(n - 2)⋅(n - 1)
 
-```
-combsimp(binomial(n+1, k+1)/binomial(n, k))
+julia> combsimp(binomial(n+1, k+1)/binomial(n, k))
+n + 1
+─────
+k + 1
 ```
 
 ----
@@ -1330,7 +1432,7 @@ combsimp(binomial(n+1, k+1)/binomial(n, k))
 To simplify expressions with gamma functions or combinatorial functions with
 non-integer argument, use `gammasimp()`.
 
-```verbatim
+```python
     >>> gammasimp(gamma(x)*gamma(1 - x))
        π
     ────────
@@ -1339,8 +1441,9 @@ non-integer argument, use `gammasimp()`.
 
 ##### In `Julia`:
 
-```
-gammasimp(gamma(x)*gamma(1 - x))
+```jldoctest simplification
+julia> gammasimp(gamma(x)*gamma(1 - x)) |> string
+"pi/sin(pi*x)"
 ```
 
 ----
@@ -1367,7 +1470,7 @@ fraction from a list is to work backwards.  Note that despite the apparent
 symmetry of the definition, the first element, `a_0`, must usually be handled
 differently from the rest.
 
-```verbatim
+```python
     >>> def list_to_frac(l):
     ...     expr = Integer(0)
     ...     for i in reversed(l[1:]):
@@ -1384,16 +1487,19 @@ differently from the rest.
 
 ##### In `Julia`:
 
-```
-function list_to_frac(l)
-   expr = sympy.Integer(0)
-   for i in reverse(l[1:end])
-      expr += i
-      expr = 1/expr
-   end
-   return l[1] + expr
-end
-list_to_frac([x, y, z])
+```jldoctest simplification
+julia>  function list_to_frac(l)
+         expr = Sym(0)
+         for i in reverse(l[2:end])
+           expr += i
+           expr =  1/expr
+         end
+         l[1] + expr
+       end
+list_to_frac (generic function with 1 method)
+
+julia> list_to_frac([x, y, z]) |> string
+"x + 1/(y + 1/z)"
 ```
 
 ----
@@ -1401,7 +1507,7 @@ list_to_frac([x, y, z])
 We use `Integer(0)` in `list_to_frac` so that the result will always be a
 SymPy object, even if we only pass in Python ints.
 
-```verbatim
+```python
     >>> list_to_frac([1, 2, 3, 4])
     43
     ──
@@ -1410,8 +1516,9 @@ SymPy object, even if we only pass in Python ints.
 
 ##### In `Julia`:
 
-```
-list_to_frac([1, 2, 3, 4])
+```jldoctest simplification
+julia> list_to_frac([1, 2, 3, 4]) |> N
+43//30
 ```
 
 ----
@@ -1422,7 +1529,7 @@ symbolics here, so let's create a symbolic continued fraction.  The
 numbered symbols.  `symbols('a0:5')` will create the symbols `a0`, `a1`,
 ..., `a4`.
 
-```verbatim
+```python
     >>> syms = symbols('a0:5')
     >>> syms
     (a₀, a₁, a₂, a₃, a₄)
@@ -1442,18 +1549,12 @@ numbered symbols.  `symbols('a0:5')` will create the symbols `a0`, `a1`,
 
 ##### In `Julia`:
 
-```
-syms = symbols("a0:5")
-syms
-```
+```jldoctest simplification
+julia> a0,a1,a2,a3,a4 =  syms = symbols("a0:5")
+(a0, a1, a2, a3, a4)
 
-```
-a0, a1, a2, a3, a4 = syms
-```
-
-```
-frac = list_to_frac(syms)
-frac
+julia> frac = list_to_frac(syms); string(frac)
+"a0 + 1/(a1 + 1/(a2 + 1/(a3 + 1/a4)))"
 ```
 
 ----
@@ -1461,7 +1562,7 @@ frac
 This form is useful for understanding continued fractions, but lets put it
 into standard rational function form using `cancel()`.
 
-```verbatim
+```python
     >>> frac = cancel(frac)
     >>> frac
     a₀⋅a₁⋅a₂⋅a₃⋅a₄ + a₀⋅a₁⋅a₂ + a₀⋅a₁⋅a₄ + a₀⋅a₃⋅a₄ + a₀ + a₂⋅a₃⋅a₄ + a₂ + a₄
@@ -1472,9 +1573,11 @@ into standard rational function form using `cancel()`.
 
 ##### In `Julia`:
 
-```
-frac = cancel(frac)
-frac
+```jldoctest simplification
+julia> frac = cancel(frac)
+a₀⋅a₁⋅a₂⋅a₃⋅a₄ + a₀⋅a₁⋅a₂ + a₀⋅a₁⋅a₄ + a₀⋅a₃⋅a₄ + a₀ + a₂⋅a₃⋅a₄ + a₂ + a₄
+─────────────────────────────────────────────────────────────────────────
+                 a₁⋅a₂⋅a₃⋅a₄ + a₁⋅a₂ + a₁⋅a₄ + a₃⋅a₄ + 1                 
 ```
 
 ----
@@ -1493,7 +1596,7 @@ The key observation here is that we can convert an expression to the form `c +
 `apart()` function.  We use `apart()` to pull the term out, then subtract
 it from the expression, and take the reciprocal to get the `f` part.
 
-```verbatim
+```python
     >>> l = []
     >>> frac = apart(frac, a0)
     >>> frac
@@ -1510,20 +1613,26 @@ it from the expression, and take the reciprocal to get the `f` part.
 
 ##### In `Julia`:
 
-```
-l = []
-frac = apart(frac, a0)
-frac
-push!(l, append(a0))
-frac = 1/(frac - a0)
-frac
+```jldoctest simplification
+julia> l = Sym[]
+0-element Array{Sym,1}
+
+julia> frac = apart(frac, a0); string(frac)
+"a0 + (a2*a3*a4 + a2 + a4)/(a1*a2*a3*a4 + a1*a2 + a1*a4 + a3*a4 + 1)"
+
+julia> push!(l,  a0)
+1-element Array{Sym,1}:
+ a0
+
+julia> frac = 1/(frac - a0); string(frac)
+"(a1*a2*a3*a4 + a1*a2 + a1*a4 + a3*a4 + 1)/(a2*a3*a4 + a2 + a4)"
 ```
 
 ----
 
 Now we repeat this process
 
-```verbatim
+```python
     >>> frac = apart(frac, a1)
     >>> frac
              a₃⋅a₄ + 1
@@ -1563,44 +1672,31 @@ Now we repeat this process
 
 ##### In `Julia`:
 
-```
-frac = apart(frac, a1)
-frac
-```
+```jldoctest simplification
+julia> frac = apart(frac, a1);
 
-```
-push!(l, a1)
-frac = 1/(frac - a1)
-```
+julia> push!(l, a1);
 
-```
-frac = apart(frac, a2)
-frac
-```
+julia> frac = 1/(frac - a1);
 
-```
-push!(l, a2)
-frac = 1/(frac - a2)
-```
+julia> frac = apart(frac, a2);
 
-```
-frac = apart(frac, a3)
-frac
-```
+julia> push!(l, a2);
 
-```
-push!(l, a3)
-frac = 1/(frac - a3)
-```
+julia> frac = 1/(frac - a2);
 
-```
-frac = apart(frac, a4)
-frac
-```
+julia> frac = apart(frac, a3);
 
-```
-push!(l, a4)
-list_to_frac(l)
+julia> push!(l, a3);
+
+julia> frac = 1/(frac - a3);
+
+julia> frac = apart(frac, a4);
+
+julia> push!(l, a4);
+
+julia> list_to_frac(l) |> string
+"a0 + 1/(a1 + 1/(a2 + 1/(a3 + 1/a4)))"
 ```
 
 ----
@@ -1609,7 +1705,6 @@ list_to_frac(l)
 
 
 !!! note "Quick tip"
-
     You can execute multiple lines at once in SymPy Live.  Typing
     `Shift-Enter` instead of `Enter` will enter a newline instead of
     executing.
@@ -1620,7 +1715,7 @@ exercise.  Take a list of symbols and randomize them, and create the canceled
 continued fraction, and see if you can reproduce the original list.  For
 example
 
-```verbatim
+```python
     >>> import random
     >>> l = list(symbols('a0:5'))
     >>> random.shuffle(l)
@@ -1632,11 +1727,19 @@ example
 
 * `shuffle` from Python is `randperm` in the `Random` module
 
-```
-using Random
-l = symbols("a0:5")
-l = l[randperm(length(l))]
-orig_frac = frac = cancel(list_to_frac(l))
+```julia
+julia> using Random
+
+julia> l = symbols("a0:5")
+(a0, a1, a2, a3, a4)
+
+julia> l = l[randperm(length(l))]
+(a1, a4, a2, a3, a0)
+
+julia> orig_frac = frac = cancel(list_to_frac(l))
+a0*a1*a2*a3*a4 + a0*a1*a3 + a0*a1*a4 + a0*a2*a3 + a0 + a1*a2*a4 + a1 + a2
+-------------------------------------------------------------------------
+                 a0*a2*a3*a4 + a0*a3 + a0*a4 + a2*a4 + 1  
 ```
 
 ----
@@ -1658,6 +1761,3 @@ at each stage (hint: think of what happens to $a_0$ in the formula $a_0 +
     Answer: a0 is the only symbol that does not appear in the denominator
 
 
-----
-
-[return to index](./index.html)

@@ -737,6 +737,19 @@ can be used: `\ll<tab>`, `\leqq<tab>`, `\Equal<tab>`, `\geqq<tab>`, and
 `\gg<tab>`. For example, `x*y ≪ 1`.  To combine terms, the unicode
 `\vee<tab>` (for "or"), `\wedge<tab>` (for "and") can be used.
 
+
+###  Example
+
+```@example
+using Plots, SymPy
+@vars x
+plot(sin(6x) + exp(sin(60x)), -1, 1)
+savefig("sympy.svg"); nothing # hide
+```
+
+![](sympy.svg)
+
+
 ## Calculus
 
 `SymPy` has many of the basic operations of calculus provided through a relatively small handful of functions.

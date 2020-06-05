@@ -1,5 +1,11 @@
 # Gotchas
 
+```@setup gotchas
+using SymPy
+sympy.init_printing(pretty_print=False, use_unicode=False)
+```
+
+
 [From](https://docs.sympy.org/latest/tutorial/gotchas.html)
 
 To begin, we should make something about SymPy clear.  SymPy is nothing more
@@ -26,7 +32,7 @@ One consequence of this fact is that SymPy can be used in any environment
 where Python is available.  We just import it, like we would any other
 library:
 
-```verbatim
+```python
     >>> from sympy import *
 ```
 
@@ -34,8 +40,8 @@ library:
 
 * the functions from the `sympy` module are loaded with the package:
 
-```
-using SymPy
+```jldoctest gotchas
+julia> using SymPy
 ```
 
 ----
@@ -43,7 +49,7 @@ using SymPy
 This imports all the functions and classes from SymPy into our interactive
 Python session.  Now, suppose we start to do a computation.
 
-```verbatim
+```python
     >>> x + 1
     Traceback (most recent call last):
     ...
@@ -54,8 +60,11 @@ Python session.  Now, suppose we start to do a computation.
 
 * the error output may differ, but an `UndefVarError` is thrown
 
-```
-x + 1
+```julia
+julia> x + 1
+ERROR: UndefVarError: x not defined
+Stacktrace:
+ [1] top-level scope at REPL[86]:1
 ```
 
 ----
@@ -66,7 +75,7 @@ are defined.  SymPy is no different.  Unlike many symbolic manipulation
 systems you may have used, in SymPy, variables are not defined automatically.
 To define variables, we must use `symbols`.
 
-```verbatim
+```python
     >>> x = symbols('x')
     >>> x + 1
     x + 1
@@ -74,8 +83,11 @@ To define variables, we must use `symbols`.
 
 ##### In `Julia`:
 
-```
-x = symbols("x")
+```jldoctest gotchas
+julia> x = symbols("x")
+x
+
+julia> x + 1
 x + 1
 ```
 
@@ -87,14 +99,18 @@ Later, we will investigate some convenient ways we can work around this issue.
 For now, let us just define the most common variable names, `x`, `y`, and
 `z`, for use through the rest of this section
 
-```verbatim
+```python
     >>> x, y, z = symbols('x y z')
 ```
 
 ##### In `Julia`:
 
-```
-x, y, z = symbols("x y z")
+```jldoctest gotchas
+julia> x + 1
+x + 1
+
+julia> x, y, z = symbols("x y z")
+(x, y, z)
 ```
 
 ----
@@ -102,23 +118,27 @@ x, y, z = symbols("x y z")
 As a final note, we note that the name of a Symbol and the name of the
 variable it is assigned to need not have anything to do with one another.
 
-```verbatim
+```python
     >>> a, b = symbols('b a')
     >>> a
     b
     >>> b
     a
-```
+```jldoctest gotchas
 
 ##### In `Julia`:
 
-```
-a, b = symbols("b a")
-a
+```jldoctest gotchas
+julia>  a, b = symbols("b a")
+(b, a)
+
+julia> a
+b
 ```
 
-```
-b
+```jldoctest gotchas
+julia> b
+a
 ```
 
 ----
@@ -128,7 +148,7 @@ Here we have done the very confusing thing of assigning a Symbol with the name
 `a`.  Now the Python variable named `a` points to the SymPy Symbol named
 `b`, and visa versa.  How confusing.  We could have also done something like
 
-```verbatim
+```python
     >>> crazy = symbols('unrelated')
     >>> crazy + 1
     unrelated + 1
@@ -136,9 +156,12 @@ Here we have done the very confusing thing of assigning a Symbol with the name
 
 ##### In `Julia`:
 
-```
-crazy = symbols("unrelated")
-crazy + 1
+```jldoctest gotchas
+julia> crazy = symbols("unrelated")
+unrelated
+
+julia> crazy + 1
+unrelated + 1
 ```
 
 ----
@@ -159,7 +182,7 @@ SymPy Symbol and the word "variable" will refer to a Python variable.
 Finally, let us be sure we understand the difference between SymPy Symbols and
 Python variables.  Consider the following::
 
-```verbatim
+```python
   x = symbols('x')
   expr = x + 1
   x = 2
@@ -170,7 +193,7 @@ Python variables.  Consider the following::
 What do you think the output of this code will be?  If you thought `3`,
 you're wrong.  Let's see what really happens
 
-```verbatim
+```python
     >>> x = symbols('x')
     >>> expr = x + 1
     >>> x = 2
@@ -182,11 +205,18 @@ you're wrong.  Let's see what really happens
 
 * we must change to double quotes (or use `@vars x`, say)
 
-```
-x = symbols("x")
-expr = x + 1
-x = 2
-expr
+```jldoctest gotchas
+julia> x = symbols("x")
+x
+
+julia> expr = x + 1
+x + 1
+
+julia> x = 2
+2
+
+julia> expr
+x + 1
 ```
 
 ----
@@ -200,7 +230,7 @@ behavior is not unique to SymPy.  All Python programs work this way: if a
 variable is changed, expressions that were already created with that variable
 do not change automatically.  For example
 
-```verbatim
+```python
     >>> x = 'abc'
     >>> expr = x + 'def'
     >>> expr
@@ -214,25 +244,32 @@ do not change automatically.  For example
 
 * The `*` infix operator is used for string concatenation
 
-```
-x = "abc"
-expr = x * "def"
-expr
+```jldoctest gotchas
+julia> x = "abc"
+"abc"
+
+julia> expr = x * "def"
+"abcdef"
+
+julia> expr
+"abcdef"
 ```
 
-```
-x = "ABC"
-expr
+```jldoctest gotchas
+julia> x = "ABC"
+"ABC"
+
+julia> expr
+"abcdef"
 ```
 
 ----
 
 
 !!! note "Quick Tip"
+    To change the value of a Symbol in an expression, use `subs`
 
-   To change the value of a Symbol in an expression, use `subs`
-
-```verbatim
+```python
      >>> x = symbols('x')
      >>> expr = x + 1
      >>> expr.subs(x, 2)
@@ -241,10 +278,15 @@ expr
 
 ##### In `Julia`:
 
-```
-x = symbols("x")
-expr = x + 1
-expr.subs(x, 2)
+```jldoctest gotchas
+julia> x = symbols("x")
+x
+
+julia> expr = x + 1
+x + 1
+
+julia> expr.subs(x, 2)
+3
 ```
 
 
@@ -260,7 +302,7 @@ build a symbolic representation for `expr`, and then substitute `x` with
 values.  The correct way to do this in SymPy is to use `subs`, which will be
 discussed in more detail later.
 
-```verbatim
+```python
     >>> x = symbols('x')
     >>> expr = x + 1
     >>> expr.subs(x, 2)
@@ -269,16 +311,20 @@ discussed in more detail later.
 
 ##### In `Julia`:
 
-```
-x = symbols("x")
-expr = x + 1
-expr.subs(x, 2)
+```jldoctest gotchas
+julia> x = symbols("x")
+x
+
+julia> expr = x + 1
+x + 1
+
+julia> expr.subs(x, 2)
+3
 ```
 
 ----
 
 !!! note "TODO"
-
     Add link to basic operations section
 
 
@@ -293,7 +339,7 @@ You may think, however, that `==`, which is used for equality testing in
 Python, is used for SymPy as equality.  This is not quite correct either.  Let
 us see what happens when we use `==`.
 
-```verbatim
+```python
     >>> x + 1 == 4
     False
 ```
@@ -301,14 +347,16 @@ us see what happens when we use `==`.
 ##### In `Julia`:
 
 * `==` is similar as in Python:
-```
-x + 1 == 4
+```jldoctest gotchas
+julia> x + 1 == 4
+false
 ```
 
 Recall `==` promotes values, so we have a Julia object may be "equal" to a `SymPy` one:
 
-```
-0 == zero(Sym)  ## or Sym(0)
+```jldoctest gotchas
+julia> 0 == zero(Sym)  ## or Sym(0)
+true
 ```
 
 
@@ -320,15 +368,16 @@ SymPy, `==` represents exact structural equality testing.  This means that
 the result of `==`.  There is a separate object, called `Eq`, which can be
 used to create symbolic equalities
 
-```verbatim
+```python
     >>> Eq(x + 1, 4)
     Eq(x + 1, 4)
 ```
 
 ##### In `Julia`:
 
-```
-Eq(x + 1, 4)
+```jldoctest gotchas
+julia> Eq(x + 1, 4)
+x + 1 = 4
 ```
 
 ----
@@ -336,15 +385,16 @@ Eq(x + 1, 4)
 There is one additional caveat about `==` as well.  Suppose we want to know
 if $(x + 1)^2 = x^2 + 2x + 1$.  We might try something like this:
 
-```verbatim
+```python
     >>> (x + 1)**2 == x**2 + 2*x + 1
     False
 ```
 
 ##### In `Julia`:
 
-```
-(x + 1)^2 == x^2 + 2*x + 1
+```jldoctest gotchas
+julia> (x + 1)^2 == x^2 + 2*x + 1
+false
 ```
 
 ----
@@ -373,7 +423,7 @@ method is not infallible---in fact, it can be `theoretically proven
 to determine if two symbolic expressions are identically equal in
 general---but for most common expressions, it works quite well.
 
-```verbatim
+```python
     >>> a = (x + 1)**2
     >>> b = x**2 + 2*x + 1
     >>> simplify(a - b)
@@ -385,23 +435,35 @@ general---but for most common expressions, it works quite well.
 
 ##### In `Julia`:
 
-```
-a = (x + 1)^2
-b = x^2 + 2*x + 1
-simplify(a - b)
+
+```jldoctest gotchas
+julia> @vars x
+(x,)
+
+julia> a = (x + 1)^2; string(a)
+"(x + 1)^2"
+
+julia> b = x^2 + 2*x + 1; string(b)
+"x^2 + 2*x + 1"
+
+julia> simplify(a - b)
+0
+
+julia> c = x^2 - 2*x + 1; string(c)
+"x^2 - 2*x + 1"
+
+julia> simplify(a - c)
+4⋅x
 ```
 
-```
-c = x^2 - 2*x + 1
-simplify(a - c)
-```
-
+!!! note "Unfortunate parsing"
+    The awkward calls `string(a)`,  `string(b)`, and  `string(c)` are necesssary for technical reasons (Documenter's processing terminates early for   thtese  outputs). They are  not  examples of good style.
 ----
 
 There is also a method called `equals` that tests if two expressions are
 equal by evaluating them numerically at random points.
 
-```verbatim
+```python
     >>> a = cos(x)**2 - sin(x)**2
     >>> b = cos(2*x)
     >>> a.equals(b)
@@ -410,10 +472,16 @@ equal by evaluating them numerically at random points.
 
 ##### In `Julia`:
 
-```
-a = cos(x)^2 - sin(x)^2
-b = cos(2*x)
-a.equals(b)
+```jldoctest gotchas
+julia> a = cos(x)^2 - sin(x)^2
+     2         2   
+- sin (x) + cos (x)
+
+julia> b = cos(2*x)
+cos(2⋅x)
+
+julia> a.equals(b)
+true
 ```
 
 ----
@@ -426,7 +494,7 @@ You may have noticed that we have been using `**` for exponentiation instead
 of the standard `^`.  That's because SymPy follows Python's conventions.  In
 Python, `^` represents logical exclusive or.  SymPy follows this convention:
 
-```verbatim
+```python
      >>> True ^ False
      True
      >>> True ^ True
@@ -442,16 +510,19 @@ Python, `^` represents logical exclusive or.  SymPy follows this convention:
 * This does **not** apply, as we use `^` for exponentiation.
 
 * Use the prefix `Or` for logical
-```
-Or(True, False)
-```
-
-```
-Or(True, True)
+```jldoctest gotchas
+julia> Or(True, False)
+True
 ```
 
+```jldoctest gotchas
+julia> Or(True, True)
+True
 ```
-Or(x, y)
+
+```jldoctest gotchas
+julia> Or(x, y)
+x ∨ y
 ```
 
 ----
@@ -469,7 +540,7 @@ object and a Python object, you get a SymPy object, but whenever you combine
 two Python objects, SymPy never comes into play, and so you get a Python
 object.
 
-```verbatim
+```python
     >>> type(Integer(1) + 1)
     <class 'sympy.core.numbers.Integer'>
     >>> type(1 + 1)
@@ -480,46 +551,54 @@ object.
 
 * In Julia, most operations between `SymPy` objects and `Julia` objects will promote to a `SymPy` objects, but of course `Julia` objects combined will produce `Julia` Objects:
 
-```
-typeof(sympy.Integer(1) + 1)
+```jldoctest gotchas
+julia> typeof(sympy.Integer(1) + 1)
+Sym
 ```
 
-```
-typeof(1 + 1)
+```jldoctest gotchas
+julia> typeof(1 + 1)
+Int64
 ```
 
 To convert a `Julia` object to a `SymPy` object, the `Sym` constructor may be useful:
 
-```
-Sym(1)
+```jldoctest gotchas
+julia> Sym(1)
+1
 ```
 
 To convert a `SymPy` object to a `Julia` object, the `N` function is useful for numbers and booleans:
 
-```
-N(Sym(1)), N(True)
+```jldoctest gotchas
+julia> N(Sym(1)), N(True)
+(1, true)
 ```
 
 And the `lambdify` function can produce a function from an expression:
 
-```
-ex = x^2 - 2x + 2
-fn = lambdify(ex)
-fn(1) - ex(1)
+```jldoctest gotchas
+julia> ex = x^2 - 2x + 2
+ 2
+x  - 2⋅x + 2
+
+julia> fn = lambdify(ex)
+#86 (generic function with 1 method)
+
+julia> fn(1) - ex(1)
+0
 ```
 
 ----
 
 !!! note
-
-   On running the example above in SymPy Live, (1+1) is wrapped
-   by Integer, so it does not show the correct output.
+    On running the example above in SymPy Live, (1+1) is wrapped by Integer, so it does not show the correct output.
 
 This is usually not a big deal. Python ints work much the same as SymPy
 Integers, but there is one important exception:  division.  In SymPy, the
 division of two Integers gives a Rational:
 
-```verbatim
+```python
     >>> Integer(1)/Integer(3)
     1/3
     >>> type(Integer(1)/Integer(3))
@@ -528,18 +607,21 @@ division of two Integers gives a Rational:
 
 ##### In `Julia`:
 
-```
-sympy.Integer(1)/sympy.Integer(3)
+```jldoctest gotchas
+julia> sympy.Integer(1)/sympy.Integer(3)
+1/3
 ```
 
-```
-typeof(sympy.Integer(1)/sympy.Integer(3))
+```jldoctest gotchas
+julia> typeof(sympy.Integer(1)/sympy.Integer(3))
+Sym
 ```
 
 And to get the Python, type, we can use `__class__`:
 
-```
-(sympy.Integer(1)/sympy.Integer(3)).__class__
+```jldoctest gotchas
+julia> (sympy.Integer(1)/sympy.Integer(3)).__class__
+PyObject <class 'sympy.core.numbers.Rational'>
 ```
 
 ----
@@ -548,7 +630,7 @@ But in Python `/` represents either integer division or floating point
 division, depending on whether you are in Python 2 or Python 3, and depending
 on whether or not you have run `from __future__ import division`:
 
-```verbatim
+```python
     >>> from __future__ import division
     >>> 1/2 #doctest: +SKIP
     0.5
@@ -567,7 +649,7 @@ on whether or not you have run `from __future__ import division`:
 
 To avoid this, we can construct the rational object explicitly
 
-```verbatim
+```python
     >>> Rational(1, 2)
     1/2
 ```
@@ -576,12 +658,14 @@ To avoid this, we can construct the rational object explicitly
 
 * `Rational` from `sympy` is *not* exported, it would conflict with `Julia`'s `Rational` costructor. We must qualify it:
 
-```
-Rational(1, 2)
+```jldoctest gotchas
+julia> Rational(1, 2)
+1//2
 ```
 
-```
-sympy.Rational(1, 2)
+```jldoctest gotchas
+julia> sympy.Rational(1, 2)
+1/2
 ```
 
 ----
@@ -589,7 +673,7 @@ sympy.Rational(1, 2)
 This problem also comes up whenever we have a larger symbolic expression with
 `int/int` in it.  For example:
 
-```verbatim
+```python
     >>> x + 1/2 #doctest: +SKIP
     x + 0.5
 ```
@@ -598,14 +682,14 @@ This problem also comes up whenever we have a larger symbolic expression with
 
 * `Int/Int` will produce a floating point value, whereas `Int//Int` will produce a rational, which can then be promoted without loss to a symbolic object:
 
-```
-x + 1/2 #doctest: +SKIP
+```jldoctest gotchas
+julia> x + 1/2
+x + 0.5
 ```
 
 ----
 
 !!! note
-
    On running the example above in SymPy Live, (1/2) is wrapped
    by Integer, so it does not show the correct output.
 
@@ -613,15 +697,16 @@ This happens because Python first evaluates `1/2` into `0.5`, and then
 that is cast into a SymPy type when it is added to `x`.  Again, we can get
 around this by explicitly creating a Rational:
 
-```verbatim
+```python
     >>> x + Rational(1, 2)
     x + 1/2
 ```
 
 ##### In `Julia`:
 
-```
-x + 1//2
+```jldoctest gotchas
+julia> x + 1//2
+x + 1/2
 ```
 
 ----
@@ -633,6 +718,3 @@ document.
 
 For more discussion on the topics covered in this section, see :ref:`gotchas`.
 
-----
-
-[return to index](./index.html)

@@ -1,6 +1,6 @@
 # SymPy.jl
 
-
+TODO:  add  Random, SpecialFunctions
 
 Documentation for [SymPy.jl](https://github.com/JuliaPy/SymPy.jl) a `Julia` interface to Python's [SymPy](https://github.com/JuliaPy/SymPy.jl) library for symbolic mathematics.
 
