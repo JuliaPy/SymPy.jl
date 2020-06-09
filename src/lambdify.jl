@@ -106,43 +106,55 @@ function walk_expression(ex; values=Dict(), fns=Dict())
 end
 
 """
-     lambdify(ex, vars; typ, fns, values, use_julia_code, invoke_latest)
+     lambdify(ex, vars; typ, fns, values, use_julia_code=false, invoke_latest=true)
 
-Take a symbolic expression and return an anonymous `Julia` function
+Take a symbolic expression and returns an anonymous `Julia` function.
 
-Converts from a SymPy object to an expression by walking the SymPy expression tree and converting each step. Then creates a function. The function arguments are based on `free_symbols`, and its ordering unless `vars` is specified directly.
+Converts from a SymPy object to a `Julia` expression by walking the SymPy expression tree and converting each step, (e.g. essentially calls `convert(Expr,  ex)`).
 
-* `use_julia_code=false` will use SymPy's conversion to an expression, the default is `false`
+Then creates a function. The function arguments are based on `free_symbols` and its ordering, unless `vars` is specified directly.
 
-* `invoke_latest=true` calls `Base.invokelatest` to work around world age issues. This is th safe default, but setting to `false` will result in faster-executing functions.
+* `use_julia_code=true` will use SymPy's conversion to an expression, the default is `false`
+
+* `invoke_latest=true` calls `Base.invokelatest` to work around world age issues. This is the safe default, but setting to `false` will result in faster-executing functions.
 
 Example:
 
+```jldoctest
+julia> using SymPy
+
+julia> @vars x y z
+(x, y, z)
+
+julia> ex = x^2 * sin(x)
+ 2       
+x ⋅sin(x)
+
+julia> fn = lambdify(ex)
+#87 (generic function with 1 method)
+
+julia> fn(pi)
+1.2086779438644711e-15
+
+julia> ex = x + 2y + 3z
+x + 2⋅y + 3⋅z
+
+julia> fn = lambdify(ex)
+#87 (generic function with 1 method)
+
+julia> fn(1,2,3) # order is by free_symbols
+14
+
+julia> ex(x=>1, y=>2, z=>3)
+14
+
+julia> fn = lambdify(ex, (y,x,z))
+#87 (generic function with 1 method)
+
+julia> fn(1,2,3)
+13
 ```
-@vars x y z
-ex = x^2 * sin(x)
-fn = lambdify(ex)
-fn(pi)
 
-ex = x + 2y + 3z
-fn = lambdify(ex)
-fn(1,2,3) # order is y,x,z
-
-fn = lambdify(ex, (x,y,z))
-fn(1,2,3)
-```
-
-!!! note
-
-    Ideally, this would just be:
-
-```
-body = Meta.parse(julia_code(ex))
-syms = Symbol.(free_symbols(ex))
-fn = eval(Expr(:function, Expr(:call, gensym(), syms...), body))
-```
-
-Where the first line could also be `convert(Expr, ex)`. However, the `julia_code` method from sympy needs some attention.
 
 """
 function lambdify(ex::Sym, vars=free_symbols(ex);

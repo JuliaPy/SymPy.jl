@@ -1,8 +1,7 @@
-[![SymPy](http://pkg.julialang.org/badges/SymPy_0.7.svg)](http://pkg.julialang.org/?pkg=SymPy&ver=0.7)
-
 Linux: [![Build Status](https://travis-ci.org/JuliaPy/SymPy.jl.svg?branch=master)](https://travis-ci.org/JuliaPy/SymPy.jl)
 &nbsp;
 Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/JuliaPy/SymPy.jl?branch=master&svg=true)](https://ci.appveyor.com/project/jverzani/sympy-jl)
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://juliapy.github.io/SymPy.jl/stable)
 
 
 
@@ -19,9 +18,8 @@ This `SymPy` package provides a light interface for  the
 features of the SymPy library that makes working with SymPy objects a bit
 easier.
 
-The [tutorial](examples/tutorial.md) provides an overview. It is
-viewable as an `IJulia` notebook
-[here](http://nbviewer.ipython.org/github/JuliaPy/SymPy.jl/blob/master/examples/tutorial.ipynb). In addition, most of the SymPy tutorial has the `julia` counterparts illustrated starting from [index.html](http://htmlpreview.github.io/?https://github.com/JuliaPy/SymPy.jl/blob/master/examples/index.html).
+The documentation inludes an introduction document and a version of
+the SymPy tutorial translated from the Python syntax into Julia.
 
 ### Installation
 

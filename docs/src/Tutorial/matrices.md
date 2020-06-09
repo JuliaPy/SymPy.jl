@@ -2,9 +2,14 @@
 
 [From](https://docs.sympy.org/latest/tutorial/matrices.html)
 
-```verbatim
+```python
     >>> from sympy import *
     >>> init_printing(use_unicode=True)
+```
+
+```@setup matrices
+using SymPy
+sympy.init_printing(use_unicode=True)
 ```
 
 ##### In `Julia`:
@@ -24,8 +29,11 @@
 * The matrix constructor in SymPy using a vector of row vectors does *not* work in `SymPy`, as of newer versions (it does not work with version 1.5.1 of sympy and PyCall). This style is used in this document. The user of `SymPy` can eaesily avoid this specification, using Julia's matrix construction techniques.
 
 
-```
-using SymPy
+```jldoctest matrices
+julia> using SymPy
+
+julia> using LinearAlgebra
+
 ```
 
 ----
@@ -40,7 +48,7 @@ $$~
 
 use
 
-```verbatim
+```python
     >>> Matrix([[1, -1], [3, 4], [0, 2]])
     ⎡1  -1⎤
     ⎢     ⎥
@@ -51,10 +59,15 @@ use
 
 ##### In `Julia`:
 
-* In `Julia`, the `Matrix` constructor is *not* exported, so must be qualified. Here we *avoid* thte vector of row vectors above:
+* In `Julia`, the `Matrix` constructor is *not* exported, so must be qualified. Here we *avoid* the vector of row vectors above:
 
-```
-sympy.Matrix([1 -1; 3 4; 0 2])
+```jldoctest matrices
+julia> sympy.Matrix([1 -1; 3 4; 0 2])
+3×2 Array{Sym,2}:
+ 1  -1
+ 3   4
+ 0   2
+
 ```
 
 *However*, through the magic of `PyCall`, such matrices are converted into `Julia` matrices, of type `Array{Sym}`, so the familiar matrix operations for `Julia` users are available.
@@ -62,14 +75,24 @@ sympy.Matrix([1 -1; 3 4; 0 2])
 
 In fact, the above could be done in the more `Julia`n manner through
 
-```
-Sym[1 -1; 3 4; 0 2]
+```jldoctest matrices
+julia> Sym[1 -1; 3 4; 0 2]
+3×2 Array{Sym,2}:
+ 1  -1
+ 3   4
+ 0   2
+
 ```
 
 using an annotation to ensure the type. Alternatively, through promotion, just a single symbolic object will result in the same:
 
-```
-[Sym(1) -1; 3 4; 0 2]
+```jldoctest matrices
+julia> [Sym(1) -1; 3 4; 0 2]
+3×2 Array{Sym,2}:
+ 1  -1
+ 3   4
+ 0   2
+
 ```
 
 ----
@@ -77,7 +100,7 @@ using an annotation to ensure the type. Alternatively, through promotion, just a
 To make it easy to make column vectors, a list of elements is considered to be
 a column vector.
 
-```verbatim
+```python
     >>> Matrix([1, 2, 3])
     ⎡1⎤
     ⎢ ⎥
@@ -90,26 +113,36 @@ a column vector.
 
 For ths use, `sympy.Matrix` does work, but again its usage is discouraged:
 
-```
-sympy.Matrix([1, 2, 3])
+```jldoctest matrices
+julia> sympy.Matrix([1, 2, 3])
+3×1 Array{Sym,2}:
+ 1
+ 2
+ 3
+
 ```
 
 * Again, this is converted into a `Vector{Sym}` object or entered directly:
 
-```
-Sym[1,2,3]
+```jldoctest matrices
+julia> Sym[1,2,3]
+3-element Array{Sym,1}:
+ 1
+ 2
+ 3
+
 ```
 
-!!! note "And again:"
+!!!  note "Avoid `sympy.Matrix`"
+     As shown, it is better to  avoid  the   `sympy.Matrix` constructor when possible, and when not, only pass in a  symbolic  array created through `Julia`'s array semantics.
 
-    Using `sympy.Matrix` is strongly discouraged.
 
 ----
 
 Matrices are manipulated just like any other object in SymPy or Python.
 
 
-```verbatim
+```python
     >>> M = Matrix([[1, 2, 3], [3, 2, 1]])
     >>> N = Matrix([0, 1, 1])
     >>> M*N
@@ -122,10 +155,23 @@ Matrices are manipulated just like any other object in SymPy or Python.
 
 * In `Julia`, matrices are just matrices, and inherit all of the operations defined on them:
 
-```
-M = Sym[1 2 3; 3 2 1]
-N = Sym[0, 1, 1]
-M*N
+```jldoctest matrices
+julia> M = Sym[1 2 3; 3 2 1]
+2×3 Array{Sym,2}:
+ 1  2  3
+ 3  2  1
+
+julia> N = Sym[0, 1, 1]
+3-element Array{Sym,1}:
+ 0
+ 1
+ 1
+
+julia> M*N
+2-element Array{Sym,1}:
+ 5
+ 3
+
 ```
 
 ----
@@ -139,7 +185,7 @@ expressions or as keys to dictionaries.  If you need an immutable version of
 
 ##### In `Julia`:
 
-A distinction is made between `ImmutableMatrix` and a mutable one. Mutable ones are mapped to `Julia` arrays, immutable ones are left as a symbolic object of type `SymMatrix`. The usual infix mathematical operations (but not dot broadcasting), 0-based indexing, and dot call syntax for methods are used with these objects.
+A distinction is made between `ImmutableMatrix` and a mutable one. Mutable ones are mapped to `Julia` arrays, immutable ones are left as a symbolic object of type `SymMatrix`. The usual infix mathematical operations (but not dot broadcasting), 0-based indexing, and dot call syntax for methods maay  be used with these objects.
 
 
 
@@ -152,7 +198,7 @@ A distinction is made between `ImmutableMatrix` and a mutable one. Mutable ones 
 Here are some basic operations on `Matrix`.  To get the shape of a matrix
 use `shape`
 
-```verbatim
+```python
     >>> M = Matrix([[1, 2, 3], [-2, 0, 4]])
     >>> M
     ⎡1   2  3⎤
@@ -164,19 +210,23 @@ use `shape`
 
 ##### In `Julia`:
 
-```
-M = Sym[1 2 3; -2 0 4]
-M
-```
+```jldoctest matrices
+julia> M = Sym[1 2 3; -2 0 4]
+2×3 Array{Sym,2}:
+  1  2  3
+ -2  0  4
 
-```
-M.shape
+julia> M.shape
+(2, 3)
+
 ```
 
 Or, the `Julia`n counterpart:
 
-```
-size(M)
+```jldoctest matrices
+julia> size(M)
+(2, 3)
+
 ```
 
 ----
@@ -188,7 +238,7 @@ To get an individual row or column of a matrix, use `row` or `col`.  For
 example, `M.row(0)` will get the first row. `M.col(-1)` will get the last
 column.
 
-```verbatim
+```python
     >>> M.row(0)
     [1  2  3]
     >>> M.col(-1)
@@ -201,15 +251,24 @@ column.
 
 * these 0-based operations are supported:
 
-```
-M.row(0)
-M.col(-1)
+```jldoctest matrices
+julia> M.row(0)
+1×3 Array{Sym,2}:
+ 1  2  3
+
+julia> M.col(-1)
+2×1 Array{Sym,2}:
+ 3
+ 4
+
 ```
 
 The more familiar counterparts would be:
 
-```
-M[1,:], M[:, end]
+```jldoctest matrices
+julia> M[1,:], M[:, end]
+(Sym[1, 2, 3], Sym[3, 4])
+
 ```
 
 
@@ -221,7 +280,7 @@ M[1,:], M[:, end]
 To delete a row or column, use `row_del` or `col_del`.  These operations
 will modify the Matrix **in place**.
 
-```verbatim
+```python
     >>> M.col_del(0)
     >>> M
     ⎡2  3⎤
@@ -238,36 +297,50 @@ These methods do **not** work on `Array{Sym}` objects, use `Julia's` indexing no
 
 However, these methods **do** work on the `ImmutableMatrix` class:
 
-```
-M = sympy.ImmutableMatrix([1 2 3; -2 0 4])  # avoid vector of row vector construction
-M.col_del(0)
-```
+```jldoctest matrices
+julia> M = sympy.ImmutableMatrix([1 2 3; -2 0 4])  # avoid vector of row vector construction
+⎡1   2  3⎤
+⎢        ⎥
+⎣-2  0  4⎦
+
+julia> M.col_del(0)
+⎡2  3⎤
+⎢    ⎥
+⎣0  4⎦
 
 ```
-M.row_del(1)
-```
 
-
-!!! Alert
-
-For older versions of sympy, the following did not work (using symbolic  values as matrix entries without reverting to  their PyObjects  had shape issues) but  this should work  now:
-
+```jldoctest matrices
+julia> M.row_del(1)
+[1  2  3]
 
 ```
-@vars x
-sympy.ImmutableMatrix([x 1;  1  x])
+
+
+!!! note "Alert"
+    For older versions of sympy, the following did not work (using symbolic  values as matrix entries without reverting to  their PyObjects  had shape issues);  this should work  now:
+
+
+```jldoctest matrices
+julia> @vars x
+(x,)
+
+julia> sympy.ImmutableMatrix([x 1;  1  x])
+⎡x  1⎤
+⎢    ⎥
+⎣1  x⎦
+
 ```
 
 ----
 
 !!! note "TODO"
-
     This is a mess. See issue 6992.
 
 To insert rows or columns, use `row_insert` or `col_insert`.  These
 operations **do not** operate in place.
 
-```verbatim
+```python
     >>> M
     [2  3]
     >>> M = M.row_insert(1, Matrix([[0, 4]]))
@@ -284,15 +357,23 @@ operations **do not** operate in place.
 
 ##### In `Julia`:
 
-```
-M
-M = M.row_insert(1, Sym[0 4])
-M
-```
+```jldoctest matrices
+julia> M = sympy.ImmutableMatrix([2 3])
+[2  3]
+
+julia> M = M.row_insert(1, Sym[0 4])
+⎡2  3⎤
+⎢    ⎥
+⎣0  4⎦
 
 ```
-M = M.col_insert(0, Matrix([1, -2]))
-M
+
+```jldoctest matrices
+julia> M = M.col_insert(0, Sym[1, -2])
+⎡1   2  3⎤
+⎢        ⎥
+⎣-2  0  4⎦
+
 ```
 
 ----
@@ -314,7 +395,7 @@ As noted above, simple operations like addition and multiplication are done
 just by using `+`, `*`, and `**`.  To find the inverse of a matrix, just
 raise it to the `-1` power.
 
-```verbatim
+```python
     >>> M = Matrix([[1, 3], [-2, 3]])
     >>> N = Matrix([[0, 3], [0, 7]])
     >>> M + N
@@ -345,62 +426,100 @@ raise it to the `-1` power.
 
 ##### In `Julia`:
 
-```
-M = Sym[1 3; -2 3]
-M1 = Sym[0 3; 0 7]
-M + M1
+In `Julia`,  we  use `M1` instead  of `N`, an exported symbol of `SymPy`. Otherise, it  all looks similar:
+
+```jldoctest matrices
+julia> M = Sym[1 3; -2 3]
+2×2 Array{Sym,2}:
+  1  3
+ -2  3
+
+julia> M1 = Sym[0 3; 0 7]
+2×2 Array{Sym,2}:
+ 0  3
+ 0  7
+
+julia> M + M1
+2×2 Array{Sym,2}:
+  1   6
+ -2  10
+
+julia> M*M1
+2×2 Array{Sym,2}:
+ 0  24
+ 0  15
+
+julia> 3*M
+2×2 Array{Sym,2}:
+  3  9
+ -6  9
+
+julia> M^2
+2×2 Array{Sym,2}:
+ -5  12
+ -8   3
+
+julia> M^-1
+2×2 Array{Sym,2}:
+ 1/3  -1/3
+ 2/9   1/9
 ```
 
-```
-M*M1
-```
+Attempting to find the inverse of  `M1` will  error (we suppress its lengthy output)
 
-```
-3*M
-```
+```jldoctest matrices
+julia> using Test
 
-```
-M^2
-```
+julia> @test_throws  Exception M1^-1
+Test Passed
+      Thrown: PyCall.PyError
 
-```
-M^-1
-```
-
-```
-M1^-1
 ```
 
 The above (except for the inverses) are using generic `Julia` definitions. For immutable matrices, we would have:
 
 
 
-```
-M = sympy.ImmutableMatrix([1 3; -2 3])
-M1 = sympy.ImmutableMatrix([0 3; 0 7])
-M + M1
-```
+```jldoctest matrices
+julia> M = sympy.ImmutableMatrix([1 3; -2 3])
+⎡1   3⎤
+⎢     ⎥
+⎣-2  3⎦
+
+julia> M1 = sympy.ImmutableMatrix([0 3; 0 7])
+⎡0  3⎤
+⎢    ⎥
+⎣0  7⎦
+
+julia> M + M1
+⎡1   6 ⎤
+⎢      ⎥
+⎣-2  10⎦
 
 ```
-M*M1
+
+```jldoctest matrices
+julia> M*M1
+⎡0  24⎤
+⎢     ⎥
+⎣0  15⎦
+
+julia> 3*M
+⎡3   9⎤
+⎢     ⎥
+⎣-6  9⎦
+
+julia> M^2
+         2
+2
+
+julia> M^-1
+⎡1/3  -1/3⎤
+⎢         ⎥
+⎣2/9  1/9 ⎦
 ```
 
-```
-3*M
-```
-
-```
-M^2
-```
-
-```
-M^-1
-```
-
-```
-M1^-1
-```
-
+Similarly, `M1^(-1)` would yield an  error  for  the non-invertible matrix
 
 * There is no broadcasting defined for the `SymMatrix` type.
 
@@ -408,7 +527,7 @@ M1^-1
 
 To take the transpose of a Matrix, use `T`.
 
-```verbatim
+```python
     >>> M = Matrix([[1, 2, 3], [4, 5, 6]])
     >>> M
     ⎡1  2  3⎤
@@ -424,13 +543,18 @@ To take the transpose of a Matrix, use `T`.
 
 ##### In `Julia`:
 
-```
-M = Sym[1 2 3; 4 5 6]
-M
-```
+```jldoctest matrices
+julia> M = Sym[1 2 3; 4 5 6]
+2×3 Array{Sym,2}:
+ 1  2  3
+ 4  5  6
 
-```
-M.T
+julia> M.T
+3×2 Array{Sym,2}:
+ 1  4
+ 2  5
+ 3  6
+
 ```
 
 ----
@@ -441,7 +565,7 @@ M.T
 Several constructors exist for creating common matrices.  To create an
 identity matrix, use `eye`.  The command `eye(n)` will create an `n x n` identity matrix:
 
-```verbatim
+```python
     >>> eye(3)
     ⎡1  0  0⎤
     ⎢       ⎥
@@ -462,9 +586,20 @@ identity matrix, use `eye`.  The command `eye(n)` will create an `n x n` identit
 
 * `eye` is *not* exported so must qualified:
 
-```
-sympy.eye(3)
-sympy.eye(4)
+```jldoctest matrices
+julia> sympy.eye(3)
+3×3 Array{Sym,2}:
+ 1  0  0
+ 0  1  0
+ 0  0  1
+
+julia> sympy.eye(4)
+4×4 Array{Sym,2}:
+ 1  0  0  0
+ 0  1  0  0
+ 0  0  1  0
+ 0  0  0  1
+
 ```
 
 ----
@@ -472,7 +607,7 @@ sympy.eye(4)
 To create a matrix of all zeros, use `zeros`.  `zeros(n, m)` creates an
 `n x m` matrix of `0`s.
 
-```verbatim
+```python
     >>> zeros(2, 3)
     ⎡0  0  0⎤
     ⎢       ⎥
@@ -481,29 +616,41 @@ To create a matrix of all zeros, use `zeros`.  `zeros(n, m)` creates an
 
 ##### In `Julia`:
 
-* zeros is exported but the method expects a symbolic first argument.  Either qualify it:
+* zeros is extended but the method expects a symbolic first argument.  Either qualify it:
 
-```
-sympy.zeros(2, 3)
+```jldoctest matrices
+julia> sympy.zeros(2, 3)
+2×3 Array{Sym,2}:
+ 0  0  0
+ 0  0  0
+
 ```
 
 *or* create a symbolic first value:
 
-```
-zeros(Sym(2), 3)
+```jldoctest matrices
+julia> zeros(Sym(2), 3)
+2×3 Array{Sym,2}:
+ 0  0  0
+ 0  0  0
+
 ```
 
 *or* use the `Julia` constructor:
 
-```
-zeros(Sym, 2, 3)
+```jldoctest matrices
+julia> zeros(Sym, 2, 3)
+2×3 Array{Sym,2}:
+ 0  0  0
+ 0  0  0
+
 ```
 
 ----
 
 Similarly, `ones` creates a matrix of ones.
 
-```verbatim
+```python
     >>> ones(3, 2)
     ⎡1  1⎤
     ⎢    ⎥
@@ -516,8 +663,13 @@ Similarly, `ones` creates a matrix of ones.
 
 * Similarly with `ones`:
 
-```
-sympy.ones(3, 2)
+```jldoctest matrices
+julia> sympy.ones(3, 2)
+3×2 Array{Sym,2}:
+ 1  1
+ 1  1
+ 1  1
+
 ```
 
 ----
@@ -527,7 +679,7 @@ either numbers or matrices.  A number is interpreted as a `1 x 1`
 matrix. The matrices are stacked diagonally.  The remaining elements are
 filled with `0`\ s.
 
-```verbatim
+```python
     >>> diag(1, 2, 3)
     ⎡1  0  0⎤
     ⎢       ⎥
@@ -552,19 +704,33 @@ filled with `0`\ s.
 
 * similarly with `diag`:
 
-```
-sympy.diag(1, 2, 3)
-```
+```jldoctest matrices
+julia> sympy.diag(1, 2, 3)
+3×3 Array{Sym,2}:
+ 1  0  0
+ 0  2  0
+ 0  0  3
+
+julia> sympy.diag(-1, sympy.ones(2, 2), sympy.Matrix([5, 7, 5]))
+6×4 Array{Sym,2}:
+ -1  0  0  0
+  0  1  1  0
+  0  1  1  0
+  0  0  0  5
+  0  0  0  7
+  0  0  0  5
 
 ```
-sympy.diag(-1, sympy.ones(2, 2), sympy.Matrix([5, 7, 5]))
-```
 
-* The first one, could also use `Julia`'s `diagm` function:
+* The first one, could also use `Julia`'s `diagm` function from the `LinearAlgebra` package:
 
-```
-using LinearAlgebra
-diagm(0 => Sym[1,2,3])
+```jldoctest matrices
+julia> diagm(0 => Sym[1,2,3])
+3×3 Array{Sym,2}:
+ 1  0  0
+ 0  2  0
+ 0  0  3
+
 ```
 
 
@@ -578,7 +744,7 @@ diagm(0 => Sym[1,2,3])
 
 To compute the determinant of a matrix, use `det`.
 
-```verbatim
+```python
     >>> M = Matrix([[1, 0, 1], [2, -1, 3], [4, 3, 2]])
     >>> M
     ⎡1  0   1⎤
@@ -592,39 +758,59 @@ To compute the determinant of a matrix, use `det`.
 
 ##### In `Julia`:
 
-```
-using LinearAlgebra
-M = Sym[1 0 1; 2 -1 3; 4 3 2]
-M
-```
+```jldoctest matrices
+julia> M = Sym[1 0 1; 2 -1 3; 4 3 2]
+3×3 Array{Sym,2}:
+ 1   0  1
+ 2  -1  3
+ 4   3  2
 
-```
-M.det()
+julia> M.det()
+-1
+
 ```
 
 
 Let
 
-```
-@vars x
-A = Sym[x 1; 1 x]
-```
+```jldoctest matrices
+julia> @vars x
+(x,)
 
-Then we can compute the determinant using `Julia`'s generic implementation:
-
-```
-det(A)
-```
-
-*or* using SymPy's:
+julia> A = Sym[x 1; 1 x]
+2×2 Array{Sym,2}:
+ x  1
+ 1  x
 
 ```
-A.det()
+
+The method for `det` falls back  the  sympy method:
+
+```jldoctest matrices
+julia> det(A)
+ 2
+x  - 1
+
 ```
 
-The answer is identical, though not necessarily being done in a similar manner.
+There is no reason  to,  but generic `Julia` methods  could be used:
 
+```jldoctest matrices
+julia> out  = lu(A)
+LU{Sym,Array{Sym,2}}
+L factor:
+2×2 Array{Sym,2}:
+ 1  0
+ x  1
+U factor:
+2×2 Array{Sym,2}:
+ 1        x
+ 0  1 - x^2
 
+julia> prod(diag(out.L)) * prod(diag(out.U))
+     2
+1 - x 
+```
 
 ### RREF
 
@@ -633,7 +819,7 @@ To put a matrix into reduced row echelon form, use `rref`.  `rref` returns
 a tuple of two elements. The first is the reduced row echelon form, and the
 second is a tuple of indices of the pivot columns.
 
-```verbatim
+```python
     >>> M = Matrix([[1, 0, 1, 3], [2, 3, 4, 7], [-1, -3, -3, -4]])
     >>> M
     ⎡1   0   1   3 ⎤
@@ -651,19 +837,20 @@ second is a tuple of indices of the pivot columns.
 
 ##### In `Julia`:
 
-```
-M = Sym[1 0 1 3; 2 3 4 7; -1 -3 -3 -4]
-M
-```
+```jldoctest matrices
+julia> M = Sym[1 0 1 3; 2 3 4 7; -1 -3 -3 -4]
+3×4 Array{Sym,2}:
+  1   0   1   3
+  2   3   4   7
+ -1  -3  -3  -4
 
-```
-M.rref()
+julia> M.rref()
+(Sym[1 0 1 3; 0 1 2/3 1/3; 0 0 0 0], (0, 1))
 ```
 
 
 
 !!! note
-
     The first element of the tuple returned by `rref` is of type
     `Matrix`. The second is of type `tuple`.
 
@@ -673,7 +860,7 @@ Nullspace
 To find the nullspace of a matrix, use `nullspace`. `nullspace` returns a
 `list` of column vectors that span the nullspace of the matrix.
 
-```verbatim
+```python
     >>> M = Matrix([[1, 2, 3, 0, 0], [4, 10, 0, 0, 1]])
     >>> M
     ⎡1  2   3  0  0⎤
@@ -695,13 +882,18 @@ To find the nullspace of a matrix, use `nullspace`. `nullspace` returns a
 
 * the list is mapped to an array of vectors, otherwise this is identical:
 
-```
-M = Sym[1 2 3 0 0; 4 10 0 0 1]
-M
-```
+```jldoctest matrices
+julia> M = Sym[1 2 3 0 0; 4 10 0 0 1]
+2×5 Array{Sym,2}:
+ 1   2  3  0  0
+ 4  10  0  0  1
 
-```
-M.nullspace()
+julia> M.nullspace()
+3-element Array{Array{Sym,2},1}:
+ [-15; 6; … ; 0; 0]
+ [0; 0; … ; 1; 0]
+ [1; -1/2; … ; 0; 1]
+
 ```
 
 
@@ -712,7 +904,7 @@ Columnspace
 To find the columnspace of a matrix, use `columnspace`. `columnspace` returns a
 `list` of column vectors that span the columnspace of the matrix.
 
-```verbatim
+```python
     >>> M = Matrix([[1, 1, 2], [2 ,1 , 3], [3 , 1, 4]])
     >>> M
     ⎡1  1  2⎤
@@ -732,13 +924,18 @@ To find the columnspace of a matrix, use `columnspace`. `columnspace` returns a
 
 * as with `nullspace`, the return value is a vector of vectors:
 
-```
-M = Sym[1 1 2; 2 1 3; 3 1 4]
-M
-```
+```jldoctest matrices
+julia> M = Sym[1 1 2; 2 1 3; 3 1 4]
+3×3 Array{Sym,2}:
+ 1  1  2
+ 2  1  3
+ 3  1  4
 
-```
-M.columnspace()
+julia> M.columnspace()
+2-element Array{Array{Sym,2},1}:
+ [1; 2; 3]
+ [1; 1; 1]
+
 ```
 
 ----
@@ -750,7 +947,7 @@ To find the eigenvalues of a matrix, use `eigenvals`.  `eigenvals`
 returns a dictionary of `eigenvalue:algebraic multiplicity` pairs (similar to the
 output of :ref:`roots <tutorial-roots>`).
 
-```verbatim
+```python
     >>> M = Matrix([[3, -2,  4, -2], [5,  3, -3, -2], [5, -2,  2, -2], [5, -2, -3,  3]])
     >>> M
     ⎡3  -2  4   -2⎤
@@ -766,13 +963,20 @@ output of :ref:`roots <tutorial-roots>`).
 
 ##### In `Julia`:
 
-```
-M = Sym[3 -2  4 -2; 5  3 -3 -2; 5 -2  2 -2; 5 -2 -3  3]
-M
-```
+```jldoctest matrices
+julia> M = Sym[3 -2  4 -2; 5  3 -3 -2; 5 -2  2 -2; 5 -2 -3  3]
+4×4 Array{Sym,2}:
+ 3  -2   4  -2
+ 5   3  -3  -2
+ 5  -2   2  -2
+ 5  -2  -3   3
 
-```
-M.eigenvals()
+julia> M.eigenvals()
+Dict{Any,Any} with 3 entries:
+  3  => 1
+  -2 => 1
+  5  => 2
+
 ```
 
 ----
@@ -785,7 +989,7 @@ To find the eigenvectors of a matrix, use `eigenvects`.  `eigenvects`
 returns a list of tuples of the form `(eigenvalue:algebraic multiplicity,
 [eigenvectors])`.
 
-```verbatim
+```python
     >>> M.eigenvects()
     ⎡⎛       ⎡⎡0⎤⎤⎞  ⎛      ⎡⎡1⎤⎤⎞  ⎛      ⎡⎡1⎤  ⎡0 ⎤⎤⎞⎤
     ⎢⎜       ⎢⎢ ⎥⎥⎟  ⎜      ⎢⎢ ⎥⎥⎟  ⎜      ⎢⎢ ⎥  ⎢  ⎥⎥⎟⎥
@@ -802,14 +1006,25 @@ returns a list of tuples of the form `(eigenvalue:algebraic multiplicity,
 
 * the `eigvals` and `eigvecs` methods present the output in the manner that `Julia`'s generic functions do:
 
-```
-M.eigenvects()
+```jldoctest matrices
+julia> M.eigenvects()
+3-element Array{Tuple{Sym,Int64,Array{Array{Sym,2},1}},1}:
+ (-2, 1, [[0; 1; 1; 1]])
+ (3, 1, [[1; 1; 1; 1]])
+ (5, 2, [[1; 1; 1; 0], [0; -1; 0; 1]])
+
 ```
 
 compare with
 
-```
-eigvecs(M)
+```jldoctest matrices
+julia> eigvecs(M)
+4×4 Array{Sym,2}:
+ 0  1  1   0
+ 1  1  1  -1
+ 1  1  1   0
+ 1  1  0   1
+
 ```
 
 
@@ -824,7 +1039,7 @@ diagonalizable.
 To diagonalize a matrix, use `diagonalize`. `diagonalize` returns a tuple
 `(P, D)`, where `D` is diagonal and `M = PDP^{-1}`.
 
-```verbatim
+```python
     >>> P, D = M.diagonalize()
     >>> P
     ⎡0  1  1  0 ⎤
@@ -856,31 +1071,40 @@ To diagonalize a matrix, use `diagonalize`. `diagonalize` returns a tuple
 
 ##### In `Julia`:
 
-```
-P, D = M.diagonalize()
-P
-```
+```jldoctest matrices
+julia> P, D = M.diagonalize()
+(Sym[0 1 1 0; 1 1 1 -1; 1 1 1 0; 1 1 0 1], Sym[-2 0 0 0; 0 3 0 0; 0 0 5 0; 0 0 0 5])
 
-```
-D
-```
+julia> P
+4×4 Array{Sym,2}:
+ 0  1  1   0
+ 1  1  1  -1
+ 1  1  1   0
+ 1  1  0   1
 
-```
-P*D*P^-1
-```
+julia> D
+4×4 Array{Sym,2}:
+ -2  0  0  0
+  0  3  0  0
+  0  0  5  0
+  0  0  0  5
 
-```
-P*D*P^-1 == M
+julia> P*D*P^-1
+4×4 Array{Sym,2}:
+ 3  -2   4  -2
+ 5   3  -3  -2
+ 5  -2   2  -2
+ 5  -2  -3   3
+
+julia> P*D*P^-1 == M
+true
+
 ```
 
 
 
 !!! note "Quick Tip"
-
-   `lambda` is a reserved keyword in Python, so to create a Symbol called
-   $\lambda$, while using the same names for SymPy Symbols and Python
-   variables, use `lamda` (without the `b`).  It will still pretty print
-   as $\lambda$.
+   As  `lambda` is a reserved keyword in Python, so to create a Symbol called  λ, while using the same names for SymPy Symbols and Python variables, use `lamda` (without the `b`).  It will still pretty print as λ.
 
 Note that since `eigenvects` also includes the eigenvalues, you should use
 it instead of `eigenvals` if you also want the eigenvectors. However, as
@@ -891,7 +1115,7 @@ If all you want is the characteristic polynomial, use `charpoly`.  This is
 more efficient than `eigenvals`, because sometimes symbolic roots can be
 expensive to calculate.
 
-```verbatim
+```python
     >>> lamda = symbols('lamda')
     >>> p = M.charpoly(lamda)
     >>> factor(p)
@@ -903,10 +1127,16 @@ expensive to calculate.
 
 * note missing `b` is not needed with `Julia`:
 
-```
-lambda = symbols("lambda")
-p = M.charpoly(lambda)
-factor(p)
+```jldoctest matrices
+julia> lambda = symbols("lambda")
+λ
+
+julia> p = M.charpoly(lambda)
+PurePoly(lambda**4 - 11*lambda**3 + 29*lambda**2 + 35*lambda - 150, lambda, domain='ZZ')
+
+julia> factor(p) |>  string
+"(lambda - 5)^2*(lambda - 3)*(lambda + 2)"
+
 ```
 
 ----
@@ -946,7 +1176,7 @@ while being defaulted with `_iszero`.
 Here is an example of solving an issue caused by undertested zero.
 [#zerotestexampleidea-fn]_ [#zerotestexamplediscovery-fn]_
 
-```verbatim
+```python
     >>> from sympy import *
     >>> q = Symbol("q", positive = True)
     >>> m = Matrix([
@@ -959,13 +1189,19 @@ Here is an example of solving an issue caused by undertested zero.
 
 ##### In `Julia`:
 
-```
-q = sympy.Symbol("q", positive = true)
-m = Sym[
--2*cosh(q/3)      exp(-q)            1;
-      exp(q) -2*cosh(q/3)            1;
-           1            1 -2*cosh(q/3)]
-m.nullspace()
+```jldoctest matrices
+julia> q = sympy.Symbol("q", positive = true)
+q
+
+julia> m = Sym[-2*cosh(q/3) exp(-q) 1; exp(q) -2*cosh(q/3) 1; 1 1 -2*cosh(q/3)]
+3×3 Array{Sym,2}:
+ -2*cosh(q/3)       exp(-q)             1
+       exp(q)  -2*cosh(q/3)             1
+            1             1  -2*cosh(q/3) 
+
+julia> m.nullspace()
+0-element Array{Any,1}
+
 ```
 
 ----
@@ -973,7 +1209,7 @@ m.nullspace()
 You can trace down which expression is being underevaluated,
 by injecting a custom zero test with warnings enabled.
 
-```verbatim
+```python
     >>> import warnings
     >>>
     >>> def my_iszero(x):
@@ -1010,7 +1246,7 @@ For this specific example, rewriting to exponentials and applying simplify would
 make zero test stronger for hyperbolics,
 while being harmless to other polynomials or transcendental functions.
 
-```verbatim
+```python
     >>> def my_iszero(x):
     ...     try:
     ...         result = x.rewrite(exp).simplify().is_zero
@@ -1077,23 +1313,12 @@ so if you have encountered one, you can report the issue to
 SymPy issue tracker [#sympyissues-fn]_ to get detailed help from the community.
 
 !!! note "Footnotes"
+    * [#zerotestexampleidea-fn] Inspired by https://gitter.im/sympy/sympy?at=5b7c3e8ee5b40332abdb206c
+    * [#zerotestexamplediscovery-fn] Discovered from https://github.com/sympy/sympy/issues/15141
+    * [#zerotestsimplifysolution-fn] Suggested from https://github.com/sympy/sympy/issues/10120
+    * [#zerotestnumerictestsolution-fn] Suggested from https://github.com/sympy/sympy/issues/10279
+    * [#constantproblemwikilink-fn] https://en.wikipedia.org/wiki/Constant_problem
+    * [#mathematicazero-fn] How mathematica tests zero https://reference.wolfram.com/language/ref/PossibleZeroQ.html
+    * [#matlabzero-fn] How matlab tests zero https://www.mathworks.com/help/symbolic/mupad_ref/iszero.html
+	* [#sympyissues-fn] https://github.com/sympy/sympy/issues
 
-* [#zerotestexampleidea-fn] Inspired by https://gitter.im/sympy/sympy?at=5b7c3e8ee5b40332abdb206c
-
-* [#zerotestexamplediscovery-fn] Discovered from https://github.com/sympy/sympy/issues/15141
-
-* [#zerotestsimplifysolution-fn] Suggested from https://github.com/sympy/sympy/issues/10120
-
-* [#zerotestnumerictestsolution-fn] Suggested from https://github.com/sympy/sympy/issues/10279
-
-* [#constantproblemwikilink-fn] https://en.wikipedia.org/wiki/Constant_problem
-
-* [#mathematicazero-fn] How mathematica tests zero https://reference.wolfram.com/language/ref/PossibleZeroQ.html
-
-* [#matlabzero-fn] How matlab tests zero https://www.mathworks.com/help/symbolic/mupad_ref/iszero.html
-
-* [#sympyissues-fn] https://github.com/sympy/sympy/issues
-
-----
-
-[return to index](./index.html)

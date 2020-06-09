@@ -9,9 +9,6 @@ julia:
   - 1.3
   - 1.4
   - nightly
-matrix:
-  allow_failures:
-    - julia: nightly
 git:
     depth: 99999
 env:
@@ -22,8 +19,24 @@ env:
     - MPMATH=false
 notifications:
   email: false
+
 before_install:
     #install mpmath to test functionallity
   - if [ $MPMATH = "true" ]; then julia -e 'using Pkg; Pkg.add("Conda"); using Conda; Conda.add("mpmath")';fi
+
+jobs:
+  include:
+    - stage: "Documentation"
+      julia: 1.4
+      os: linux
+      env:
+        - GKSwstype="100"
+      script:
+        - julia --project=docs/ -e 'using Pkg; Pkg.instantiate();  Pkg.develop(PackageSpec(path=pwd()))'
+        - julia --project=docs/ docs/make.jl
+      after_success: skip
+
 after_success:
-  - julia -e 'cd(Pkg.dir("SymPy")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
+  - julia -e 'using Pkg; cd(Pkg.dir("SymPy")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())';
+
+

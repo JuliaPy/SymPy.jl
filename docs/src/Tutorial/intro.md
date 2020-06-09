@@ -1,6 +1,13 @@
 # Introduction
 
-[From](https://docs.sympy.org/latest/tutorial/intro.html)
+Taken [from](https://docs.sympy.org/latest/tutorial/intro.html) the  SymPy tutorial (version 1.3).
+
+```@setup intro
+using SymPy
+sympy.init_printing(use_unicode=True)
+```
+
+
 
 ## What is Symbolic Computation?
 
@@ -12,7 +19,7 @@ variables are left in symbolic form.
 Let's take an example. Say we wanted to use the built-in Python functions to
 compute square roots. We might do something like this
 
-```verbatim
+```python
    >>> import math
    >>> math.sqrt(9)
    3.0
@@ -22,8 +29,9 @@ compute square roots. We might do something like this
 
 * Of course, `sqrt` is already there:
 
-```
-sqrt(9)
+```jldoctest intro
+julia> sqrt(9)
+3.0
 ```
 
 ----
@@ -31,15 +39,16 @@ sqrt(9)
 9 is a perfect square, so we got the exact answer, 3. But suppose we computed
 the square root of a number that isn't a perfect square
 
-```verbatim
+```python
    >>> math.sqrt(8)
    2.82842712475
 ```
 
 ##### In `Julia`:
 
-```
-sqrt(8)
+```jldoctest intro
+julia> sqrt(8)
+2.8284271247461903
 ```
 
 ----
@@ -55,7 +64,7 @@ This is where symbolic computation comes in.  With a symbolic computation
 system like SymPy, square roots of numbers that are not perfect squares are
 left unevaluated by default
 
-```verbatim
+```python
    >>> import sympy
    >>> sympy.sqrt(3)
    sqrt(3)
@@ -64,15 +73,18 @@ left unevaluated by default
 ##### In `Julia`:
 
 
-```
-using SymPy
-sympy.sqrt(3)
+```jldoctest intro
+julia> using SymPy
+
+julia> sympy.sqrt(3)
+√3
 ```
 
 * When `SymPy` is loaded, the `sqrt` function is overloaded for symbolic objects, so this could also be done through:
 
-```
-sqrt(Sym(3))
+```jldoctest intro
+julia> sqrt(Sym(3))
+√3
 ```
 
 ----
@@ -80,15 +92,16 @@ sqrt(Sym(3))
 Furthermore---and this is where we start to see the real power of symbolic
 computation---symbolic results can be symbolically simplified.
 
-```verbatim
+```python
    >>> sympy.sqrt(8)
    2*sqrt(2)
 ```
 
 ##### In `Julia`:
 
-```
-sympy.sqrt(8)
+```jldoctest intro
+julia> sympy.sqrt(8)
+2⋅√2
 ```
 
 ----
@@ -109,7 +122,7 @@ section <tutorial-gotchas-symbols>`).
 Let us define a symbolic expression, representing the mathematical expression
 `x + 2y`.
 
-```verbatim
+```python
    >>> from sympy import symbols
    >>> x, y = symbols('x y')
    >>> expr = x + 2*y
@@ -121,10 +134,12 @@ Let us define a symbolic expression, representing the mathematical expression
 
 * the command `from sympy import *` is *essentially* run (only functions are "imported", not all objects), so this becomes the same after adjusting the quotes:
 
-```
-x, y = symbols("x y")
-expr = x + 2*y
-expr
+```jldoctest intro
+julia> x, y = symbols("x y")
+(x, y)
+
+julia> expr = x + 2*y
+x + 2⋅y
 ```
 
 ----
@@ -134,7 +149,7 @@ ordinary Python variables. But in this case, instead of evaluating to
 something, the expression remains as just `x + 2*y`.  Now let us play around
 with it:
 
-```verbatim
+```python
    >>> expr + 1
    x + 2*y + 1
    >>> expr - x
@@ -143,12 +158,14 @@ with it:
 
 ##### In `Julia`:
 
-```
-expr + 1
+```jldoctest intro
+julia> expr + 1
+x + 2⋅y + 1
 ```
 
-```
-expr - x
+```jldoctest intro
+julia> expr - x
+2⋅y
 ```
 
 ----
@@ -159,15 +176,16 @@ automatically canceled one another.  This is similar to how `sqrt(8)`
 automatically turned into `2*sqrt(2)` above.  This isn't always the case in
 SymPy, however:
 
-```verbatim
+```python
    >>> x*expr
    x*(x + 2*y)
 ```
 
 ##### In `Julia`:
 
-```
-x*expr
+```jldoctest intro
+julia> x*expr
+x⋅(x + 2⋅y)
 ```
 
 ----
@@ -180,7 +198,7 @@ because we might prefer the factored form `x(x + 2y)`, or we might prefer the
 expanded form `x^2 + 2xy`.  Both forms are useful in different circumstances.
 In SymPy, there are functions to go from one form to the other
 
-```verbatim
+```python
    >>> from sympy import expand, factor
    >>> expanded_expr = expand(x*expr)
    >>> expanded_expr
@@ -191,13 +209,15 @@ In SymPy, there are functions to go from one form to the other
 
 ##### In `Julia`:
 
-```
-expanded_expr = expand(x*expr)
-expanded_expr
+```jldoctest intro
+julia> expanded_expr = expand(x*expr)
+ 2
+x  + 2⋅x⋅y
 ```
 
-```
-factor(expanded_expr)
+```jldoctest intro
+julia> factor(expanded_expr)
+x⋅(x + 2⋅y)
 ```
 
 ----
@@ -213,7 +233,7 @@ formulas, or `\LaTeX`), code generation, physics, statistics, combinatorics,
 number theory, geometry, logic, and more. Here is a small sampling of the sort
 of symbolic power SymPy is capable of, to whet your appetite.
 
-```verbatim
+```python
  >>> from sympy import *
  >>> x, t, z, nu = symbols('x t z nu')
 ```
@@ -222,15 +242,16 @@ of symbolic power SymPy is capable of, to whet your appetite.
 
 * again, the functions in the `sympy` module are already imported:
 
-```
-x, t, z, nu = symbols("x t z nu")
+```jldoctest intro
+julia> x, t, z, nu = symbols("x t z nu")
+(x, t, z, nu)
 ```
 
 ----
 
 This will make all further examples pretty print with unicode characters.
 
-```verbatim
+```python
  >>> init_printing(use_unicode=True)
 ```
 
@@ -242,7 +263,7 @@ This will make all further examples pretty print with unicode characters.
 
 Take the derivative of $\sin{(x)}e^x$.
 
-```verbatim
+```python
  >>> diff(sin(x)*exp(x), x)
   x           x
  ℯ ⋅sin(x) + ℯ ⋅cos(x)
@@ -250,15 +271,17 @@ Take the derivative of $\sin{(x)}e^x$.
 
 ##### In `Julia`:
 
-```
-diff(sin(x)*exp(x), x)
+```jldoctest intro
+julia> diff(sin(x)*exp(x), x)
+ x           x
+ℯ ⋅sin(x) + ℯ ⋅cos(x)
 ```
 
 ----
 
 Compute $\int(e^x\sin{(x)} + e^x\cos{(x)})\,dx$.
 
-```verbatim
+```python
  >>> integrate(exp(x)*sin(x) + exp(x)*cos(x), x)
   x
  ℯ ⋅sin(x)
@@ -266,15 +289,17 @@ Compute $\int(e^x\sin{(x)} + e^x\cos{(x)})\,dx$.
 
 ##### In `Julia`:
 
-```
-integrate(exp(x)*sin(x) + exp(x)*cos(x), x)
+```jldoctest intro
+julia> integrate(exp(x)*sin(x) + exp(x)*cos(x), x)
+ x
+ℯ ⋅sin(x)
 ```
 
 ----
 
 Compute $\int_{-\infty}^\infty \sin{(x^2)}\,dx$.
 
-```verbatim
+```python
  >>> integrate(sin(x**2), (x, -oo, oo))
  √2⋅√π
  ─────
@@ -285,45 +310,52 @@ Compute $\int_{-\infty}^\infty \sin{(x^2)}\,dx$.
 
 * In `Julia` `**` is `^`:
 
-```
-integrate(sin(x^2), (x, -oo, oo))
+```jldoctest intro
+julia> integrate(sin(x^2), (x, -oo, oo))
+√2⋅√π
+─────
+  2
 ```
 
 ----
 
 Find $\lim_{x\to 0}\frac{\sin{(x)}}{x}$.
 
-```verbatim
+```python
  >>> limit(sin(x)/x, x, 0)
  1
 ```
 
 ##### In `Julia`:
 
-```
-limit(sin(x)/x, x, 0)
+```jldoctest intro
+julia> limit(sin(x)/x, x, 0)
+1
 ```
 
 ----
 
 Solve $x^2 - 2 = 0$.
 
-```verbatim
+```python
  >>> solve(x**2 - 2, x)
  [-√2, √2]
 ```
 
 ##### In `Julia`:
 
-```
-solve(x^2 - 2, x)
+```jldoctest intro
+julia> solve(x^2 - 2, x)
+2-element Array{Sym,1}:
+ -sqrt(2)
+  sqrt(2)
 ```
 
 ----
 
 Solve the differential equation `y'' - y = e^t`.
 
-```verbatim
+```python
  >>> y = Function('y')
  >>> dsolve(Eq(y(t).diff(t, t) - y(t), exp(t)), y(t))
             -t   ⎛     t⎞  t
@@ -335,16 +367,25 @@ Solve the differential equation `y'' - y = e^t`.
 
 * `Function` is not a function, so is not exported. We must qualify its use:
 
+```jldoctest intro
+julia> y = sympy.Function("y")
+PyObject y
+
+julia> dsolve(Eq(y(t).diff(t, t) - y(t), exp(t)), y(t)) |> string # work around formatting issue
+"Eq(y(t), C2*exp(-t) + (C1 + t/2)*exp(t))"
 ```
-y = sympy.Function("y")
-dsolve(Eq(y(t).diff(t, t) - y(t), exp(t)), y(t))
-```
+
+!!! note "Why `string`?"
+    The uses of `|> string` above and elsewhere throughout  this translation  of  the SymPy tutorial is only for technical reasons  related to  how `Documenter.jl` parses  the output. It is not idiomatic, or suggested; it  only allows the cell  to  be tested programatically for  regressions.
 
 * This is made more familiar looking with the `SymFunction` class:
 
-```
-y = SymFunction("y")
-dsolve(y''(t) - y(t) - exp(t), y(t))
+```jldoctest intro
+julia> y = SymFunction("y")
+y
+
+julia> dsolve(y''(t) - y(t) - exp(t), y(t)) |> string  
+"Eq(y(t), C2*exp(-t) + (C1 + t/2)*exp(t))"
 ```
 
 ----
@@ -352,7 +393,7 @@ dsolve(y''(t) - y(t) - exp(t), y(t))
 Find the eigenvalues of `\left[\begin{smallmatrix}1 & 2\\2 &
 2\end{smallmatrix}\right]`.
 
-```verbatim
+```python
  >>> Matrix([[1, 2], [2, 2]]).eigenvals()
  ⎧3   √17       √17   3   ⎫
  ⎨─ + ───: 1, - ─── + ─: 1⎬
@@ -361,25 +402,25 @@ Find the eigenvalues of `\left[\begin{smallmatrix}1 & 2\\2 &
 
 ##### In `Julia`:
 
-* Like `Function`, `Matrix` is not imported and its use must by qualified:
+* Like `Function`, `Matrix` is not imported and its use must by qualified (`Julia` matrix conventions  are used):
 
-```
-out = sympy.Matrix([[1, 2], [2, 2]]).eigenvals()
+```jldoctest intro
+julia> out = sympy.Matrix([1 2; 2 2]).eigenvals();
+
+julia> sort(collect(keys(out)))
+2-element Array{Any,1}:
+ 3/2 - sqrt(17)/2
+ 3/2 + sqrt(17)/2
 ```
 
-
-* This can be pretty printed if the keys become symbolic:
-
-```
-convert(Dict{Sym, Any}, out)
-```
+(The keys are returned  as type  `Any`, they may format more nicely if converted, say, through  `convert(Dict{Sym,Sym},out)`.)
 
 ----
 
 Rewrite the Bessel function $J_{\nu}\left(z\right)$ in terms of the
 spherical Bessel function $j_\nu(z)$.
 
-```verbatim
+```python
   >>> besselj(nu, z).rewrite(jn)
   √2⋅√z⋅jn(ν - 1/2, z)
   ────────────────────
@@ -391,16 +432,23 @@ spherical Bessel function $j_\nu(z)$.
 * we need to call in `SpecialFunctions`
 * `jn` is imported as a function object and this is not what SymPy expects, instead we pass in the object `sympy.jn`
 
-```
-using SpecialFunctions
-besselj(nu, z).rewrite(sympy.jn)
+```jldoctest intro
+julia> using SpecialFunctions
+
+julia> @vars ν z
+(ν, z)
+
+julia> besselj(ν, z).rewrite(sympy.jn)
+√2⋅√z⋅jn(ν - 1/2, z)
+────────────────────
+         √π  
 ```
 
 ----
 
 Print $\int_{0}^{\pi} \cos^{2}{\left (x \right )}\, dx$ using $\LaTeX$.
 
-```verbatim
+```python
   >>> latex(Integral(cos(x)**2, (x, 0, pi)))
   \int_{0}^{\pi} \cos^{2}{\left (x \right )}\, dx
 ```
@@ -415,8 +463,9 @@ Print $\int_{0}^{\pi} \cos^{2}{\left (x \right )}\, dx$ using $\LaTeX$.
 
 * and we use  `PI`, an alias for `sympy.pi`, the symbolic value for $\pi$:
 
-```
-sympy.latex(sympy.Integral(cos(x)^2, (x, 0, PI)))
+```jldoctest intro
+julia> sympy.latex(sympy.Integral(cos(x)^2, (x, 0, PI)))
+"\\int\\limits_{0}^{\\pi} \\cos^{2}{\\left(x \\right)}\\, dx"
 ```
 
 ----
@@ -467,14 +516,11 @@ to extend it with your own custom functions.
 
 There are other symbolic packages for `Julia`:
 
-* Reduce.jl
-* Symata.jl
-* SymEngine.jl
-* Nemo.jl
+* [Reduce.jl](https://github.com/chakravala/Reduce.jl)
+* [Symata.jl](https://github.com/jlapeyre/Symata.jl)
+* [SymEngine.jl](https://github.com/symengine/SymEngine.jl)
+* [Nemo.jl](https://github.com/Nemocas/Nemo.jl)
+* [SymbolicUtils](https://github.com/JuliaSymbolics/SymbolicUtils.jl)
 
 SymPy is an attractive alternative as `PyCall` makes most all of its functinality directly available and SymPy is fairly feature rich.
 
-
-----
-
-[return to index](./index.html)

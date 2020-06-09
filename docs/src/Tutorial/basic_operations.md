@@ -7,16 +7,23 @@ Here we discuss some of the most basic operations needed for expression
 manipulation in SymPy.  Some more advanced operations will be discussed later
 in the :ref:`advanced expression manipulation <tutorial-manipulation>` section.
 
-```verbatim
+```python
     >>> from sympy import *
     >>> x, y, z = symbols("x y z")
 ```
 
 ##### In `Julia`:
 
-```
+```@setup basicoperations
 using SymPy
-x, y, z = symbols("x y z")
+sympy.init_printing(use_unicode=True)
+```
+
+```jldoctest basicoperations
+julia> using SymPy
+
+julia> x, y, z = symbols("x y z")
+(x, y, z)
 ```
 
 * We didn't replicate `from sympy import *`, though this is mostly
@@ -37,7 +44,7 @@ expression is substitution.  Substitution replaces all instances of something
 in an expression with something else.  It is done using the `subs` method.
 For example
 
-```verbatim
+```python
     >>> expr = cos(x) + 1
     >>> expr.subs(x, y)
     cos(y) + 1
@@ -45,15 +52,19 @@ For example
 
 ##### In `Julia`:
 
-```
-expr = cos(x) + 1
-expr.subs(x, y)
+```jldoctest basicoperations
+julia> expr = cos(x) + 1
+cos(x) + 1
+
+julia> expr.subs(x, y)
+cos(y) + 1
 ```
 
 Julia also allows "call" notation using a pairs to indicate the substitution:
 
-```
-expr(x => y)
+```jldoctest basicoperations
+julia> expr(x => y)
+cos(y) + 1
 ```
 
 ----
@@ -64,15 +75,16 @@ Substitution is usually done for one of two reasons:
    `cos(x) + 1` and we want to evaluate it at the point `x = 0`, so that
    we get `cos(0) + 1`, which is 2.
 
-```verbatim
+```python
    >>> expr.subs(x, 0)
    2
 ```
 
 ##### In `Julia`:
 
-```
-expr(x => 0)
+```jldoctest basicoperations
+julia> expr(x => 0)
+2
 ```
 
 ----
@@ -84,7 +96,7 @@ expr(x => 0)
    would then get `x**(x**y)`.  If we replaced `y` in this new expression
    with `x**x`, we would get `x**(x**(x**x))`, the desired expression.
 
-```verbatim
+```python
    >>> expr = x**y
    >>> expr
    x**y
@@ -98,19 +110,22 @@ expr(x => 0)
 
 ##### In `Julia`:
 
-```
-expr = x^y
-expr
-```
+```jldoctest basicoperations
+julia> expr = x^y
+ y
+x 
 
-```
-expr = expr(y => x^y)
-expr
-```
+julia> expr = expr(y => x^y)
+ ⎛ y⎞
+ ⎝x ⎠
+x    
 
-```
-expr = expr(y => x^x)
-expr
+julia> expr = expr(y => x^x)
+ ⎛ ⎛ x⎞⎞
+ ⎜ ⎝x ⎠⎟
+ ⎝x    ⎠
+x       
+
 ```
 
 ----
@@ -125,7 +140,7 @@ The second is if we want to perform a very controlled simplification, or
    :ref:`advanced expression manipulation <tutorial-manipulation>` section, an
    easy way is to just replace `\sin(2x)` with `2\sin(x)\cos(x)`.
 
-```verbatim
+```python
    >>> expr = sin(2*x) + cos(2*x)
    >>> expand_trig(expr)
    2*sin(x)*cos(x) + 2*cos(x)**2 - 1
@@ -137,20 +152,22 @@ The second is if we want to perform a very controlled simplification, or
 
 * `expand_trig` is not exported, so we qualify it:
 
-```
-expr = sin(2*x) + cos(2*x)
-sympy.expand_trig(expr)
-```
+```jldoctest basicoperations
+julia> expr = sin(2*x) + cos(2*x)
+sin(2⋅x) + cos(2⋅x)
 
-```
-expr(sin(2*x) => 2*sin(x)*cos(x))
+julia> sympy.expand_trig(expr) |> string
+"2*sin(x)*cos(x) + 2*cos(x)^2 - 1"
+
+julia> expr(sin(2*x) => 2*sin(x)*cos(x))
+2⋅sin(x)⋅cos(x) + cos(2⋅x)
 ```
 
 ----
 
 There are two important things to note about `subs`.  First, it returns a new expression.  SymPy objects are immutable.  That means that `subs` does not modify it in-place.  For example
 
-```verbatim
+```python
    >>> expr = cos(x)
    >>> expr.subs(x, 0)
    1
@@ -162,24 +179,24 @@ There are two important things to note about `subs`.  First, it returns a new ex
 
 ##### In `Julia`:
 
-```
-expr = cos(x)
-expr(x => 0)
-```
+```jldoctest basicoperations
+julia> expr = cos(x)
+cos(x)
 
-```
-expr
-```
+julia> expr(x => 0)
+1
 
-```
+julia> expr
+cos(x)
+
+julia> x
 x
 ```
 
 ----
 
 !!! note "Quick Tip"
-
-   SymPy expressions are immutable.  No function will change them in-place.
+    SymPy expressions are immutable.  No function will change them in-place.
 
 
 Here, we see that performing `expr.subs(x, 0)` leaves `expr` unchanged.
@@ -189,7 +206,7 @@ in-place.  All functions will return new expressions.
 To perform multiple substitutions at once, pass a list of `(old, new)` pairs
 to `subs`.
 
-```verbatim
+```python
     >>> expr = x**3 + 4*x*y - z
     >>> expr.subs([(x, 2), (y, 4), (z, 0)])
     40
@@ -197,15 +214,19 @@ to `subs`.
 
 ##### In `Julia`:
 
-```
-expr = x^3 + 4*x*y - z
-expr.subs([(x, 2), (y, 4), (z, 0)])
+```jldoctest basicoperations
+julia> expr = x^3 + 4*x*y - z;  string(expr)
+"x^3 + 4*x*y - z"
+
+julia> expr.subs([(x, 2), (y, 4), (z, 0)])
+40
 ```
 
 Or, using pairs:
 
-```
-expr(x => 2, y=>4, z => 0)
+```jldoctest basicoperations
+julia> expr(x=>2, y=>4, z=>0)
+40
 ```
 
 ----
@@ -215,7 +236,7 @@ of similar replacements all at once.  For example, say we had `x^4 - 4x^3 + 4x^2
 2x + 3` and we wanted to replace all instances of `x` that have an even power
 with `y`, to get `y^4 - 4x^3 + 4y^2 - 2x + 3`.
 
-```verbatim
+```python
     >>> expr = x**4 - 4*x**3 + 4*x**2 - 2*x + 3
     >>> replacements = [(x**i, y**i) for i in range(5) if i % 2 == 0]
     >>> expr.subs(replacements)
@@ -224,10 +245,19 @@ with `y`, to get `y^4 - 4x^3 + 4y^2 - 2x + 3`.
 
 ##### In `Julia`:
 
-```
-expr = x^4 - 4*x^3 + 4*x^2 - 2*x + 3
-replacements = [(x^i, y^i) for i in 1:5 if iseven(i)]
-expr.subs(replacements)
+```jldoctest basicoperations
+julia> expr = x^4 - 4*x^3 + 4*x^2 - 2*x + 3
+ 4      3      2
+x  - 4⋅x  + 4⋅x  - 2⋅x + 3
+
+julia> replacements = [(x^i, y^i) for i in 1:5 if iseven(i)]
+2-element Array{Tuple{Sym,Sym},1}:
+ (x^2, y^2)
+ (x^4, y^4)
+
+julia> expr.subs(replacements)
+     3          4      2
+- 4⋅x  - 2⋅x + y  + 4⋅y  + 3
 ```
 
 ----
@@ -240,7 +270,7 @@ The `sympify` function (that's `sympify`, not to be confused with
 
 For example
 
-```verbatim
+```python
     >>> str_expr = "x**2 + 3*x - 1/2"
     >>> expr = sympify(str_expr)
     >>> expr
@@ -253,20 +283,21 @@ For example
 
 As `sympify` is not passed a symbolic value, it is qualified:
 
-```
-str_expr = "x^2 + 3*x - 1/2"
-expr = sympy.sympify(str_expr)
-expr
-```
+```jldoctest basicoperations
+julia> str_expr = "x^2 + 3*x - 1/2"
+"x^2 + 3*x - 1/2"
 
-```
-expr.subs(x, 2)
+julia> expr = sympy.sympify(str_expr)
+ 2         1
+x  + 3⋅x - ─
+           2
+julia> expr.subs(x, 2)
+19/2
 ```
 
 ----
 
 !!! note "Alert:"
-
     `sympify` uses `eval`.  Don't use it on unsanitized input.
 
 ## `evalf`
@@ -275,7 +306,7 @@ expr.subs(x, 2)
 To evaluate a numerical expression into a floating point number, use
 `evalf`.
 
-```verbatim
+```python
     >>> expr = sqrt(8)
     >>> expr.evalf()
     2.82842712474619
@@ -285,12 +316,15 @@ To evaluate a numerical expression into a floating point number, use
 
 * We must use a symbolic value for `8`:
 
-```
-expr = sqrt(Sym(8))
-expr.evalf()
+```jldoctest basicoperations
+julia> expr = sqrt(Sym(8))
+2⋅√2
+
+julia> expr.evalf()
+2.82842712474619
 ```
 
-!!! note "N"
+!!! note "N is different in SymPy.jl"
 
     More importantly, `SymPy.jl` treats `N` differently from
     `evalf`. `N` is used to convert a SymPy numeric (or Boolean) value
@@ -299,12 +333,14 @@ expr.evalf()
     `T`, `N` works to guess the appropriate type for the `SymPy`
     object.
 
-```
-N(sqrt(8))   # brings back as BigFloat
+```jldoctest basicoperations
+julia> N(sqrt(8))   # brings back as BigFloat
+2.8284271247461903
 ```
 
-```
-N(sqrt(9))   # an Int
+```jldoctest basicoperations
+julia> N(sqrt(9))   # an Int
+3.0
 ```
 
 
@@ -314,15 +350,16 @@ SymPy can evaluate floating point expressions to arbitrary precision.  By
 default, 15 digits of precision are used, but you can pass any number as the
 argument to `evalf`.  Let's compute the first 100 digits of `\pi`.
 
-```verbatim
+```python
     >>> pi.evalf(100)
 3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068
 ```
 
 ##### In `Julia`:
 
-```
-PI.evalf(100)
+```jldoctest basicoperations
+julia> PI.evalf(100)
+3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068
 ```
 
 ----
@@ -332,7 +369,7 @@ To numerically evaluate an expression with a Symbol at a point, we might use
 stable to pass the substitution to `evalf` using the `subs` flag, which
 takes a dictionary of `Symbol: point` pairs.
 
-```verbatim
+```python
     >>> expr = cos(2*x)
     >>> expr.evalf(subs={x: 2.4})
     0.0874989834394464
@@ -342,9 +379,12 @@ takes a dictionary of `Symbol: point` pairs.
 
 A Dict can be used:
 
-```
-expr = cos(2*x)
-expr.evalf(subs=Dict(x => 2.4))
+```jldoctest basicoperations
+julia> expr = cos(2*x)
+cos(2⋅x)
+
+julia> expr.evalf(subs=Dict(x => 2.4))
+0.0874989834394464
 ```
 
 ----
@@ -353,7 +393,7 @@ Sometimes there are roundoff errors smaller than the desired precision that
 remain after an expression is evaluated. Such numbers can be removed at the
 user's discretion by setting the `chop` flag to True.
 
-```verbatim
+```python
     >>> one = cos(1)**2 + sin(1)**2
     >>> (one - 1).evalf()
     -0.e-124
@@ -363,15 +403,20 @@ user's discretion by setting the `chop` flag to True.
 
 ##### In `Julia`:
 
-* we need to use symbolic values for `1`:
+* we need to use symbolic values for `1` in defining  `_one`:
 
-```
-_one = cos(Sym(1))^2 + sin(Sym(1))^2
-(_one - 1).evalf()
+```jldoctest basicoperations
+julia> _one = cos(Sym(1))^2 + sin(Sym(1))^2
+   2         2   
+cos (1) + sin (1)
+
+julia> (_one - 1).evalf()
+-0.e-124
 ```
 
-```
-(_one - 1).evalf(chop=true)
+```jldoctest basicoperations
+julia> (_one - 1).evalf(chop=true)
+0
 ```
 
 ----
@@ -380,10 +425,15 @@ _one = cos(Sym(1))^2 + sin(Sym(1))^2
 
 The `N` function is used to convert a symbolic number or boolean into a `Julia` counterpart.
 
-```
-two = Sym(2)
-a,b,c,d = two, sqrt(two), two^20, two^100
-N.((a,b,c,d))
+```jldoctest basicoperations
+julia> two = Sym(2)
+2
+
+julia> a,b,c,d = two, sqrt(two), two^20, two^100
+(2, sqrt(2), 1048576, 1267650600228229401496703205376)
+
+julia> N.((a,b,c,d))
+(2, 1.414213562373095048801688724209698078569671875376948073176679737990732478462102, 1048576, 1267650600228229401496703205376)
 ```
 
 
@@ -402,7 +452,7 @@ numerically evaluated is to use the `lambdify` function.  `lambdify` acts
 like a `lambda` function, except it converts the SymPy names to the names of
 the given numerical library, usually NumPy.  For example
 
-```verbatim
+```python
     >>> import numpy # doctest:+SKIP
     >>> a = numpy.arange(10) # doctest:+SKIP
     >>> expr = sin(x)
@@ -413,22 +463,61 @@ the given numerical library, usually NumPy.  For example
 ```
 
 
-```
-alert("""
-`lambdify` uses `eval`.  Don't use it on unsanitized input.
-""")
-```
+!!! note "Alert"
+    `lambdify` uses `eval`.  Don't use it on unsanitized input.
 
 ##### In `Julia`:
 
 * `lambdify` is defined seperately and with a different argument order: `lambdify(ex, vars=free_symbols(ex))`.
 
+```jldoctest basicoperations
+julia> a = 0:10
+0:10
+
+julia> @vars x
+(x,)
+
+julia> expr = sin(x)
+sin(x)
+
+julia> fn = lambdify(expr);
+
+julia> fn.(a)
+11-element Array{Float64,1}:
+  0.0
+  0.8414709848078965
+  0.9092974268256817
+  0.1411200080598672
+ -0.7568024953079282
+ -0.9589242746631385
+ -0.27941549819892586
+  0.6569865987187891
+  0.9893582466233818
+  0.4121184852417566
+ -0.5440211108893698
 ```
-a = 0:10
-@vars x
-expr = sin(x)
-fn = lambdify(expr)
-fn.(a)
+
+!!!  note "Technical note"
+    The `lambdify`  function converts a symbolic  expression into  a `Julia`  expression, and then creates a function using `invokelatest`  to avoid  world  age issues.
+	
+More performant functions can be produced using the following pattern:
+	
+```jldoctest basicoperations
+julia> ex = sin(x)^2 + x^2
+ 2      2   
+x  + sin (x)
+
+julia> body = convert(Expr, ex)
+:(x ^ 2 + sin(x) ^ 2)
+
+julia> syms = Symbol.(free_symbols(ex))
+1-element Array{Symbol,1}:
+ :x
+
+julia> fn = eval(Expr(:function, Expr(:call, gensym(), syms...), body));
+
+julia> fn(pi)
+9.869604401089358
 ```
 
 ----
@@ -436,7 +525,7 @@ fn.(a)
 You can use other libraries than NumPy. For example, to use the standard
 library math module, use `"math"`.
 
-```verbatim
+```python
     >>> f = lambdify(x, expr, "math")
     >>> f(0.1)
     0.0998334166468
@@ -452,7 +541,7 @@ library math module, use `"math"`.
 To use lambdify with numerical libraries that it does not know about, pass a
 dictionary of `sympy_name:numerical_function` pairs.  For example
 
-```verbatim
+```python
     >>> def mysin(x):
     ...     """
     ...     My sine. Note that this is only accurate for small x.
@@ -467,13 +556,23 @@ dictionary of `sympy_name:numerical_function` pairs.  For example
 
 * The `fns` dictionary coud be used to do this, though due to the call of `eval`, we must do this in the proper module:
 
-```
-mysin(x) = cos(x)
-ex = sin(x)
-body = SymPy.walk_expression(ex, fns=Dict("sin" => :mysin))
-syms = (:x,)
-fn = eval(Expr(:function, Expr(:call, gensym(), syms...), body))
-fn(0)
+```jldoctest basicoperations
+julia> mysin(x) = cos(x)
+mysin (generic function with 1 method)
+
+julia> ex = sin(x)
+sin(x)
+
+julia> body = SymPy.walk_expression(ex, fns=Dict("sin" => :mysin))
+:(mysin(x))
+
+julia> syms = (:x,)
+(:x,)
+
+julia> fn = eval(Expr(:function, Expr(:call, gensym(), syms...), body));
+
+julia> fn(0)
+1.0
 ```
 
 ----
@@ -482,7 +581,3 @@ fn(0)
 
     Write an advanced numerics section
 
-
-----
-
-[return to index](./index.html)

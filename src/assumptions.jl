@@ -2,21 +2,36 @@
 ## http://docs.sympy.org/0.7.2/modules/assumptions/index.html
 
 """
-refine: http://docs.sympy.org/dev/modules/assumptions/refine.html
+     refine
+
+Simplify an expression using assumptions; [refine](https://docs.sympy.org/dev/modules/assumptions/refine.html).
 """
 refine(ex, assumpts...) = sympy.refine(ex, assumpts...)
 export refine
 
 """
+    ask(query)
 
-`ask`. Returns true, false or nothing
+Returns `true`, `false`, or `nothing`; [ask](https://docs.sympy.org/dev/modules/assumptions/ask.html)
 
 Example:
 
-```
-ask(Q.integer(x*y), And(Q.integer(x), Q.integer(y)))
-## really slow isprime:
-filter(x -> ask(Q.prime(x)), [1:1000])
+```jldoctest ask
+julia> using SymPy
+
+julia> @vars x y integer=true
+(x, y)
+
+julia> ask(𝑄.integer(x*y), And(𝑄.integer(x), 𝑄.integer(y)))
+true
+
+julia> ## really slow isprime:
+       filter(x -> ask(𝑄.prime(x)), 1:10)
+4-element Array{Int64,1}:
+ 2
+ 3
+ 5
+ 7
 ```
 
 """
@@ -46,20 +61,32 @@ on variables. These may be placed on free sympols at construction.
 
 For example, the following creates a real value variable `x` and a postive, real variable `y`:
 
-```
-@vars x real=true
-@vars y real=true positive=true
+```jldoctest 𝑄
+julia> using SymPy
+
+julia> @vars x real=true
+(x,)
+
+julia> @vars y real=true positive=true
+(y,)
 ```
 
 The `Q` module exposes a means to *q*uery the assumptions on a
 variable. For example,
 
-```
-ask(𝑄.positive(y))  # true
-ask(𝑄.negative(y))  # false
-ask(SymPy.Q.positive(x))  # `nothing`
-ask(SymPy.Q.positive(x^2)) # `nothing` -- might be 0
-ask(SymPy.Q.positive(1 + x^2) # true  -- must be postive now.
+```jldoctest 𝑄
+julia> ask(𝑄.positive(y))  # true
+true
+
+julia> ask(𝑄.negative(y))  # false
+false
+
+julia> ask(SymPy.Q.positive(x))  # `nothing`
+
+julia> ask(SymPy.Q.positive(x^2)) # `nothing` -- might be 0
+
+julia> ask(SymPy.Q.positive(1 + x^2)) # true  -- must be postive now.
+true
 ```
 
 The ask function uses tri-state logic, returning one of 3 values:
@@ -68,15 +95,16 @@ The ask function uses tri-state logic, returning one of 3 values:
 The construction of predicates is done through `Q` methods. These can
 be combined logically. For example, this will be `true`:
 
-```
-ask(𝑄.positive(y) & 𝑄.negative(-x^2 - 1))
+```jldoctest 𝑄
+julia> ask(𝑄.positive(y) & 𝑄.negative(-x^2 - 1))
+true
 ```
 
 The above use `&` as an infix operation for the binary operator
 `And`. Values can also be combined with `Or`, `Not`, `Xor`, `Nand`,
 `Nor`, `Implies`, `Equivalent`, and `satisfiable`.
 
-!!! note: 
+!!! note "Matrix predicates"
     As `SymPy.jl` converts symbolic matrices into Julia's `Array`
 type and not as matrices within Python, the predicate functions from SymPy for
 matrices are not used, though a replacement is given.

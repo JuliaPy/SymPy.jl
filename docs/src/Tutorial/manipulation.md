@@ -1,5 +1,13 @@
 # Advanced Expression Manipulation
 
+[From](https://docs.sympy.org/latest/tutorial/manipulation.html)  (version 1.3)
+
+```@setup manipulation
+using SymPy
+sympy.init_printing(use_unicode=True)
+```
+
+
 In this section, we discuss some ways that we can perform advanced
 manipulation of expressions.
 
@@ -7,16 +15,15 @@ manipulation of expressions.
 
 
 !!! note "Quick Tip"
-
-   To play with the `srepr` form of expressions in the SymPy Live shell,
-   change the output format to `Repr` in the settings.
+    To play with the `srepr` form of expressions in the SymPy Live shell,
+    change the output format to `Repr` in the settings.
 
 Before we can do this, we need to understand how expressions are represented
 in SymPy.  A mathematical expression is represented as a tree.  Let us take
 the expression `2^x + xy`, i.e., `2**x + x*y`.  We can see what this
 expression looks like internally by using `srepr`
 
-```verbatim
+```python
     >>> from sympy import *
     >>> x, y, z = symbols('x y z')
 
@@ -30,12 +37,19 @@ expression looks like internally by using `srepr`
 * We replace the import command with a `using` command, as this will import functions (not Classes though) from `sympy`
 
 
-```
-using SymPy
-x, y, z = symbols("x y z")
+```jldoctest manipulation
+julia> using SymPy
 
-expr = 2^x + x*y
-srepr(expr)
+julia> x, y, z = symbols("x y z")
+(x, y, z)
+
+julia> expr = 2^x + x*y
+ x
+2  + x⋅y
+
+julia> srepr(expr)
+"Add(Pow(Integer(2), Symbol('x')), Mul(Symbol('x'), Symbol('y')))"
+
 ```
 
 ----
@@ -51,21 +65,23 @@ tree. Here is a [diagram](https://docs.sympy.org/latest/tutorial/manipulation.ht
 First, let's look at the leaves of this tree.  Symbols are instances of the
 class Symbol.  While we have been doing
 
-```verbatim
+```python
     >>> x = symbols('x')
 ```
 
 ##### In `Julia`:
 
-```
-x = symbols("x")
+```jldoctest manipulation
+julia> x = symbols("x")
+x
+
 ```
 
 ----
 
 we could have also done
 
-```verbatim
+```python
     >>> x = Symbol('x')
 ```
 
@@ -73,12 +89,16 @@ we could have also done
 
 * this can be done, but `@vars` would be suggested:
 
-```
-x = sympy.Symbol("x")
-```
+```jldoctest manipulation
+julia> x = sympy.Symbol("x")
+x
 
 ```
-@vars x
+
+```jldoctest manipulation
+julia> @vars x
+(x,)
+
 ```
 
 ----
@@ -90,7 +110,7 @@ integers.  It is similar to the Python built-in type `int`, except that
 When we write `2**x`, this creates a `Pow` object.  `Pow` is short for
 "power".
 
-```verbatim
+```python
     >>> srepr(2**x)
     "Pow(Integer(2), Symbol('x'))"
 ```
@@ -99,14 +119,16 @@ When we write `2**x`, this creates a `Pow` object.  `Pow` is short for
 
 * we replace `**` by `^`
 
-```
-srepr(2^x)
+```jldoctest manipulation
+julia> srepr(2^x)
+"Pow(Integer(2), Symbol('x'))"
+
 ```
 
 ----
 We could have created the same object by calling `Pow(2, x)`
 
-```verbatim
+```python
     >>> Pow(2, x)
     2**x
 ```
@@ -115,8 +137,11 @@ We could have created the same object by calling `Pow(2, x)`
 
 * `Pow` is *not* a function, rather a managed property, so we must qualify it, as it wasn't brought in when loading the package
 
-```
-sympy.Pow(2, x)
+```jldoctest manipulation
+julia> sympy.Pow(2, x)
+ x
+2
+
 ```
 
 ----
@@ -127,7 +152,7 @@ whenever you combine a SymPy object with a non-SymPy object via some function
 or operation, the non-SymPy object will be converted into a SymPy object.  The
 function that does this is `sympify` [#sympify-fn]_.
 
-```verbatim
+```python
     >>> type(2)
     <... 'int'>
     >>> type(sympify(2))
@@ -136,12 +161,13 @@ function that does this is `sympify` [#sympify-fn]_.
 
 ##### In `Julia`:
 
-```
-typeof(2)
-```
+```jldoctest manipulation
+julia> typeof(2)
+Int64
 
-```
-typeof(sympify(2))
+julia> typeof(sympify(2))
+Sym
+
 ```
 
 ----
@@ -150,21 +176,23 @@ We have seen that `2**x` is represented as `Pow(2, x)`.  What about
 `x*y`?  As we might expect, this is the multiplication of `x` and `y`.
 The SymPy class for multiplication is `Mul`.
 
-```verbatim
+```python
     >>> srepr(x*y)
     "Mul(Symbol('x'), Symbol('y'))"
 ```
 
 ##### In `Julia`:
 
-```
-srepr(x*y)
+```jldoctest manipulation
+julia> srepr(x*y)
+"Mul(Symbol('x'), Symbol('y'))"
+
 ```
 
 ----
 Thus, we could have created the same object by writing `Mul(x, y)`.
 
-```verbatim
+```python
     >>> Mul(x, y)
     x*y
 ```
@@ -173,8 +201,10 @@ Thus, we could have created the same object by writing `Mul(x, y)`.
 
 * Again, `Mul` is not a function, so it must be qualified
 
-```
-sympy.Mul(x, y)
+```jldoctest manipulation
+julia> sympy.Mul(x, y)
+x⋅y
+
 ```
 
 ----
@@ -183,7 +213,7 @@ our last two objects, `Pow(2, x)`, and `Mul(x, y)`.  The SymPy class for
 addition is `Add`, so, as you might expect, to create this object, we use
 `Add(Pow(2, x), Mul(x, y))`.
 
-```verbatim
+```python
     >>> Add(Pow(2, x), Mul(x, y))
     2**x + x*y
 ```
@@ -192,16 +222,20 @@ addition is `Add`, so, as you might expect, to create this object, we use
 
 * We *can* import these operations to avoid qualifying them as done here:
 
-```
-import_from(sympy, (:Add, :Mul, :Pow), typ=:Any)
-Add(Pow(2, x), Mul(x, y))
+```jldoctest manipulation
+julia> import_from(sympy, (:Add, :Mul, :Pow), typ=:Any)
+
+julia> Add(Pow(2, x), Mul(x, y))
+ x
+2  + x⋅y
+
 ```
 
 ----
 SymPy expression trees can have many branches, and can be quite deep or quite
 broad.  Here is a more complicated example
 
-```verbatim
+```python
     >>> expr = sin(x*y)/2 - x**2 + 1/y
     >>> srepr(expr)
     "Add(Mul(Integer(-1), Pow(Symbol('x'), Integer(2))), Mul(Rational(1, 2),
@@ -210,9 +244,15 @@ broad.  Here is a more complicated example
 
 ##### In `Julia`:
 
-```
-expr = sin(x*y)/2 - x^2 + 1/y
-srepr(expr)
+```jldoctest manipulation
+julia> expr = sin(x*y)/2 - x^2 + 1/y
+   2   sin(x⋅y)   1
+- x  + ──────── + ─
+          2       y
+
+julia> srepr(expr)
+"Add(Mul(Integer(-1), Pow(Symbol('x'), Integer(2))), Mul(Rational(1, 2), sin(Mul(Symbol('x'), Symbol('y')))), Pow(Symbol('y'), Integer(-1)))"
+
 ```
 
 ----
@@ -231,15 +271,17 @@ One level up, we see we have `Mul(-1, Pow(x, 2))`.  There is no subtraction
 class in SymPy.  `x - y` is represented as `x + -y`, or, more completely,
 `x + -1*y`, i.e., `Add(x, Mul(-1, y))`.
 
-```verbatim
+```python
     >>> srepr(x - y)
     "Add(Symbol('x'), Mul(Integer(-1), Symbol('y')))"
 ```
 
 ##### In `Julia`:
 
-```
-srepr(x - y)
+```jldoctest manipulation
+julia> srepr(x - y)
+"Add(Symbol('x'), Mul(Integer(-1), Symbol('y')))"
+
 ```
 
 ----
@@ -250,7 +292,7 @@ division is represented by a power of -1.  Hence, we have `Pow(y, -1)`.
 What if we had divided something other than 1 by `y`, like `x/y`?  Let's
 see.
 
-```verbatim
+```python
     >>> expr = x/y
     >>> srepr(expr)
     "Mul(Symbol('x'), Pow(Symbol('y'), Integer(-1)))"
@@ -258,9 +300,15 @@ see.
 
 ##### In `Julia`:
 
-```
-expr = x/y
-srepr(expr)
+```jldoctest manipulation
+julia> expr = x/y
+x
+─
+y
+
+julia> srepr(expr)
+"Mul(Symbol('x'), Pow(Symbol('y'), Integer(-1)))"
+
 ```
 
 ----
@@ -279,15 +327,17 @@ expression and the order that it came out from `srepr` or in the graph were
 different.  You may have also noticed this phenomenon earlier in the
 tutorial.  For example
 
-```verbatim
+```python
      >>> 1 + x
      x + 1
 ```
 
 ##### In `Julia`:
 
-```
-1 + x
+```jldoctest manipulation
+julia> 1 + x
+x + 1
+
 ```
 
 ----
@@ -301,9 +351,8 @@ shall see in the next section, the printing order and the order in which
 things are stored internally need not be the same either.
 
 !!! note "Quick Tip"
-
-   The way an expression is represented internally and the way it is printed
-   are often not the same.
+    The way an expression is represented internally and the way it is printed
+    are often not the same.
 
 In general, an important thing to keep in mind when working with SymPy expression
 trees is this:  the internal representation of an expression and the way it is
@@ -329,7 +378,7 @@ to this rule).
 Two notes about `func`.  First, the class of an object need not be the same
 as the one used to create it.  For example
 
-```verbatim
+```python
     >>> expr = Add(x, x)
     >>> expr.func
     <class 'sympy.core.mul.Mul'>
@@ -337,15 +386,21 @@ as the one used to create it.  For example
 
 ##### In `Julia`:
 
-```
-expr = Add(x, x)
-expr.func
+```jldoctest manipulation
+julia> expr = Add(x, x)
+2⋅x
+
+julia> expr.func
+PyObject <class 'sympy.core.mul.Mul'>
+
 ```
 
 * The output isn't as desired, as `PyObject`s don't show nicely here. We can ask for the name, which does display as desired:
 
-```
-expr.func.__name__
+```jldoctest manipulation
+julia> expr.func.__name__
+"Mul"
+
 ```
 
 * In `SymPy` the `func` and `args` properties are exported as functions in the module `SymPy.Introspection`.
@@ -355,15 +410,17 @@ expr.func.__name__
 We created `Add(x, x)`, so we might expect `expr.func` to be `Add`, but
 instead we got `Mul`.  Why is that?  Let's take a closer look at `expr`.
 
-```verbatim
+```python
     >>> expr
     2*x
 ```
 
 ##### In `Julia`:
 
-```
-expr
+```jldoctest manipulation
+julia> expr
+2⋅x
+
 ```
 
 ----
@@ -376,7 +433,7 @@ class to be returned from the constructor.
 Second, some classes are special-cased, usually for efficiency reasons
 [#singleton-fn]_.
 
-```verbatim
+```python
     >>> Integer(2).func
     <class 'sympy.core.numbers.Integer'>
     >>> Integer(0).func
@@ -387,16 +444,16 @@ Second, some classes are special-cased, usually for efficiency reasons
 
 ##### In `Julia`:
 
-```
-sympy.Integer(2).func.__name__
-```
+```jldoctest manipulation
+julia> sympy.Integer(2).func.__name__
+"Integer"
 
-```
-sympy.Integer(0).func.__name__
-```
+julia> sympy.Integer(0).func.__name__
+"Zero"
 
-```
-sympy.Integer(-1).func.__name__
+julia> sympy.Integer(-1).func.__name__
+"NegativeOne"
+
 ```
 
 ----
@@ -410,7 +467,7 @@ so as long as you use `isinstance`, it will not be an issue.
 `args` are the top-level arguments of the object.  `(x*y).args` would be
 `(x, y)`.  Let's look at some examples
 
-```verbatim
+```python
     >>> expr = 3*y**2*x
     >>> expr.func
     <class 'sympy.core.mul.Mul'>
@@ -422,13 +479,17 @@ so as long as you use `isinstance`, it will not be an issue.
 
 * The `args` property can be accessed exactly as `func`
 
-```
-expr = 3*y^2*x
-expr.func.__name__
-```
+```jldoctest manipulation
+julia> expr = 3*y^2*x
+     2
+3⋅x⋅y
 
-```
-expr.args
+julia> expr.func.__name__
+"Mul"
+
+julia> expr.args
+(3, x, y^2)
+
 ```
 
 ----
@@ -436,7 +497,7 @@ From this, we can see that `expr == Mul(3, y**2, x)`.  In fact, we can see
 that we can completely reconstruct `expr` from its `func` and its
 `args`.
 
-```verbatim
+```python
     >>> expr.func(*expr.args)
     3*x*y**2
     >>> expr == expr.func(*expr.args)
@@ -445,12 +506,14 @@ that we can completely reconstruct `expr` from its `func` and its
 
 ##### In `Julia`:
 
-```
-expr.func(expr.args...)
-```
+```jldoctest manipulation
+julia> expr.func(expr.args...)
+     2
+3⋅x⋅y
 
-```
-expr == expr.func(expr.args...)
+julia> expr == expr.func(expr.args...)
+true
+
 ```
 
 ----
@@ -459,7 +522,7 @@ In a `Mul`, the Rational coefficient will come first in the `args`, but
 other than that, the order of everything else follows no special pattern.  To
 be sure, though, there is an order.
 
-```verbatim
+```python
     >>> expr = y**2*3*x
     >>> expr.args
     (3, x, y**2)
@@ -467,9 +530,13 @@ be sure, though, there is an order.
 
 ##### In `Julia`:
 
-```
-expr = y^2*3*x
-expr.args
+```jldoctest manipulation
+julia> expr = y^2*3*x
+     2
+3⋅x⋅y
+
+julia> expr.args
+(3, x, y^2)
 ```
 
 ----
@@ -481,21 +548,23 @@ The `srepr` form of our `expr` is `Mul(3, x, Pow(y, 2))`.  What if we
 want to get at the `args` of `Pow(y, 2)`.  Notice that the `y**2` is in
 the third slot of `expr.args`, i.e., `expr.args[2]`.
 
-```verbatim
+```python
     >>> expr.args[2]
     y**2
 ```
 
 ##### In `Julia`:
 
-```
-expr.args[2]
+```jldoctest manipulation
+julia> expr.args[2]
+x
+
 ```
 
 ----
 So to get the `args` of this, we call `expr.args[2].args`.
 
-```verbatim
+```python
     >>> expr.args[2].args
     (y, 2)
 ```
@@ -504,15 +573,17 @@ So to get the `args` of this, we call `expr.args[2].args`.
 
 * Python uses 0-based indexing, so we bump the index by 1
 
-```
-expr.args[3].args
+```jldoctest manipulation
+julia> expr.args[3].args
+(y, 2)
+
 ```
 
 ----
 Now what if we try to go deeper.  What are the args of `y`.  Or `2`.
 Let's see.
 
-```verbatim
+```python
     >>> y.args
     ()
     >>> Integer(2).args
@@ -521,12 +592,13 @@ Let's see.
 
 ##### In `Julia`:
 
-```
-y.args
-```
+```jldoctest manipulation
+julia> y.args
+()
 
-```
-sympy.Integer(2).args
+julia> sympy.Integer(2).args
+()
+
 ```
 
 ----
@@ -566,7 +638,7 @@ tree.  The nested nature of `args` is a perfect fit for recursive functions.
 The base case will be empty `args`.  Let's write a simple function that goes
 through an expression and prints all the `args` at each level.
 
-```verbatim
+```python
     >>> def pre(expr):
     ...     print(expr)
     ...     for arg in expr.args:
@@ -575,13 +647,14 @@ through an expression and prints all the `args` at each level.
 
 ##### In `Julia`:
 
-```
-function pre(expr)
-    @show expr
-    for arg in expr.args
-    	pre(arg)
-	end
-end
+```jldoctest manipulation
+julia> function pre(expr)
+       @show expr
+       for arg in expr.args
+         pre(arg)
+       end
+       end
+pre (generic function with 1 method)
 ```
 
 ----
@@ -592,7 +665,7 @@ automatically by the for loop.
 
 Let's test our function.
 
-```verbatim
+```python
     >>> expr = x*y + 1
     >>> pre(expr)
     x*y + 1
@@ -604,11 +677,19 @@ Let's test our function.
 
 ##### In `Julia`:
 
-* `@show` does not work in these notes; this would need copy-and-pasting to be verified
+* Here we see the output:
 
-```
+```jldoctest manipulation
+julia> expr = x*y + 1
+x⋅y + 1
+
+julia> pre(expr)
 expr = x*y + 1
-pre(expr)
+expr = 1
+expr = x*y
+expr = x
+expr = y
+
 ```
 
 ----
@@ -621,7 +702,7 @@ Such traversals are so common in SymPy that the generator functions
 `preorder_traversal` and `postorder_traversal` are provided to make such
 traversals easy.  We could have also written our algorithm as
 
-```verbatim
+```python
     >>> for arg in preorder_traversal(expr):
     ...     print(arg)
     x*y + 1
@@ -635,10 +716,16 @@ traversals easy.  We could have also written our algorithm as
 
 * The `preorder_traversal` function is not a function, so needs to be qualified:
 
-```
-for arg in sympy.preorder_traversal(expr)
-   @show arg
-end
+```jldoctest manipulation
+julia> for arg in sympy.preorder_traversal(expr)
+         @show arg
+       end
+arg = x*y + 1
+arg = 1
+arg = x*y
+arg = x
+arg = y
+
 ```
 
 ----
@@ -652,7 +739,7 @@ an evaluation stopper by wrapping the expression with `UnevaluatedExpr`.
 
 For example:
 
-```verbatim
+```python
     >>> from sympy import Add
     >>> from sympy.abc import x, y, z
     >>> x + x
@@ -665,17 +752,19 @@ For example:
 
 ##### In `Julia`:
 
-```
-@vars x y z
+```jldoctest manipulation
+julia> @vars x y z
+(x, y, z)
+
+julia> x + x
+2⋅x
+
+julia> Add(x, x)
+2⋅x
+
+julia> Add(x, x, evaluate=False)
 x + x
-```
 
-```
-Add(x, x)
-```
-
-```
-Add(x, x, evaluate=False)
 ```
 
 ----
@@ -683,7 +772,7 @@ If you don't remember the class corresponding to the expression you
 want to build (operator overloading usually assumes `evaluate=True`),
 just use `sympify` and pass a string:
 
-```verbatim
+```python
     >>> from sympy import sympify
     >>> sympify("x + x", evaluate=False)
     x + x
@@ -693,16 +782,17 @@ just use `sympify` and pass a string:
 
 
 
-```
-sympify("x + x", evaluate=false)
-    x + x
+```jldoctest manipulation
+julia> sympify("x + x", evaluate=false)
+2⋅x
+
 ```
 
 ----
 Note that `evaluate=False` won't prevent future evaluation in later
 usages of the expression:
 
-```verbatim
+```python
     >>> expr = Add(x, x, evaluate=False)
     >>> expr
     x + x
@@ -712,13 +802,15 @@ usages of the expression:
 
 ##### In `Julia`:
 
-```
-expr = Add(x, x, evaluate=false)
-expr
-```
+```jldoctest manipulation
+julia> expr = Add(x, x, evaluate=false)
+x + x
 
 ```
-expr + x
+
+```jldoctest manipulation
+julia> expr + x
+3⋅x
 ```
 
 ----
@@ -728,7 +820,7 @@ an expression unevaluated. By *unevaluated* it is meant that the value
 inside of it will not interact with the expressions outside of it to give
 simplified outputs. For example:
 
-```verbatim
+```python
     >>> from sympy import UnevaluatedExpr
     >>> expr = x + UnevaluatedExpr(x)
     >>> expr
@@ -739,35 +831,38 @@ simplified outputs. For example:
 
 ##### In `Julia`:
 
-```
-import_from(sympy, (:UnevaluatedExpr,))
-expr = x + UnevaluatedExpr(x)
-expr
-```
+```jldoctest manipulation
+julia> import_from(sympy, (:UnevaluatedExpr,))
 
-```
-x + expr
+julia> expr
+x + x
+
+julia> x + expr
+3⋅x
+
 ```
 
 ----
 The `x` remaining alone is the `x` wrapped by `UnevaluatedExpr`.
 To release it:
 
-```verbatim
+```python
     >>> (x + expr).doit()
     3*x
 ```
 
 ##### In `Julia`:
 
-```
-(x + expr).doit()
+```jldoctest manipulation
+julia> (x + expr).doit()
+3⋅x
+
 ```
 
 ----
 Other examples:
 
-```verbatim
+```python
     >>> from sympy import *
     >>> from sympy.abc import x, y, z
     >>> uexpr = UnevaluatedExpr(S.One*5/7)*UnevaluatedExpr(S.One*3/4)
@@ -779,15 +874,21 @@ Other examples:
 
 ##### In `Julia`:
 
-```
-@vars x y z
-const S = sympy.S
-uexpr = UnevaluatedExpr(S.One * 5/7) * UnevaluatedExpr(S.One * 3/4)
-uexpr
-```
+```jldoctest manipulation
+julia> @vars x y z
+(x, y, z)
 
-```
-x * UnevaluatedExpr(1/x)
+julia> const S = sympy.S
+PyObject S
+
+julia> uexpr = UnevaluatedExpr(S.One * 5/7) * UnevaluatedExpr(S.One * 3/4)
+5/7⋅3/4
+
+julia> x * UnevaluatedExpr(1/x)
+  1
+x⋅─
+  x
+
 ```
 
 ----
@@ -795,7 +896,7 @@ x * UnevaluatedExpr(1/x)
 A point to be noted is that  `UnevaluatedExpr` cannot prevent the
 evaluation of an expression which is given as argument. For example:
 
-```verbatim
+```python
     >>> expr1 = UnevaluatedExpr(x + x)
     >>> expr1
     2*x
@@ -806,14 +907,13 @@ evaluation of an expression which is given as argument. For example:
 
 ##### In `Julia`:
 
-```
-expr1 = UnevaluatedExpr(x + x)
-expr1
-```
+```jldoctest manipulation
+julia> expr1 = UnevaluatedExpr(x + x)
+2⋅x
 
-```
-expr2 = sympify("x + x", evaluate=False)
-expr2
+julia> expr2 = sympify("x + x", evaluate=False)
+2⋅x
+
 ```
 
 ----
@@ -823,15 +923,16 @@ Remember that `expr2` will be evaluated if included into another
 expression. Combine both of the methods to prevent both inside and outside
 evaluations:
 
-```verbatim
+```python
     >>> UnevaluatedExpr(sympify("x + x", evaluate=False)) + y
     y + x + x
 ```
 
 ##### In `Julia`:
 
-```
-UnevaluatedExpr(sympify("x + x", evaluate=False)) + y
+```jldoctest manipulation
+julia> UnevaluatedExpr(sympify("x + x", evaluate=False)) + y
+y + 2⋅x
 ```
 
 ----
@@ -839,7 +940,7 @@ UnevaluatedExpr(sympify("x + x", evaluate=False)) + y
 `UnevalutedExpr` is supported by SymPy printers and can be used to print the
 result in different output forms. For example
 
-```verbatim
+```python
     >>> from sympy import latex
     >>> uexpr = UnevaluatedExpr(S.One*5/7)*UnevaluatedExpr(S.One*3/4)
     >>> print(latex(uexpr))
@@ -850,9 +951,14 @@ result in different output forms. For example
 
 * The printing support is through `show`, but we can use SymPy's:
 
-```
-uexpr = UnevaluatedExpr(S.One*5/7)*UnevaluatedExpr(S.One*3/4)
-sympy.latex(uexpr)
+```jldoctest manipulation
+julia> uexpr = UnevaluatedExpr(S.One*5/7)*UnevaluatedExpr(S.One*3/4)
+5/7⋅3/4
+
+julia> sympy.latex(uexpr)
+"\\frac{5}{7} \\frac{3}{4}"
+
+
 ```
 
 ----
@@ -860,40 +966,22 @@ sympy.latex(uexpr)
 In order to release the expression and get the evaluated LaTeX form,
 just use `.doit()`:
 
-```verbatim
+```python
     >>> print(latex(uexpr.doit()))
     \frac{15}{28}
 ```
 
 ##### In `Julia`:
 
-```
-sympy.latex(uexpr.doit())
+```jldoctest manipulation
+julia> sympy.latex(uexpr.doit())
+"\\frac{15}{28}"
+
 ```
 
 ----
 
 !!! note "Footnotes"
-
-* [#symbols-fn] We have been using `symbols` instead of `Symbol` because it
-  automatically splits apart strings into multiple `Symbol`\ s.
-  `symbols('x y z')` returns a tuple of three `Symbol`\ s.  `Symbol('x y
-  z')` returns a single `Symbol` called `x y z`.
-
-* [#sympify-fn] Technically, it is an internal function called `_sympify`,
-  which differs from `sympify` in that it does not convert strings.  `x +
-  '2'` is not allowed.
-
-* [#singleton-fn] Classes like `One` and `Zero` are singletonized, meaning
-  that only one object is ever created, no matter how many times the class is
-  called.  This is done for space efficiency, as these classes are very
-  common.  For example, `Zero` might occur very often in a sparse matrix
-  represented densely.  As we have seen, `NegativeOne` occurs any time we
-  have `-x` or `1/x`.  It is also done for speed efficiency because
-  singletonized objects can be compared by `is`.  The unique objects for
-  each singletonized class can be accessed from the `S` object.
-
-
-----
-
-[return to index](./index.html)
+    * [#symbols-fn] We have been using `symbols` instead of `Symbol` because it automatically splits apart strings into multiple `Symbol`\ s.    `symbols('x y z')` returns a tuple of three `Symbol`\ s.  `Symbol('x y  z')` returns a single `Symbol` called `x y z`.
+    * [#sympify-fn] Technically, it is an internal function called `_sympify`, which differs from `sympify` in that it does not convert strings.  `x + '2'` is not allowed.
+    * [#singleton-fn] Classes like `One` and `Zero` are singletonized, meaning that only one object is ever created, no matter how many times the class is called.  This is done for space efficiency, as these classes are very  common.  For example, `Zero` might occur very often in a sparse matrix represented densely.  As we have seen, `NegativeOne` occurs any time we  have `-x` or `1/x`.  It is also done for speed efficiency because singletonized objects can be compared by `is`.  The unique objects for each singletonized class can be accessed from the `S` object.

@@ -121,7 +121,7 @@ Base.inv(x::SymMatrix) = x.inv()
 ^(x::SymMatrix, y::Union{Int, SymbolicObject}) = pycall(sympy.Pow, SymMatrix, x, y)
 
 """
-   M[i,j]
+    M[i,j]
 
 Define `getindex` for SymPy's `ImmutableMatrix` class.
 
