@@ -17,11 +17,10 @@ rest. SymPy methods are called through Python's dot-call syntax.  To
 find documentation on SymPy functions and methods, one should refer to
 SymPy's [website](http://docs.sympy.org/latest/index.html).
 
-Plotting is provided through the `Plots` interface. For details, see
-the help page for `sympy_plotting`.
+Plotting is provided through  `Plots` recipes. For details, see
+the help page for [`sympy_plotting`](@ref).
 
-The package tutorial provides many examples. This can be read on
-[GitHub](http://nbviewer.ipython.org/github/JuliaPy/SymPy.jl/blob/master/examples/tutorial.ipynb).
+The package documentation provides many examples. 
 
 """
 module SymPy
@@ -75,19 +74,19 @@ pynull() = PyCall.PyNULL()
 """
     sympy
 
-variable from `pyimport("sympy")`
+Variable from `pyimport("sympy")`. Numerous methods are available through Python's dot-call syntax. 
 """
 const sympy  = PyCall.PyNULL()
 """
     sympy_core
 
-variable from `pyimport("sympy.core")`
+Variable from `pyimport("sympy.core")`.
 """
 const sympy_core =  PyCall.PyNULL()
 """
     sympy_matrices
 
-variable from `pyimport("sympy.matrices")`
+Variable from `pyimport("sympy.matrices")`.
 """
 const sympy_matrices =  PyCall.PyNULL()
 const mpmath = PyCall.PyNULL()

@@ -1,16 +1,30 @@
 ## Getindex default.
 ## Is this the proper default?
 """
-
-   x[i]
+    x[i]
 
 Some SymPy Python objects have index notation provided for them through `__getitem__`. This allows Julia's `getindex` to dispatch to Python's `__getitem__`. The index (indices) must be symbolic. This will use 0-based indexing, as it is a simple pass through to Python.
 
 Examples:
-```
-i,j = sympy.symbols("i j", integer=True)
-x = sympy.IndexedBase("x")
-a = sympy.Sum(x[i], (i, 1, j))
+
+```jldoctest utils
+julia> using SymPy
+
+julia> i,j = sympy.symbols("i j", integer=True)
+(i, j)
+
+julia> x = sympy.IndexedBase("x")
+x
+
+julia> a = sympy.Sum(x[i], (i, 1, j))
+  j       
+ ___      
+ ╲        
+  ╲       
+  ╱   x[i]
+ ╱        
+ ‾‾‾      
+i = 1     
 ```
 
 """
@@ -37,7 +51,7 @@ end
 function (ex::Sym)(args...)
     xs = ex.free_symbols
     for (var, val) in zip(xs, args)
-        ex = ex.subs(var, val)
+        ex = ex.subs(var, Sym(val))
     end
     ex
 end
@@ -45,13 +59,13 @@ end
 ## can use a Dict or pairs to specify:
 function (ex::Sym)(x::Dict)
     for (k,v) in x
-        ex = ex.subs(k, v)
+        ex = ex.subs(k, Sym(v))
     end
     ex
 end
 function (ex::Sym)(kvs::Pair...)
     for (k,v) in kvs
-        ex = ex.subs(k, v)
+        ex = ex.subs(k, Sym(v))
     end
     ex
 end
@@ -64,37 +78,45 @@ end
 value.
 Examples:
 
-```
-x,y = symbols("x,y")
-ex = (x-y)*(x+2y)
-subs(ex, (y, y^2))
-subs(ex, (x,1), (y,2))
-subs(ex, (x,y^3), (y,2))
-subs(ex, y, 3)
+```jldoctest subs
+julia> using SymPy
+
+julia> x,y = symbols("x,y")
+(x, y)
+
+julia> ex = (x-y)*(x+2y)
+(x - y)⋅(x + 2⋅y)
+
+julia> subs(ex, (y, y^2))
+⎛     2⎞ ⎛       2⎞
+⎝x - y ⎠⋅⎝x + 2⋅y ⎠
+
+julia> subs(ex, (x,1), (y,2))
+-5
+
+julia> subs(ex, (x,y^3), (y,2))
+72
+
+julia> subs(ex, y, 3)
+(x - 3)⋅(x + 6)
 ```
 
 There is a curried form of `subs` to use with the chaining `|>` operator
 
-```
-ex |> subs(x,e)
+```jldoctest subs
+julia> ex |> subs(x,ℯ)
+(ℯ - y)⋅(2⋅y + ℯ)
 ```
 The use of pairs gives a convenient alternative:
 
-```
-subs(ex, x=>1, y=>2)
-ex |> subs(x=>1, y=>2)
+```jldoctest subs
+julia> subs(ex, x=>1, y=>2)
+-5
+
+julia> ex |> subs(x=>1, y=>2)
+-5
 ```
 
-Examples:
-
-```
-subs(ex, :y, pi)    # using a symbol, not a symbolic object
-subs(ex, x=1, y=pi) # using keyword argument, and not pairs
-## or their curried or call forms
-ex |> subs(:x, e)
-ex |> subs(x=e)
-ex(x=2, y=3)
-```
 
 """
 subs(ex::T, y::Tuple{Any, Any}; kwargs...)          where {T <: SymbolicObject} = ex.subs(y[1], Sym(y[2]), kwargs...)
@@ -197,7 +219,7 @@ const base_exclude=("C", "lambdify",
 """
     import_from(module, meths; kwargs...)
 
-Import methods from python module
+Import methods from a python module. Implements functionality  of `from module import function` in  Python.
 
 * `module`: a python module, such as `sympy`
 * `meths`: nothing or a tuple of symbols to import. If `nothing`, then all member functions of the module are imported (but not constructors or other objects)
@@ -270,21 +292,32 @@ end
 
 
 """
-   free_symbols(ex)
+    free_symbols(ex)
+    free_symbols(ex::Vector{Sym})
 
-Return free symbols of expression or vector of expressions. The results are orderded by
+Return vector of free symbols of expression or vector of expressions. The results are orderded by
 `sortperm(string.(fs))`.
 
-```
-@vars x y z a
-free_symbols(2*x + a*y) # [a, x, y]
+Example:
+
+```jldoctest
+julia> using SymPy
+
+julia> @vars x y z a
+(x, y, z, a)
+
+julia> free_symbols(2*x + a*y) # [a, x, y]
+3-element Array{Sym,1}:
+ a
+ x
+ y
 ```
 """
 function free_symbols(ex::Union{T, Vector{T}}) where {T<:SymbolicObject}
     pex = PyObject(ex)
     #fs.__class__.__name__ == "set"
     if PyCall.hasproperty(pex, :free_symbols)
-        fs = convert(Vector{Sym}, collect(pex.free_symbols))
+        fs = collect(Sym, pex.free_symbols)
         fs[sortperm(string.(fs))]   # some sorting order to rely on
     else
         Sym[]

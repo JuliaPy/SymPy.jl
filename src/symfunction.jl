@@ -1,33 +1,6 @@
 ##################################################
 
 """
-     SymFunction
-
-Thin wrapper for symbolic functions that allows prime notation in place of using `diff`.
-
-Functions constructed through `SymFunction("f")` or `@symfuns f`.
-"""
-mutable struct SymFunction <: SymbolicObject
-    __pyobject__::PyCall.PyObject
-    n::Int
-end
-
-Base.:(==)(x::SymFunction, y::SymFunction) = x.__pyobject__ == y.__pyobject__ && x.n == y.n
-Base.hash(x::SymFunction) = hash((hash(x.__pyobject__),x.n))
-
-# these are from https://github.com/OptMist-Tokyo/DAEPreprocessor.jl/blob/sympy_warning/src/symbolic.jl
-derivative(x::SymFunction, d::Int = 1) = SymFunction(x.__pyobject__, x.n + d)
-
-Base.show(io::IO, u::SymFunction) = print(io, "$(string(Sym(u.__pyobject__)))" * repeat("'", u.n))
-Base.show(io::IO, ::MIME"text/plain", u::SymFunction) = print(io, "$(string(Sym(u.__pyobject__)))" * repeat("'", u.n))
-Base.show(io::IO, ::MIME"text/latex", x::SymFunction) = print(io, "\\begin{align*}" * latex(x) * "\\end{align*}")
-function Base.show(io::IO, ::MIME"text/latex", x::AbstractArray{SymFunction, 1})
-    print(io, "\\begin{align*}\\left[\\begin{array}{c}" * join(latex.(x), "\\\\") * "\\end{array}\\right]\\end{align*}")
-end
-
-latex(x::SymFunction) = latex(Sym(x.__pyobject__)) * repeat("'", x.n)
-
-"""
 
 
 Create a symbolic function. These can be used for specifying differential equations.
@@ -47,7 +20,16 @@ more than one at a time. (The `cls=symfunction` is no longer supported):
 F,G,H = SymFunction("F, G, H")
 ```
 
+This is just a thin wrapper around `sympy.Functioni` for symbolic functions that allows prime notation in place of using `diff`.
+
+The macro `@symfuns` is also available for constructing symbolic functions.
 """
+mutable struct SymFunction <: SymbolicObject
+    __pyobject__::PyCall.PyObject
+    n::Int
+end
+
+
 function SymFunction(x::T; kwargs...) where {T<:AbstractString}
     us = split(x, r",\s*")
     if length(us) > 1
@@ -85,6 +67,23 @@ macro symfuns(x...)
     push!(q.args, Expr(:tuple, map(esc,reverse(fs))...)) # return all of the symbols we created
     q
 end
+
+
+Base.:(==)(x::SymFunction, y::SymFunction) = x.__pyobject__ == y.__pyobject__ && x.n == y.n
+Base.hash(x::SymFunction) = hash((hash(x.__pyobject__),x.n))
+
+# these are from https://github.com/OptMist-Tokyo/DAEPreprocessor.jl/blob/sympy_warning/src/symbolic.jl
+derivative(x::SymFunction, d::Int = 1) = SymFunction(x.__pyobject__, x.n + d)
+
+Base.show(io::IO, u::SymFunction) = print(io, "$(string(Sym(u.__pyobject__)))" * repeat("'", u.n))
+Base.show(io::IO, ::MIME"text/plain", u::SymFunction) = print(io, "$(string(Sym(u.__pyobject__)))" * repeat("'", u.n))
+Base.show(io::IO, ::MIME"text/latex", x::SymFunction) = print(io, "\\begin{align*}" * latex(x) * "\\end{align*}")
+function Base.show(io::IO, ::MIME"text/latex", x::AbstractArray{SymFunction, 1})
+    print(io, "\\begin{align*}\\left[\\begin{array}{c}" * join(latex.(x), "\\\\") * "\\end{array}\\right]\\end{align*}")
+end
+
+latex(x::SymFunction) = latex(Sym(x.__pyobject__)) * repeat("'", x.n)
+
 
 
 

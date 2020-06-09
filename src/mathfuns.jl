@@ -84,15 +84,30 @@ end
 Use `solve` to solve algebraic equations. 
 
 Examples:
-```
-@vars x y a b c d
-solve(x^2 + 2x + 1, x) # [-1]
-solve(x^2 + 2a*x + a^2, x) # [-a]
-solve([a*x + b*y-3, c*x + b*y - 1], [x,y]) # Dict(y => (a - 3*c)/(b*(a - c)),x => 2/(a - c))
+
+```jldoctest solve
+julia> using SymPy
+
+julia> @vars x y a b c d
+(x, y, a, b, c, d)
+
+julia> solve(x^2 + 2x + 1, x) # [-1]
+1-element Array{Sym,1}:
+ -1
+
+julia> solve(x^2 + 2a*x + a^2, x) # [-a]
+1-element Array{Sym,1}:
+ -a
+
+julia> solve([a*x + b*y-3, c*x + b*y - 1], [x,y]) # Dict(y => (a - 3*c)/(b*(a - c)),x => 2/(a - c))
+Dict{Any,Any} with 2 entries:
+  x => 2/(a - c)
+  y => (a - 3*c)/(b*(a - c))
+
 ```
 
-!!! Note
-   A very nice example using `solve` is a [blog](https://newptcai.github.io/euclidean-plane-geometry-with-julia.html) entry on [Napolean's theorem](https://en.wikipedia.org/wiki/Napoleon%27s_theorem) by Xing Shi Cai.
+!!! note
+    A very nice example using `solve` is a [blog](https://newptcai.github.io/euclidean-plane-geometry-with-julia.html) entry on [Napolean's theorem](https://en.wikipedia.org/wiki/Napoleon%27s_theorem) by Xing Shi Cai.
 """
 solve() = ()
 solve(V::Vector{T}, args...; kwargs...) where {T <: SymbolicObject} =
@@ -126,11 +141,25 @@ Here `ics` allows the specification of a term like `f(x0) = y0` as a tuple `(f, 
 
 Example:
 
-```
-x = Sym("x")
-y = SymFunction("y")
-eqn = y''(x) - y(x) - exp(x)
-dsolve(eqn, y(x), ics=((y,0,1), (y, 1, 1//2)))
+```jldoctest dsolve
+julia> using SymPy
+
+julia> x = Sym("x")
+x
+
+julia> y = SymFunction("y")
+y
+
+julia> eqn = y'(x) - y(x);
+
+julia> dsolve(eqn, y(x), ics=(y,0,1)) |> string # technical to avoid  parsing issue with doctesting
+"Eq(y(x), exp(x))"
+
+julia> eqn = y''(x) - y(x) - exp(x); 
+
+julia> dsolve(eqn, y(x), ics=((y,0,1), (y, 1, 1//2))) |> string
+"Eq(y(x), (x/2 - (-1 + 2*exp(-1) + E)/(4*sinh(1)))*exp(x) - (1 - 3*E)*exp(-x)/(4*sinh(1)))"
+
 ```
 """
 function dsolve(eqn::Sym, args...; ics=nothing, kwargs...)

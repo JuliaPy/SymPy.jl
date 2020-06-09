@@ -196,7 +196,7 @@ x
 ----
 
 !!! note "Quick Tip"
-   SymPy expressions are immutable.  No function will change them in-place.
+    SymPy expressions are immutable.  No function will change them in-place.
 
 
 Here, we see that performing `expr.subs(x, 0)` leaves `expr` unchanged.

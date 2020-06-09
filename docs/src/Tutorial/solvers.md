@@ -728,9 +728,8 @@ f
 julia> x, a = symbols("x, a")
 (x, a)
 
-julia> dsolve(f'(x) - f(x), f(x), ics = (f, 0, a))
-          x
-x
+julia> dsolve(f'(x) - f(x), f(x), ics = (f, 0, a)) |>  string
+"Eq(f(x), a*exp(x))"
 
 ```
 

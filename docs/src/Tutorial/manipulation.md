@@ -15,9 +15,8 @@ manipulation of expressions.
 
 
 !!! note "Quick Tip"
-
-   To play with the `srepr` form of expressions in the SymPy Live shell,
-   change the output format to `Repr` in the settings.
+    To play with the `srepr` form of expressions in the SymPy Live shell,
+    change the output format to `Repr` in the settings.
 
 Before we can do this, we need to understand how expressions are represented
 in SymPy.  A mathematical expression is represented as a tree.  Let us take
@@ -352,9 +351,8 @@ shall see in the next section, the printing order and the order in which
 things are stored internally need not be the same either.
 
 !!! note "Quick Tip"
-
-   The way an expression is represented internally and the way it is printed
-   are often not the same.
+    The way an expression is represented internally and the way it is printed
+    are often not the same.
 
 In general, an important thing to keep in mind when working with SymPy expression
 trees is this:  the internal representation of an expression and the way it is
@@ -984,21 +982,6 @@ julia> sympy.latex(uexpr.doit())
 ----
 
 !!! note "Footnotes"
-
-* [#symbols-fn] We have been using `symbols` instead of `Symbol` because it
-  automatically splits apart strings into multiple `Symbol`\ s.
-  `symbols('x y z')` returns a tuple of three `Symbol`\ s.  `Symbol('x y
-  z')` returns a single `Symbol` called `x y z`.
-
-* [#sympify-fn] Technically, it is an internal function called `_sympify`,
-  which differs from `sympify` in that it does not convert strings.  `x +
-  '2'` is not allowed.
-
-* [#singleton-fn] Classes like `One` and `Zero` are singletonized, meaning
-  that only one object is ever created, no matter how many times the class is
-  called.  This is done for space efficiency, as these classes are very
-  common.  For example, `Zero` might occur very often in a sparse matrix
-  represented densely.  As we have seen, `NegativeOne` occurs any time we
-  have `-x` or `1/x`.  It is also done for speed efficiency because
-  singletonized objects can be compared by `is`.  The unique objects for
-  each singletonized class can be accessed from the `S` object.
+    * [#symbols-fn] We have been using `symbols` instead of `Symbol` because it automatically splits apart strings into multiple `Symbol`\ s.    `symbols('x y z')` returns a tuple of three `Symbol`\ s.  `Symbol('x y  z')` returns a single `Symbol` called `x y z`.
+    * [#sympify-fn] Technically, it is an internal function called `_sympify`, which differs from `sympify` in that it does not convert strings.  `x + '2'` is not allowed.
+    * [#singleton-fn] Classes like `One` and `Zero` are singletonized, meaning that only one object is ever created, no matter how many times the class is called.  This is done for space efficiency, as these classes are very  common.  For example, `Zero` might occur very often in a sparse matrix represented densely.  As we have seen, `NegativeOne` occurs any time we  have `-x` or `1/x`.  It is also done for speed efficiency because singletonized objects can be compared by `is`.  The unique objects for each singletonized class can be accessed from the `S` object.

@@ -335,7 +335,6 @@ julia> sympy.ImmutableMatrix([x 1;  1  x])
 ----
 
 !!! note "TODO"
-
     This is a mess. See issue 6992.
 
 To insert rows or columns, use `row_insert` or `col_insert`.  These
@@ -852,7 +851,6 @@ julia> M.rref()
 
 
 !!! note
-
     The first element of the tuple returned by `rref` is of type
     `Matrix`. The second is of type `tuple`.
 
@@ -1106,7 +1104,7 @@ true
 
 
 !!! note "Quick Tip"
-   `lambda` is a reserved keyword in Python, so to create a Symbol called $\lambda$, while using the same names for SymPy Symbols and Python variables, use `lamda` (without the `b`).  It will still pretty print as $\lambda$.
+   As  `lambda` is a reserved keyword in Python, so to create a Symbol called  λ, while using the same names for SymPy Symbols and Python variables, use `lamda` (without the `b`).  It will still pretty print as λ.
 
 Note that since `eigenvects` also includes the eigenvalues, you should use
 it instead of `eigenvals` if you also want the eigenvectors. However, as
@@ -1315,7 +1313,6 @@ so if you have encountered one, you can report the issue to
 SymPy issue tracker [#sympyissues-fn]_ to get detailed help from the community.
 
 !!! note "Footnotes"
-
     * [#zerotestexampleidea-fn] Inspired by https://gitter.im/sympy/sympy?at=5b7c3e8ee5b40332abdb206c
     * [#zerotestexamplediscovery-fn] Discovered from https://github.com/sympy/sympy/issues/15141
     * [#zerotestsimplifysolution-fn] Suggested from https://github.com/sympy/sympy/issues/10120

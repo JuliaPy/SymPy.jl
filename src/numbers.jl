@@ -73,50 +73,96 @@ function is_complex(x::Sym)
 end
 
 """
+    N(ex)
 
 Convert a `Sym` value to a numeric Julian value.
 
-The `N` function of SymPy is an alias for `evalf`. Within SymPy, either may be used to
-find numeric values from symbolic values.
+In SymPy, `N(ex, options...)` is identifcal to `ex.evalf(options...)`
+and is used to convert expressions into floating-point
+approximations. A positional precision argument indicates the number
+of digits, keyword arguments `chop` can be used to trim floating point
+roundoff errors and `subs` for free variable substitution prior to
+conversions.
 
 For example, symbolic roots can be computed numerically, even if not
 available symbolically, by calling `N` on the values.
 
 Using `SymPy` within `Julia` makes having two such functions useful:
 
-* one to do the equivalent of SymPy's `evalf` function
-* one to *also* convert these expressions back into `Julia` objects.
+* one to do the equivalent of SymPy's `evalf` call
+* one to convert these expressions back into `Julia` objects (like `convert(T,  ex)`)
 
 We use `N` to return a `Julia` object and `evalf` to return a symbolic
-object.
+object. The type of `Julia` object is heurisitically identified.
 
 Examples:
+
+```jldoctest
+julia> using SymPy
+
+julia> x = Sym("x")
+x
+
+julia> p = subs(x, x, pi)
+π
+
+julia> N(p)                            # float version of pi
+π = 3.1415926535897...
+
+julia> p.evalf(60)                     # 60 digits of pi, as a symbolic value
+3.14159265358979323846264338327950288419716939937510582097494
+
+julia> N(p, 60)                        # when a precision is given, "Big" values are returned
+3.141592653589793238462643383279502884197169399375105820974939
+
+julia> r = subs(x,x,1.2)
+1.20000000000000
+
+julia> N(r)                            # float
+1.2
+
+julia> q = subs(x, x, 1//2)
+1/2
+
+julia> N(q)                            # 1//2
+1//2
+
+julia> z = solve(x^2 + 1)[1]           # -ⅈ
+-ⅈ
+
+julia> N(z)                            # 0 - 1im
+0 - 1im
+
+julia> z.evalf()
+-1.0⋅ⅈ
+
+julia> rts = solve(x^5 - x + 1)
+5-element Array{Sym,1}:
+ CRootOf(x^5 - x + 1, 0)
+ CRootOf(x^5 - x + 1, 1)
+ CRootOf(x^5 - x + 1, 2)
+ CRootOf(x^5 - x + 1, 3)
+ CRootOf(x^5 - x + 1, 4)
+
+julia> [r.evalf() for r in rts]          # numeric solutions to quintic
+5-element Array{Sym,1}:
+                       -1.16730397826142
+ -0.181232444469875 - 1.08395410131771*I
+ -0.181232444469875 + 1.08395410131771*I
+ 0.764884433600585 - 0.352471546031726*I
+ 0.764884433600585 + 0.352471546031726*I
+
+julia> [N(r) for r in rts]             
+5-element Array{Number,1}:
+                     -1.167303978261418684256045899854842180720560371525489039140082449275651903429536
+ -0.18123244446987538 - 1.0839541013177107im
+ -0.18123244446987538 + 1.0839541013177107im
+   0.7648844336005847 - 0.35247154603172626im
+   0.7648844336005847 + 0.35247154603172626im
 ```
-x = Sym("x")
-p = subs(x, x, pi)
-N(p)                            # float version of pi
-evalf(p, 60)                    # 60 digits of pi, as a symbolic value
-N(p, 60)                        # when a precision is given, "Big" values are returned
-r = subs(x,x,1.2)
-N(r)                            # float
-q = subs(x, x, 1//2)
-N(q)                            # 1//2
-z = solve(x^2 + 1)[1]           # -ⅈ
-N(z)                            # 0 - 1im
-evalf(z)
-
-rts = solve(x^5 - x + 1)
-[N(r) for r in rts]             # numeric solutions to quintic
-```
 
 
-The `evalf` function is similar, though it leaves the expression as a symbolic object.
-This breaks the similarity of N and evalf for sympy users.
-
-Returns the value unchanged when it has free symbols.
-
-`N` is type unstable.
-
+`N` returns the value unchanged when it has free symbols.
 """
 function N(x::Sym)
 
@@ -184,6 +230,12 @@ function N(x::Sym)
         convert(Float64, x)
     elseif x.__class__.__name__ == "mpc"
         return complex(N(sympy.re(x)), N(sympy.im(x)))
+    elseif x.__class__.__name__ == "Infinity"
+        return Inf
+    elseif x.__class__.__name__ == "NegativeInfinity"
+        return -Inf
+    elseif x.__class__.__name__ == "ComplexInfinity"
+        return complex(Inf)
     elseif Eq(x,Sym(true)) == Sym(true)
         return true
     elseif Eq(x, Sym(false)) == Sym(true)
@@ -213,18 +265,18 @@ sympy_core_numbers = ((:Zero, 0),
 
 # fix me XXX
 """
-`N` can take a precision argument.
+    N(x::Sym, digits::Int)
 
-When given as an integer greater than 16, we try to match the digits of accuracy using `BigFloat` precision on conversions to floating point.
+`N` can take a precision argument, whichm when given as an integer greater than 16, we try to match the digits of accuracy using `BigFloat` precision on conversions to floating point.
 
 """
-function N(x::Sym, digits::Int)
+function N(x::Sym, digits::Int; kwargs...)
 
 
     ## check
     digits <= 16 && return(N(x))
     if is_integer(x) == nothing
-        out = x.evalf(digits)
+        out = x.evalf(digits; kwargs...)
         return( N(out, digits) )
     end
 
@@ -246,7 +298,8 @@ function N(x::Sym, digits::Int)
         return(Complex(u, v))
     end
 
-    throw(DomainError())
+    N(x.evalf(digits; kwargs...))
+    #throw(DomainError())
 end
 
 
