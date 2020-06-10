@@ -138,4 +138,9 @@ using LinearAlgebra
                                                   sin(ϕ)  ρ*cos(ϕ)]
     @test X.jacobian(Y) == view(X, :, :).jacobian(view(Y, :, :))
 
+    ## Issue   #359
+    @vars a
+    @test eltype([a 1; 1 a] + I) == Sym
+    @test eltype([a 1; 1 a] + 2I) == Sym
+    
 end
