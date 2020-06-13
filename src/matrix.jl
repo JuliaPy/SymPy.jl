@@ -102,6 +102,8 @@ function LinearAlgebra.:\(A::AbstractArray{T,2}, B::AbstractArray{S,2}) where {T
     hcat([A \ bⱼ for bⱼ in eachcol(B)]...)
 end
 
+## Issue #359 so that A  +  λI is of type Sym
+Base.:+(A::AbstractMatrix{T}, I::UniformScaling) where {T <: SymbolicObject} = (n=LinearAlgebra.checksquare(A); A .+ I.λ*I(n))
 
 ##################################################
 ##
