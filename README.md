@@ -1,7 +1,7 @@
 Linux: [![Build Status](https://travis-ci.org/JuliaPy/SymPy.jl.svg?branch=master)](https://travis-ci.org/JuliaPy/SymPy.jl)
 &nbsp;
 Windows: [![Build Status](https://ci.appveyor.com/api/projects/status/github/JuliaPy/SymPy.jl?branch=master&svg=true)](https://ci.appveyor.com/project/jverzani/sympy-jl)
-[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://juliapy.github.io/SymPy.jl/stable)
+[![](https://img.shields.io/badge/docs-stable-blue.svg)](https://juliahub.com/docs/SymPy)
 
 
 
