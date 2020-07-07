@@ -516,6 +516,7 @@ to extend it with your own custom functions.
 
 There are other symbolic packages for `Julia`:
 
+* [ModelingToolkit.jl](https://github.com/SciML/ModelingToolkit.jl)
 * [Reduce.jl](https://github.com/chakravala/Reduce.jl)
 * [Symata.jl](https://github.com/jlapeyre/Symata.jl)
 * [SymEngine.jl](https://github.com/symengine/SymEngine.jl)
