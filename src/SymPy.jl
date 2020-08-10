@@ -25,6 +25,9 @@ The package documentation provides many examples.
 """
 module SymPy
 
+if isdefined(Base, :Experimental) && isdefined(Base.Experimental, Symbol("@optlevel"))
+    @eval Base.Experimental.@optlevel 1
+end
 
 ## minimal version of conveniently using SymPy in Julia
 ## uses getfield overloading to access sympy methods of Sym object
