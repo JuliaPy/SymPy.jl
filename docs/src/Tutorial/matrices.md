@@ -111,7 +111,7 @@ a column vector.
 
 ##### In `Julia`:
 
-For ths use, `sympy.Matrix` does work, but again its usage is discouraged:
+For this use, `sympy.Matrix` does work, but again its usage is discouraged:
 
 ```jldoctest matrices
 julia> sympy.Matrix([1, 2, 3])
