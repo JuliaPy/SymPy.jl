@@ -146,8 +146,11 @@ simplify(x,args...;kwargs...) = x
 ##################################################
 # avoid type piracy. After we call `pytype` mappings, some
 # objects are automatically converted and no longer PyObjects
-pycall_hasproperty(x::PyCall.PyObject, k) = PyCall.hasproperty(x, k)
-pycall_hasproperty(x::SymbolicObject, k) = PyCall.hasproperty(PyCall.PyObject(x), k)
+function pycall_hasproperty(x::PyCall.PyObject, k) 
+    PyCall.hasproperty(x, k) && (getproperty(x,k) != nothing)
+end
+
+pycall_hasproperty(x::SymbolicObject, k) = pycall_hasproperty(PyCall.PyObject(x), k)
 pycall_hasproperty(x, k) = false
 
 # simple helper for boolean properties
