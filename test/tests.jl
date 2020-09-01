@@ -682,4 +682,6 @@ end
     @test Sym(1) / true == Sym(1) == true / Sym(1)
     @test true^Sym(1)   == Sym(1) == Sym(1)^true
 
+    ## issue with `pycall_hasproperty` and nothing values.
+    @test !SymPy.is_rational(Sym(2.5))
 end
