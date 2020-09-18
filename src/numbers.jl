@@ -272,7 +272,6 @@ sympy_core_numbers = ((:Zero, 0),
 """
 function N(x::Sym, digits::Int; kwargs...)
 
-
     ## check
     digits <= 16 && return(N(x))
     if is_integer(x) == nothing
@@ -284,9 +283,9 @@ function N(x::Sym, digits::Int; kwargs...)
     if is_integer(x)
         return(convert(BigInt, x))
     elseif is_rational(x)
-        return N(numer(x)) / N(denom(x))
+        return N(numer(x), digits;kwargs...) / N(denom(x), digits; kwargs...)
     elseif is_real(x) == true
-        p = round(Int,log2(10)*digits)
+        p = round(Int, log2(10)*digits)
 
         out = setprecision(p) do
             convert(BigFloat, ex)
