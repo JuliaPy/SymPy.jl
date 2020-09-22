@@ -283,10 +283,14 @@ function N(x::Sym, digits::Int; kwargs...)
     if is_integer(x)
         return(convert(BigInt, x))
     elseif is_rational(x)
-        return N(numer(x), digits;kwargs...) / N(denom(x), digits; kwargs...)
+        p = round(Int, log2(10)*digits)
+        ex =  x.evalf(1+digits)
+        out = setprecision(p) do
+            convert(BigFloat, ex)
+        end
+        return(out)
     elseif is_real(x) == true
         p = round(Int, log2(10)*digits)
-
         out = setprecision(p) do
             convert(BigFloat, ex)
         end
