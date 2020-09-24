@@ -273,7 +273,7 @@ function import_from(sm, meths=nothing;
 ##                 println("$M.$k(ex::$typ, args...; kwargs...)=getproperty($(sm.__name__), :$k)(ex, args...; kwargs...)")
                  @eval begin
                      ($M.$meth)(ex::($typ), args...; kwargs...) =
-                         getproperty($sm,$k)(ex, args...; kwargs...)
+                         getproperty($sm,$k)(ex, Sym.(args)...; kwargs...)
                  end
                  break
              end

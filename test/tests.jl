@@ -643,6 +643,9 @@ end
     @vars x
     @test abs2(x) == x*conj(x)
 
+    ## Issue 376 promote to Sym Before pycall
+    f(x) = x^2 + 1 +log(abs( 11*x-15 ))/99
+    @test limit(f, 15//11) == limit(f(x), x, 15//11) == limit(f(x), x=>15//11) == -oo
 end
 
 @testset "generic programming, issue 223" begin
