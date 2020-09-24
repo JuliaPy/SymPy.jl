@@ -10,8 +10,6 @@ os:
 arch:
   - x64
   - x86
-  - arm64
-
 env:
     global:
     - PYTHON=conda
