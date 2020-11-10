@@ -33,13 +33,14 @@ function _piecewise(args...)
 end
 
 ## Hack to avoid Expr(:call,  :*,2, x)  being  2x and  not  2*x
+## As of newer sympy versions, this is no longer needed.
 __prod__(args...) =  prod(args)
 export __prod__
 
 fn_map = Dict(
               "Add" => :+,
               "Sub" => :-,
-              "Mul" => :__prod__,
+              "Mul" => :__prod__, # :* can now be used
               "Div" => :/,
               "Pow" => :^,
               "re"  => :real,
@@ -106,17 +107,21 @@ function walk_expression(ex; values=Dict(), fns=Dict())
 end
 
 """
-     lambdify(ex, vars; typ, fns, values, use_julia_code=false, invoke_latest=true)
+    lambdify(ex, vars=free_symbols(); 
+             fns=Dict(), values=Dict, use_julia_code=false, 
+             invoke_latest=true)
 
-Take a symbolic expression and returns an anonymous `Julia` function.
+Take a symbolic expression and return a `Julia` function or expression to build a function.
 
-Converts from a SymPy object to a `Julia` expression by walking the SymPy expression tree and converting each step, (e.g. essentially calls `convert(Expr,  ex)`).
+* `ex::Sym` a symbolic expression with 0, 1, or more free symbols
 
-Then creates a function. The function arguments are based on `free_symbols` and its ordering, unless `vars` is specified directly.
+* `vars` a container of symbols to use for the function arguments. The default is `free_symbols` which has a specific ordering. Specifying `vars` allows this default ordering of arguments to be customized.
 
-* `use_julia_code=true` will use SymPy's conversion to an expression, the default is `false`
+* `fns::Dict`, `vals::Dict`: Dictionaries that allow customization of the function that walks the expression `ex` and creates the corresponding AST for a Julia expression. See `SymPy.fn_map` and `SymPy.val_map` for the default mappings of sympy functions and values into `Julia`'s AST.
 
-* `invoke_latest=true` calls `Base.invokelatest` to work around world age issues. This is the safe default, but setting to `false` will result in faster-executing functions.
+* `use_julia_code::Bool`: use SymPy's conversion to an expression, the default is `false`
+
+* `invoke_latest=true`: if `true` will call `eval` and `Base.invokelatest` to return a function that should not have any world age issue. If `false` will return a Julia expression that can be `eval`ed to produce a function.
 
 Example:
 
@@ -155,42 +160,82 @@ julia> fn(1,2,3)
 13
 ```
 
+!!! Note:
+
+The default produces slower functions due to the calls to `eval` and
+`Base.invokelatest`.  In the following `g2` (which, as seen, requires
+additional work to compute) is as fast as calling `f` (on non symbolic
+types), whereas `g1` is an order of magnitude slower in this example.
+
+```
+julia> @vars x
+(x,)
+
+julia> f(x) = exp(cot(x))
+f (generic function with 1 method)
+
+julia> g1 = lambdify(f(x))
+#88 (generic function with 1 method)
+
+julia> ex = lambdify(f(x), invoke_latest=false)
+:(function var"##271"(x)
+      exp(cot(x))
+  end)
+
+julia> @eval g2(x) = (\$ex)(x)
+g2 (generic function with 1 method)
+```
+
+An alternative, say, is to use `GeneralizedGenerated`'s `mk_function`, as follows:
+
+```
+julia> using GeneralizedGenerated
+
+julia> body = convert(Expr, f(x))
+:(exp(cot(x)))
+
+julia> g3 = mk_function((:x,), (), body)
+function = (x;) -> begin
+    (Main).exp((Main).cot(x))
+end
+```
+
+This function will be about 2-3 times slower than `f`.
 
 """
-function lambdify(ex::Sym, vars=free_symbols(ex);
-                  typ=Any, fns=Dict(), values=Dict(),
-                  use_julia_code=false,
-                  invoke_latest=true
-                  )
-    # if :julia_code printer is there, use it
+function  lambdify(ex::Sym, vars=free_symbols(ex);
+              fns=Dict(), values=Dict(),
+              use_julia_code=false,
+              invoke_latest=true)
+
+    body = convert_expr(ex, fns=fns, values=values, use_julia_code=use_julia_code)
+    ex = expr_to_function(body, vars)
+    if invoke_latest
+        fn = eval(ex)
+        return (args...) -> Base.invokelatest(fn, args...)
+    else
+        ex
+    end
+end
+
+# convert symbolic expression to julia AST
+# more flexibly than `convert(Exprt, ex)`
+function convert_expr(ex::Sym;
+                      fns=Dict(), values=Dict(),
+                      use_julia_code=false)
     if use_julia_code
         body = Meta.parse(sympy.julia_code(ex)) # issue here with 2.*...
     else
         body = walk_expression(ex, fns=fns, values=values)
     end
-
-    try
-        syms = typ == Any ? map(Symbol,vars) : map(s->Expr(:(::),s,typ), Symbol.(vars))
-        fn = eval(Expr(:function, Expr(:call, gensym(), syms...), body))
-        if invoke_latest
-            (args...) -> Base.invokelatest(fn, args...) # https://github.com/JuliaLang/julia/pull/19784
-        else
-            fn
-        end
-    catch err
-        throw(ArgumentError("Expression does not lambdify"))
-    end
+    body
 end
 
-
-function _lambdify(ex::Sym, vars=free_symbols(ex))
-    body = convert(Expr, ex)
+# take an expression and arguments and return an Expr of a generic function
+function  expr_to_function(body, vars)
     syms = Symbol.(vars)
-    fn = eval(Expr(:function, Expr(:call, gensym(), syms...), body))
-    fn
+    Expr(:function, Expr(:call, gensym(), syms...), body)
 end
-
-
 
 # from @mistguy cf. https://github.com/JuliaPy/SymPy.jl/issues/218
 # T a data type to convert to, when specified
@@ -203,6 +248,6 @@ function lambdify(exs::Array{S, N}, vars = union(free_symbols.(exs)...); T::Data
     end
 end
 
-export(lambdify)
-
 Base.convert(::Type{Function}, ex::Sym) = lambdify(ex)
+
+export lambdify
