@@ -1,6 +1,6 @@
 name = "SymPy"
 uuid = "24249f21-da20-56a4-8eb1-6a02cf4ae2e6"
-version = "1.0.32"
+version = "1.0.33"
 
 
 [deps]
@@ -11,7 +11,7 @@ SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
 [compat]
 PyCall = "1.91"
-RecipesBase = "0.7, 1.0"
+RecipesBase = "0.7, 0.8, 1.0, 1.1"
 SpecialFunctions = "0.8, 0.9, 0.10, 1.0"
 julia = "1.0"
 
