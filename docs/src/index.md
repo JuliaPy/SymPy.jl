@@ -86,3 +86,36 @@ julia> out.doit()
 x ⋅(log(x) + 1)
 ```
 
+## Using other features of SymPy
+
+By design, along with methods defined for generic functions in `Julia`, only a select number of core SymPy functions are exported; others need to be qualified. Many can be found, as above, from the syntax `sympy.XXX`, where the `XXX` method from the underlying `sympy` module is used. Many more must be imported before being available. 
+
+For example, the [Stats](https://docs.sympy.org/latest/modules/stats.html) module provides methods to support the concept of a random variable used in probability and statistics. The following shows how to import all the methods into a session:
+
+```jldoctest Stats
+julia> SymPy.PyCall.pyimport_conda("sympy.stats", "sympy")
+PyObject <module 'sympy.stats' from '/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/stats/__init__.py'>
+
+julia> SymPy.import_from(sympy.stats)
+
+julia> p = 1//2
+1//2
+
+julia> @vars x integer=true positive=true
+(x,)
+
+julia> pdf = p * (1-p)^(x-1);
+
+julia> D = DiscreteRV(x, pdf, set=sympy.S.Naturals)
+x
+
+julia> E(D)
+2
+
+julia> P(D ≫ 3)
+1/8
+```
+
+The `import_from` function imports all the functions it can, creating methods specialized on their first argument being symbolic. In this case, `E` and `P` are used above without qualification. `Naturals`, above, is in a different sympy module, and hasn't been imported, so it must be qualified above. The `pyimport_conda` call of `PyCall` will import the module into the specific name, and if necessary install the underlying package.
+
+The above works well for interactive usage, but would cause problems were it included in package code, as the assignment within `pyimport_conda` occurs at run time. There are necessary workarounds.
