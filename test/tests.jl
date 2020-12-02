@@ -206,7 +206,7 @@ import PyCall
     u =   free_symbols(out)[1]
     @test out ==  [1-u,u]
 
-    
+
     # Just a made-up example to test  if manageable
     @vars a1 a2
     n = 7
@@ -214,8 +214,8 @@ import PyCall
     b = Vector{Sym}(1:n)
     x = A \ b
     @test length(free_symbols(x)) ==  2
-    
-    
+
+
     ## limits
     @vars x
     @test limit(x -> sin(x)/x, 0) == 1
@@ -646,6 +646,16 @@ end
     ## Issue 376 promote to Sym Before pycall
     f(x) = x^2 + 1 +log(abs( 11*x-15 ))/99
     @test limit(f, 15//11) == limit(f(x), x, 15//11) == limit(f(x), x=>15//11) == -oo
+
+    ## Issue #390 on div (__div__ was depracated, use __truediv__)
+    @test Sym(2):-Sym(2):-Sym(2) |> collect == [2, 0, -2]
+
+    ## Lambda function to create a lambda
+    @vars x
+    ex = x^2 - 2
+    fn1 = Lambda(x, ex)
+    fn2 = lambdify(ex)
+    @test fn1(3) == fn2(3)
 end
 
 @testset "generic programming, issue 223" begin
@@ -679,7 +689,7 @@ end
 
 
     ## Issue 351 booleans  and arithmetic operations
-    @test Sym(1) + true == Sym(2) == true +  Sym(1) 
+    @test Sym(1) + true == Sym(2) == true +  Sym(1)
     @test Sym(1) - true == Sym(0) == true -  Sym(1)
     @test Sym(1) * true == Sym(1) == true * Sym(1)
     @test Sym(1) / true == Sym(1) == true / Sym(1)

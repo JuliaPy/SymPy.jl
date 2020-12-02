@@ -46,6 +46,14 @@ end
 export SymPermutationGroup
 Base.convert(::Type{SymPermutationGroup}, o::PyCall.PyObject) = SymPermutationGroup(o)
 
+# a Lambda function
+struct Lambda <: SymbolicObject
+    __pyobject__::PyCall.PyObject
+end
+Lambda(args, expression) = Lambda(sympy.Lambda(args, expression).__pyobject__)
+(λ::Lambda)(args...; kwargs...) = λ.__pyobject__(args...; kwargs...)
+export Lambda
+
 
 ##################################################
 
