@@ -785,6 +785,12 @@ flag `evaluate=True`:
 
 ```jldoctest calculus
 julia> sympy.differentiate_finite(f(x)*g(x), evaluate=true)
+/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/calculus/finite_diff.py:477: SymPyDeprecationWarning:
+
+``evaluate`` flag has been deprecated since SymPy 1.5. See
+https://github.com/sympy/sympy/issues/17881 for more info.
+
+  deprecated_since_version="1.5").warn()
 (-f(x - 1/2) + f(x + 1/2))⋅g(x) + (-g(x - 1/2) + g(x + 1/2))⋅f(x)
 
 ```

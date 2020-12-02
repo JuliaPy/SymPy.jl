@@ -583,7 +583,7 @@ julia> ex = x^2 - 2x + 2
 x  - 2⋅x + 2
 
 julia> fn = lambdify(ex)
-#87 (generic function with 1 method)
+#89 (generic function with 1 method)
 
 julia> fn(1) - ex(1)
 0
