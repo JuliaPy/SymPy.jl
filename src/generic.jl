@@ -77,6 +77,7 @@ Base.Float64(x::Sym) = _Float64(N(x))
 _Float64(x::Sym) = throw(ArgumentError("variable must have no free symbols"))
 _Float64(x) = Float64(x)
 
+Base.Integer(x::Sym) = is_integer(x) ? N(x) : throw(DomainError("x can not be converted to an integer"))
 
 Base.complex(::Type{Sym}) = Sym
 Base.complex(r::Sym) = real(r) + imag(r) * im

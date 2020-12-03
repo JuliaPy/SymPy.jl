@@ -148,7 +148,7 @@ julia> solveset(exp(x), x)     # No solution exists
 ∅
 
 julia> solveset(cos(x) - x, x)  # Not able to find solution
-{x | x ∊ ℂ ∧ -x + cos(x) = 0}
+{x | x ∊ ℂ ∧ (-x + cos(x) = 0)}
 ```
 
 ----
@@ -347,7 +347,7 @@ julia> nonlinsolve([x^2 + 1, y^2 + 1], (x, y))
 julia> system = [x^2-2*y^2-2, x*y-2]
 2-element Array{Sym,1}:
  x^2 - 2*y^2 - 2
-         x*y - 2
+         x⋅y - 2
 
 julia> vars = (x, y)
 (x, y)
@@ -377,7 +377,1148 @@ julia> real_soln = (log(sin(S(1)/3)), S(1)/3)
 (log(sin(1/3)), 1/3)
 
 julia> img_lamda = sympy.Lambda(n, 2*n*IM*PI + sympy.Mod(log(sin(S(1)/3)), 2*IM*PI))
-n ↦ 2⋅n⋅ⅈ⋅π + (log(sin(1/3)) mod 2⋅ⅈ⋅π)
+ERROR: PyError ($(Expr(:escape, :(ccall(#= /Users/verzani/.julia/packages/PyCall/BcTLp/src/pyfncall.jl:43 =# @pysym(:PyObject_Call), PyPtr, (PyPtr, PyPtr, PyPtr), o, pyargsptr, kw))))) <class 'RecursionError'>
+RecursionError('maximum recursion depth exceeded while calling a Python object')
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 218, in eval
+    return G*cls(p, q, evaluate=(p, q) != (pwas, qwas))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 473, in __new__
+    result = super().__new__(cls, *args, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/cache.py", line 72, in wrapper
+    retval = cfunc(*args, **kwargs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/function.py", line 285, in __new__
+    evaluated = cls.eval(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 101, in eval
+    rv = doit(p, q)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mod.py", line 73, in doit
+    d = int(r)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/expr.py", line 320, in __int__
+    r = self.round(2)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/expr.py", line 3758, in round
+    return r.round(n) + S.ImaginaryUnit*i.round(n)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/expr.py", line 3831, in round
+    sign = 1 if x > 0 else -1
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/decorators.py", line 267, in _func
+    return func(self, other)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/expr.py", line 370, in __gt__
+    return StrictGreaterThan(self, other)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/relational.py", line 711, in __new__
+    return cls._eval_relation(lhs, rhs, **options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/relational.py", line 718, in _eval_relation
+    val = cls._eval_fuzzy_relation(lhs, rhs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/relational.py", line 1020, in _eval_fuzzy_relation
+    return is_gt(lhs, rhs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/relational.py", line 1118, in is_gt
+    return fuzzy_not(is_le(lhs, rhs))
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/relational.py", line 1126, in is_le
+    return is_ge(rhs, lhs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/relational.py", line 1222, in is_ge
+    n2 = _n2(lhs, rhs)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/relational.py", line 1066, in _n2
+    if a.is_comparable and b.is_comparable:
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/basic.py", line 670, in is_comparable
+    for p in self.as_real_imag()]
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/basic.py", line 670, in <listcomp>
+    for p in self.as_real_imag()]
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/evalf.py", line 1473, in evalf
+    result = evalf(self, prec + 4, options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/evalf.py", line 1325, in evalf
+    r = rf(x, prec, options)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/evalf.py", line 562, in evalf_mul
+    res = pure_complex(v)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/evalf.py", line 146, in pure_complex
+    c, i = t.as_coeff_Mul()
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/mul.py", line 786, in as_coeff_Mul
+    return coeff, self._new_rawargs(*args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/operations.py", line 158, in _new_rawargs
+    return self._from_args(args, is_commutative)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/operations.py", line 105, in _from_args
+    obj = super().__new__(cls, *args)
+  File "/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/core/basic.py", line 110, in __new__
+    obj = object.__new__(cls)
+
+Stacktrace:
+ [1] pyerr_check at /Users/verzani/.julia/packages/PyCall/BcTLp/src/exception.jl:62 [inlined]
+ [2] pyerr_check at /Users/verzani/.julia/packages/PyCall/BcTLp/src/exception.jl:66 [inlined]
+ [3] _handle_error(::String) at /Users/verzani/.julia/packages/PyCall/BcTLp/src/exception.jl:83
+ [4] macro expansion at /Users/verzani/.julia/packages/PyCall/BcTLp/src/exception.jl:97 [inlined]
+ [5] #110 at /Users/verzani/.julia/packages/PyCall/BcTLp/src/pyfncall.jl:43 [inlined]
+ [6] disable_sigint at ./c.jl:446 [inlined]
+ [7] __pycall! at /Users/verzani/.julia/packages/PyCall/BcTLp/src/pyfncall.jl:42 [inlined]
+ [8] _pycall!(::PyCall.PyObject, ::PyCall.PyObject, ::Tuple{Sym,Sym}, ::Int64, ::Ptr{Nothing}) at /Users/verzani/.julia/packages/PyCall/BcTLp/src/pyfncall.jl:29
+ [9] _pycall!(::PyCall.PyObject, ::PyCall.PyObject, ::Tuple{Sym,Sym}, ::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}) at /Users/verzani/.julia/packages/PyCall/BcTLp/src/pyfncall.jl:11
+ [10] (::PyCall.PyObject)(::Sym, ::Vararg{Sym,N} where N; kwargs::Base.Iterators.Pairs{Union{},Union{},Tuple{},NamedTuple{(),Tuple{}}}) at /Users/verzani/.julia/packages/PyCall/BcTLp/src/pyfncall.jl:86
+ [11] (::PyCall.PyObject)(::Sym, ::Vararg{Sym,N} where N) at /Users/verzani/.julia/packages/PyCall/BcTLp/src/pyfncall.jl:86
+ [12] top-level scope at none:1
 
 julia> complex_soln = (sympy.ImageSet(img_lamda, S.Integers), S(1)/3)
 (ImageSet(Lambda(_n, 2*_n*I*pi + Mod(log(sin(1/3)), 2*I*pi)), Integers), 1/3)
