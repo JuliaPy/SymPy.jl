@@ -1614,14 +1614,14 @@ it from the expression, and take the reciprocal to get the `f` part.
 
 ```jldoctest simplification
 julia> l = Sym[]
-0-element Array{Sym,1}
+Sym[]
 
 julia> frac = apart(frac, a0); string(frac)
 "a0 + (a2*a3*a4 + a2 + a4)/(a1*a2*a3*a4 + a1*a2 + a1*a4 + a3*a4 + 1)"
 
 julia> push!(l,  a0)
 1-element Array{Sym,1}:
- a0
+ a₀
 
 julia> frac = 1/(frac - a0); string(frac)
 "(a1*a2*a3*a4 + a1*a2 + a1*a4 + a3*a4 + 1)/(a2*a3*a4 + a2 + a4)"

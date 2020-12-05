@@ -771,29 +771,6 @@ julia> sympy.differentiate_finite(f(x)*g(x))
 
 (The functions `f` and `g` can also be created with the command `@symfuns f g`, using the `@symfuns` macro.)
 
-----
-
-If we want to expand the intermediate derivative we may pass the
-flag `evaluate=True`:
-
-```python
-    >>> differentiate_finite(f(x)*g(x), evaluate=True)
-    (-f(x - 1/2) + f(x + 1/2))⋅g(x) + (-g(x - 1/2) + g(x + 1/2))⋅f(x)
-```
-
-##### In `Julia`:
-
-```jldoctest calculus
-julia> sympy.differentiate_finite(f(x)*g(x), evaluate=true)
-/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/calculus/finite_diff.py:477: SymPyDeprecationWarning:
-
-``evaluate`` flag has been deprecated since SymPy 1.5. See
-https://github.com/sympy/sympy/issues/17881 for more info.
-
-  deprecated_since_version="1.5").warn()
-(-f(x - 1/2) + f(x + 1/2))⋅g(x) + (-g(x - 1/2) + g(x + 1/2))⋅f(x)
-
-```
 
 ----
 
