@@ -8,11 +8,12 @@ symbols(xs::T...; kwargs...) where {T <: SymbolicObject} = xs
 """
     @vars x y z
 
-Define symbolic values, possibly with assumptions
+Define symbolic values, possibly with names and assumptions
 
 Examples:
 ```
 @vars x y
+@vars a1=>"α₁"
 @vars a b real=true
 ```
 
@@ -26,15 +27,15 @@ macro vars(x...)
             if s.head == :(=)
                 s.head = :kw
                 push!(as, s)
-            elseif s.head == :(=>)
-                push!(ss, s.args[1])
-                push!(q.args, Expr(:(=), esc(s.args[1]), Expr(:call, :symbols, s.args[2], map(esc,as)...)))
+            elseif s.head == :call && s.args[1] == :(=>)
+                push!(ss, s.args[2])
+                push!(q.args, Expr(:(=), esc(s.args[2]), Expr(:call, :symbols, s.args[3], map(esc,as)...)))
             end
         elseif isa(s, Symbol)   # raw symbol to be created
             push!(ss, s)
             push!(q.args, Expr(:(=), esc(s), Expr(:call, :symbols, Expr(:quote, s), map(esc,as)...)))
         else
-            throw(AssertionError("@syms expected a list of symbols and assumptions"))
+            throw(AssertionError("@vars expected a list of symbols and assumptions"))
         end
     end
     push!(q.args, Expr(:tuple, map(esc,reverse(ss))...)) # return all of the symbols we created

@@ -1,4 +1,4 @@
-![Build status](https://github.com/JuliaPy/SymPy.jl/workflows/CI/badge.svg)](https://github.com/JuliaPy/SymPy.jl/actions)
+[![Build status](https://github.com/JuliaPy/SymPy.jl/workflows/CI/badge.svg)](https://github.com/JuliaPy/SymPy.jl/actions)
 &nbsp;
 [![](https://img.shields.io/badge/docs-stable-blue.svg)](https://juliahub.com/docs/SymPy)
 

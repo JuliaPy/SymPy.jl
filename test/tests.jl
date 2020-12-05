@@ -24,6 +24,9 @@ import PyCall
     @test_throws UndefVarError isdefined(w)
     @vars a b c
 
+    # Renaming with @vars
+    @vars a=>"α₁"
+    @test a.name == "α₁"
 
     ## extract symbols
     @vars z
