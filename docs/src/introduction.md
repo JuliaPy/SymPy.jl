@@ -107,6 +107,14 @@ julia> solve(u1 + u2)  # empty, though solving u1 - u2 is not.
 
 ```
 
+Additionally you can rename arguments using pair notation:
+```
+julia> @vars a1=>"α₁" a2=>"α₂"
+(α₁, α₂)
+```
+
+In this example, the Julia variables `a1` and `a2` are defined to store SymPy
+symbols with the "pretty" names `α₁` and `α₂` respectively.
 
 As can be seen, there are several ways to create symbolic values. One
 caveat is that one can't use `Sym` to create a variable from a
