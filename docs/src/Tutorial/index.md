@@ -9,7 +9,7 @@ The `SymPy` package for `Julia` allows `Julia` users to interact with  python's 
 ----
 
 ```@contents
-Pages  = ["intro.md", "gotchas.md", "basic_operations.md", "simplification.md",  "calculus.md",
-"solvers.md", "matrices.md", "manipulation.md"]
+Pages  = ["intro.md","gotchas.md", "basic_operations.md", "simplification.md",  "calculus.md", "solvers.md",
+"matrices.md", "manipulation.md"]
 ```	
 

@@ -86,13 +86,13 @@ We jump ahead for a second to illustrate, but here we see that `solve` will resp
 
 ```jldoctest introduction
 julia> solve(x^2 + 1)   # ±i are not real
-0-element Array{Any,1}
+Any[]
 
 ```
 
 ```jldoctest introduction
 julia> solve(y1 + 1)    # -1 is not positive
-0-element Array{Any,1}
+Any[]
 
 ```
 
@@ -103,7 +103,7 @@ julia> @vars u1 u2 positive=true
 (u1, u2)
 
 julia> solve(u1 + u2)  # empty, though solving u1 - u2 is not.
-0-element Array{Any,1}
+Any[]
 
 ```
 
@@ -206,7 +206,7 @@ A straight call is also possble, where the order of the variables is determined 
 
 ```jldoctest introduction
 julia> ex(1, pi)
-x + 1 + π
+z + 1 + π
 
 ```
 
@@ -635,8 +635,8 @@ roots, when available, are returned by `real_roots`. For example,
 ```jldoctest introduction
 julia> real_roots(x^2 - 2)
 2-element Array{Sym,1}:
- -sqrt(2)
-  sqrt(2)
+ -√2
+  √2
 
 ```
 
@@ -697,11 +697,11 @@ The output of calling `roots` will be a dictionary whose keys are the roots and 
 julia> roots(p)
 Dict{Any,Any} with 7 entries:
   1                  => 1
-  -1/2 + sqrt(3)*I/2 => 1
-  3                  => 2
   -1/2 - sqrt(3)*I/2 => 1
-  0                  => 1
+  3                  => 2
+  -1/2 + sqrt(3)*I/2 => 1
   -1                 => 1
+  0                  => 1
   2                  => 1
 
 ```
@@ -714,7 +714,7 @@ julia> p = x^5 - x + 1
 x  - x + 1
 
 julia> roots(p)
-Dict{Any,Any} with 0 entries
+Dict{Any,Any}()
 
 ```
 
@@ -752,10 +752,10 @@ provided. The answers are still symbolic:
 julia> nroots(p)
 5-element Array{Sym,1}:
                        -1.16730397826142
- -0.181232444469875 - 1.08395410131771*I
- -0.181232444469875 + 1.08395410131771*I
- 0.764884433600585 - 0.352471546031726*I
- 0.764884433600585 + 0.352471546031726*I
+ -0.181232444469875 - 1.08395410131771⋅ⅈ
+ -0.181232444469875 + 1.08395410131771⋅ⅈ
+ 0.764884433600585 - 0.352471546031726⋅ⅈ
+ 0.764884433600585 + 0.352471546031726⋅ⅈ
 
 ```
 
@@ -767,9 +767,8 @@ For example, it can be used to solve when $\cos(x) = \sin(x)$:
 
 ```jldoctest introduction
 julia> solve(cos(x) - sin(x))
-2-element Array{Sym,1}:
- -3*pi/4
-    pi/4
+1-element Array{Sym,1}:
+ pi/4
 
 ```
 
@@ -889,13 +888,13 @@ julia> x, y = symbols("x,y", real=true)
 
 julia> exs = [2x+3y-6, 3x-4y-12]
 2-element Array{Sym,1}:
-  2*x + 3*y - 6
- 3*x - 4*y - 12
+  2⋅x + 3⋅y - 6
+ 3⋅x - 4⋅y - 12
 
 julia> d = solve(exs)
 Dict{Any,Any} with 2 entries:
-  y => -6/17
   x => 60/17
+  y => -6/17
 
 ```
 
@@ -943,7 +942,7 @@ julia> p = a*x^2 + b*x + c
 a⋅x  + b⋅x + c
 
 julia> fn = cos
-cos (generic function with 13 methods)
+cos (generic function with 14 methods)
 
 julia> exs = [fn(0*h)-p(x=>0), fn(h)-p(x => h), fn(2h)-p(x => 2h)]
 3-element Array{Sym,1}:
@@ -953,8 +952,8 @@ julia> exs = [fn(0*h)-p(x=>0), fn(h)-p(x => h), fn(2h)-p(x => 2h)]
 
 julia> d = solve(exs, [a,b,c])
 Dict{Any,Any} with 3 entries:
-  a => (-2*cos(h) + cos(2*h) + 1)/(2*h^2)
-  b => (4*cos(h) - cos(2*h) - 3)/(2*h)
+  b => 2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)
+  a => -cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)
   c => 1
 
 ```
@@ -964,7 +963,7 @@ substituting back in for `a`, `b`, and `c`:
 
 ```jldoctest introduction
 julia> quad_approx = p.subs(d); string(quad_approx)
-"1 + x*(4*cos(h) - cos(2*h) - 3)/(2*h) + x^2*(-2*cos(h) + cos(2*h) + 1)/(2*h^2)"
+"x^2*(-cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)) + x*(2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)) + 1"
 
 ```
 
@@ -983,15 +982,15 @@ julia> x, c = symbols("x,c")
 
 julia> as = Sym["a$i" for i in 0:(n-1)]
 3-element Array{Sym,1}:
- a0
- a1
- a2
+ a₀
+ a₁
+ a₂
 
 julia> bs = Sym["b$i" for i in 0:(n-1)]
 3-element Array{Sym,1}:
- b0
- b1
- b2
+ b₀
+ b₁
+ b₂
 
 julia> p = sum([as[i+1]*x^i for i in 0:(n-1)])
                 2
@@ -1004,8 +1003,8 @@ julia> q = sum([bs[i+1]*(x-c)^i for i in 0:(n-1)])
 julia> solve(p-q, bs)
 Dict{Any,Any} with 3 entries:
   b0 => a0 + a1*c + a2*c^2
-  b2 => a2
   b1 => a1 + 2*a2*c
+  b2 => a2
 
 ```
 
@@ -1045,13 +1044,13 @@ julia> x, y = symbols("x,y", real=true)
 
 julia> exs = [2x+3y ⩵ 6, 3x-4y ⩵ 12]    ## Using \Equal[tab]
 2-element Array{Sym,1}:
-  Eq(2*x + 3*y, 6)
- Eq(3*x - 4*y, 12)
+  2⋅x + 3⋅y = 6
+ 3⋅x - 4⋅y = 12
 
 julia> d = solve(exs)
 Dict{Any,Any} with 2 entries:
-  y => -6/17
   x => 60/17
+  y => -6/17
 
 ```
 
@@ -1211,7 +1210,7 @@ In a previous example, we defined `quad_approx`:
 
 ```jldoctest introduction
 julia> quad_approx  |>  string
-"1 + x*(4*cos(h) - cos(2*h) - 3)/(2*h) + x^2*(-2*cos(h) + cos(2*h) + 1)/(2*h^2)"
+"x^2*(-cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)) + x*(2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)) + 1"
 
 ```
 
@@ -1405,8 +1404,8 @@ x ⋅cos(y)
 
 julia> [diff(ex,v1, v2) for v1 in [x,y], v2 in [x,y]]  # also hessian(ex, (x,y))
 2×2 Array{Sym,2}:
-    2*cos(y)  -2*x*sin(y)
- -2*x*sin(y)  -x^2*cos(y)
+    2⋅cos(y)  -2⋅x⋅sin(y)
+ -2⋅x⋅sin(y)  -x^2*cos(y)
 
 ```
 
@@ -1906,7 +1905,7 @@ Or
 ```jldoctest introduction
 julia> cross(v,w)
 3-element Array{Sym,1}:
- -x*y + 6
+ -x⋅y + 6
     x - 3
     y - 2
 
@@ -1939,8 +1938,8 @@ The mixed partials is similarly done by passing two variables to differentiate i
 ```jldoctest introduction
 julia> Sym[diff(ex, v1, v2) for v1 in (x,y), v2 in (x,y)]
 2×2 Array{Sym,2}:
-       2*y  2*(x - y)
- 2*(x - y)       -2*x
+       2⋅y  2⋅(x - y)
+ 2⋅(x - y)       -2⋅x
 
 ```
 
@@ -1949,8 +1948,8 @@ For this task, SymPy provides the `hessian` method:
 ```jldoctest introduction
 julia> hessian(ex, (x,y))
 2×2 Array{Sym,2}:
-       2*y  2*x - 2*y
- 2*x - 2*y       -2*x
+       2⋅y  2⋅x - 2⋅y
+ 2⋅x - 2⋅y       -2⋅x
 
 ```
 
@@ -2013,8 +2012,8 @@ julia> diagm(0=>ones(Sym, 5))
 
 julia> M^2
 2×2 Array{Sym,2}:
- x^2 + 1      2*x
-     2*x  x^2 + 1
+ x^2 + 1      2⋅x
+     2⋅x  x^2 + 1
 
 julia> det(M)
      2
@@ -2026,8 +2025,8 @@ Similarly,
 ```jldoctest introduction
 julia> A^2
 2×2 Array{Sym,2}:
- x*y + 1      3*x
-     3*y  x*y + 4
+ x⋅y + 1      3⋅x
+     3⋅y  x⋅y + 4
 
 ```
 
@@ -2066,8 +2065,8 @@ As compared to SymPy's `eigenvects` which yields:
 ```jldoctest introduction
 julia> A.eigenvects()
 2-element Array{Tuple{Sym,Int64,Array{Array{Sym,2},1}},1}:
- (3/2 - sqrt(4*x*y + 1)/2, 1, [[-x/(sqrt(4*x*y + 1)/2 - 1/2); 1]])
- (sqrt(4*x*y + 1)/2 + 3/2, 1, [[-x/(-sqrt(4*x*y + 1)/2 - 1/2); 1]])
+ (3/2 - sqrt(4*x*y + 1)/2, 1, [[-2*x/(sqrt(4*x*y + 1) - 1); 1]])
+ (sqrt(4*x*y + 1)/2 + 3/2, 1, [[2*x/(sqrt(4*x*y + 1) + 1); 1]])
 
 ```
 
@@ -2208,6 +2207,7 @@ We know that $F'(0)=1$ now, so we solve for `C2` through
 
 ```jldoctest introduction
 julia> C2 = free_symbols(ex1)[2]
+C₂
 
 julia> solve( diff(ex2, x)(x => 0) - 1, C2 )
 1-element Array{Sym,1}:

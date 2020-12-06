@@ -347,8 +347,8 @@ Solve $x^2 - 2 = 0$.
 ```jldoctest intro
 julia> solve(x^2 - 2, x)
 2-element Array{Sym,1}:
- -sqrt(2)
-  sqrt(2)
+ -√2
+  √2
 ```
 
 ----

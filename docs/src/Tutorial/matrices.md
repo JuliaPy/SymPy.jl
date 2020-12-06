@@ -1135,7 +1135,7 @@ julia> p = M.charpoly(lambda)
 PurePoly(lambda**4 - 11*lambda**3 + 29*lambda**2 + 35*lambda - 150, lambda, domain='ZZ')
 
 julia> factor(p) |>  string
-"(lambda - 5)^2*(lambda - 3)*(lambda + 2)"
+"PurePoly(lambda^4 - 11*lambda^3 + 29*lambda^2 + 35*lambda - 150, lambda, domain='ZZ')"
 
 ```
 
@@ -1200,7 +1200,8 @@ julia> m = Sym[-2*cosh(q/3) exp(-q) 1; exp(q) -2*cosh(q/3) 1; 1 1 -2*cosh(q/3)]
             1             1  -2*cosh(q/3) 
 
 julia> m.nullspace()
-0-element Array{Any,1}
+1-element Array{Array{Sym,2},1}:
+ [-(-2*exp(q)*cosh(q/3) - 4*cosh(q/3)^2 - 1 - 2*exp(-q)*cosh(q/3))/(4*exp(q)*cosh(q/3)^2 + 4*cosh(q/3) + exp(-q)); -(1 - 4*cosh(q/3)^2)/(2*cosh(q/3) + exp(-q)); 1]
 
 ```
 
