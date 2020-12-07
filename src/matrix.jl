@@ -105,6 +105,9 @@ end
 ## Issue #359 so that A  +  λI is of type Sym
 Base.:+(A::AbstractMatrix{T}, I::UniformScaling) where {T <: SymbolicObject} = (n=LinearAlgebra.checksquare(A); A .+ I.λ*I(n))
 
+# Issue 397 so that A' infers correctly
+Base.adjoint(x::Sym)::Sym = x.adjoint()
+
 ##################################################
 ##
 ## Support for ImmutableMatrix via SymMatrix
