@@ -144,5 +144,9 @@ using LinearAlgebra
         @test eltype([a 1; 1 a] + I) == Sym
         @test eltype([a 1; 1 a] + 2I) == Sym
     end
+
+    ## Issue #397 adjoint losing type
+    A = ones(Sym, 1, 1)
+    @test eltype(A * A') == Sym
     
 end
