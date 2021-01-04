@@ -36,7 +36,7 @@ using PyCall
 
 using SpecialFunctions
 using LinearAlgebra
-
+using Markdown
 
 import Base: show
 import Base: convert, promote_rule
