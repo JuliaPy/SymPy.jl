@@ -81,21 +81,26 @@ Base.show(io::IO, s::Sym) = print(io, jprint(s))
 Base.show(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy.pretty(s))
 
 ## latex enhancements: Sym, array, Dict
-Base.show(io::IO, ::MIME"text/latex", x::SymbolicObject) = print(io, sympy.latex(x, mode="equation*"))
+#Base.show(io::IO, ::MIME"text/latex", x::SymbolicObject) = print(io, sympy.latex(x, mode="equation*"))
+
+as_markdown(x) = Markdown.parse("``$x``")
+function Base.show(io::IO, ::MIME"text/latex", x::SymbolicObject) 
+    print(io, as_markdown(sympy.latex(x, mode="equation*")))
+end
 
 function  show(io::IO, ::MIME"text/latex", x::AbstractArray{Sym})
     function toeqnarray(x::Vector{Sym})
         a = join([sympy.latex(x[i]) for i in 1:length(x)], "\\\\")
-        """\\[ \\left[ \\begin{array}{r}$a\\end{array} \\right] \\]"""
+        """\\left[ \\begin{array}{r}$a\\end{array} \\right]"""
 #        "\\begin{bmatrix}$a\\end{bmatrix}"
     end
     function toeqnarray(x::AbstractArray{Sym,2})
         sz = size(x)
         a = join([join(map(sympy.latex, x[i,:]), "&") for i in 1:sz[1]], "\\\\")
-        "\\[\\left[ \\begin{array}{" * repeat("r",sz[2]) * "}" * a * "\\end{array}\\right]\\]"
+        "\\left[ \\begin{array}{" * repeat("r",sz[2]) * "}" * a * "\\end{array}\\right]"
 #        "\\begin{bmatrix}$a\\end{bmatrix}"
     end
-    print(io, toeqnarray(x))
+    print(io, as_markdown(toeqnarray(x)))
 end
 function show(io::IO, ::MIME"text/latex", d::Dict{T,S}) where {T<:SymbolicObject, S<:Any}
     Latex(x::Sym) = sympy.latex(x)
@@ -106,7 +111,7 @@ function show(io::IO, ::MIME"text/latex", d::Dict{T,S}) where {T<:SymbolicObject
         out = out * Latex(k) * " & \\text{=>} &" * Latex(v) * "\\\\"
     end
     out = out * "\\end{cases}\\end{equation*}"
-    print(io, out)
+    print(io, as_markdown(out))
 end
 
 latex(x::Sym) = sympy.latex(x)
