@@ -40,7 +40,7 @@ export __prod__
 fn_map = Dict(
               "Add" => :+,
               "Sub" => :-,
-              "Mul" => :__prod__, # :* can now be used
+              "Mul" => :((as...)->prod(as)), #:__prod__, # :* can now be used
               "Div" => :/,
               "Pow" => :^,
               "re"  => :real,
@@ -49,8 +49,8 @@ fn_map = Dict(
               "Min" => :min,
               "Max" => :max,
               "Poly" => :identity,
-              "Heaviside" => :(_heaviside),
               "Piecewise" => :(_piecewise),
+              "Order" => :((xs...)->0), 
               "And" => :(&),
               "Or" => :(|),
               "Less" => :(<),
@@ -61,8 +61,8 @@ fn_map = Dict(
               "Unequality" => :(!==),
               "StrictGreaterThan" => :(>),
               "GreaterThan" => :(>=),
-"Greater" => :(>),
-"conjugate" => :conj
+              "Greater" => :(>),
+              "conjugate" => :conj
               )
 
 map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : Symbol(key)
@@ -102,7 +102,6 @@ function walk_expression(ex; values=Dict(), fns=Dict())
     end
 
     as = Introspection.args(ex)
-
     Expr(:call, map_fn(fn, fns_map), [walk_expression(a, values=values, fns=fns) for a in as]...)
 end
 
