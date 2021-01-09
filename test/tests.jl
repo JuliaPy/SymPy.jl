@@ -659,6 +659,11 @@ end
     fn1 = Lambda(x, ex)
     fn2 = lambdify(ex)
     @test fn1(3) == fn2(3)
+
+    ## issue 402 with lamdify and Order
+    @vars x
+    t = series(exp(x), x, 0, 2)
+    @test lambdify(t)(1/2) == 1 + 1/2
 end
 
 @testset "generic programming, issue 223" begin
