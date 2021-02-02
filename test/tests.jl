@@ -705,4 +705,12 @@ end
 
     ## issue with `pycall_hasproperty` and nothing values.
     @test !SymPy.is_rational(Sym(2.5))
+
+    ## Issue #405 with ambigous methods
+    @vars α
+    M = SymMatrix([1 2; 3 4])
+    @test α * M == M * α
+    @test 2 * M == M * 2
+    @test isa(M/α, SymMatrix)
+    @test isa(α * inv(M), SymMatrix)
 end
