@@ -713,4 +713,9 @@ end
     @test 2 * M == M * 2
     @test isa(M/α, SymMatrix)
     @test isa(α * inv(M), SymMatrix)
+
+    ## issue #408 with inv
+    @vars n integer=true positive=true
+    A = sympy.MatrixSymbol("A", n, n)
+    @test inv(A) == A.I
 end
