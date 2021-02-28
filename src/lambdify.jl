@@ -62,7 +62,9 @@ fn_map = Dict(
               "StrictGreaterThan" => :(>),
               "GreaterThan" => :(>=),
               "Greater" => :(>),
-              "conjugate" => :conj
+    "conjugate" => :conj,
+    # not quite a match; NaN not θ(0) when evaluated at 0 w/o second argument
+    "Heaviside" => :((a...)  -> (a[1] < 0 ? 0.0 : (a[1] > 0 ? 1.0 : (length(a) > 1 ? a[2] : NaN))))
               )
 
 map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : Symbol(key)

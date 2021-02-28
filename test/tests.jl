@@ -718,4 +718,14 @@ end
     @vars n integer=true positive=true
     A = sympy.MatrixSymbol("A", n, n)
     @test inv(A) == A.I
+
+    ## issue #411 with Heaviside
+    @vars t
+    u = Heaviside(t)
+    λ = lambdify(u)
+    @test all((iszero(λ(-1)), isnan(λ(0)), isone(λ(1))))
+    u = Heaviside(t, 1)
+    λ = lambdify(u)
+    @test all((iszero(λ(-1)), isone(λ(0)), isone(λ(1))))
+   
 end
