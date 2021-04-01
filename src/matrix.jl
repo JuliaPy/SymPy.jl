@@ -64,6 +64,10 @@ function Base.inv(A::Matrix{T}) where {T <: SymbolicObject}
     A.inv()
 end
 
+function Base.exp(A::Matrix{T}) where {T <: Sym}
+    A.exp()
+end
+
 function LinearAlgebra.det(A::Matrix{T}) where {T <: Sym}
     A.det()
 end
@@ -120,6 +124,7 @@ Base.inv(x::SymMatrix) = x.inv()
 *(x::SymbolicObject, y::SymMatrix) = y.multiply(x)
 *(x::SymMatrix, y::Number) = x.multiply(y)
 *(x::Number, y::SymMatrix) = y.multiply(x)
+*(x::SymMatrix, y::SymMatrix) = x.multiply(y)
 /(x::SymMatrix, y::Number) = x.multiply(1/Sym(y))
 /(x::SymMatrix, y::SymbolicObject) = x.multiply(1/y)
 +(x::SymMatrix, y::SymMatrix) = x.add(y)

@@ -148,5 +148,11 @@ using LinearAlgebra
     ## Issue #397 adjoint losing type
     A = ones(Sym, 1, 1)
     @test eltype(A * A') == Sym
-    
+
+    ## Issue 413 wth matrix exponential; SymMatrix multiplication
+    @vars a
+    A,A1 = [1 0; 0 a], [1 1; a 2]
+    @test exp(A) == [exp(Sym(1)) 0; 0 exp(a)]
+    B,B1 = convert(SymMatrix,A), convert(SymMatrix,A1)
+    @test B*B1 == convert(SymMatrix, A*A1)
 end

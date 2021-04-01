@@ -35,6 +35,9 @@ end
 Base.rad2deg(x::Sym) = (x * 180) / PI
 Base.deg2rad(x::Sym) = (x * PI) / 180
 
+Base.hypot(x::Sym, y::Number) = hypot(promote(x,y)...)
+Base.hypot(xs::Sym...) = sqrt(sum(abs(xᵢ)^2 for xᵢ ∈ xs))
+
 ## exponential
 Base.log1p(x::Sym) = sympy.log(1 + x)
 Base.log(x::Sym) = sympy.log(x)
