@@ -13,6 +13,8 @@ using SpecialFunctions
     @test atan(Sym(1), 1) == PI/4
     @test atan(Sym(1), -1) == 3PI/4
 
+    @test N(angle(Sym(1) + Sym(2)*IM)) ≈ atan(2,1)
+
     @test factorial(Sym(0)) == 1
     @test factorial(Sym(7)) == 5040
 

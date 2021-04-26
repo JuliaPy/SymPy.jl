@@ -63,6 +63,7 @@ fn_map = Dict(
               "GreaterThan" => :(>=),
               "Greater" => :(>),
     "conjugate" => :conj,
+    "atan2" => :atan,
     # not quite a match; NaN not θ(0) when evaluated at 0 w/o second argument
     "Heaviside" => :((a...)  -> (a[1] < 0 ? 0.0 : (a[1] > 0 ? 1.0 : (length(a) > 1 ? a[2] : NaN))))
               )
