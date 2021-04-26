@@ -69,7 +69,7 @@ Base.one(::Type{Sym}) = Sym(1)
 
 
 
-## float, complex, real, image,
+## float, complex, real, imag, angle
 Base.float(x::Sym) = _float(N(x))
 _float(x::Sym) = throw(ArgumentError("variable must have no free symbols"))
 _float(x) = float(x)
@@ -108,7 +108,7 @@ Base.imag(x::Sym) = _imag(N(x))
 _imag(x::Sym) = sympy.im(x)
 _imag(x) = imag(x)
 
-
+Base.angle(z::SymPy.SymbolicObject) = atan(sympy.im(z), sympy.re(z))
 
 
 # sympy.div for poly division
