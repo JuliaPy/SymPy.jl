@@ -42,29 +42,44 @@ macro vars(x...)
     q
 end
 
-# old alias for @vars; should deprecate...
-macro syms(x...)
-    q = Expr(:block)
-    as = []    # running list of assumptions to be applied
-    ss = []    # running list of symbols created
-    for s in reverse(x)
-        if isa(s, Expr)    # either an assumption or a named variable
-            if s.head == :(=)
-                s.head = :kw
-                push!(as, s)
-            elseif s.head == :(=>)
-                push!(ss, s.args[1])
-                push!(q.args, Expr(:(=), esc(s.args[1]), Expr(:call, :symbols, s.args[2], map(esc,as)...)))
-            end
-        elseif isa(s, Symbol)   # raw symbol to be created
-            push!(ss, s)
-            push!(q.args, Expr(:(=), esc(s), Expr(:call, :symbols, Expr(:quote, s), map(esc,as)...)))
-        else
-            throw(AssertionError("@syms expected a list of symbols and assumptions"))
-        end
+macro syms(xs...)
+    # If the user separates declaration with commas, the top-level expression is a tuple
+    if length(xs) == 1 && xs[1].head == :tuple
+        return :(@syms($(xs[1].args...)))
+    elseif length(xs) == 0
+        return nothing
     end
-    push!(q.args, Expr(:tuple, map(esc,reverse(ss))...)) # return all of the symbols we created
-    q
+
+    asstokw(a) = Expr(:kw, esc(a), true)
+    
+    # Each declaration is parsed and generates a declaration using `symbols`
+    symdefs = map(xs) do expr
+        varname, sym, assumptions = parsedecl(expr)
+        sym, :($(esc(sym)) = $(esc(symbols))($(varname), $(map(asstokw, assumptions)...)))
+    end
+    syms, defs = collect(zip(symdefs...))
+
+    # The macro returns a tuple of Symbols that were declared
+    Expr(:block, defs..., :(tuple($(map(esc,syms)...))))
+end
+
+function parsedecl(expr)
+    # @vars x
+    if isa(expr, Symbol)
+        return String(expr), expr, []
+    # @vars x::assumptions, where assumption = assumptionkw | (assumptionkw...)
+    elseif isa(expr, Expr) && expr.head == :(::)
+        sym, assumptions = expr.args
+        assumptions = isa(assumptions, Symbol) ? (assumptions,) : assumptions.args
+        return String(sym), sym, assumptions
+    # @vars x=>"name" 
+    elseif isa(expr, Expr) && expr.head == :call && expr.args[1] == :(=>)
+        expr, strname = expr.args[2:end]
+        _, sym, assumptions = parsedecl(expr)
+        return strname, sym, assumptions
+    else
+        error("Incorrect @syms syntax. Try `@syms x::(real,positive)=>\"x₀\" y z::complex n::integer` for instance.")
+    end
 end
 
 ## avoid PyObject conversion as possible
