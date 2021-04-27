@@ -487,8 +487,33 @@ import PyCall
     #@test sympy"sin"(1) == sin(Sym(1))
 end
 
+@testset "Syms macro" begin
+    x, y, z, n = @syms x::(real,positive)=>"x₀", y, z::complex, n::integer
+    @test isa(x, Sym)
+    @test ask(And(𝑄.real(x), 𝑄.positive(x)))
+    @test string(x) == "x₀"
+    
+    @test isa(y, Sym)
+
+    @test isa(z, Sym)
+    @test ask(𝑄.complex(z))
+    
+    @test isa(n, Sym)
+    @test ask(𝑄.integer(n))
+
+    f, g, h = @syms f()::(real, positive), g(), h()::complex=>"h̄"
+    @test isa(f, SymFunction)
+    @test ask(And(𝑄.real(f(x)), 𝑄.positive(f(x))))
+
+    @test isa(g, SymFunction)
+
+    @test isa(h, SymFunction)
+    @test ask(𝑄.complex(h(x)))
+    @test string(h) == "h̄"
+end
+
 @testset "SymFunctions" begin
-    @syms x y real=true
+    @syms x::real y::real
     @symfuns f g real=true
 
     @test isreal(f(x))
