@@ -45,19 +45,21 @@ end
 
 macro syms(xs...)
     # If the user separates declaration with commas, the top-level expression is a tuple
-    if length(xs) == 1 && xs[1].head == :tuple
-        return :(@syms($(xs[1].args...)))
-    elseif length(xs) == 0
-        return nothing
+    if length(xs) == 1 && isa(xs[1], Expr) && xs[1].head == :tuple
+        _gensyms(xs[1].args...)
+    elseif length(xs) > 0
+        _gensyms(xs...)
     end
+end
 
+function _gensyms(xs...)
     asstokw(a) = Expr(:kw, esc(a), true)
     
     # Each declaration is parsed and generates a declaration using `symbols`
     symdefs = map(xs) do expr
         varname, sym, assumptions, isfun = parsedecl(expr)
         ctor = isfun ? :SymFunction : :symbols
-        sym, :($(esc(sym)) = $(esc(ctor))($(varname), $(map(asstokw, assumptions)...)))
+        sym, :($(esc(sym)) = $(ctor)($(varname), $(map(asstokw, assumptions)...)))
     end
     syms, defs = collect(zip(symdefs...))
 
