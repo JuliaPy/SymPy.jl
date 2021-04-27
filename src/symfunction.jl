@@ -22,7 +22,11 @@ F,G,H = SymFunction("F, G, H")
 
 This is just a thin wrapper around `sympy.Functioni` for symbolic functions that allows prime notation in place of using `diff`.
 
-The macro `@symfuns` is also available for constructing symbolic functions.
+The macro [`@syms`](@ref) is also available for constructing symbolic functions.
+
+```
+@syms u(t), v(t)::real
+```
 """
 mutable struct SymFunction <: SymbolicObject
     __pyobject__::PyCall.PyObject
@@ -40,8 +44,13 @@ function SymFunction(x::T; kwargs...) where {T<:AbstractString}
 end
 
 """
-    symfuns...
+    @symfuns
+
 Thanks to `@alhirzel` for the contribution.
+
+!!! Note:
+    The `@symfuns` will be deprecated. The more general [`@syms`](@ref) macro should be used for constructing symbolic functions.
+
 """
 macro symfuns(x...)
     q = Expr(:block)

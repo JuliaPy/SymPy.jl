@@ -306,7 +306,7 @@ Example:
 ```jldoctest
 julia> using SymPy
 
-julia> @vars x y z a
+julia> @syms x y z a
 (x, y, z, a)
 
 julia> free_symbols(2*x + a*y) # [a, x, y]
