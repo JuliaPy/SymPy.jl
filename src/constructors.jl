@@ -42,6 +42,7 @@ macro vars(x...)
     q
 end
 
+
 macro syms(xs...)
     # If the user separates declaration with commas, the top-level expression is a tuple
     if length(xs) == 1 && xs[1].head == :tuple
@@ -54,8 +55,9 @@ macro syms(xs...)
     
     # Each declaration is parsed and generates a declaration using `symbols`
     symdefs = map(xs) do expr
-        varname, sym, assumptions = parsedecl(expr)
-        sym, :($(esc(sym)) = $(esc(symbols))($(varname), $(map(asstokw, assumptions)...)))
+        varname, sym, assumptions, isfun = parsedecl(expr)
+        ctor = isfun ? :SymFunction : :symbols
+        sym, :($(esc(sym)) = $(esc(ctor))($(varname), $(map(asstokw, assumptions)...)))
     end
     syms, defs = collect(zip(symdefs...))
 
@@ -66,20 +68,35 @@ end
 function parsedecl(expr)
     # @vars x
     if isa(expr, Symbol)
-        return String(expr), expr, []
+        return String(expr), expr, [], false
     # @vars x::assumptions, where assumption = assumptionkw | (assumptionkw...)
     elseif isa(expr, Expr) && expr.head == :(::)
-        sym, assumptions = expr.args
+        symexpr, assumptions = expr.args
+        _, sym, _, isfun = parsedecl(symexpr)
         assumptions = isa(assumptions, Symbol) ? (assumptions,) : assumptions.args
-        return String(sym), sym, assumptions
+        return String(sym), sym, assumptions, isfun
     # @vars x=>"name" 
     elseif isa(expr, Expr) && expr.head == :call && expr.args[1] == :(=>)
+        length(expr.args) == 3 || parseerror()
+        isa(expr.args[3], String) || parseerror()
+
         expr, strname = expr.args[2:end]
-        _, sym, assumptions = parsedecl(expr)
-        return strname, sym, assumptions
+        _, sym, assumptions, isfun = parsedecl(expr)
+        return strname, sym, assumptions, isfun
+    # @vars x()
+    elseif isa(expr, Expr) && expr.head == :call && expr.args[1] != :(=>)
+        length(expr.args) == 1 || parseerror()
+        isa(expr.args[1], Symbol) || parseerror()
+
+        sym = expr.args[1]
+        return String(sym), sym, [], true
     else
-        error("Incorrect @syms syntax. Try `@syms x::(real,positive)=>\"x₀\" y z::complex n::integer` for instance.")
+        parseerror()
     end
+end
+
+function parseerror()
+    error("Incorrect @syms syntax. Try `@syms x::(real,positive)=>\"x₀\" y() z::complex n::integer` for instance.")
 end
 
 ## avoid PyObject conversion as possible
