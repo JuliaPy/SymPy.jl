@@ -8,8 +8,13 @@ For these objects we can specify derivatives with the transpose
 operator (e.g., `u''`) as opposed to, say `diff(u(x), x, 2)`.
 
 Example:
-```
-u = SymFunction("u")
+
+```jldoctest symfunction
+julia> using SymPy
+
+julia> u = SymFunction("u");
+
+julia> u'
 u'
 ```
 
@@ -20,12 +25,12 @@ more than one at a time. (The `cls=symfunction` is no longer supported):
 F,G,H = SymFunction("F, G, H")
 ```
 
-This is just a thin wrapper around `sympy.Functioni` for symbolic functions that allows prime notation in place of using `diff`.
+This is just a thin wrapper around `sympy.Function` for symbolic functions that allows prime notation in place of using `diff`.
 
 The macro [`@syms`](@ref) is also available for constructing symbolic functions.
 
-```
-@syms u(t), v(t)::real
+```jldoctest symfunction
+@syms u(), v()::real
 ```
 """
 mutable struct SymFunction <: SymbolicObject
