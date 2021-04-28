@@ -34,10 +34,10 @@ julia> x, y, z = symbols("x y z")
 (x, y, z)
 ```
 
-We can also use the convenient `@vars` macro, as with
+We can also use the convenient `@syms` macro, as with
 
 ```jldoctest calculus
-julia> @vars x y z
+julia> @syms x y z
 (x, y, z)
 ```
 
@@ -223,7 +223,7 @@ Derivatives of unspecified order can be created using tuple `(x, n)` where
 ##### In `Julia`:
 
 ```jldoctest calculus
-julia> @vars m n a b
+julia> @syms m n a b
 (m, n, a, b)
 
 julia> expr = (a*x + b)^m;  string(expr)

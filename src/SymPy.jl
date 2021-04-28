@@ -56,6 +56,7 @@ export free_symbols
 
 
 include("types.jl")
+include("decl.jl")
 include("constructors.jl")
 include("utils.jl")
 include("numbers.jl")

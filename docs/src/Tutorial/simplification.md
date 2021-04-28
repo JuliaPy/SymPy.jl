@@ -670,6 +670,8 @@ but for now, all we need to know are the following.
 
 ##### In `Julia`:
 
+The same notation can be used:
+
 ```jldoctest simplification
 julia> x, y = symbols("x y", positive=true)
 (x, y)
@@ -680,6 +682,20 @@ julia> a, b = symbols("a b", real=true)
 julia> z, t, c = symbols("z t c")
 (z, t, c)
 ```
+
+However, the recommended way is to use `@syms` for symbol construction with assumptions:
+
+```
+julia> @syms x::positive, y::positive
+(x, y)
+
+julia> @syms a::real, b::real
+(a, b)
+
+julia> @syms z, t, c
+(z, t, c)
+
+
 
 ----
 
@@ -1016,10 +1032,10 @@ is real.
 ##### In `Julia`:
 
 ```jldoctest simplification
-julia> x, y = symbols("x y", positive=true)
+julia> @syms x::positive, y::positive
 (x, y)
 
-julia> n = symbols("n", real=true)
+julia> @syms n::real
 n
 ```
 
@@ -1180,10 +1196,10 @@ assumptions we put on them in the previous section.  We will also define `k`,
 ##### In `Julia`:
 
 ```jldoctest simplification
-julia> x, y, z = symbols("x y z")
+julia> @syms x, y, z
 (x, y, z)
 
-julia> k, m, n = symbols("k m n")
+julia> @syms k, m, n
 (k, m, n)
 ```
 
@@ -1411,7 +1427,7 @@ To simplify combinatorial expressions, use `combsimp()`.
 ##### In `Julia`:
 
 ```jldoctest simplification
-julia> n, k = symbols("n k", integer = true)
+julia> @syms n::integer, k::integer
 (n, k)
 
 julia> combsimp(factorial(n)/factorial(n - 3))
@@ -1549,7 +1565,7 @@ numbered symbols.  `symbols('a0:5')` will create the symbols `a0`, `a1`,
 ##### In `Julia`:
 
 ```jldoctest simplification
-julia> a0,a1,a2,a3,a4 =  syms = symbols("a0:5")
+julia> a0,a1,a2,a3,a4 = syms = symbols("a0:5")
 (a0, a1, a2, a3, a4)
 
 julia> frac = list_to_frac(syms); string(frac)

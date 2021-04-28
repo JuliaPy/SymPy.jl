@@ -205,7 +205,7 @@ you're wrong.  Let's see what really happens
 
 ##### In `Julia`:
 
-* we must change to double quotes (or use `@vars x`, say)
+* we must change to double quotes (or use `@syms x`, say)
 
 ```jldoctest gotchas
 julia> x = symbols("x")
@@ -439,7 +439,7 @@ general---but for most common expressions, it works quite well.
 
 
 ```jldoctest gotchas
-julia> @vars x
+julia> @syms x
 (x,)
 
 julia> a = (x + 1)^2; string(a)

@@ -87,7 +87,7 @@ we could have also done
 
 ##### In `Julia`:
 
-* this can be done, but `@vars` would be suggested:
+* this can be done, but `@syms` would be suggested:
 
 ```jldoctest manipulation
 julia> x = sympy.Symbol("x")
@@ -96,7 +96,7 @@ x
 ```
 
 ```jldoctest manipulation
-julia> @vars x
+julia> @syms x
 (x,)
 
 ```
@@ -753,7 +753,7 @@ For example:
 ##### In `Julia`:
 
 ```jldoctest manipulation
-julia> @vars x y z
+julia> @syms x y z
 (x, y, z)
 
 julia> x + x
@@ -875,7 +875,7 @@ Other examples:
 ##### In `Julia`:
 
 ```jldoctest manipulation
-julia> @vars x y z
+julia> @syms x y z
 (x, y, z)
 
 julia> const S = sympy.S

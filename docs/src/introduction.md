@@ -41,21 +41,24 @@ x
 This creates a symbolic object `x`, which can be manipulated through further function calls.
 
 
-There is the `@vars` macro that makes creating multiple variables a
+There are the `@syms` and `@vars` macros that makes creating multiple variables a
 bit less typing, as it creates variables in the local scope -- no
 assignment is necessary. Compare these similar ways to create symbolic
 variables:
 
 ```jldoctest introduction
-julia> @vars a b c
+julia> @syms a b c
 (a, b, c)
+
+julia> @vars u v w
+(u, v, w)
 
 julia> a,b,c = Sym("a,b,c")
 (a, b, c)
 
 ```
 
-(There is the identical `@syms` for MATLAB users.)
+The `@syms` macro is recommended, and will be modeled in the following, as it makes the specification of assumptions and symbolic functions more natural.
 
 ### Assumptions
 
@@ -96,7 +99,17 @@ Any[]
 
 ```
 
-The `@vars` macro can also have assumptions passed in as follows:
+The `@syms` macro allows annotations, akin to type annotations, to specify assumptions on new variables:
+
+```jldoctest introduction
+julia> @syms u1::positive u2::positive
+(u1, u2)
+
+julia> solve(u1 + u2)  # empty, though solving u1 - u2 is not.
+Any[]
+```
+
+The `@vars` macro can also have assumptions passed in as follows; the assumptions apply to each variable.
 
 ```jldoctest introduction
 julia> @vars u1 u2 positive=true
@@ -109,7 +122,7 @@ Any[]
 
 Additionally you can rename arguments using pair notation:
 ```
-julia> @vars a1=>"α₁" a2=>"α₂"
+julia> @syms a1=>"α₁" a2=>"α₂"
 (α₁, α₂)
 ```
 
@@ -149,7 +162,7 @@ julia> [asin(1), asin(Sym(1))]
 SymPy provides a means to substitute values in for the symbolic expressions. The specification requires an expression, a variable in the expression to substitute in for, and a new value. For example, this is one way to make a polynomial in a new variable:
 
 ```jldoctest introduction
-julia> @vars x y
+julia> @syms x y
 (x, y)
 
 julia> ex = x^2 + 2x + 1
@@ -280,7 +293,7 @@ but the latter two expressions do not.
 `SymPy` makes it very easy to work with polynomial and rational expressions. First we create some variables:
 
 ```jldoctest introduction
-julia> @vars x y z
+julia> @syms x y z
 (x, y, z)
 
 ```
@@ -475,7 +488,7 @@ The SymPy [tutorial](http://docs.sympy.org/dev/tutorial/simplification.html#powe
 We see that with assumptions, the following expression does simplify to $0$:
 
 ```jldoctest introduction
-julia> @vars x y nonnegative=true a real=true
+julia> @syms x::nonnegatve y::nonnegative  a::real
 (x, y, a)
 
 julia> simplify(x^a * y^a - (x*y)^a)
@@ -1084,7 +1097,7 @@ For example:
 
 ```@example plots
 using SymPy, Plots
-@vars x
+@syms x
 plot(x^2 - 2, -2,2)
 savefig("plot-1.svg"); nothing  # hide
 ```
@@ -1172,7 +1185,7 @@ julia> limit((1+1/x)^x, x => oo)
 This example computes what L'Hopital reportedly paid a Bernoulli for
 
 ```jldoctest introduction
-julia> a = symbols("a", positive=true)
+julia> @syms a::positive
 a
 
 julia> ex = (sqrt(2a^3*x-x^4) - a*(a^2*x)^(1//3)) / (a - (a*x^3)^(1//4));  string(ex)
@@ -1323,7 +1336,7 @@ julia> limit(f(x), x, 0, dir="+")
 One *could* use limits to implement the definition of a derivative:
 
 ```jldoctest introduction
-julia> x, h = symbols("x,h")
+julia> @syms x, h
 (x, h)
 
 julia> f(x) = exp(x)*sin(x)
@@ -1395,7 +1408,7 @@ julia> diff(f(x), x) |> solve
 The `diff` function makes finding partial derivatives as easy as specifying the variable to differentiate in. This  example computes the mixed partials of an expression in `x` and `y`:
 
 ```jldoctest introduction
-julia> x,y = symbols("x,y")
+julia> @syms x,y
 (x, y)
 
 julia> ex = x^2*cos(y)
@@ -1452,6 +1465,15 @@ julia> F, G = SymFunction("F"), SymFunction("G")
 
 ```
 
+The `@syms` macro can also more naturally be used, in place of `SymFunction`:
+
+```jldoctest introduction
+julia> @syms F(), G()
+(F, G)
+
+```
+
+
 We can call these functions, but we get a function expression:
 
 ```jldoctest introduction
@@ -1473,7 +1495,7 @@ dx
 To get back to our problem, we have our expression:
 
 ```jldoctest introduction
-julia> x,y = symbols("x, y")
+julia> @syms x, y
 (x, y)
 
 julia> ex = y^4 - x^4 - y^2 + 2x^2
@@ -1538,7 +1560,7 @@ half circle has radius $r=w/2$. With this, we can see that the area is
 $wh+(1/2)\pi r^2$ and the perimeter is $w + 2h + \pi r$. This gives:
 
 ```jldoctest introduction
-julia> w, h, P = symbols("w, h, P", nonnegative=true)
+julia> @syms w::nonnegative, h::nonnegative, P::nonnegative
 (w, h, P)
 
 julia> r = w/2
@@ -1680,7 +1702,7 @@ x
 Or in more generality:
 
 ```jldoctest introduction
-julia> n = symbols("n", real=true)
+julia> @syms n::real
 n
 
 julia> ex = integrate(x^n, x)
@@ -1754,7 +1776,7 @@ The `integrate` function uses a tuple, `(var, a, b)`, to specify the limits of a
 For example, the following computes the integral of $xy$ over the unit square:
 
 ```jldoctest introduction
-julia> x, y = symbols("x,y")
+julia> @syms x, y
 (x, y)
 
 julia> integrate(x*y, (y, 0, 1), (x, 0, 1))
@@ -1836,7 +1858,7 @@ julia> s1.removeO() |> string
 `SymPy` can do sums, including some infinite ones. The `summation` function performs this task. For example, we have
 
 ```jldoctest introduction
-julia> i, n = symbols("i, n")
+julia> @syms i, n
 (i, n)
 
 julia> summation(i^2, (i, 1, n)) |> string
@@ -1873,7 +1895,7 @@ This would have also been possible through `summation(1/i^2, (i, 1, oo))`.
 Julia makes constructing a vector of symbolic objects easy:
 
 ```jldoctest introduction
-julia> x,y = symbols("x,y")
+julia> @syms x,y
 (x, y)
 
 julia> v = [1,2,x]
@@ -1964,7 +1986,7 @@ well, SymPy has a class for matrices. `SymPy`, through `PyCall`, automatically m
 Constructing matrices with symbolic entries follows `Julia`'s conventions:
 	
 ```jldoctest introduction
-julia> x,y = symbols("x,y")
+julia> @syms x,y
 (x, y)
 
 julia> M = [1 x; x 1]
@@ -2126,7 +2148,7 @@ key is to create a symbolic function expression using
 `SymFunction`. Again, this may be done through:
 
 ```jldoctest introduction
-julia> F = SymFunction("F")
+julia> @syms F()
 F
 
 ```
@@ -2239,11 +2261,8 @@ $$~
 We proceed through:
 
 ```jldoctest introduction
-julia> t, m, k, alpha = symbols("t,m,k,alpha")
-(t, m, k, alpha)
-
-julia> v = SymFunction("v")
-v
+julia> @syms t, m, k, alpha=>"α", v()
+(t, m, k, α, v)
 
 julia> ex = Eq( (m/k)*v'(t), alpha^2 - v(t)^2 )
   d
@@ -2285,11 +2304,8 @@ To illustrate, we follow an example from
 [Wolfram](https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html).
 
 ```jldoctest introduction
-julia> y = SymFunction("y")
-y
-
-julia> a, x = symbols("a,x")
-(a, x)
+julia> @syms y(), a, x
+(y, a, x)
 
 julia> eqn = y'(x) - 3*x*y(x) - 1; string(eqn)
 "-3*x*y(x) + Derivative(y(x), x) - 1"
@@ -2365,10 +2381,7 @@ of solving $y'' + 5y' + 6y=0$ with values prescribed for both $y$ and
 $y'$ at $x_0=0$.
 
 ```jldoctest introduction
-julia> y = SymFunction("y")
-y
-
-julia> x = symbols("x")
+julia> @syms y(), x
 x
 
 julia> eqn = y''(x) + 5y'(x) + 6y(x);  string(eqn)

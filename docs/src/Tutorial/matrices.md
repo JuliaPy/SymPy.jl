@@ -322,7 +322,7 @@ julia> M.row_del(1)
 
 
 ```jldoctest matrices
-julia> @vars x
+julia> @syms x
 (x,)
 
 julia> sympy.ImmutableMatrix([x 1;  1  x])
@@ -774,7 +774,7 @@ julia> M.det()
 Let
 
 ```jldoctest matrices
-julia> @vars x
+julia> @syms x
 (x,)
 
 julia> A = Sym[x 1; 1 x]

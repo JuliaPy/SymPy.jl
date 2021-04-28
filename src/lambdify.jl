@@ -130,7 +130,7 @@ Example:
 ```jldoctest
 julia> using SymPy
 
-julia> @vars x y z
+julia> @syms x y z
 (x, y, z)
 
 julia> ex = x^2 * sin(x)
