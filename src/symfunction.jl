@@ -21,8 +21,12 @@ u'
 Alternatively, we can pass a comma separated string of variable names to create
 more than one at a time. (The `cls=symfunction` is no longer supported):
 
-```
-F,G,H = SymFunction("F, G, H")
+```jldoctest symfunction
+julia> F,G,H = SymFunction("F, G, H")
+3-element Vector{SymFunction}:
+ F
+ G
+ H
 ```
 
 This is just a thin wrapper around `sympy.Function` for symbolic functions that allows prime notation in place of using `diff`.
@@ -30,7 +34,12 @@ This is just a thin wrapper around `sympy.Function` for symbolic functions that 
 The macro [`@syms`](@ref) is also available for constructing symbolic functions.
 
 ```jldoctest symfunction
-@syms u(), v()::real
+julia> @syms u(), v()::real, t
+(u, v, t)
+
+julia> sqrt(u(t)^2), sqrt(v(t)^2) # real values have different simplification rules
+(sqrt(u(t)^2), Abs(v(t)))
+
 ```
 """
 mutable struct SymFunction <: SymbolicObject
