@@ -491,6 +491,9 @@ end
     @syms u
     @test isa(u, Sym)
     
+    ret = @syms a, b, c
+    @test isa(ret, Tuple{Sym, Sym, Sym})
+
     @syms x::(real,positive)=>"x₀", y, z::complex, n::integer
     @test isa(x, Sym)
     @test ask(And(𝑄.real(x), 𝑄.positive(x)))

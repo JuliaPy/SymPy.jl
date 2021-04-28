@@ -59,7 +59,7 @@ function _gensyms(xs...)
     symdefs = map(xs) do expr
         decl = parsedecl(expr)
         symname = sym(decl)
-        sym, gendecl(decl)
+        symname, gendecl(decl)
     end
     syms, defs = collect(zip(symdefs...))
 
