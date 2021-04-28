@@ -56,6 +56,7 @@ export free_symbols
 
 
 include("types.jl")
+include("decl.jl")
 include("constructors.jl")
 include("utils.jl")
 include("numbers.jl")
@@ -67,7 +68,6 @@ include("sets.jl")
 include("symfunction.jl")
 include("assumptions.jl")
 include("lambdify.jl")
-include("decl.jl")
 include("patternmatch.jl")
 include("permutations.jl")
 include("plot_recipes.jl")
