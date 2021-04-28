@@ -1,5 +1,6 @@
 # The map_subscripts function is stolen from Symbolics.jl
 const IndexMap = Dict{Char,Char}(
+    '-' => '₋',
     '0' => '₀',
     '1' => '₁',
     '2' => '₂',

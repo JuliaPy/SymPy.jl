@@ -8,21 +8,39 @@ For these objects we can specify derivatives with the transpose
 operator (e.g., `u''`) as opposed to, say `diff(u(x), x, 2)`.
 
 Example:
-```
-u = SymFunction("u")
+
+```jldoctest symfunction
+julia> using SymPy
+
+julia> u = SymFunction("u");
+
+julia> u'
 u'
 ```
 
 Alternatively, we can pass a comma separated string of variable names to create
 more than one at a time. (The `cls=symfunction` is no longer supported):
 
-```
-F,G,H = SymFunction("F, G, H")
+```jldoctest symfunction
+julia> F,G,H = SymFunction("F, G, H")
+3-element Vector{SymFunction}:
+ F
+ G
+ H
 ```
 
-This is just a thin wrapper around `sympy.Functioni` for symbolic functions that allows prime notation in place of using `diff`.
+This is just a thin wrapper around `sympy.Function` for symbolic functions that allows prime notation in place of using `diff`.
 
-The macro `@symfuns` is also available for constructing symbolic functions.
+The macro [`@syms`](@ref) is also available for constructing symbolic functions.
+
+```jldoctest symfunction
+julia> @syms u(), v()::real, t
+(u, v, t)
+
+julia> sqrt(u(t)^2), sqrt(v(t)^2) # real values have different simplification rules
+(sqrt(u(t)^2), Abs(v(t)))
+
+```
 """
 mutable struct SymFunction <: SymbolicObject
     __pyobject__::PyCall.PyObject
@@ -40,8 +58,13 @@ function SymFunction(x::T; kwargs...) where {T<:AbstractString}
 end
 
 """
-    symfuns...
+    @symfuns
+
 Thanks to `@alhirzel` for the contribution.
+
+!!! Note:
+    The `@symfuns` will be deprecated. The more general [`@syms`](@ref) macro should be used for constructing symbolic functions.
+
 """
 macro symfuns(x...)
     q = Expr(:block)

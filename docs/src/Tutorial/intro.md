@@ -435,7 +435,7 @@ spherical Bessel function $j_\nu(z)$.
 ```jldoctest intro
 julia> using SpecialFunctions
 
-julia> @vars ν z
+julia> @syms ν z
 (ν, z)
 
 julia> besselj(ν, z).rewrite(sympy.jn)

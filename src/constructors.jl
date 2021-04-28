@@ -42,6 +42,57 @@ macro vars(x...)
     q
 end
 
+"""
+    @syms a n::integer x::(real,positive)=>"x₀" y[-1:1] u() v()::real w()::(real,positive)
+
+Construct symbolic variables or functions along with specified assumptions. Similar to `@vars`, `sympy.symbols`, and `sympy.Function`, but the specification of the assumptions is more immediate than those interfaces which follow sympy's constructors.
+
+Allows the specification of assumptions on the variables and functions.
+
+* a type-like annontation, such as `n::integer` is equivalent to `sympy.symbols("n", integer=true)`. Multiple assumptions are combined using parentheses (e.g., `n::(integer,nonnegative)`.
+
+The possible [values](https://docs.sympy.org/latest/modules/core.html#module-sympy.core.assumptions) for assumptions are: "commutative", "complex", "imaginary", "real", "integer", "odd", "even", "prime", "composite", "zero", "nonzero", "rational", "algebraic", "transcendental", "irrational", "finite", "infinite", "negative", "nonnegative", "positive", "nonpositive", "hermitian", "antihermetian". 
+
+* a tensor declaration form is provided to define arrays of variables, e.g. `x[-1:1]` or `y[1:4, 2:5]`.
+
+* a symbolic function can be specified using a pair of parentheses after the name, as in `u()`. 
+
+* The return type of a function can have assumptions specified, as with a variable. E.g., `h()::complex`. How the symbolic function prints can be set as with a variable, e.g. `h()::complex=>"h̄"`.
+
+* multiple definitions can be separated by commas
+
+* How the symbol prints (the `__str__()` value) can be specified using the syntax `=>"name"`, as in `x=>"xₒ"`
+
+## Examples:
+
+```jldoctest constructors
+julia> using SymPy
+julia> @syms a b::nonnegative
+julia> sqrt(a^2), sqrt(b^2)
+```
+
+```jldoctest constructors
+julia> @syms x::prime
+julia> ask(𝑄.negative(x)), ask(𝑄.integer(x)), ask(𝑄.even(x))  # (false, true, nothing)
+```
+
+```jldoctest constructors
+julia> @syms a[0:5], x
+
+julia> sum( aᵢ*x^(i) for (i,aᵢ) ∈ zip(0:5, a))
+```
+
+
+```jldoctest constructors
+julia> @syms x u() v()::nonnegative
+
+julia> sqrt(u(x)^2), sqrt(v(x)^2) # sqrt(u(x)^2), Abs(v(x))
+```
+
+
+!!! Note:
+    Many thanks to `@matthieubulte` for this contribution.
+"""
 
 macro syms(xs...)
     # If the user separates declaration with commas, the top-level expression is a tuple

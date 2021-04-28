@@ -34,6 +34,13 @@ julia> x, y, z = symbols("x y z")
 
 * If a function is not imported, it may be referenced through qualification, asin `sympy.expand_trig`, as will be seen in the following.
 
+* the use of `symbols` to construct symbolic values is more easily facilitated with the macro `@syms`, used as follows
+
+```jldoctest basicoperations
+julia> @syms x, y, z
+(x, y, z)
+```
+
 ----
 
 ## Substitution
@@ -474,7 +481,7 @@ the given numerical library, usually NumPy.  For example
 julia> a = 0:10
 0:10
 
-julia> @vars x
+julia> @syms x
 (x,)
 
 julia> expr = sin(x)

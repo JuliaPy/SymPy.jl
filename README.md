@@ -92,7 +92,7 @@ With the `SymPy` package this gets replaced by a more `julia`n syntax:
 
 ```
 using SymPy
-x = symbols("x")		       # or   @vars x, Sym("x"), or  Sym(:x)
+x = symbols("x")		       # or  @syms x, @vars x, Sym("x"), or  Sym(:x)
 y = sin(pi*x)
 y(1)                           # Does y.subs(x, 1). Use y(x=>1) to be specific as to which symbol to substitute
 ```

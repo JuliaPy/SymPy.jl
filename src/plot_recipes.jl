@@ -17,7 +17,7 @@ Example. Here we use the default backend for `Plots` to make a plot:
 
 ```
 using Plots
-@vars x
+@syms x
 plot(x^2 - 2x, 0, 4)
 ```
 
@@ -28,7 +28,7 @@ plot(x^2 - 2x, 0, 4)
 Example:
 
 ```
-@vars x
+@syms x
 plot(sin(2x), cos(3x), 0, 4pi) ## also
 ```
 
@@ -42,7 +42,7 @@ plot(sin(x), cos(x), x, 0, 4pi) # helix in 3d
 * `plot(xs, ys, expression)` will make a contour plot (for many backends).
 
 ```
-@vars x y
+@syms x y
 plot(range(0,stop=5, length=50), range(0,stop=5, length=50), x*y)
 ```
 
@@ -51,7 +51,7 @@ plot(range(0,stop=5, length=50), range(0,stop=5, length=50), x*y)
 * To plot the surface  `z=ex(x,y)` over a region we have `Plots.surface`. For example,
 
 ```
-@vars x y
+@syms x y
 surface(-5:5, -5:5, 25 - x^2 - y^2)
 ```
 
@@ -85,7 +85,7 @@ vfieldplot(fx, fy)
     `plot(ex1, a, b); plot!(ex2)`, as in:
 
 ```
-@vars x
+@syms x
 plot(sin(x), 0, 2pi)
 plot!(cos(x))
 ```
@@ -103,7 +103,7 @@ Plot the parametrically defined surface `[exs[1](u,v), exs[2](u,v), exs[3](u,v)]
 where disambiguation of variable names is needed.
 
 ```
-@vars theta, phi
+@syms theta, phi
 r = 1
 sympy.plotting.plot3d_parametric_surface((r*sin(theta)*sin(phi), r*sin(theta)*cos(phi), r*cos(theta)),
                         (theta, 0, pi), (phi, 0, pi/2))
@@ -170,7 +170,7 @@ F(x,y) = 3*y*x
 plot(VectorField(F))
 
 # plot field and solution u' = u*(1-u)
-u = SymFunction("u"); @vars x
+@syms x u()
 F(x,y) = y*(1-y)
 out = dsolve(u'(x) - F(x, u(x)), x, (u, 0, 1))
 plot(VectorField(F), xlims=(0,5), ylims=(0,2))
@@ -222,7 +222,7 @@ Render a parametrically defined surface plot.
 
 Example:
 ```
-@vars u, v
+@syms u, v
 plot_parametric_surface((u*v,u-v,u+v), (u,0,1), (v,0,1))
 ```
 

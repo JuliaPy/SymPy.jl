@@ -78,7 +78,7 @@ function integrate(f::Function, a::Number, b::Number)
     sympy.integrate(f(x), (x, a, b))
 end
 function integrate(f::Function)
-    @vars  x
+    @syms  x
     sympy.integrate(f(x), x)
 end
 
@@ -94,7 +94,7 @@ Examples:
 ```jldoctest solve
 julia> using SymPy
 
-julia> @vars x y a b c d
+julia> @syms x y a b c d
 (x, y, a, b, c, d)
 
 julia> solve(x^2 + 2x + 1, x) # [-1]
@@ -150,11 +150,8 @@ Example:
 ```jldoctest dsolve
 julia> using SymPy
 
-julia> x = Sym("x")
-x
-
-julia> y = SymFunction("y")
-y
+julia> @syms x y()
+(x, y)
 
 julia> eqn = y'(x) - y(x);
 
