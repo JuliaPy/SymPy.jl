@@ -513,6 +513,29 @@ end
     @test isa(h, SymFunction)
     @test ask(𝑄.complex(h(x)))
     @test string(h) == "h̄"
+
+    @syms X[1:20]
+    @test isa(X, Vector{Sym})
+    @test size(X) == (20,)
+    @test string(X[11]) == "X₁₁"
+
+    @syms bigy[1:5]=>"Y"
+    @test string(bigy[3]) == "Y₃"
+
+    @syms Z[1:5, 1:6]
+    @test isa(Z, Matrix{Sym})
+    @test size(Z) == (5, 6)
+    @test string(Z[2,4]) == "Z₂_₄"
+
+    @syms F[1:2](), G()[1:2]
+    @test isa(F, Vector{SymFunction})
+    @test isa(G, Vector{SymFunction})
+
+    @syms WOW[1:3, 1:2:4]()::(real, positive)=>"f"
+    @test isa(WOW, Matrix{SymFunction})
+    @test size(WOW) == (3, 2)
+    @test ask(And(𝑄.real(WOW[1,2](x)), 𝑄.positive(WOW[1,2](x))))
+    @test string(WOW[1,2]) == "f₁_₃"
 end
 
 @testset "SymFunctions" begin
