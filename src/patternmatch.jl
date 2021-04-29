@@ -77,7 +77,7 @@ julia> replace(f, sympy.sin, sympy.cos)  |>  string
 "log(cos(x)) + tan(cos(x^2))"
 
 julia> sin(x).replace(sympy.sin, sympy.cos, map=true)
-(cos(x), Dict{Any,Any}(sin(x) => cos(x)))
+(cos(x), Dict{Any, Any}(sin(x) => cos(x)))
 
 ```
 

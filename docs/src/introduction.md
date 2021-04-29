@@ -58,6 +58,30 @@ julia> a,b,c = Sym("a,b,c")
 
 ```
 
+Here are two ways to make related variables:
+
+```jldoctest introduction
+julia> @syms xs[1:5]
+(Sym[xs₁, xs₂, xs₃, xs₄, xs₅],)
+
+julia> ys = [Sym("y$i") for i in 1:5]
+julia> 5-element Vector{Sym}:
+ y₁
+ y₂
+ y₃
+ y₄
+ y₅
+5-element Vector{Sym}:
+ y₁
+ y₂
+ y₃
+ y₄
+ y₅
+```
+
+The former much more succinct, but the latter pattern of use when the number of terms is a variable.
+
+
 The `@syms` macro is recommended, and will be modeled in the following, as it makes the specification of assumptions and symbolic functions more natural.
 
 ### Assumptions
@@ -129,9 +153,9 @@ julia> @syms a1=>"α₁" a2=>"α₂"
 In this example, the Julia variables `a1` and `a2` are defined to store SymPy
 symbols with the "pretty" names `α₁` and `α₂` respectively.
 
-As can be seen, there are several ways to create symbolic values. One
-caveat is that one can't use `Sym` to create a variable from a
-function name in Base.
+As can be seen, there are several ways to create symbolic values, but
+the recommended way is to use `@syms`. One caveat is that one can't
+use `Sym` to create a variable from a function name in Base.
 
 ### Special constants
 
@@ -151,7 +175,7 @@ function, the second to `SymPy`'s:
 
 ```jldoctest introduction
 julia> [asin(1), asin(Sym(1))]
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  1.57079632679490
              pi/2
 
@@ -190,7 +214,7 @@ The output has no free variables, but is still symbolic.
 Expressions with more than one variable can have multiple substitutions, where each is expressed as a tuple:
 
 ```jldoctest introduction
-julia> x,y,z = symbols("x,y,z")
+julia> @syms x,y,z
 (x, y, z)
 
 julia> ex = x + y + z
@@ -219,7 +243,7 @@ A straight call is also possble, where the order of the variables is determined 
 
 ```jldoctest introduction
 julia> ex(1, pi)
-z + 1 + π
+y + 1 + π
 
 ```
 
@@ -499,7 +523,7 @@ julia> simplify(x^a * y^a - (x*y)^a)
 However, without assumptions this is not the case
 
 ```jldoctest introduction
-julia> x,y,a = symbols("x,y,a")
+julia> @syms x,y,a
 (x, y, a)
 
 julia> simplify(x^a * y^a - (x*y)^a)
@@ -521,8 +545,8 @@ julia> powsimp(x^a * y^a - (x*y)^a, force=true)
 For trigonometric expressions, `simplify` will use `trigsimp` to simplify:
 
 ```jldoctest introduction
-julia> theta = symbols("theta", real=true)
-θ
+julia> @syms theta::real
+(theta,)
 
 julia> p = cos(theta)^2 + sin(theta)^2
    2         2
@@ -560,7 +584,7 @@ julia> expand_trig(sin(2theta))
 Returning to polynomials, there are a few functions to find various pieces of the polynomials. First we make a general quadratic polynomial:
 
 ```jldoctest introduction
-julia> a,b,c,x = symbols("a, b, c, x")
+julia> @syms a,b,c,x
 (a, b, c, x)
 
 julia> p = a*x^2 + b*x + c
@@ -601,7 +625,7 @@ Though one could use some trick like this to find all the coefficients:
 
 ```jldoctest introduction
 julia> Sym[[p.coeff(x^i) for i in N(degree(p,gen=x)):-1:1]; p(x=>0)]
-3-element Array{Sym,1}:
+3-element Vector{Sym}:
  a
  b
  c
@@ -623,7 +647,7 @@ julia> q = sympy.Poly(p, x)
 Poly(a*x**2 + b*x + c, x, domain='ZZ[a,b,c]')
 
 julia> q.coeffs()
-3-element Array{Sym,1}:
+3-element Vector{Sym}:
  a
  b
  c
@@ -647,7 +671,7 @@ roots, when available, are returned by `real_roots`. For example,
 
 ```jldoctest introduction
 julia> real_roots(x^2 - 2)
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  -√2
   √2
 
@@ -667,7 +691,7 @@ julia> p = (x-3)^2*(x-2)*(x-1)*x*(x+1)*(x^2 + x + 1);  string(p)
 "x*(x - 3)^2*(x - 2)*(x - 1)*(x + 1)*(x^2 + x + 1)"
 
 julia> real_roots(p)
-6-element Array{Sym,1}:
+6-element Vector{Sym}:
  -1
   0
   1
@@ -688,7 +712,7 @@ of distinct roots can be found with `solve`:
 
 ```jldoctest introduction
 julia> solve(p)
-7-element Array{Sym,1}:
+7-element Vector{Sym}:
                  -1
                   0
                   1
@@ -708,14 +732,14 @@ The output of calling `roots` will be a dictionary whose keys are the roots and 
 
 ```jldoctest introduction
 julia> roots(p)
-Dict{Any,Any} with 7 entries:
-  1                  => 1
-  -1/2 - sqrt(3)*I/2 => 1
-  3                  => 2
+Dict{Any, Any} with 7 entries:
   -1/2 + sqrt(3)*I/2 => 1
   -1                 => 1
+  3                  => 2
+  1                  => 1
   0                  => 1
   2                  => 1
+  -1/2 - sqrt(3)*I/2 => 1
 
 ```
 
@@ -727,7 +751,7 @@ julia> p = x^5 - x + 1
 x  - x + 1
 
 julia> roots(p)
-Dict{Any,Any}()
+Dict{Any, Any}()
 
 ```
 
@@ -735,7 +759,7 @@ Calling `solve` seems to produce very little as well:
 
 ```jldoctest introduction
 julia> rts = solve(p)
-5-element Array{Sym,1}:
+5-element Vector{Sym}:
  CRootOf(x^5 - x + 1, 0)
  CRootOf(x^5 - x + 1, 1)
  CRootOf(x^5 - x + 1, 2)
@@ -748,7 +772,7 @@ But in fact, `rts` contains lots of information. We can extract numeric values q
 
 ```jldoctest introduction
 julia> N.(rts)
-5-element Array{Number,1}:
+5-element Vector{Number}:
                      -1.167303978261418684256045899854842180720560371525489039140082449275651903429536
  -0.18123244446987538 - 1.0839541013177107im
  -0.18123244446987538 + 1.0839541013177107im
@@ -763,7 +787,7 @@ provided. The answers are still symbolic:
 
 ```jldoctest introduction
 julia> nroots(p)
-5-element Array{Sym,1}:
+5-element Vector{Sym}:
                        -1.16730397826142
  -0.181232444469875 - 1.08395410131771⋅ⅈ
  -0.181232444469875 + 1.08395410131771⋅ⅈ
@@ -780,7 +804,7 @@ For example, it can be used to solve when $\cos(x) = \sin(x)$:
 
 ```jldoctest introduction
 julia> solve(cos(x) - sin(x))
-1-element Array{Sym,1}:
+1-element Vector{Sym}:
  pi/4
 
 ```
@@ -809,7 +833,7 @@ julia> v = solveset(x^2 - 4)
 {-2, 2}
 
 julia> collect(Set(v...))
-2-element Array{Any,1}:
+2-element Vector{Any}:
  -2
   2
 
@@ -819,7 +843,7 @@ This composition is done in the `elements` function:
 
 ```jldoctest introduction
 julia> elements(v)
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  -2
   2
 
@@ -851,7 +875,7 @@ equations of a more general type. For example, here it is used to
 derive the quadratic equation:
 
 ```jldoctest introduction
-julia> a,b,c  = symbols("a,b,c", real=true)
+julia> @syms a::real, b::real, c::real
 (a, b, c)
 
 julia> p = a*x^2 + b*x + c
@@ -859,7 +883,7 @@ julia> p = a*x^2 + b*x + c
 a⋅x  + b⋅x + c
 
 julia> solve(p, x)
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  (-b + sqrt(-4*a*c + b^2))/(2*a)
  -(b + sqrt(-4*a*c + b^2))/(2*a)
 
@@ -886,7 +910,7 @@ solution over all the free variables:
 
 ```jldoctest introduction
 julia> solve(p)
-1-element Array{Dict{Any,Any},1}:
+1-element Vector{Dict{Any, Any}}:
  Dict(a => -(b*x + c)/x^2)
 ```
 
@@ -896,18 +920,18 @@ is one where all the expressions are 0. For example, to solve this
 linear system: $2x + 3y = 6, 3x - 4y=12$, we have:
 
 ```jldoctest introduction
-julia> x, y = symbols("x,y", real=true)
+julia> @syms x::real, y::real
 (x, y)
 
 julia> exs = [2x+3y-6, 3x-4y-12]
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
   2⋅x + 3⋅y - 6
  3⋅x - 4⋅y - 12
 
 julia> d = solve(exs)
-Dict{Any,Any} with 2 entries:
-  x => 60/17
+Dict{Any, Any} with 2 entries:
   y => -6/17
+  x => 60/17
 
 ```
 
@@ -917,7 +941,7 @@ We can "check our work" by plugging into each equation. We take advantage of how
 
 ```jldoctest introduction
 julia> map(ex -> ex.subs(d), exs)
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  0
  0
 
@@ -927,12 +951,12 @@ The more `Julia`n way to solve a linear  equation, like this   would be as follo
 
 ```jldoctest introduction
 julia> A = Sym[2 3; 3  -4]; b = Sym[6, 12]
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
   6
  12
 
 julia> A \ b
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  60/17
  -6/17
 ```
@@ -958,16 +982,16 @@ julia> fn = cos
 cos (generic function with 14 methods)
 
 julia> exs = [fn(0*h)-p(x=>0), fn(h)-p(x => h), fn(2h)-p(x => 2h)]
-3-element Array{Sym,1}:
+3-element Vector{Sym}:
                            1 - c
        -a*h^2 - b*h - c + cos(h)
  -4*a*h^2 - 2*b*h - c + cos(2*h)
 
 julia> d = solve(exs, [a,b,c])
-Dict{Any,Any} with 3 entries:
-  b => 2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)
+Dict{Any, Any} with 3 entries:
   a => -cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)
   c => 1
+  b => 2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)
 
 ```
 
@@ -990,20 +1014,14 @@ expansion theorem.)
 julia> n = 3
 3
 
-julia> x, c = symbols("x,c")
+julia> @syms x, c
 (x, c)
 
-julia> as = Sym["a$i" for i in 0:(n-1)]
-3-element Array{Sym,1}:
- a₀
- a₁
- a₂
+julia> @syms as[1:3]
+(Sym[as₁, as₂, as₃],)
 
-julia> bs = Sym["b$i" for i in 0:(n-1)]
-3-element Array{Sym,1}:
- b₀
- b₁
- b₂
+julia> @syms bs[1:3]
+(Sym[bs₁, bs₂, bs₃],)
 
 julia> p = sum([as[i+1]*x^i for i in 0:(n-1)])
                 2
@@ -1014,10 +1032,10 @@ julia> q = sum([bs[i+1]*(x-c)^i for i in 0:(n-1)])
 2
 
 julia> solve(p-q, bs)
-Dict{Any,Any} with 3 entries:
-  b0 => a0 + a1*c + a2*c^2
-  b1 => a1 + 2*a2*c
-  b2 => a2
+Dict{Any, Any} with 3 entries:
+  bs₃ => as₃
+  bs₂ => as₂ + 2*as₃*c
+  bs₁ => as₁ + as₂*c + as₃*c^2
 
 ```
 
@@ -1028,7 +1046,7 @@ The `solve` function does not need to just solve `ex = 0`. There are other means
 
 ```jldoctest introduction
 julia> solve(Eq(x, 1))
-1-element Array{Sym,1}:
+1-element Vector{Sym}:
  1
 
 ```
@@ -1044,7 +1062,7 @@ So, the above could have been written with the following nearly identical expres
 
 ```jldoctest introduction
 julia> solve(x ⩵ 1)
-1-element Array{Sym,1}:
+1-element Vector{Sym}:
  1
 
 ```
@@ -1056,14 +1074,14 @@ julia> x, y = symbols("x,y", real=true)
 (x, y)
 
 julia> exs = [2x+3y ⩵ 6, 3x-4y ⩵ 12]    ## Using \Equal[tab]
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
   2⋅x + 3⋅y = 6
  3⋅x - 4⋅y = 12
 
 julia> d = solve(exs)
-Dict{Any,Any} with 2 entries:
-  x => 60/17
+Dict{Any, Any} with 2 entries:
   y => -6/17
+  x => 60/17
 
 ```
 
@@ -1186,7 +1204,7 @@ This example computes what L'Hopital reportedly paid a Bernoulli for
 
 ```jldoctest introduction
 julia> @syms a::positive
-a
+(a,)
 
 julia> ex = (sqrt(2a^3*x-x^4) - a*(a^2*x)^(1//3)) / (a - (a*x^3)^(1//4));  string(ex)
 "(-a^(5/3)*x^(1/3) + sqrt(2*a^3*x - x^4))/(-a^(1/4)*(x^3)^(1/4) + a)"
@@ -1279,7 +1297,7 @@ A numeric attempt might be done along these lines:
 
 ```jldoctest introduction
 julia> hs = [10.0^(-i) for i in 6:16]
-11-element Array{Float64,1}:
+11-element Vector{Float64}:
  1.0e-6
  1.0e-7
  1.0e-8
@@ -1293,7 +1311,7 @@ julia> hs = [10.0^(-i) for i in 6:16]
  1.0e-16
 
 julia> ys = [f(h) for h in hs]
-11-element Array{Float64,1}:
+11-element Vector{Float64}:
  6.146316238971239e-7
  1.4298053954169988e-7
  3.4385814272678773e-8
@@ -1307,7 +1325,7 @@ julia> ys = [f(h) for h in hs]
  9.64641441953344e-13
 
 julia> [hs ys]
-11×2 Array{Float64,2}:
+11×2 Matrix{Float64}:
  1.0e-6   6.14632e-7
  1.0e-7   1.42981e-7
  1.0e-8   3.43858e-8
@@ -1396,7 +1414,7 @@ julia> f(x) = (12x^2 - 1) / (x^3)
 f (generic function with 1 method)
 
 julia> diff(f(x), x) |> solve
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  -1/2
   1/2
 
@@ -1416,7 +1434,7 @@ julia> ex = x^2*cos(y)
 x ⋅cos(y)
 
 julia> [diff(ex,v1, v2) for v1 in [x,y], v2 in [x,y]]  # also hessian(ex, (x,y))
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
     2⋅cos(y)  -2⋅x⋅sin(y)
  -2⋅x⋅sin(y)  -x^2*cos(y)
 
@@ -1605,7 +1623,7 @@ The leading term can be found through:
 
 ```jldoctest introduction
 julia> sympy.Poly(A1, w).coeffs()
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  -1/2 - pi/8
          P/2
 
@@ -1703,7 +1721,7 @@ Or in more generality:
 
 ```jldoctest introduction
 julia> @syms n::real
-n
+(n,)
 
 julia> ex = integrate(x^n, x)
 ⎧ n + 1
@@ -1741,7 +1759,10 @@ Tedious problems, such as those needing multiple integration-by-parts steps can 
 ```jldoctest introduction
 julia> integrate(x^5*sin(x), x)
    5             4              3              2
-- x ⋅cos(x) + 5⋅x ⋅sin(x) + 20⋅x ⋅cos(x) - 60⋅x ⋅sin(x) - 120⋅x⋅cos(x) + 120⋅sin(x)
+- x ⋅cos(x) + 5⋅x ⋅sin(x) + 20⋅x ⋅cos(x) - 60⋅x ⋅sin(x) - 120⋅x⋅cos(x) + 120⋅s
+
+
+in(x)
 
 ```
 
@@ -1899,13 +1920,13 @@ julia> @syms x,y
 (x, y)
 
 julia> v = [1,2,x]
-3-element Array{Sym,1}:
+3-element Vector{Sym}:
  1
  2
  x
 
 julia> w = [1,y,3]
-3-element Array{Sym,1}:
+3-element Vector{Sym}:
  1
  y
  3
@@ -1926,7 +1947,7 @@ Or
 
 ```jldoctest introduction
 julia> cross(v,w)
-3-element Array{Sym,1}:
+3-element Vector{Sym}:
  -x⋅y + 6
     x - 3
     y - 2
@@ -1941,7 +1962,7 @@ julia> ex = x^2*y - x*y^2
 x ⋅y - x⋅y
 
 julia> Sym[diff(ex,var) for var in (x,y)]
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  2*x*y - y^2
  x^2 - 2*x*y
 
@@ -1959,7 +1980,7 @@ The mixed partials is similarly done by passing two variables to differentiate i
 
 ```jldoctest introduction
 julia> Sym[diff(ex, v1, v2) for v1 in (x,y), v2 in (x,y)]
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
        2⋅y  2⋅(x - y)
  2⋅(x - y)       -2⋅x
 
@@ -1969,7 +1990,7 @@ For this task, SymPy provides the `hessian` method:
 
 ```jldoctest introduction
 julia> hessian(ex, (x,y))
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
        2⋅y  2⋅x - 2⋅y
  2⋅x - 2⋅y       -2⋅x
 
@@ -1990,7 +2011,7 @@ julia> @syms x,y
 (x, y)
 
 julia> M = [1 x; x 1]
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
  1  x
  x  1
 
@@ -2002,7 +2023,7 @@ Construction of symbolic matrices can *also* be done through the `Matrix` constr
 julia> import PyCall: PyObject
 
 julia> A = sympy.Matrix([[1,PyObject(x)], [PyObject(y), 2]])
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
  1  x
  y  2
 ```
@@ -2013,7 +2034,7 @@ Alternatively, using tuples will avoid  the behind-the-scenes conversion:
 
 ```jldoctest introduction
 julia> A = sympy.Matrix( ((1,x),  (y,2)) )
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
  1  x
  y  2
 ```
@@ -2025,7 +2046,7 @@ Either is useful if copying SymPy examples, but otherwise unneccesary, these are
 
 ```jldoctest introduction
 julia> diagm(0=>ones(Sym, 5))
-5×5 Array{Sym,2}:
+5×5 Matrix{Sym}:
  1  0  0  0  0
  0  1  0  0  0
  0  0  1  0  0
@@ -2033,7 +2054,7 @@ julia> diagm(0=>ones(Sym, 5))
  0  0  0  0  1
 
 julia> M^2
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
  x^2 + 1      2⋅x
      2⋅x  x^2 + 1
 
@@ -2046,7 +2067,7 @@ Similarly,
 
 ```jldoctest introduction
 julia> A^2
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
  x⋅y + 1      3⋅x
      3⋅y  x⋅y + 4
 
@@ -2076,7 +2097,7 @@ Occasionally, the SymPy method has more content:
 
 ```jldoctest introduction
 julia> eigvecs(M)
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
  -1  1
   1  1
 
@@ -2086,7 +2107,7 @@ As compared to SymPy's `eigenvects` which yields:
 
 ```jldoctest introduction
 julia> A.eigenvects()
-2-element Array{Tuple{Sym,Int64,Array{Array{Sym,2},1}},1}:
+2-element Vector{Tuple{Sym, Int64, Vector{Matrix{Sym}}}}:
  (3/2 - sqrt(4*x*y + 1)/2, 1, [[-2*x/(sqrt(4*x*y + 1) - 1); 1]])
  (sqrt(4*x*y + 1)/2 + 3/2, 1, [[2*x/(sqrt(4*x*y + 1) + 1); 1]])
 
@@ -2098,12 +2119,12 @@ This example from the tutorial shows the `nullspace` function:
 
 ```jldoctest introduction
 julia> A = Sym[1 2 3 0 0; 4 10 0 0 1]
-2×5 Array{Sym,2}:
+2×5 Matrix{Sym}:
  1   2  3  0  0
  4  10  0  0  1
 
 julia> vs = A.nullspace()
-3-element Array{Array{Sym,2},1}:
+3-element Vector{Matrix{Sym}}:
  [-15; 6; … ; 0; 0]
  [0; 0; … ; 1; 0]
  [1; -1/2; … ; 0; 1]
@@ -2114,7 +2135,7 @@ And this shows that they are indeed in the null space of `M`:
 
 ```jldoctest introduction
 julia> [A*vs[i] for i in 1:3]
-3-element Array{Array{Sym,2},1}:
+3-element Vector{Matrix{Sym}}:
  [0; 0]
  [0; 0]
  [0; 0]
@@ -2125,7 +2146,7 @@ Symbolic expressions can be included in the matrices:
 
 ```jldoctest introduction
 julia> A = [1 x; x 1]
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
  1  x
  x  1
 
@@ -2133,7 +2154,7 @@ julia> P, D = A.diagonalize()  # M = PDP^-1
 (Sym[-1 1; 1 1], Sym[1 - x 0; 0 x + 1])
 
 julia> A - P*D*inv(P)
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
  0  0
  0  0
 
@@ -2149,7 +2170,7 @@ key is to create a symbolic function expression using
 
 ```jldoctest introduction
 julia> @syms F()
-F
+(F,)
 
 ```
 
@@ -2212,7 +2233,7 @@ julia> C1 = first(free_symbols(ex1))
 C₁
 
 julia> solve(ex1(x => 0), C1)
-1-element Array{Sym,1}:
+1-element Vector{Sym}:
  -1/2
 
 ```
@@ -2232,7 +2253,7 @@ julia> C2 = free_symbols(ex1)[2]
 C₂
 
 julia> solve( diff(ex2, x)(x => 0) - 1, C2 )
-1-element Array{Sym,1}:
+1-element Vector{Sym}:
  3/2
 ```
 
@@ -2285,7 +2306,7 @@ It is linear, but not solvable. Proceeding with `dsolve` gives:
 
 ```jldoctest introduction
 julia> dsolve(ex, v(t)) |> string
-"Eq(v(t), -alpha/tanh(log(exp(alpha*k*(C1 - 2*t)))/(2*m)))"
+"Eq(v(t), -α/tanh(log(exp(k*α*(C1 - 2*t)))/(2*m)))"
 
 ```
 
@@ -2382,7 +2403,7 @@ $y'$ at $x_0=0$.
 
 ```jldoctest introduction
 julia> @syms y(), x
-x
+(y, x)
 
 julia> eqn = y''(x) + 5y'(x) + 6y(x);  string(eqn)
 "6*y(x) + 5*Derivative(y(x), x) + Derivative(y(x), (x, 2))"

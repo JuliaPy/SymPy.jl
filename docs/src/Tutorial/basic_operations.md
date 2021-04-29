@@ -258,7 +258,7 @@ julia> expr = x^4 - 4*x^3 + 4*x^2 - 2*x + 3
 x  - 4⋅x  + 4⋅x  - 2⋅x + 3
 
 julia> replacements = [(x^i, y^i) for i in 1:5 if iseven(i)]
-2-element Array{Tuple{Sym,Sym},1}:
+2-element Vector{Tuple{Sym, Sym}}:
  (x^2, y^2)
  (x^4, y^4)
 
@@ -366,7 +366,8 @@ argument to `evalf`.  Let's compute the first 100 digits of `\pi`.
 
 ```jldoctest basicoperations
 julia> PI.evalf(100)
-3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068
+3.1415926535897932384626433832795028841971693993751058209749445923078164062862
+08998628034825342117068
 ```
 
 ----
@@ -490,7 +491,7 @@ sin(x)
 julia> fn = lambdify(expr);
 
 julia> fn.(a)
-11-element Array{Float64,1}:
+11-element Vector{Float64}:
   0.0
   0.8414709848078965
   0.9092974268256817
@@ -518,7 +519,7 @@ julia> body = convert(Expr, ex)
 :(x ^ 2 + sin(x) ^ 2)
 
 julia> syms = Symbol.(free_symbols(ex))
-1-element Array{Symbol,1}:
+1-element Vector{Symbol}:
  :x
 
 julia> fn = eval(Expr(:function, Expr(:call, gensym(), syms...), body));

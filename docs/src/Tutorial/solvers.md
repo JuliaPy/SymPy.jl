@@ -20,7 +20,7 @@ sympy.init_printing(use_unicode=True)
 ```jldoctest solvers
 julia> using SymPy
 
-julia> x, y, z = symbols("x y z")
+julia> @syms x, y, z
 (x, y, z)
 ```
 
@@ -197,7 +197,7 @@ We use `Julia`n syntax for matrices:
 
 ```jldoctest solvers
 julia> A =  [1 1 1; 1  1  2];  b =  [1,3]
-2-element Array{Int64,1}:
+2-element Vector{Int64}:
  1
  3
 ```
@@ -218,12 +218,12 @@ In lieu of using `sympy.Matrix`, the matrix can be created  symbolically,   as:
 
 ```jldoctest solvers
 julia> A =  Sym[1 1 1; 1  1  2];  b =  [1,3]
-2-element Array{Int64,1}:
+2-element Vector{Int64}:
  1
  3
 
 julia> aug = [A b]
-2×4 Array{Sym,2}:
+2×4 Matrix{Sym}:
  1  1  1  1
  1  1  2  3
 
@@ -257,7 +257,7 @@ We  follow the syntax  above to   construct the matrix (tuple of tuples), but  n
 
 ```jldoctest solvers
 julia> M = sympy.Matrix(((1, 1, 1, 1), (1, 1, 2, 3)))
-2×4 Array{Sym,2}:
+2×4 Matrix{Sym}:
  1  1  1  1
  1  1  2  3
 
@@ -293,7 +293,7 @@ In the `solveset` module, the non linear system of equations is solved using
 * we pass `[a,b]` as either `a, b` or using a tuple, as in `(a,b)`, but *not* as a vector, as this gets mapped into a vector of symbolic objects which causes issues with `nonlinsolve`:
 
 ```jldoctest solvers
-julia> a, b, c, d = symbols("a, b, c, d", real=true)
+julia> @syms a::real, b::real, c::real, d::real
 (a, b, c, d)
 
 julia> nonlinsolve([a^2 + a, a - b], a, b)
@@ -349,7 +349,7 @@ julia> nonlinsolve([x^2 + 1, y^2 + 1], (x, y))
 
 ```jldoctest solvers
 julia> system = [x^2-2*y^2-2, x*y-2]
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  x^2 - 2*y^2 - 2
          x⋅y - 2
 
@@ -373,7 +373,7 @@ julia> n = sympy.Dummy("n")
 n
 
 julia> system = [exp(x)-sin(y), 1/y-3]
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  exp(x) - sin(y)
         -3 + 1/y
 
@@ -420,7 +420,7 @@ julia> nonlinsolve([x*y, x*y-x], (x, y))
 
 ```jldoctest solvers
 julia> system = [a^2+a*c, a-b]
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  a^2 + a*c
      a - b
 
@@ -453,7 +453,7 @@ it is similar
 
 ```jldoctest solvers
 julia> u = solve([x^2 - y^2/exp(x)], [x, y], dict=true)
-2-element Array{Dict{Any,Any},1}:
+2-element Vector{Dict{Any, Any}}:
  Dict(x => 2*LambertW(-y/2))
  Dict(x => 2*LambertW(y/2))
 
@@ -463,7 +463,7 @@ To get prettier output, the dict may be converted to have one with symbolic keys
 
 ```jldoctest solvers
 julia> convert(Dict{SymPy.Sym, Any}, first(u))
-Dict{Sym,Any} with 1 entry:
+Dict{Sym, Any} with 1 entry:
   x => 2*LambertW(-y/2)
 
 ```
@@ -486,7 +486,7 @@ Dict{Sym,Any} with 1 entry:
 
 ```jldoctest solvers
 julia> solve([sin(x + y), cos(x - y)], [x, y])
-4-element Array{Tuple{Sym,Sym},1}:
+4-element Vector{Tuple{Sym, Sym}}:
  (-3*pi/4, 3*pi/4)
  (-pi/4, pi/4)
  (pi/4, 3*pi/4)
@@ -517,7 +517,7 @@ julia> solveset(x^3 - 6*x^2 + 9*x, x)
 
 ```jldoctest solvers
 julia> roots(x^3 - 6*x^2 + 9*x, x)  |>  d -> convert(Dict{Sym, Any}, d) # prettier priting
-Dict{Sym,Any} with 2 entries:
+Dict{Sym, Any} with 2 entries:
   3 => 2
   0 => 1
 ```
@@ -544,7 +544,7 @@ multiplicity 1 and `3` is a root of multiplicity 2.
 
 ```jldoctest solvers
 julia> solve(x*exp(x) - 1, x )
-1-element Array{Sym,1}:
+1-element Vector{Sym}:
  W(1)
 
 ```
@@ -566,8 +566,8 @@ function by passing `cls=Function` to the `symbols` function.
 ##### In `Julia`:
 
 ```jldoctest solvers
-julia> f, g = symbols("f g", cls=sympy.Function)
-(PyObject f, PyObject g)
+julia> @syms f() g()
+(f, g)
 
 ```
 
@@ -698,7 +698,7 @@ f
 
 ```
 
-or the `@symfuns` macro, as in `@symfuns f` to define symbolic functions. For these, rather than use `diff` to specify derivatives, the prime notation can be used. We then have, with `f` defined above:
+or the `@syms` macro, as in `@syms f()` to define symbolic functions. For these objects, rather than use `diff` to specify derivatives, the prime notation can be used. We then have, with `f` defined above:
 
 ```jldoctest solvers
 julia> diffeq = Eq(f''(x) - 2*f'(x) + f(x), sin(x)); string(diffeq)
@@ -725,11 +725,8 @@ For the initial condition `f'(x0) = y0`, this would be specified with a tuple `(
 For example, to solve the exponential equation $f'(x) = f(x), f(0) = a$ we would have:
 
 ```jldoctest solvers
-julia> f = SymFunction("f")
-f
-
-julia> x, a = symbols("x, a")
-(x, a)
+julia> @syms x, a, f()
+(x, a, f)
 
 julia> dsolve(f'(x) - f(x), f(x), ics = (f, 0, a)) |>  string
 "Eq(f(x), a*exp(x))"

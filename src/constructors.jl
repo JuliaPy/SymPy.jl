@@ -1,4 +1,17 @@
 ##################################################
+"""
+    symbols(name(s), assumptions...)
+
+Calls `sympy.symbols` to produce symbolic variables and symbolic functions. An alternate to the recommended `@syms`, (when applicable)
+
+In sympy `sympy.symbols` and `sympy.Symbol` both allow the construction of symbolic variables and functions. The `Julia` function `symbols` is an alias for `sympy.symbols`.
+
+* Variables are created through `x=symbols("x")`;
+* Assumptions on variables by `x=symbols("x", real=true)`;
+* Multiple symbols `x1,x2 = symbols("x[1:3]")` can be created. Unlike `@syms`, the number of variables can be specified with a variable through interpolation.
+* Symbolic functions can be created py passing `cls=sympy.Function`, `symbols("F", cls=sympy.Function, real=true)`
+
+"""
 function symbols(x::AbstractString; kwargs...)
     out = sympy.symbols(x; kwargs...)
 end
@@ -16,7 +29,8 @@ Examples:
 @vars a1=>"α₁"
 @vars a b real=true
 ```
-
+!!! Note:
+    The `@syms` macro is recommended as it has a more flexible syntax
 """
 macro vars(x...)
     q = Expr(:block)
@@ -43,7 +57,7 @@ macro vars(x...)
 end
 
 """
-    @syms a n::integer x::(real,positive)=>"x₀" y[-1:1] u() v()::real w()::(real,positive)
+    @syms a n::integer x::(real,positive)=>"x₀" y[-1:1] u() v()::real w()::(real,positive) y()[1:3]::real
 
 Construct symbolic variables or functions along with specified assumptions. Similar to `@vars`, `sympy.symbols`, and `sympy.Function`, but the specification of the assumptions is more immediate than those interfaces which follow sympy's constructors.
 
@@ -88,7 +102,6 @@ julia> @syms x u() v()::nonnegative
 
 julia> sqrt(u(x)^2), sqrt(v(x)^2) # sqrt(u(x)^2), Abs(v(x))
 ```
-
 
 !!! Note:
     Many thanks to `@matthieubulte` for this contribution.

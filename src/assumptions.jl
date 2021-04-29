@@ -27,7 +27,7 @@ true
 
 julia> ## really slow isprime:
        filter(x -> ask(𝑄.prime(x)), 1:10)
-4-element Array{Int64,1}:
+4-element Vector{Int64}:
  2
  3
  5

@@ -34,7 +34,7 @@ julia> using SymPy
 
 julia> import_from(sympy)
 
-julia> x, y, z = symbols("x y z")
+julia> @syms x, y, z
 (x, y, z)
 ```
 
@@ -221,7 +221,7 @@ more structured output.
 
 ```jldoctest simplification
 julia> factor_list(x^2*z + 4*x*y*z + 4*y^2*z)
-(1, Tuple{Sym,Int64}[(z, 1), (x + 2*y, 2)])
+(1, Tuple{Sym, Int64}[(z, 1), (x + 2*y, 2)])
 ```
 
 ----
@@ -1564,12 +1564,15 @@ numbered symbols.  `symbols('a0:5')` will create the symbols `a0`, `a1`,
 
 ##### In `Julia`:
 
-```jldoctest simplification
-julia> a0,a1,a2,a3,a4 = syms = symbols("a0:5")
-(a0, a1, a2, a3, a4)
+We can pass tensor-like notation to `@syms` to create containers of indexed variables
 
-julia> frac = list_to_frac(syms); string(frac)
-"a0 + 1/(a1 + 1/(a2 + 1/(a3 + 1/a4)))"
+```jldoctest simplification
+julia> @syms a[0:4]
+(Sym[a₀, a₁, a₂, a₃, a₄],)
+
+julia> frac = list_to_frac(a); string(frac)
+
+"a₀ + 1/(a₁ + 1/(a₂ + 1/(a₃ + 1/a₄)))"
 ```
 
 ----
@@ -1631,6 +1634,8 @@ it from the expression, and take the reciprocal to get the `f` part.
 ```jldoctest simplification
 julia> l = Sym[]
 Sym[]
+
+julia> a0,a1,a2,a3,a4,a5 = a; # destructure
 
 julia> frac = apart(frac, a0); string(frac)
 "a0 + (a2*a3*a4 + a2 + a4)/(a1*a2*a3*a4 + a1*a2 + a1*a4 + a3*a4 + 1)"
@@ -1745,16 +1750,21 @@ example
 ```julia
 julia> using Random
 
-julia> l = symbols("a0:5")
-(a0, a1, a2, a3, a4)
+julia> @syms a[0:4]
+(Sym[a₀, a₁, a₂, a₃, a₄],)
 
-julia> l = l[randperm(length(l))]
-(a1, a4, a2, a3, a0)
+julia> a = a[randperm(length(a))]
+5-element Vector{Sym}:
+ a₄
+ a₀
+ a₃
+ a₂
+ a₁
 
-julia> orig_frac = frac = cancel(list_to_frac(l))
-a0*a1*a2*a3*a4 + a0*a1*a3 + a0*a1*a4 + a0*a2*a3 + a0 + a1*a2*a4 + a1 + a2
--------------------------------------------------------------------------
-                 a0*a2*a3*a4 + a0*a3 + a0*a4 + a2*a4 + 1  
+julia> orig_frac = frac = cancel(list_to_frac(a))
+a₀⋅a₁⋅a₂⋅a₃⋅a₄ + a₀⋅a₁⋅a₄ + a₀⋅a₃⋅a₄ + a₁⋅a₂⋅a₃ + a₁⋅a₂⋅a₄ + a₁ + a₃ + a₄
+─────────────────────────────────────────────────────────────────────────
+                 a₀⋅a₁⋅a₂⋅a₃ + a₀⋅a₁ + a₀⋅a₃ + a₁⋅a₂ + 1 
 ```
 
 ----

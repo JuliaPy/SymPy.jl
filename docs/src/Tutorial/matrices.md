@@ -63,7 +63,7 @@ use
 
 ```jldoctest matrices
 julia> sympy.Matrix([1 -1; 3 4; 0 2])
-3×2 Array{Sym,2}:
+3×2 Matrix{Sym}:
  1  -1
  3   4
  0   2
@@ -77,7 +77,7 @@ In fact, the above could be done in the more `Julia`n manner through
 
 ```jldoctest matrices
 julia> Sym[1 -1; 3 4; 0 2]
-3×2 Array{Sym,2}:
+3×2 Matrix{Sym}:
  1  -1
  3   4
  0   2
@@ -88,7 +88,7 @@ using an annotation to ensure the type. Alternatively, through promotion, just a
 
 ```jldoctest matrices
 julia> [Sym(1) -1; 3 4; 0 2]
-3×2 Array{Sym,2}:
+3×2 Matrix{Sym}:
  1  -1
  3   4
  0   2
@@ -115,7 +115,7 @@ For this use, `sympy.Matrix` does work, but again its usage is discouraged:
 
 ```jldoctest matrices
 julia> sympy.Matrix([1, 2, 3])
-3×1 Array{Sym,2}:
+3×1 Matrix{Sym}:
  1
  2
  3
@@ -126,7 +126,7 @@ julia> sympy.Matrix([1, 2, 3])
 
 ```jldoctest matrices
 julia> Sym[1,2,3]
-3-element Array{Sym,1}:
+3-element Vector{Sym}:
  1
  2
  3
@@ -157,18 +157,18 @@ Matrices are manipulated just like any other object in SymPy or Python.
 
 ```jldoctest matrices
 julia> M = Sym[1 2 3; 3 2 1]
-2×3 Array{Sym,2}:
+2×3 Matrix{Sym}:
  1  2  3
  3  2  1
 
 julia> N = Sym[0, 1, 1]
-3-element Array{Sym,1}:
+3-element Vector{Sym}:
  0
  1
  1
 
 julia> M*N
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  5
  3
 
@@ -212,7 +212,7 @@ use `shape`
 
 ```jldoctest matrices
 julia> M = Sym[1 2 3; -2 0 4]
-2×3 Array{Sym,2}:
+2×3 Matrix{Sym}:
   1  2  3
  -2  0  4
 
@@ -253,11 +253,11 @@ column.
 
 ```jldoctest matrices
 julia> M.row(0)
-1×3 Array{Sym,2}:
+1×3 Matrix{Sym}:
  1  2  3
 
 julia> M.col(-1)
-2×1 Array{Sym,2}:
+2×1 Matrix{Sym}:
  3
  4
 
@@ -430,37 +430,37 @@ In `Julia`,  we  use `M1` instead  of `N`, an exported symbol of `SymPy`. Otheri
 
 ```jldoctest matrices
 julia> M = Sym[1 3; -2 3]
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
   1  3
  -2  3
 
 julia> M1 = Sym[0 3; 0 7]
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
  0  3
  0  7
 
 julia> M + M1
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
   1   6
  -2  10
 
 julia> M*M1
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
  0  24
  0  15
 
 julia> 3*M
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
   3  9
  -6  9
 
 julia> M^2
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
  -5  12
  -8   3
 
 julia> M^-1
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
  1/3  -1/3
  2/9   1/9
 ```
@@ -545,12 +545,12 @@ To take the transpose of a Matrix, use `T`.
 
 ```jldoctest matrices
 julia> M = Sym[1 2 3; 4 5 6]
-2×3 Array{Sym,2}:
+2×3 Matrix{Sym}:
  1  2  3
  4  5  6
 
 julia> M.T
-3×2 Array{Sym,2}:
+3×2 Matrix{Sym}:
  1  4
  2  5
  3  6
@@ -588,13 +588,13 @@ identity matrix, use `eye`.  The command `eye(n)` will create an `n x n` identit
 
 ```jldoctest matrices
 julia> sympy.eye(3)
-3×3 Array{Sym,2}:
+3×3 Matrix{Sym}:
  1  0  0
  0  1  0
  0  0  1
 
 julia> sympy.eye(4)
-4×4 Array{Sym,2}:
+4×4 Matrix{Sym}:
  1  0  0  0
  0  1  0  0
  0  0  1  0
@@ -620,7 +620,7 @@ To create a matrix of all zeros, use `zeros`.  `zeros(n, m)` creates an
 
 ```jldoctest matrices
 julia> sympy.zeros(2, 3)
-2×3 Array{Sym,2}:
+2×3 Matrix{Sym}:
  0  0  0
  0  0  0
 
@@ -630,7 +630,7 @@ julia> sympy.zeros(2, 3)
 
 ```jldoctest matrices
 julia> zeros(Sym(2), 3)
-2×3 Array{Sym,2}:
+2×3 Matrix{Sym}:
  0  0  0
  0  0  0
 
@@ -640,7 +640,7 @@ julia> zeros(Sym(2), 3)
 
 ```jldoctest matrices
 julia> zeros(Sym, 2, 3)
-2×3 Array{Sym,2}:
+2×3 Matrix{Sym}:
  0  0  0
  0  0  0
 
@@ -665,7 +665,7 @@ Similarly, `ones` creates a matrix of ones.
 
 ```jldoctest matrices
 julia> sympy.ones(3, 2)
-3×2 Array{Sym,2}:
+3×2 Matrix{Sym}:
  1  1
  1  1
  1  1
@@ -706,13 +706,13 @@ filled with `0`\ s.
 
 ```jldoctest matrices
 julia> sympy.diag(1, 2, 3)
-3×3 Array{Sym,2}:
+3×3 Matrix{Sym}:
  1  0  0
  0  2  0
  0  0  3
 
 julia> sympy.diag(-1, sympy.ones(2, 2), sympy.Matrix([5, 7, 5]))
-6×4 Array{Sym,2}:
+6×4 Matrix{Sym}:
  -1  0  0  0
   0  1  1  0
   0  1  1  0
@@ -726,7 +726,7 @@ julia> sympy.diag(-1, sympy.ones(2, 2), sympy.Matrix([5, 7, 5]))
 
 ```jldoctest matrices
 julia> diagm(0 => Sym[1,2,3])
-3×3 Array{Sym,2}:
+3×3 Matrix{Sym}:
  1  0  0
  0  2  0
  0  0  3
@@ -760,7 +760,7 @@ To compute the determinant of a matrix, use `det`.
 
 ```jldoctest matrices
 julia> M = Sym[1 0 1; 2 -1 3; 4 3 2]
-3×3 Array{Sym,2}:
+3×3 Matrix{Sym}:
  1   0  1
  2  -1  3
  4   3  2
@@ -778,7 +778,7 @@ julia> @syms x
 (x,)
 
 julia> A = Sym[x 1; 1 x]
-2×2 Array{Sym,2}:
+2×2 Matrix{Sym}:
  x  1
  1  x
 
@@ -797,19 +797,20 @@ There is no reason  to,  but generic `Julia` methods  could be used:
 
 ```jldoctest matrices
 julia> out  = lu(A)
-LU{Sym,Array{Sym,2}}
+LU{Sym, Matrix{Sym}}
 L factor:
-2×2 Array{Sym,2}:
- 1  0
- x  1
+2×2 Matrix{Sym}:
+   1  0
+ 1/x  1
 U factor:
-2×2 Array{Sym,2}:
- 1        x
- 0  1 - x^2
+2×2 Matrix{Sym}:
+ x        1
+ 0  x - 1/x
 
 julia> prod(diag(out.L)) * prod(diag(out.U))
-     2
-1 - x 
+  ⎛    1⎞
+x⋅⎜x - ─⎟
+  ⎝    x⎠ 
 ```
 
 ### RREF
@@ -839,7 +840,7 @@ second is a tuple of indices of the pivot columns.
 
 ```jldoctest matrices
 julia> M = Sym[1 0 1 3; 2 3 4 7; -1 -3 -3 -4]
-3×4 Array{Sym,2}:
+3×4 Matrix{Sym}:
   1   0   1   3
   2   3   4   7
  -1  -3  -3  -4
@@ -884,12 +885,12 @@ To find the nullspace of a matrix, use `nullspace`. `nullspace` returns a
 
 ```jldoctest matrices
 julia> M = Sym[1 2 3 0 0; 4 10 0 0 1]
-2×5 Array{Sym,2}:
+2×5 Matrix{Sym}:
  1   2  3  0  0
  4  10  0  0  1
 
 julia> M.nullspace()
-3-element Array{Array{Sym,2},1}:
+3-element Vector{Matrix{Sym}}:
  [-15; 6; … ; 0; 0]
  [0; 0; … ; 1; 0]
  [1; -1/2; … ; 0; 1]
@@ -926,13 +927,13 @@ To find the columnspace of a matrix, use `columnspace`. `columnspace` returns a
 
 ```jldoctest matrices
 julia> M = Sym[1 1 2; 2 1 3; 3 1 4]
-3×3 Array{Sym,2}:
+3×3 Matrix{Sym}:
  1  1  2
  2  1  3
  3  1  4
 
 julia> M.columnspace()
-2-element Array{Array{Sym,2},1}:
+2-element Vector{Matrix{Sym}}:
  [1; 2; 3]
  [1; 1; 1]
 
@@ -965,16 +966,16 @@ output of :ref:`roots <tutorial-roots>`).
 
 ```jldoctest matrices
 julia> M = Sym[3 -2  4 -2; 5  3 -3 -2; 5 -2  2 -2; 5 -2 -3  3]
-4×4 Array{Sym,2}:
+4×4 Matrix{Sym}:
  3  -2   4  -2
  5   3  -3  -2
  5  -2   2  -2
  5  -2  -3   3
 
 julia> M.eigenvals()
-Dict{Any,Any} with 3 entries:
-  3  => 1
+Dict{Any, Any} with 3 entries:
   -2 => 1
+  3  => 1
   5  => 2
 
 ```
@@ -1008,7 +1009,7 @@ returns a list of tuples of the form `(eigenvalue:algebraic multiplicity,
 
 ```jldoctest matrices
 julia> M.eigenvects()
-3-element Array{Tuple{Sym,Int64,Array{Array{Sym,2},1}},1}:
+3-element Vector{Tuple{Sym, Int64, Vector{Matrix{Sym}}}}:
  (-2, 1, [[0; 1; 1; 1]])
  (3, 1, [[1; 1; 1; 1]])
  (5, 2, [[1; 1; 1; 0], [0; -1; 0; 1]])
@@ -1019,7 +1020,7 @@ compare with
 
 ```jldoctest matrices
 julia> eigvecs(M)
-4×4 Array{Sym,2}:
+4×4 Matrix{Sym}:
  0  1  1   0
  1  1  1  -1
  1  1  1   0
@@ -1076,21 +1077,21 @@ julia> P, D = M.diagonalize()
 (Sym[0 1 1 0; 1 1 1 -1; 1 1 1 0; 1 1 0 1], Sym[-2 0 0 0; 0 3 0 0; 0 0 5 0; 0 0 0 5])
 
 julia> P
-4×4 Array{Sym,2}:
+4×4 Matrix{Sym}:
  0  1  1   0
  1  1  1  -1
  1  1  1   0
  1  1  0   1
 
 julia> D
-4×4 Array{Sym,2}:
+4×4 Matrix{Sym}:
  -2  0  0  0
   0  3  0  0
   0  0  5  0
   0  0  0  5
 
 julia> P*D*P^-1
-4×4 Array{Sym,2}:
+4×4 Matrix{Sym}:
  3  -2   4  -2
  5   3  -3  -2
  5  -2   2  -2
@@ -1128,15 +1129,27 @@ expensive to calculate.
 * note missing `b` is not needed with `Julia`:
 
 ```jldoctest matrices
-julia> lambda = symbols("lambda")
-λ
+julia> @syms lambda
+(lambda,)
 
 julia> p = M.charpoly(lambda)
-PurePoly(lambda**4 - 11*lambda**3 + 29*lambda**2 + 35*lambda - 150, lambda, domain='ZZ')
+PurePoly(lambda**4 - 11*lambda**3 + 29*lambda**2 + 35*lambda - 150, lambda, do
+main='ZZ')
 
 julia> factor(p) |>  string
 "PurePoly(lambda^4 - 11*lambda^3 + 29*lambda^2 + 35*lambda - 150, lambda, domain='ZZ')"
 
+```
+
+
+As an aside, we can get prettier output by adjusting how `lambda` should print, as follows:
+
+```
+julia> @syms lambda=>"λ"
+(λ,)
+
+julia> p = M.charpoly(lambda)
+PurePoly(λ**4 - 11*λ**3 + 29*λ**2 + 35*λ - 150, λ, domain='ZZ')
 ```
 
 ----
@@ -1194,13 +1207,13 @@ julia> q = sympy.Symbol("q", positive = true)
 q
 
 julia> m = Sym[-2*cosh(q/3) exp(-q) 1; exp(q) -2*cosh(q/3) 1; 1 1 -2*cosh(q/3)]
-3×3 Array{Sym,2}:
+3×3 Matrix{Sym}:
  -2*cosh(q/3)       exp(-q)             1
        exp(q)  -2*cosh(q/3)             1
             1             1  -2*cosh(q/3) 
 
 julia> m.nullspace()
-1-element Array{Array{Sym,2},1}:
+1-element Vector{Matrix{Sym}}:
  [-(-2*exp(q)*cosh(q/3) - 4*cosh(q/3)^2 - 1 - 2*exp(-q)*cosh(q/3))/(4*exp(q)*cosh(q/3)^2 + 4*cosh(q/3) + exp(-q)); -(1 - 4*cosh(q/3)^2)/(2*cosh(q/3) + exp(-q)); 1]
 
 ```

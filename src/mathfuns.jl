@@ -98,17 +98,17 @@ julia> @syms x y a b c d
 (x, y, a, b, c, d)
 
 julia> solve(x^2 + 2x + 1, x) # [-1]
-1-element Array{Sym,1}:
+1-element Vector{Sym}:
  -1
 
 julia> solve(x^2 + 2a*x + a^2, x) # [-a]
-1-element Array{Sym,1}:
+1-element Vector{Sym}:
  -a
 
 julia> solve([a*x + b*y-3, c*x + b*y - 1], [x,y]) # Dict(y => (a - 3*c)/(b*(a - c)),x => 2/(a - c))
-Dict{Any,Any} with 2 entries:
+Dict{Any, Any} with 2 entries:
+  y => (a - 3*c)/(a*b - b*c)
   x => 2/(a - c)
-  y => (a - 3*c)/(b*(a - c))
 
 ```
 
@@ -161,7 +161,7 @@ julia> dsolve(eqn, y(x), ics=(y,0,1)) |> string # technical to avoid  parsing is
 julia> eqn = y''(x) - y(x) - exp(x); 
 
 julia> dsolve(eqn, y(x), ics=((y,0,1), (y, 1, 1//2))) |> string
-"Eq(y(x), (x/2 - (-1 + 2*exp(-1) + E)/(4*sinh(1)))*exp(x) - (1 - 3*E)*exp(-x)/(4*sinh(1)))"
+"Eq(y(x), (x/2 + (-exp(2) - 2 + E)/(-2 + 2*exp(2)))*exp(x) + (-E + 3*exp(2))*exp(-x)/(-2 + 2*exp(2)))"
 
 ```
 """

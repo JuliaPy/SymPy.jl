@@ -310,7 +310,7 @@ julia> @syms x y z a
 (x, y, z, a)
 
 julia> free_symbols(2*x + a*y) # [a, x, y]
-3-element Array{Sym,1}:
+3-element Vector{Sym}:
  a
  x
  y
