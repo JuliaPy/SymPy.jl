@@ -221,7 +221,7 @@ more structured output.
 
 ```jldoctest simplification
 julia> factor_list(x^2*z + 4*x*y*z + 4*y^2*z)
-(1, Tuple{Sym,Int64}[(z, 1), (x + 2*y, 2)])
+(1, Tuple{Sym, Int64}[(z, 1), (x + 2*y, 2)])
 ```
 
 ----

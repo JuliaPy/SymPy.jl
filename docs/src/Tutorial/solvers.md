@@ -197,7 +197,7 @@ We use `Julia`n syntax for matrices:
 
 ```jldoctest solvers
 julia> A =  [1 1 1; 1  1  2];  b =  [1,3]
-2-element Array{Int64,1}:
+2-element Vector{Int64}:
  1
  3
 ```
@@ -218,12 +218,12 @@ In lieu of using `sympy.Matrix`, the matrix can be created  symbolically,   as:
 
 ```jldoctest solvers
 julia> A =  Sym[1 1 1; 1  1  2];  b =  [1,3]
-2-element Array{Int64,1}:
+2-element Vector{Int64}:
  1
  3
 
 julia> aug = [A b]
-2×4 Array{Sym,2}:
+2×4 Matrix{Sym}:
  1  1  1  1
  1  1  2  3
 
@@ -257,7 +257,7 @@ We  follow the syntax  above to   construct the matrix (tuple of tuples), but  n
 
 ```jldoctest solvers
 julia> M = sympy.Matrix(((1, 1, 1, 1), (1, 1, 2, 3)))
-2×4 Array{Sym,2}:
+2×4 Matrix{Sym}:
  1  1  1  1
  1  1  2  3
 
@@ -349,7 +349,7 @@ julia> nonlinsolve([x^2 + 1, y^2 + 1], (x, y))
 
 ```jldoctest solvers
 julia> system = [x^2-2*y^2-2, x*y-2]
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  x^2 - 2*y^2 - 2
          x⋅y - 2
 
@@ -373,7 +373,7 @@ julia> n = sympy.Dummy("n")
 n
 
 julia> system = [exp(x)-sin(y), 1/y-3]
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  exp(x) - sin(y)
         -3 + 1/y
 
@@ -420,7 +420,7 @@ julia> nonlinsolve([x*y, x*y-x], (x, y))
 
 ```jldoctest solvers
 julia> system = [a^2+a*c, a-b]
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  a^2 + a*c
      a - b
 
@@ -453,7 +453,7 @@ it is similar
 
 ```jldoctest solvers
 julia> u = solve([x^2 - y^2/exp(x)], [x, y], dict=true)
-2-element Array{Dict{Any,Any},1}:
+2-element Vector{Dict{Any, Any}}:
  Dict(x => 2*LambertW(-y/2))
  Dict(x => 2*LambertW(y/2))
 
@@ -463,7 +463,7 @@ To get prettier output, the dict may be converted to have one with symbolic keys
 
 ```jldoctest solvers
 julia> convert(Dict{SymPy.Sym, Any}, first(u))
-Dict{Sym,Any} with 1 entry:
+Dict{Sym, Any} with 1 entry:
   x => 2*LambertW(-y/2)
 
 ```
@@ -486,7 +486,7 @@ Dict{Sym,Any} with 1 entry:
 
 ```jldoctest solvers
 julia> solve([sin(x + y), cos(x - y)], [x, y])
-4-element Array{Tuple{Sym,Sym},1}:
+4-element Vector{Tuple{Sym, Sym}}:
  (-3*pi/4, 3*pi/4)
  (-pi/4, pi/4)
  (pi/4, 3*pi/4)
@@ -517,7 +517,7 @@ julia> solveset(x^3 - 6*x^2 + 9*x, x)
 
 ```jldoctest solvers
 julia> roots(x^3 - 6*x^2 + 9*x, x)  |>  d -> convert(Dict{Sym, Any}, d) # prettier priting
-Dict{Sym,Any} with 2 entries:
+Dict{Sym, Any} with 2 entries:
   3 => 2
   0 => 1
 ```
@@ -544,7 +544,7 @@ multiplicity 1 and `3` is a root of multiplicity 2.
 
 ```jldoctest solvers
 julia> solve(x*exp(x) - 1, x )
-1-element Array{Sym,1}:
+1-element Vector{Sym}:
  W(1)
 
 ```

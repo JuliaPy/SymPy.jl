@@ -79,7 +79,7 @@ We can see that a flip is an involution through:
 
 ```jldoctest permutations
 julia> flip^2  # the identity
-(3)
+()
 
 ```
 
@@ -98,7 +98,7 @@ These two operations do not commute:
 
 ```jldoctest permutations
 julia> flip * rotate  # (3)(0 2) -- note (n) is the identity
-(3)(0 2)
+(0 2)
 
 ```
 
@@ -120,7 +120,7 @@ We can check that `flip` and `rotate^2` do commute:
 
 ```jldoctest permutations
 julia> id = Permutation(3)   # (n) is the identify
-(3)
+()
 
 julia> flip.commutator(rotate^2) == id
 true

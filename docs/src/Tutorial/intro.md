@@ -346,7 +346,7 @@ Solve $x^2 - 2 = 0$.
 
 ```jldoctest intro
 julia> solve(x^2 - 2, x)
-2-element Array{Sym,1}:
+2-element Vector{Sym}:
  -√2
   √2
 ```
@@ -408,7 +408,7 @@ Find the eigenvalues of `\left[\begin{smallmatrix}1 & 2\\2 &
 julia> out = sympy.Matrix([1 2; 2 2]).eigenvals();
 
 julia> sort(collect(keys(out)))
-2-element Array{Any,1}:
+2-element Vector{Any}:
  3/2 - sqrt(17)/2
  3/2 + sqrt(17)/2
 ```

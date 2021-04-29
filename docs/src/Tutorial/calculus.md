@@ -894,7 +894,7 @@ takes `order`, `x_list`, `y_list` and `x0` as parameters:
 
 ```jldoctest calculus
 julia> x_list = [-3, 1, 2]
-3-element Array{Int64,1}:
+3-element Vector{Int64}:
  -3
   1
   2
