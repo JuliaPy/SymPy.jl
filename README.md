@@ -4,7 +4,7 @@
 
 
 
-# SymPy Package to bring Python's `Sympy` functionality into `Julia` via `PyCall`
+# SymPy Package to bring Python's `SymPy` functionality into `Julia` via `PyCall`
 
 
 
@@ -92,7 +92,7 @@ With the `SymPy` package this gets replaced by a more `julia`n syntax:
 
 ```
 using SymPy
-x = symbols("x")		       # or  @syms x, @vars x, Sym("x"), or  Sym(:x)
+x = symbols("x")		       # or  @syms x
 y = sin(pi*x)
 y(1)                           # Does y.subs(x, 1). Use y(x=>1) to be specific as to which symbol to substitute
 ```
@@ -121,7 +121,7 @@ SymPy has a mix of function calls (as in `sin(x)`) and method calls
 specialized methods for many generic `Julia` functions, such as `sin`,
 a priviledged set of the function calls in `sympy` are imported as
 generic functions narrowed on their first argument being a symbolic
-object, as constructed by `Sym` or `symbols`. (Calling
+object, as constructed by `@syms`, `Sym`, or `symbols`. (Calling
 `import_from(sympy)` will import all the function calls.)
 
 The basic usage follows these points:
@@ -150,7 +150,7 @@ dispatch, but refers to a SymPy function from the `sympy` object. Its
 argument, `1`, is converted by `PyCall` into a Python object for the
 function to process.
 
-In the initial example, slightly rewritten, we could have written:
+In the initial example, slightly rewritten, we could have issued:
 
 ```
 x = symbols("x")
@@ -168,4 +168,4 @@ dot-call syntax of `PyCall` to call the `subs` method of the symbolic
 
 Not illustrated above, but classes and other objects from SymPy are
 not brought in by default, and can be accessed using qualification, as
-in `sympy.Function` (used to define symbolic functions).
+in `sympy.Function` (used, as is `@syms`, to define symbolic functions).
