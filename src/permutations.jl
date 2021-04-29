@@ -97,7 +97,7 @@ julia> rotate.order()
 These two operations do not commute:
 
 ```jldoctest permutations
-julia> flip * rotate  # (3)(0 2) -- note (n) is the identity
+julia> flip * rotate
 (0 2)
 
 ```

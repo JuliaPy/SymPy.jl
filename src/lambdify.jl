@@ -137,8 +137,7 @@ julia> ex = x^2 * sin(x)
  2       
 x ⋅sin(x)
 
-julia> fn = lambdify(ex)
-#99 (generic function with 1 method)
+julia> fn = lambdify(ex);
 
 julia> fn(pi)
 1.2086779438644711e-15
@@ -146,8 +145,7 @@ julia> fn(pi)
 julia> ex = x + 2y + 3z
 x + 2⋅y + 3⋅z
 
-julia> fn = lambdify(ex)
-#99 (generic function with 1 method)
+julia> fn = lambdify(ex);
 
 julia> fn(1,2,3) # order is by free_symbols
 14
@@ -155,8 +153,7 @@ julia> fn(1,2,3) # order is by free_symbols
 julia> ex(x=>1, y=>2, z=>3)
 14
 
-julia> fn = lambdify(ex, (y,x,z))
-#99 (generic function with 1 method)
+julia> fn = lambdify(ex, (y,x,z));
 
 julia> fn(1,2,3)
 13

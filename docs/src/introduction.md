@@ -243,7 +243,7 @@ A straight call is also possble, where the order of the variables is determined 
 
 ```jldoctest introduction
 julia> ex(1, pi)
-z + 1 + π
+x + 1 + π
 
 ```
 
@@ -734,11 +734,11 @@ The output of calling `roots` will be a dictionary whose keys are the roots and 
 julia> roots(p)
 Dict{Any, Any} with 7 entries:
   -1                 => 1
+  -1/2 + sqrt(3)*I/2 => 1
   3                  => 2
   1                  => 1
   0                  => 1
   2                  => 1
-  -1/2 + sqrt(3)*I/2 => 1
   -1/2 - sqrt(3)*I/2 => 1
 
 ```
@@ -989,9 +989,9 @@ julia> exs = [fn(0*h)-p(x=>0), fn(h)-p(x => h), fn(2h)-p(x => 2h)]
 
 julia> d = solve(exs, [a,b,c])
 Dict{Any, Any} with 3 entries:
-  a => -cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)
   b => 2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)
   c => 1
+  a => -cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)
 
 ```
 
@@ -1034,8 +1034,8 @@ julia> q = sum([bs[i+1]*(x-c)^i for i in 0:(n-1)])
 julia> solve(p-q, bs)
 Dict{Any, Any} with 3 entries:
   bs₃ => as₃
-  bs₁ => as₁ + as₂*c + as₃*c^2
   bs₂ => as₂ + 2*as₃*c
+  bs₁ => as₁ + as₂*c + as₃*c^2
 
 ```
 
