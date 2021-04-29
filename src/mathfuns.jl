@@ -107,8 +107,8 @@ julia> solve(x^2 + 2a*x + a^2, x) # [-a]
 
 julia> solve([a*x + b*y-3, c*x + b*y - 1], [x,y]) # Dict(y => (a - 3*c)/(b*(a - c)),x => 2/(a - c))
 Dict{Any, Any} with 2 entries:
-  x => 2/(a - c)
   y => (a - 3*c)/(a*b - b*c)
+  x => 2/(a - c)
 
 ```
 
