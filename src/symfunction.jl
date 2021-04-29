@@ -1,13 +1,14 @@
 ##################################################
 
 """
+    SymFunction
 
+A type and constructor to Create symbolic functions. Such objects can be used
+for specifying differential equations.  For these objects we can
+specify derivatives with the transpose operator (e.g., `u''`) as
+opposed to, say `diff(u(x), x, 2)`.
 
-Create a symbolic function. These can be used for specifying differential equations.
-For these objects we can specify derivatives with the transpose
-operator (e.g., `u''`) as opposed to, say `diff(u(x), x, 2)`.
-
-Example:
+## Examples:
 
 ```jldoctest symfunction
 julia> using SymPy
@@ -19,7 +20,7 @@ u'
 ```
 
 Alternatively, we can pass a comma separated string of variable names to create
-more than one at a time. (The `cls=symfunction` is no longer supported):
+more than one at a time.
 
 ```jldoctest symfunction
 julia> F,G,H = SymFunction("F, G, H")
@@ -31,7 +32,9 @@ julia> F,G,H = SymFunction("F, G, H")
 
 This is just a thin wrapper around `sympy.Function` for symbolic functions that allows prime notation in place of using `diff`.
 
-The macro [`@syms`](@ref) is also available for constructing symbolic functions.
+The macro [`@syms`](@ref) is also available for constructing `SymFunction`s (`@syms f()`)
+
+For symbolic functions *not* wrapped in the `SymFunction` type, the `sympy.Function` constructor can be used, as can the [`symbols`](@ref) function to construct symbolic functions (`F=sympy.Function(F,"real=true")`; `F = sympy.symbols("F", cls=sympy.Function, real=true)`).
 
 ```jldoctest symfunction
 julia> @syms u(), v()::real, t
@@ -41,6 +44,16 @@ julia> sqrt(u(t)^2), sqrt(v(t)^2) # real values have different simplification ru
 (sqrt(u(t)^2), Abs(v(t)))
 
 ```
+
+Here is one way to find the second derivative of an inverse function to `f`, utilizing the `SymFunction` class:
+
+```
+@syms f() f⁻¹() x
+u1 = solve(diff((f⁻¹∘f)(x), x) ⩵ 1, f⁻¹'(f(x)))[1]
+u2 = solve(diff((f⁻¹∘f)(x), x,2) ⩵ 0, f⁻¹''(f(x)))[1]
+u2(f⁻¹'(f(x)) => u1) # -f''/[f']^3
+```
+
 """
 mutable struct SymFunction <: SymbolicObject
     __pyobject__::PyCall.PyObject
@@ -63,7 +76,7 @@ end
 Thanks to `@alhirzel` for the contribution.
 
 !!! Note:
-    The `@symfuns` will be deprecated. The more general [`@syms`](@ref) macro should be used for constructing symbolic functions.
+    The `@symfuns` macro will be deprecated. The more general [`@syms`](@ref) macro should be used for constructing symbolic functions of type `SymFunction` and `symbols` can be used to construct symbolic functions in general.
 
 """
 macro symfuns(x...)
