@@ -1129,8 +1129,8 @@ expensive to calculate.
 * note missing `b` is not needed with `Julia`:
 
 ```jldoctest matrices
-julia> lambda = symbols("lambda")
-λ
+julia> @syms lambda
+(lambda,)
 
 julia> p = M.charpoly(lambda)
 PurePoly(lambda**4 - 11*lambda**3 + 29*lambda**2 + 35*lambda - 150, lambda, do
@@ -1139,6 +1139,17 @@ main='ZZ')
 julia> factor(p) |>  string
 "PurePoly(lambda^4 - 11*lambda^3 + 29*lambda^2 + 35*lambda - 150, lambda, domain='ZZ')"
 
+```
+
+
+As an aside, we can get prettier output by adjusting how `lambda` should print, as follows:
+
+```
+julia> @syms lambda=>"λ"
+(λ,)
+
+julia> p = M.charpoly(lambda)
+PurePoly(λ**4 - 11*λ**3 + 29*λ**2 + 35*λ - 150, λ, domain='ZZ')
 ```
 
 ----

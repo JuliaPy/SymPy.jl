@@ -20,7 +20,7 @@ sympy.init_printing(use_unicode=True)
 ```jldoctest solvers
 julia> using SymPy
 
-julia> x, y, z = symbols("x y z")
+julia> @syms x, y, z
 (x, y, z)
 ```
 
@@ -293,7 +293,7 @@ In the `solveset` module, the non linear system of equations is solved using
 * we pass `[a,b]` as either `a, b` or using a tuple, as in `(a,b)`, but *not* as a vector, as this gets mapped into a vector of symbolic objects which causes issues with `nonlinsolve`:
 
 ```jldoctest solvers
-julia> a, b, c, d = symbols("a, b, c, d", real=true)
+julia> @syms a::real, b::real, c::real, d::real
 (a, b, c, d)
 
 julia> nonlinsolve([a^2 + a, a - b], a, b)
@@ -566,8 +566,8 @@ function by passing `cls=Function` to the `symbols` function.
 ##### In `Julia`:
 
 ```jldoctest solvers
-julia> f, g = symbols("f g", cls=sympy.Function)
-(PyObject f, PyObject g)
+julia> @syms f() g()
+(f, g)
 
 ```
 
@@ -698,7 +698,7 @@ f
 
 ```
 
-or the `@symfuns` macro, as in `@symfuns f` to define symbolic functions. For these, rather than use `diff` to specify derivatives, the prime notation can be used. We then have, with `f` defined above:
+or the `@syms` macro, as in `@syms f()` to define symbolic functions. For these objects, rather than use `diff` to specify derivatives, the prime notation can be used. We then have, with `f` defined above:
 
 ```jldoctest solvers
 julia> diffeq = Eq(f''(x) - 2*f'(x) + f(x), sin(x)); string(diffeq)
@@ -725,11 +725,8 @@ For the initial condition `f'(x0) = y0`, this would be specified with a tuple `(
 For example, to solve the exponential equation $f'(x) = f(x), f(0) = a$ we would have:
 
 ```jldoctest solvers
-julia> f = SymFunction("f")
-f
-
-julia> x, a = symbols("x, a")
-(x, a)
+julia> @syms x, a, f()
+(x, a, f)
 
 julia> dsolve(f'(x) - f(x), f(x), ics = (f, 0, a)) |>  string
 "Eq(f(x), a*exp(x))"

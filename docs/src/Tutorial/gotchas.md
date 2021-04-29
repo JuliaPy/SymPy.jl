@@ -83,12 +83,21 @@ To define variables, we must use `symbols`.
 
 ##### In `Julia`:
 
+We can use `symbols`, as here:
+
 ```jldoctest gotchas
 julia> x = symbols("x")
 x
 
 julia> x + 1
 x + 1
+```
+
+but the recommended way is to use `@syms`:
+
+```jldoctest gotchas
+julia> @syms x
+(x,)
 ```
 
 ----
@@ -105,11 +114,13 @@ For now, let us just define the most common variable names, `x`, `y`, and
 
 ##### In `Julia`:
 
+Again, we use the `@syms` macro:
+
 ```jldoctest gotchas
 julia> x + 1
 x + 1
 
-julia> x, y, z = symbols("x y z")
+julia> @syms x, y, z
 (x, y, z)
 ```
 
@@ -142,6 +153,17 @@ b
 julia> b
 a
 ```
+
+This can also be done with the `@syms` macro:
+
+```jldoctest gotchas
+julia> @syms a=>"b" b=>"c"
+(b, c)
+
+julia> a + b
+b + c
+```
+
 
 ----
 
@@ -205,7 +227,7 @@ you're wrong.  Let's see what really happens
 
 ##### In `Julia`:
 
-* we must change to double quotes (or use `@syms x`, say)
+* we must change to double quotes (or, as recommended, use `@syms x`)
 
 ```jldoctest gotchas
 julia> x = symbols("x")
@@ -281,8 +303,8 @@ julia> expr
 ##### In `Julia`:
 
 ```jldoctest gotchas
-julia> x = symbols("x")
-x
+julia> @syms x
+(x,)
 
 julia> expr = x + 1
 x + 1
@@ -314,8 +336,8 @@ discussed in more detail later.
 ##### In `Julia`:
 
 ```jldoctest gotchas
-julia> x = symbols("x")
-x
+julia> @syms x
+(x,)
 
 julia> expr = x + 1
 x + 1

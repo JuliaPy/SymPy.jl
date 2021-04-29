@@ -135,7 +135,7 @@ Let us define a symbolic expression, representing the mathematical expression
 * the command `from sympy import *` is *essentially* run (only functions are "imported", not all objects), so this becomes the same after adjusting the quotes:
 
 ```jldoctest intro
-julia> x, y = symbols("x y")
+julia> @syms x, y
 (x, y)
 
 julia> expr = x + 2*y
@@ -243,7 +243,7 @@ of symbolic power SymPy is capable of, to whet your appetite.
 * again, the functions in the `sympy` module are already imported:
 
 ```jldoctest intro
-julia> x, t, z, nu = symbols("x t z nu")
+julia> @syms x, t, z, nu
 (x, t, z, nu)
 ```
 
@@ -388,6 +388,15 @@ julia> dsolve(y''(t) - y(t) - exp(t), y(t)) |> string
 "Eq(y(t), C2*exp(-t) + (C1 + t/2)*exp(t))"
 ```
 
+Even more so, `@syms` allows the specification of symbolic functions, as follows:
+
+```jldoctest intro
+julia> @syms y()::real t
+(y, t)
+
+julia> dsolve(y''(t) - y(t) - exp(t), y(t)) |> string
+"Eq(y(t), C2*exp(-t) + (C1 + t/2)*exp(t))"
+```
 ----
 
 Find the eigenvalues of `\left[\begin{smallmatrix}1 & 2\\2 &

@@ -34,7 +34,7 @@ julia> x, y, z = symbols("x y z")
 (x, y, z)
 ```
 
-We can also use the convenient `@syms` macro, as with
+We primarily will use the convenient `@syms` macro, as with
 
 ```jldoctest calculus
 julia> @syms x y z
@@ -761,15 +761,15 @@ the `differentiate_finite` function:
 * `differentiate_finite` is not exported
 
 ```jldoctest calculus
-julia> f, g = symbols("f g", cls=sympy.Function)
-(PyObject f, PyObject g)
+julia> @syms f(), g()
+(f, g)
 
 julia> sympy.differentiate_finite(f(x)*g(x))
 -f(x - 1/2)⋅g(x - 1/2) + f(x + 1/2)⋅g(x + 1/2)
 
 ```
 
-(The functions `f` and `g` can also be created with the command `@symfuns f g`, using the `@symfuns` macro.)
+(The functions `f` and `g` can also be created with `SymFunction`.)
 
 
 ----
@@ -893,19 +893,18 @@ takes `order`, `x_list`, `y_list` and `x0` as parameters:
 * `apply_finite_diff` is not exported:
 
 ```jldoctest calculus
-julia> x_list = [-3, 1, 2]
+julia> xs = [-3, 1, 2]
 3-element Vector{Int64}:
  -3
   1
   2
 
-julia> y_list = symbols("a b c")
-(a, b, c)
+julia> @syms ys[1:3]
+(Sym[ys₁, ys₂, ys₃],)
 
-julia> sympy.apply_finite_diff(1, x_list, y_list, 0)
-  3⋅a   b   2⋅c
-- ─── - ─ + ───
-   20   4    5
-
+julia> sympy.apply_finite_diff(1, xs, ys, 0)
+  3⋅ys₁   ys₂   2⋅ys₃
+- ───── - ─── + ─────
+    20     4      5  
 ```
 

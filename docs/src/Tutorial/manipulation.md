@@ -40,7 +40,7 @@ expression looks like internally by using `srepr`
 ```jldoctest manipulation
 julia> using SymPy
 
-julia> x, y, z = symbols("x y z")
+julia> @syms x, y, z
 (x, y, z)
 
 julia> expr = 2^x + x*y

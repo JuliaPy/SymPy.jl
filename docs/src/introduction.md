@@ -58,6 +58,30 @@ julia> a,b,c = Sym("a,b,c")
 
 ```
 
+Here are two ways to make related variables:
+
+```jldoctest introduction
+julia> @syms xs[1:5]
+(Sym[xs₁, xs₂, xs₃, xs₄, xs₅],)
+
+julia> ys = [Sym("y$i") for i in 1:5]
+julia> 5-element Vector{Sym}:
+ y₁
+ y₂
+ y₃
+ y₄
+ y₅
+5-element Vector{Sym}:
+ y₁
+ y₂
+ y₃
+ y₄
+ y₅
+```
+
+The former much more succinct, but the latter pattern of use when the number of terms is a variable.
+
+
 The `@syms` macro is recommended, and will be modeled in the following, as it makes the specification of assumptions and symbolic functions more natural.
 
 ### Assumptions
@@ -129,9 +153,9 @@ julia> @syms a1=>"α₁" a2=>"α₂"
 In this example, the Julia variables `a1` and `a2` are defined to store SymPy
 symbols with the "pretty" names `α₁` and `α₂` respectively.
 
-As can be seen, there are several ways to create symbolic values. One
-caveat is that one can't use `Sym` to create a variable from a
-function name in Base.
+As can be seen, there are several ways to create symbolic values, but
+the recommended way is to use `@syms`. One caveat is that one can't
+use `Sym` to create a variable from a function name in Base.
 
 ### Special constants
 
@@ -190,7 +214,7 @@ The output has no free variables, but is still symbolic.
 Expressions with more than one variable can have multiple substitutions, where each is expressed as a tuple:
 
 ```jldoctest introduction
-julia> x,y,z = symbols("x,y,z")
+julia> @syms x,y,z
 (x, y, z)
 
 julia> ex = x + y + z
@@ -219,7 +243,7 @@ A straight call is also possble, where the order of the variables is determined 
 
 ```jldoctest introduction
 julia> ex(1, pi)
-x + 1 + π
+z + 1 + π
 
 ```
 
@@ -499,7 +523,7 @@ julia> simplify(x^a * y^a - (x*y)^a)
 However, without assumptions this is not the case
 
 ```jldoctest introduction
-julia> x,y,a = symbols("x,y,a")
+julia> @syms x,y,a
 (x, y, a)
 
 julia> simplify(x^a * y^a - (x*y)^a)
@@ -521,8 +545,8 @@ julia> powsimp(x^a * y^a - (x*y)^a, force=true)
 For trigonometric expressions, `simplify` will use `trigsimp` to simplify:
 
 ```jldoctest introduction
-julia> theta = symbols("theta", real=true)
-θ
+julia> @syms theta::real
+(theta,)
 
 julia> p = cos(theta)^2 + sin(theta)^2
    2         2
@@ -560,7 +584,7 @@ julia> expand_trig(sin(2theta))
 Returning to polynomials, there are a few functions to find various pieces of the polynomials. First we make a general quadratic polynomial:
 
 ```jldoctest introduction
-julia> a,b,c,x = symbols("a, b, c, x")
+julia> @syms a,b,c,x
 (a, b, c, x)
 
 julia> p = a*x^2 + b*x + c
@@ -712,10 +736,10 @@ Dict{Any, Any} with 7 entries:
   -1                 => 1
   3                  => 2
   1                  => 1
-  -1/2 - sqrt(3)*I/2 => 1
-  -1/2 + sqrt(3)*I/2 => 1
   0                  => 1
   2                  => 1
+  -1/2 + sqrt(3)*I/2 => 1
+  -1/2 - sqrt(3)*I/2 => 1
 
 ```
 
@@ -851,7 +875,7 @@ equations of a more general type. For example, here it is used to
 derive the quadratic equation:
 
 ```jldoctest introduction
-julia> a,b,c  = symbols("a,b,c", real=true)
+julia> @syms a::real, b::real, c::real
 (a, b, c)
 
 julia> p = a*x^2 + b*x + c
@@ -896,7 +920,7 @@ is one where all the expressions are 0. For example, to solve this
 linear system: $2x + 3y = 6, 3x - 4y=12$, we have:
 
 ```jldoctest introduction
-julia> x, y = symbols("x,y", real=true)
+julia> @syms x::real, y::real
 (x, y)
 
 julia> exs = [2x+3y-6, 3x-4y-12]
@@ -966,8 +990,8 @@ julia> exs = [fn(0*h)-p(x=>0), fn(h)-p(x => h), fn(2h)-p(x => 2h)]
 julia> d = solve(exs, [a,b,c])
 Dict{Any, Any} with 3 entries:
   a => -cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)
-  c => 1
   b => 2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)
+  c => 1
 
 ```
 
@@ -990,20 +1014,14 @@ expansion theorem.)
 julia> n = 3
 3
 
-julia> x, c = symbols("x,c")
+julia> @syms x, c
 (x, c)
 
-julia> as = Sym["a$i" for i in 0:(n-1)]
-3-element Vector{Sym}:
- a₀
- a₁
- a₂
+julia> @syms as[1:3]
+(Sym[as₁, as₂, as₃],)
 
-julia> bs = Sym["b$i" for i in 0:(n-1)]
-3-element Vector{Sym}:
- b₀
- b₁
- b₂
+julia> @syms bs[1:3]
+(Sym[bs₁, bs₂, bs₃],)
 
 julia> p = sum([as[i+1]*x^i for i in 0:(n-1)])
                 2
@@ -1015,9 +1033,9 @@ julia> q = sum([bs[i+1]*(x-c)^i for i in 0:(n-1)])
 
 julia> solve(p-q, bs)
 Dict{Any, Any} with 3 entries:
-  b1 => a1 + 2*a2*c
-  b0 => a0 + a1*c + a2*c^2
-  b2 => a2
+  bs₃ => as₃
+  bs₁ => as₁ + as₂*c + as₃*c^2
+  bs₂ => as₂ + 2*as₃*c
 
 ```
 
