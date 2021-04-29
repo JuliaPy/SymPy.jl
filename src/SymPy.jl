@@ -37,6 +37,8 @@ using PyCall
 using SpecialFunctions
 using LinearAlgebra
 using Markdown
+import CommonSolve
+import CommonSolve: solve
 
 import Base: show
 import Base: convert, promote_rule
