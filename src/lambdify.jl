@@ -40,7 +40,7 @@ export __prod__
 fn_map = Dict(
               "Add" => :+,
               "Sub" => :-,
-              "Mul" => :((as...)->prod(as)), #:__prod__, # :* can now be used
+              "Mul" => :*, # was ((as...)->prod(as)), was:__prod__, but :* can now be used
               "Div" => :/,
               "Pow" => :^,
               "re"  => :real,

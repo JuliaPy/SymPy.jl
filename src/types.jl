@@ -116,6 +116,17 @@ end
 
 latex(x::Sym) = sympy.latex(x)
 
+# (this is used by Polynomials.jl)
+function Base.show_unquoted(io::IO, pj::SymbolicObject, indent::Int, prec::Int)
+    if Base.operator_precedence(:+) <= prec
+        print(io, "(")
+        show(io, pj)
+        print(io, ")")
+    else
+        show(io, pj)
+    end
+end
+
 
 
 ## Following recent changes to PyCall where:
