@@ -140,9 +140,28 @@ using LinearAlgebra
 
     ## Issue   #359
     if VERSION >= v"1.2"
-        @vars a
-        @test eltype([a 1; 1 a] + I) == Sym
-        @test eltype([a 1; 1 a] + 2I) == Sym
+        @syms a
+        A1 = [a 1; 1 a]
+        # The first six cases work
+        @test typeof(A1 + a*I) == Matrix{Sym}
+        @test typeof(A1 - a*I) == Matrix{Sym}
+        @test typeof(-A1 + a*I) == Matrix{Sym}
+        @test typeof(-A1 - a*I) == Matrix{Sym}
+        @test typeof(-a*I + A1) == Matrix{Sym}
+        @test typeof(a*I + A1) == Matrix{Sym}
+        @test typeof(a*I - A1) == Matrix{Sym}
+        @test typeof(-a*I - A1) == Matrix{Sym}
+
+        A2 = [1 2; 2 1]
+        @test typeof(A2 + a*I) == Matrix{Sym}
+        @test typeof(A2 - a*I) == Matrix{Sym}
+        @test typeof(-A2 + a*I) == Matrix{Sym}
+        @test typeof(-A2 - a*I) == Matrix{Sym}
+        @test typeof(-a*I + A2) == Matrix{Sym}
+        @test typeof(a*I + A2) == Matrix{Sym}
+        @test typeof(a*I - A2) == Matrix{Sym}
+        @test typeof(-a*I - A2) == Matrix{Sym}
+
     end
 
     ## Issue #397 adjoint losing type
