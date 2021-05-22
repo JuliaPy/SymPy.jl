@@ -84,6 +84,20 @@ end
 
 
 ## Add interfaces for solve, nonlinsolve when vector of equations passed in
+
+## An alternative to Eq(lhs, rhs) following Symbolics.jl
+"""
+    lhs ~ rhs
+
+Specify an equation.
+
+Alternative syntax to `Eq(lhs, rhs)` or `lhs ⩵ rhs` (`\\Equal[tab]`) following `Symbolics.jl`.
+"""
+Base.:~(lhs::Number, rhs::SymbolicObject) = Eq(lhs, rhs)
+Base.:~(lhs::SymbolicObject, rhs::Number) = Eq(lhs, rhs)
+Base.:~(lhs::SymbolicObject, rhs::SymbolicObject) = Eq(lhs, rhs)
+
+
 """
     solve
 

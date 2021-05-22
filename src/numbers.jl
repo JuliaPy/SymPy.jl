@@ -351,9 +351,9 @@ export ∨, ∧, ¬
 ## (≪)(a::Number, b::Number) = Lt(promote(a,b)...)  # \ll<tab>
 
 "This is `\\leqq<tab>` mapped as an infix operator to `Le`"
-(≦)(a::Sym, b::Sym) = Le(a,b)   # \ll<tab>
-(≦)(a::Sym, b::Number) = Le(a,Sym(b))  # \ll<tab>
-(≦)(a::Number, b::Sym) = Le(Sym(a),b)   # \ll<tab>
+(≦)(a::Sym, b::Sym) = Le(a,b)   # \leqq<tab>
+(≦)(a::Sym, b::Number) = Le(a,Sym(b))  # \leqq<tab>
+(≦)(a::Number, b::Sym) = Le(Sym(a),b)   # \leqq<tab>
 
 "This is `\\gg<tab>` mapped as an infix operator to `Gt`"
 (≫)(a::Sym, b::Sym) = Gt(a,b) |> asBool
