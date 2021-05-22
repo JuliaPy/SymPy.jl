@@ -440,7 +440,7 @@ import PyCall
     @test args(ex) == (x^2, x)
 
     # alternative operators
-    for ex1,ex2 ∈ ((Eq(x^2, x), x^2 ⩵ x),
+    for (ex1,ex2) ∈ ((Eq(x^2, x), x^2 ⩵ x),
                    (Eq(x^2, x), x^2 ~ x),
                    (Lt(x^2, x), x^2 ≪ x),
                    (Le(x^2, x), x^2 ≦ x),
