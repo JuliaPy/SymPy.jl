@@ -106,7 +106,6 @@ julia> sqrt(u(x)^2), sqrt(v(x)^2) # sqrt(u(x)^2), Abs(v(x))
 !!! Note:
     Many thanks to `@matthieubulte` for this contribution.
 """
-
 macro syms(xs...)
     # If the user separates declaration with commas, the top-level expression is a tuple
     if length(xs) == 1 && isa(xs[1], Expr) && xs[1].head == :tuple

@@ -434,10 +434,21 @@ import PyCall
 
     ## relations
     x,y=symbols("x, y")
-    ex = Eq(x^2, x)
+    ex  = Eq(x^2, x)
     @test ex.lhs() == x^2
     @test ex.rhs() == x
     @test args(ex) == (x^2, x)
+
+    # alternative operators
+    for (ex1,ex2) ∈ ((Eq(x^2, x), x^2 ⩵ x),
+                   (Eq(x^2, x), x^2 ~ x),
+                   (Lt(x^2, x), x^2 ≪ x),
+                   (Le(x^2, x), x^2 ≦ x),
+                   (Ge(x^2, x), x^2 ≧ x),
+                   (Gt(x^2, x), x^2 ≫ x))
+        @test lhs(ex1) == lhs(ex2)
+        @test rhs(ex1) == rhs(ex2)
+    end
 
     ## mpmath functions
 #    if @isdefined mpmath
