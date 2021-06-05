@@ -37,6 +37,13 @@ end
 __prod__(args...) =  prod(args)
 export __prod__
 
+## Hide these away. Anonymous function definition is problematic
+__SYMPY__ANY__(xs...) = any(xs)
+__SYMPY__ALL__(xs...) = all(xs)
+__SYMPY__ZERO__(xs...) = 0
+__SYMPY__HEAVISIDE__ = (a...)  -> (a[1] < 0 ? 0 : (a[1] > 0 ? 1 : (length(a) > 1 ? a[2] : NaN)))
+export __SYMPY__ANY__, __SYMPY__ALL__, __SYMPY__ZERO__, __SYMPY__HEAVISIDE__
+
 fn_map = Dict(
               "Add" => :+,
               "Sub" => :-,
@@ -50,9 +57,9 @@ fn_map = Dict(
               "Max" => :max,
               "Poly" => :identity,
               "Piecewise" => :(_piecewise),
-              "Order" => :((xs...)->0), 
-              "And" => :(&),
-              "Or" => :(|),
+              "Order" => :__SYMPY__ZERO__, # :(as...) -> 0,
+              "And" => :__SYMPY__ALL__, #:((as...) -> all(as)), #:(&),
+              "Or" =>  :__SYMPY__ANY__, #:((as...) -> any(as)), #:(|),
               "Less" => :(<),
               "LessThan" => :(<=),
               "StrictLessThan" => :(<),
@@ -65,7 +72,7 @@ fn_map = Dict(
     "conjugate" => :conj,
     "atan2" => :atan,
     # not quite a match; NaN not θ(0) when evaluated at 0 w/o second argument
-    "Heaviside" => :((a...)  -> (a[1] < 0 ? 0.0 : (a[1] > 0 ? 1.0 : (length(a) > 1 ? a[2] : NaN))))
+    "Heaviside" => :__SYMPY__HEAVISIDE__
               )
 
 map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : Symbol(key)
@@ -208,6 +215,7 @@ function  lambdify(ex::Sym, vars=free_symbols(ex);
               invoke_latest=true)
 
     body = convert_expr(ex, fns=fns, values=values, use_julia_code=use_julia_code)
+    body = Meta.parse(string(body)) ## this seems stupid!
     ex = expr_to_function(body, vars)
     if invoke_latest
         fn = eval(ex)

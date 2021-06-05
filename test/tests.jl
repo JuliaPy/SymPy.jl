@@ -729,6 +729,23 @@ end
     @vars x
     t = series(exp(x), x, 0, 2)
     @test lambdify(t)(1/2) == 1 + 1/2
+
+    ## issue #411 with Heaviside
+    @vars t
+    u = Heaviside(t)
+    λ = lambdify(u)
+    @test all((iszero(λ(-1)), isnan(λ(0)), isone(λ(1))))
+    u = Heaviside(t, 1)
+    λ = lambdify(u)
+    @test all((iszero(λ(-1)), isone(λ(0)), isone(λ(1))))
+
+    ## issue #295 with piecewise function
+    @syms x
+    p = sympy.Piecewise((x,Gt(x,0)), (x^2, Le(x,0)))
+    @test lambdify(p)(2) == 2
+    @test lambdify(p)(-2) == (-2)^2
+
+
 end
 
 @testset "generic programming, issue 223" begin
@@ -784,13 +801,5 @@ end
     A = sympy.MatrixSymbol("A", n, n)
     @test inv(A) == A.I
 
-    ## issue #411 with Heaviside
-    @vars t
-    u = Heaviside(t)
-    λ = lambdify(u)
-    @test all((iszero(λ(-1)), isnan(λ(0)), isone(λ(1))))
-    u = Heaviside(t, 1)
-    λ = lambdify(u)
-    @test all((iszero(λ(-1)), isone(λ(0)), isone(λ(1))))
    
 end
