@@ -18,9 +18,6 @@ val_map = Dict(
                "BooleanFalse"     => :false
                )
 
-## Mapping of Julia function names into julia ones
-## most are handled by Symbol(fnname), this catches exceptions
-_heaviside(x) = 1//2 * (1 + sign(x))
 function _piecewise(args...)
     as = copy([args...])
     val, cond = pop!(as)
@@ -32,22 +29,23 @@ function _piecewise(args...)
     ex
 end
 
+
+## Mapping of Julia function names into julia ones
+## most are handled by Symbol(fnname), the following catch exceptions
 ## Hack to avoid Expr(:call,  :*,2, x)  being  2x and  not  2*x
 ## As of newer sympy versions, this is no longer needed.
-__prod__(args...) =  prod(args)
-export __prod__
+__PROD__(args...) =  prod(args)
 
-## Hide these away. Anonymous function definition is problematic
-__SYMPY__ANY__(xs...) = any(xs)
-__SYMPY__ALL__(xs...) = all(xs)
-__SYMPY__ZERO__(xs...) = 0
-__SYMPY__HEAVISIDE__ = (a...)  -> (a[1] < 0 ? 0 : (a[1] > 0 ? 1 : (length(a) > 1 ? a[2] : NaN)))
-export __SYMPY__ANY__, __SYMPY__ALL__, __SYMPY__ZERO__, __SYMPY__HEAVISIDE__
-
+__ANY__(xs...) = any(xs)
+__ALL__(xs...) = all(xs)
+__ZERO__(xs...) = 0
+# not quite a match; NaN not θ(0) when evaluated at 0 w/o second argument
+__HEAVISIDE__ = (a...)  -> (a[1] < 0 ? 0 : (a[1] > 0 ? 1 : (length(a) > 1 ? a[2] : NaN)))
+#  __SYMPY__ALL__,
 fn_map = Dict(
               "Add" => :+,
               "Sub" => :-,
-              "Mul" => :*, # was ((as...)->prod(as)), was:__prod__, but :* can now be used
+              "Mul" => :*, # :(SymPy.__PROD__)
               "Div" => :/,
               "Pow" => :^,
               "re"  => :real,
@@ -56,10 +54,10 @@ fn_map = Dict(
               "Min" => :min,
               "Max" => :max,
               "Poly" => :identity,
-              "Piecewise" => :(_piecewise),
-              "Order" => :__SYMPY__ZERO__, # :(as...) -> 0,
-              "And" => :__SYMPY__ALL__, #:((as...) -> all(as)), #:(&),
-              "Or" =>  :__SYMPY__ANY__, #:((as...) -> any(as)), #:(|),
+              "Piecewise" => :(SymPy.__PIECEWISE__),
+              "Order" => :(SymPy.__ZERO__), # :(as...) -> 0,
+              "And" => :(SymPy.__ALL__), #:((as...) -> all(as)), #:(&),
+              "Or" =>  :(SymPy.__ANY__), #:((as...) -> any(as)), #:(|),
               "Less" => :(<),
               "LessThan" => :(<=),
               "StrictLessThan" => :(<),
@@ -71,8 +69,7 @@ fn_map = Dict(
               "Greater" => :(>),
     "conjugate" => :conj,
     "atan2" => :atan,
-    # not quite a match; NaN not θ(0) when evaluated at 0 w/o second argument
-    "Heaviside" => :__SYMPY__HEAVISIDE__
+    "Heaviside" => :(SymPy.__HEAVISIDE__)
               )
 
 map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : Symbol(key)
