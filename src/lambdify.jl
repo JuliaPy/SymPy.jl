@@ -223,7 +223,7 @@ function  lambdify(ex::Sym, vars=free_symbols(ex);
 end
 
 # convert symbolic expression to julia AST
-# more flexibly than `convert(Exprt, ex)`
+# more flexibly than `convert(Expr, ex)`
 function convert_expr(ex::Sym;
                       fns=Dict(), values=Dict(),
                       use_julia_code=false)
