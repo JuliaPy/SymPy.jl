@@ -18,29 +18,34 @@ val_map = Dict(
                "BooleanFalse"     => :false
                )
 
-## Mapping of Julia function names into julia ones
-## most are handled by Symbol(fnname), this catches exceptions
-_heaviside(x) = 1//2 * (1 + sign(x))
 function _piecewise(args...)
     as = copy([args...])
     val, cond = pop!(as)
-    ex = Expr(:call, :ifelse, cond, val, :nothing)
+    ex = Expr(:call, :ifelse, cond, convert(Expr,val), :nothing)
     while length(as) > 0
         val, cond = pop!(as)
-        ex = Expr(:call, :ifelse, cond, val, ex)
+        ex = Expr(:call, :ifelse, cond, convert(Expr,val), convert(Expr, ex))
     end
     ex
 end
 
+
+## Mapping of Julia function names into julia ones
+## most are handled by Symbol(fnname), the following catch exceptions
 ## Hack to avoid Expr(:call,  :*,2, x)  being  2x and  not  2*x
 ## As of newer sympy versions, this is no longer needed.
-__prod__(args...) =  prod(args)
-export __prod__
+__PROD__(args...) =  prod(args)
 
+__ANY__(xs...) = any(xs)
+__ALL__(xs...) = all(xs)
+__ZERO__(xs...) = 0
+# not quite a match; NaN not θ(0) when evaluated at 0 w/o second argument
+__HEAVISIDE__ = (a...)  -> (a[1] < 0 ? 0 : (a[1] > 0 ? 1 : (length(a) > 1 ? a[2] : NaN)))
+#  __SYMPY__ALL__,
 fn_map = Dict(
               "Add" => :+,
               "Sub" => :-,
-              "Mul" => :*, # was ((as...)->prod(as)), was:__prod__, but :* can now be used
+              "Mul" => :*, # :(SymPy.__PROD__)
               "Div" => :/,
               "Pow" => :^,
               "re"  => :real,
@@ -49,10 +54,10 @@ fn_map = Dict(
               "Min" => :min,
               "Max" => :max,
               "Poly" => :identity,
-              "Piecewise" => :(_piecewise),
-              "Order" => :((xs...)->0), 
-              "And" => :(&),
-              "Or" => :(|),
+              "Piecewise" => :(SymPy.__PIECEWISE__),
+              "Order" => :(SymPy.__ZERO__), # :(as...) -> 0,
+              "And" => :(SymPy.__ALL__), #:((as...) -> all(as)), #:(&),
+              "Or" =>  :(SymPy.__ANY__), #:((as...) -> any(as)), #:(|),
               "Less" => :(<),
               "LessThan" => :(<=),
               "StrictLessThan" => :(<),
@@ -64,8 +69,7 @@ fn_map = Dict(
               "Greater" => :(>),
     "conjugate" => :conj,
     "atan2" => :atan,
-    # not quite a match; NaN not θ(0) when evaluated at 0 w/o second argument
-    "Heaviside" => :((a...)  -> (a[1] < 0 ? 0.0 : (a[1] > 0 ? 1.0 : (length(a) > 1 ? a[2] : NaN))))
+    "Heaviside" => :(SymPy.__HEAVISIDE__)
               )
 
 map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : Symbol(key)
@@ -218,7 +222,7 @@ function  lambdify(ex::Sym, vars=free_symbols(ex);
 end
 
 # convert symbolic expression to julia AST
-# more flexibly than `convert(Exprt, ex)`
+# more flexibly than `convert(Expr, ex)`
 function convert_expr(ex::Sym;
                       fns=Dict(), values=Dict(),
                       use_julia_code=false)
