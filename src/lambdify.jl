@@ -21,10 +21,10 @@ val_map = Dict(
 function _piecewise(args...)
     as = copy([args...])
     val, cond = pop!(as)
-    ex = Expr(:call, :ifelse, cond, val, :nothing)
+    ex = Expr(:call, :ifelse, cond, convert(Expr,val), :nothing)
     while length(as) > 0
         val, cond = pop!(as)
-        ex = Expr(:call, :ifelse, cond, val, ex)
+        ex = Expr(:call, :ifelse, cond, convert(Expr,val), convert(Expr, ex))
     end
     ex
 end
@@ -212,7 +212,6 @@ function  lambdify(ex::Sym, vars=free_symbols(ex);
               invoke_latest=true)
 
     body = convert_expr(ex, fns=fns, values=values, use_julia_code=use_julia_code)
-    body = Meta.parse(string(body)) ## this seems stupid!
     ex = expr_to_function(body, vars)
     if invoke_latest
         fn = eval(ex)
