@@ -17,14 +17,14 @@ julia> x = sympy.IndexedBase("x")
 x
 
 julia> a = sympy.Sum(x[i], (i, 1, j))
-  j       
- ___      
- ╲        
-  ╲       
+  j
+ ___
+ ╲
+  ╲
   ╱   x[i]
- ╱        
- ‾‾‾      
-i = 1     
+ ╱
+ ‾‾‾
+i = 1
 ```
 
 """
@@ -146,7 +146,7 @@ simplify(x,args...;kwargs...) = x
 ##################################################
 # avoid type piracy. After we call `pytype` mappings, some
 # objects are automatically converted and no longer PyObjects
-function pycall_hasproperty(x::PyCall.PyObject, k) 
+function pycall_hasproperty(x::PyCall.PyObject, k)
     PyCall.hasproperty(x, k) && (getproperty(x,k) != nothing)
 end
 
@@ -214,7 +214,7 @@ const base_Ms = (Base, SpecialFunctions, Base.MathConstants,
 #
 const base_exclude=("C", "lambdify",
               "latex", "eye", "sympify","symbols", "subs",
-              "div", "log", "sinc",
+              "div", "rem", "log", "sinc",
               "dsolve",
               "ask",
               "plot")

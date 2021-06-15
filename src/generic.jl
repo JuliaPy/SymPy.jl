@@ -112,8 +112,11 @@ Base.angle(z::SymPy.SymbolicObject) = atan(sympy.im(z), sympy.re(z))
 
 
 # sympy.div for poly division
+Base.divrem(x::Sym, y) = sympy.div(x, y)
+# needed for #390; but odd
 Base.div(x::Sym, y::Union{Sym,Number}) = convert(Sym, sympy.floor(x/convert(Sym,y)))
 Base.rem(x::Sym, y::Union{Sym,Number}) = x-Sym(y)*Sym(sympy.floor.(x/y))
+
 
 Base.denominator(x::SymbolicObject) = denom(x)
 Base.numerator(x::SymbolicObject) = numer(x)
