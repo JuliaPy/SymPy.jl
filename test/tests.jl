@@ -501,7 +501,7 @@ end
 @testset "Syms macro" begin
     @syms u
     @test isa(u, Sym)
-    
+
     ret = @syms a, b, c
     @test isa(ret, Tuple{Sym, Sym, Sym})
 
@@ -509,12 +509,12 @@ end
     @test isa(x, Sym)
     @test ask(And(𝑄.real(x), 𝑄.positive(x)))
     @test string(x) == "x₀"
-    
+
     @test isa(y, Sym)
 
     @test isa(z, Sym)
     @test ask(𝑄.complex(z))
-    
+
     @test isa(n, Sym)
     @test ask(𝑄.integer(n))
 
@@ -801,5 +801,8 @@ end
     A = sympy.MatrixSymbol("A", n, n)
     @test inv(A) == A.I
 
-   
+    # ceil broken
+    @syms x
+    @test limit(ceil(x), x=>0, dir="+") != limit(ceil(x), x=>0, dir="-")
+    @test limit(floor(x), x=>0, dir="+") != limit(floor(x), x=>0, dir="-")
 end
