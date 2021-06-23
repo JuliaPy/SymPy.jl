@@ -8,7 +8,7 @@ Base.min(x::Sym, a) = sympy.Min(x, a)
 
 
 Base.cbrt(x::Sym) = x^(1//3)
-Base.ceil(x::Sym) = ceiling(x)
+Base.ceil(x::Sym) = sympy.ceiling(x)
 
 ## Trig
 Base.asech(z::Sym) = log(sqrt(1/z-1)*sqrt(1/z+1) + 1/z)
@@ -101,7 +101,7 @@ Base.:~(lhs::SymbolicObject, rhs::SymbolicObject) = Eq(lhs, rhs)
 """
     solve
 
-Use `solve` to solve algebraic equations. 
+Use `solve` to solve algebraic equations.
 
 Examples:
 
@@ -172,7 +172,7 @@ julia> eqn = y'(x) - y(x);
 julia> dsolve(eqn, y(x), ics=(y,0,1)) |> string # technical to avoid  parsing issue with doctesting
 "Eq(y(x), exp(x))"
 
-julia> eqn = y''(x) - y(x) - exp(x); 
+julia> eqn = y''(x) - y(x) - exp(x);
 
 julia> dsolve(eqn, y(x), ics=((y,0,1), (y, 1, 1//2))) |> string
 "Eq(y(x), (x/2 + (-exp(2) - 2 + E)/(-2 + 2*exp(2)))*exp(x) + (-E + 3*exp(2))*exp(-x)/(-2 + 2*exp(2)))"
