@@ -745,7 +745,10 @@ end
     @test lambdify(p)(2) == 2
     @test lambdify(p)(-2) == (-2)^2
 
-
+    ## Issue catch all for N; floats only
+    @syms x
+    ex = integrate(sqrt(1 + (1/x)^2), (x, 1/sympy.E, sympy.E))
+    @test N(ex) ≈ 3.196198513599507
 end
 
 @testset "generic programming, issue 223" begin
