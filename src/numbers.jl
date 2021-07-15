@@ -152,7 +152,7 @@ julia> [r.evalf() for r in rts]          # numeric solutions to quintic
  0.764884433600585 - 0.352471546031726⋅ⅈ
  0.764884433600585 + 0.352471546031726⋅ⅈ
 
-julia> [N(r) for r in rts]             
+julia> [N(r) for r in rts]
 5-element Vector{Number}:
                      -1.167303978261418684256045899854842180720560371525489039140082449275651903429536
  -0.18123244446987538 - 1.0839541013177107im
@@ -241,8 +241,12 @@ function N(x::Sym)
     elseif Eq(x, Sym(false)) == Sym(true)
         return false
     else
-        @info "FAILED to find type for $x. Please report"
-        x
+        try
+            lambdify(x)()
+        catch err
+            @info "FAILED to find type for $x. Please report"
+            x
+        end
     end
 end
 N(x::Number) = x  # implies N(x::Sym) = x if ...
@@ -356,12 +360,12 @@ export ∨, ∧, ¬
 (≦)(a::Number, b::Sym) = Le(Sym(a),b)   # \leqq<tab>
 
 "This is `\\gg<tab>` mapped as an infix operator to `Gt`"
-(≫)(a::Sym, b::Sym) = Gt(a,b) 
+(≫)(a::Sym, b::Sym) = Gt(a,b)
 (≫)(a::Sym, b::Number) = Gt(a,Sym(b))
 (≫)(a::Number, b::Sym) = Gt(Sym(a),b)
 
 "This is `\\geqq<tab>` mapped as an infix operator to `Ge`"
-(≧)(a::Sym, b::Sym) = Ge(a,b) 
+(≧)(a::Sym, b::Sym) = Ge(a,b)
 (≧)(a::Sym, b::Number) = Ge(a,Sym(b))
 (≧)(a::Number, b::Sym) = Ge(Sym(a),b)
 
