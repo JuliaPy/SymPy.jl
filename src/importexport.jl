@@ -144,6 +144,7 @@ Gt(ex::Number, args...; kwargs...)=getproperty(sympy, :Gt)(ex, Sym.(args)...; kw
 Eq(ex::Number, args...; kwargs...)=getproperty(sympy, :Eq)(ex, Sym.(args)...; kwargs...); export Eq
 GreaterThan(ex::Number, args...; kwargs...)=getproperty(sympy, :GreaterThan)(ex, Sym.(args)...; kwargs...); export GreaterThan
 Le(ex::Number, args...; kwargs...)=getproperty(sympy, :Le)(ex, Sym.(args)...; kwargs...); export Le
+Lt(ex::Number, args...; kwargs...)=getproperty(sympy, :Lt)(ex, Sym.(args)...; kwargs...); export Lt
 Unequality(ex::Number, args...; kwargs...)=getproperty(sympy, :Unequality)(ex, Sym.(args)...; kwargs...); export Unequality
 Ge(ex::Number, args...; kwargs...)=getproperty(sympy, :Ge)(ex, Sym.(args)...; kwargs...); export Ge
 StrictLessThan(ex::Number, args...; kwargs...)=getproperty(sympy, :StrictLessThan)(ex, Sym.(args)...; kwargs...); export StrictLessThan

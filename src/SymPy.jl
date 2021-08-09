@@ -20,7 +20,7 @@ SymPy's [website](http://docs.sympy.org/latest/index.html).
 Plotting is provided through  `Plots` recipes. For details, see
 the help page for [`sympy_plotting`](@ref).
 
-The package documentation provides many examples. 
+The package documentation provides many examples.
 
 """
 module SymPy
@@ -39,6 +39,8 @@ using LinearAlgebra
 using Markdown
 import CommonSolve
 import CommonSolve: solve
+import CommonEq
+import CommonEq: Eq, Lt, Le, Ne, Ge, Gt, ⩵, ≪, ≦, ≧,≫
 
 import Base: show
 import Base: convert, promote_rule
@@ -80,7 +82,7 @@ pynull() = PyCall.PyNULL()
 """
     sympy
 
-Variable from `pyimport("sympy")`. Numerous methods are available through Python's dot-call syntax. 
+Variable from `pyimport("sympy")`. Numerous methods are available through Python's dot-call syntax.
 """
 const sympy  = PyCall.PyNULL()
 """
@@ -120,7 +122,7 @@ function __init__()
     ## Define sympy, mpmath, ...
     copy!(sympy, PyCall.pyimport_conda("sympy", "sympy"))
     copy!(sympy_core, PyCall.pyimport("sympy.core"))
-    copy!(sympy_matrices, PyCall.pyimport("sympy.matrices"))    
+    copy!(sympy_matrices, PyCall.pyimport("sympy.matrices"))
     copy!(PI.__pyobject__,  sympy.pi)
     copy!(IM.__pyobject__, sympy.I)
     copy!(oo.__pyobject__, sympy.oo)
@@ -246,17 +248,13 @@ function import_sympy()
     d1 = filter(uv -> in_base(uv) && is_function(uv), d)
     import_from(sympy, setdiff(Symbol.(collect(keys(d1))),  Symbol.(base_exclude)))
     import_from(sympy, priviledged)
-    import_from(sympy, (:Ne,  :Le, :Eq, :Ge, :Gt,
+    import_from(sympy, (:Ne, :Lt, :Le, :Eq, :Ge, :Gt,
                         :GreaterThan, :LessThan,
                         :StrictGreaterThan, :StrictLessThan,
                         :Equality, :Unequality
                         ), typ=:Number)
 end
 
-## :Lt is in Base.Order
-import Base.Order: Lt
-Lt(x::Number, args...;kwargs...) = sympy.Lt(x, args...; kwargs...)
-export(Lt)
 
 
 ### Add generic methods and new methods
