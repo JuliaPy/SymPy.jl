@@ -111,9 +111,9 @@ Base.:+(A::AbstractMatrix{T}, J::UniformScaling) where {T <: SymbolicObject} = (
 Base.:+(A::AbstractMatrix, J::UniformScaling{T}) where {T <: SymbolicObject} = (n=LinearAlgebra.checksquare(A); A .+ J.λ*I(n))
 Base.:+(A::AbstractMatrix{T}, J::UniformScaling{T}) where {T <: SymbolicObject} = (n=LinearAlgebra.checksquare(A); A .+ J.λ*I(n))
 
-Base.:-(J::UniformScaling, A::AbstractMatrix{T}) where {T <: SymbolicObject} = A + (-J)
-Base.:-(J::UniformScaling{T}, A::AbstractMatrix) where {T <: SymbolicObject} = A + (-J)
-Base.:-(J::UniformScaling{T}, A::AbstractMatrix{T}) where {T <: SymbolicObject} = A + (-J)
+Base.:-(J::UniformScaling, A::AbstractMatrix{T}) where {T <: SymbolicObject} = (-A) + J
+Base.:-(J::UniformScaling{T}, A::AbstractMatrix) where {T <: SymbolicObject} = (-A) + J
+Base.:-(J::UniformScaling{T}, A::AbstractMatrix{T}) where {T <: SymbolicObject} = (-A) + J
 
 
 # Issue 397 so that A' infers correctly
