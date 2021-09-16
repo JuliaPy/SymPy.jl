@@ -75,6 +75,7 @@ include("lambdify.jl")
 include("patternmatch.jl")
 include("permutations.jl")
 include("plot_recipes.jl")
+include("terminterface.jl")
 
 ##################################################
 
