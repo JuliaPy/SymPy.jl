@@ -157,6 +157,7 @@ pycall_hasproperty(x, k) = false
 # x.is_finite -> is_(:finite, x)
 # e.g.: is_(:FiniteSet, x) = hasproperty && get property
 function is_(k::Symbol, x::Sym)::Bool
+    (PyCall.PyObject(x) == PyCall.PyNULL()) && return Sym(false)
     key = Symbol("is_$k")
     pycall_hasproperty(x, key) && getproperty(x, key) == Sym(true)
 end

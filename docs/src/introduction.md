@@ -703,7 +703,7 @@ julia> real_roots(p)
 
 !!! note "Why `string`?"
     The uses of `string(p)` above and elsewhere throughout the introduction is only for technical reasons related to doctesting and how `Documenter.jl` parses  the expected output. This usage is not idiomatic, or suggested; it  only allows the cell  to  be tested programatically for  regressions. Similarly, expected errors  are  wrapped in `try`-`catch` blocks just  for testing purposes.
-	
+
 
 In this example, the degree of `p` is 8, but only the 6 real roots
 returned, the double root of $3$ is accounted for. The two complex
@@ -1114,22 +1114,25 @@ In particular, the following methods of `plot` are defined:
 For example:
 
 ```@example plots
-using SymPy, Plots
+using SymPy, Plots; unicodeplots()
 @syms x
 plot(x^2 - 2, -2,2)
-savefig("plot-1.svg"); nothing  # hide
+##savefig("plot-1.svg"); nothing  # hide
+##![](plot-1.svg) # hide
+show(current())  # hide
 ```
 
-![](plot-1.svg)
+
 
 Or a parametric plot:
 
 ```@example plots
 plot(sin(2x), cos(3x), 0, 4pi);
-savefig("plot-2.svg"); nothing # hide
+#savefig("plot-2.svg"); nothing # hide
+#![](plot-2.svg) # hide
+show(current())  # hide
 ```
 
-![](plot-2.svg)
 
 For plotting with other plotting packages, it is generally faster to
 first call `lambdify` on the expression and then generate `y` values
@@ -1140,10 +1143,12 @@ ex = cos(x)^2  +  cos(x^2)
 fn = lambdify(ex)
 xs = range(0, stop=10, length=256)
 plot(xs, fn.(xs))
-savefig("plot-3.svg"); nothing #hide
+#savefig("plot-3.svg"); nothing # hide
+#![](plot-3.svg) # hide
+show(current())  # hide
 ```
 
-![](plot-3.svg)
+
 
 ----
 
@@ -1709,7 +1714,7 @@ Integration is implemented in SymPy through the `integrate` function. There are 
 Basic integrals are implemented:
 
 ```jldoctest introduction
-julia> integrate(x^3, x) 
+julia> integrate(x^3, x)
  4
 x
 ──
@@ -2005,7 +2010,7 @@ well, SymPy has a class for matrices. `SymPy`, through `PyCall`, automatically m
 
 
 Constructing matrices with symbolic entries follows `Julia`'s conventions:
-	
+
 ```jldoctest introduction
 julia> @syms x,y
 (x, y)
@@ -2197,7 +2202,7 @@ arguments to control the underlying algorithm. These can be passed
 through with the appropriate keyword arguments. (To use SymPy's `ics` argument, the `sympy.dsolve` method must be called directly.)
 
 The `SymFunction` objects have the `'` method defined to
-find a derivative. 
+find a derivative.
 The above could also have been expressed  more familiarly through:
 
 ```jldoctest introduction
@@ -2210,7 +2215,7 @@ julia> sympy.dsolve(diffeq, F(x)) |> string
 ```
 
 !!! note
-    Using the `adjoint` operator for differentiation as a convenience is nice, but it has potential issues, as it preferences treating `SymFunction` objects as functions of a single variable and makes their  usages within  arrays possible problematic, as the  recursive `adjoint` function will not perform the generic  task. 
+    Using the `adjoint` operator for differentiation as a convenience is nice, but it has potential issues, as it preferences treating `SymFunction` objects as functions of a single variable and makes their  usages within  arrays possible problematic, as the  recursive `adjoint` function will not perform the generic  task.
 
 
 
@@ -2387,10 +2392,12 @@ for aᵢ in as[2:end]
     plot!(p, xs, fn.(xs))
 end
 p
-savefig("plot-9.svg"); nothing #hide
+#savefig("plot-9.svg"); nothing #hide
+#![](plot-9.svg) # hide
+show(current())  # hide
 ```
 
-![](plot-9.svg)
+
 
 The comment from the example is "This plots several integral curves of the equation for different values of $a$. The plot shows that the solutions have an inflection point if the parameter  lies between $-1$ and $1$ , while a global maximum or minimum arises for other values of $a$."
 
@@ -2428,10 +2435,12 @@ x = symbols("x"); nothing #hide
 eqn = y''(x) + 5y'(x) + 6y(x); nothing  #hide
 out = dsolve(eqn, x, ics=((y, 0, 1), (y', 0, 1))); nothing #hide
 plot(out.rhs(), -1/3, 2)
-savefig("plot-10.svg"); nothing  # hide
+#savefig("plot-10.svg"); nothing  # hide
+#![](plot-10.svg) # hide
+show(current())  # hide
 ```
 
-![](plot-10.svg)
+
 
 ##### Example
 
