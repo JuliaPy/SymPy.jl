@@ -809,3 +809,5 @@ end
     @test limit(ceil(x), x=>0, dir="+") != limit(ceil(x), x=>0, dir="-")
     @test limit(floor(x), x=>0, dir="+") != limit(floor(x), x=>0, dir="-")
 end
+
+@test SymPy.convert_expr(sympy.Indexed(sympy.IndexedBase(:x), 1, -2)) == :(x[1, -2])
