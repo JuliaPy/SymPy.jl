@@ -98,15 +98,8 @@ function Base.transpose(f::Sym)::Sym
 end
 
 Base.real(::Type{Sym}) = Sym
-Base.real(x::Sym) = _real(N(x))
-_real(x::Sym) = sympy.:re(x)
-_real(x) = real(x)
-
-
-
-Base.imag(x::Sym) = _imag(N(x))
-_imag(x::Sym) = sympy.im(x)
-_imag(x) = imag(x)
+Base.real(x::Sym) = sympy.re(x)
+Base.imag(x::Sym) =  sympy.im(x)
 
 Base.angle(z::SymPy.SymbolicObject) = atan(sympy.im(z), sympy.re(z))
 
