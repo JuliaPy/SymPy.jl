@@ -10,6 +10,11 @@ using SpecialFunctions
     @test simplify(hypot(ρ*cos(ϕ), ρ * sin(ϕ))) == ρ
     @test simplify(hypot(ρ*cos(ϕ), 3)) == sqrt(ρ^2*cos(ϕ)^2 + 9)
 
+    @test real(sqrt(Sym(5))+im) == sqrt(Sym(5))
+    @test real(sqrt(Sym(5))+im) isa Sym
+    @test imag(sqrt(Sym(5))+im) == 1
+    @test imag(sqrt(Sym(5))+im) isa Sym
+
     @test atan(Sym(1), 1) == PI/4
     @test atan(Sym(1), -1) == 3PI/4
 
