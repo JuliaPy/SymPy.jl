@@ -145,7 +145,8 @@ function Base.getproperty(o::T, s::Symbol) where {T <: SymbolicObject}
     end
 end
 
-function Base.hasproperty(o::T, s::Symbol) where {T <: SymbolicObject}
-    s ∈ fieldnames(T) && return true
-    hasproperty(PyCall.PyObject(o), s)
-end
+# XXX Needs version v1.2+
+#function Base.hasproperty(o::T, s::Symbol) where {T <: SymbolicObject}
+#    s ∈ fieldnames(T) && return true
+#    hasproperty(PyCall.PyObject(o), s)
+#end
