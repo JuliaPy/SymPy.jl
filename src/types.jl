@@ -84,10 +84,11 @@ Base.show(io::IO, ::MIME"text/plain", s::SymbolicObject) =  print(io, sympy.pret
 #Base.show(io::IO, ::MIME"text/latex", x::SymbolicObject) = print(io, sympy.latex(x, mode="equation*"))
 
 as_markdown(x) = Markdown.parse("``$x``")
-function Base.show(io::IO, ::MIME"text/latex", x::SymbolicObject) 
-    print(io, as_markdown(sympy.latex(x, mode="equation*")))
+function Base.show(io::IO, ::MIME"text/latex", x::SymbolicObject)
+    print(io, sympy.latex(x, mode="inline",fold_short_frac=false)) # plain? equation*?
+#    #print(io, as_markdown(sympy.latex(x, mode="equation*")))
+#    #print(io, as_markdown(sympy.latex(x, mode="plain",fold_short_frac=false))) # inline?
 end
-
 function  show(io::IO, ::MIME"text/latex", x::AbstractArray{Sym})
     function toeqnarray(x::Vector{Sym})
         a = join([sympy.latex(x[i]) for i in 1:length(x)], "\\\\")
@@ -142,4 +143,9 @@ function Base.getproperty(o::T, s::Symbol) where {T <: SymbolicObject}
     else
         getproperty(PyCall.PyObject(o), s)
     end
+end
+
+function Base.hasproperty(o::T, s::Symbol) where {T <: SymbolicObject}
+    s ∈ fieldnames(T) && return true
+    hasproperty(PyCall.PyObject(o), s)
 end
