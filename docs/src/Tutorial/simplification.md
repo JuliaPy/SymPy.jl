@@ -352,11 +352,11 @@ denominators (i.e., are integers).
 julia> cancel((x^2 + 2*x + 1)/(x^2 + x))
 x + 1
 ─────
-  x  
+  x
 
 julia> expr = 1/x + (3*x/2 - 2)/(x - 4)
-3⋅x        
-─── - 2    
+3⋅x
+─── - 2
  2        1
 ─────── + ─
  x - 4    x
@@ -366,16 +366,16 @@ julia> cancel(expr) |>  string
 
 julia> expr = (x*y^2 - 2*x*y*z + x*z^2 + y^2 - 2*y*z + z^2)/(x^2 - 1)
    2                2    2            2
-x⋅y  - 2⋅x⋅y⋅z + x⋅z  + y  - 2⋅y⋅z + z 
+x⋅y  - 2⋅x⋅y⋅z + x⋅z  + y  - 2⋅y⋅z + z
 ───────────────────────────────────────
-                  2                    
-                 x  - 1     
+                  2
+                 x  - 1
 
 julia> cancel(expr)
  2            2
-y  - 2⋅y⋅z + z 
+y  - 2⋅y⋅z + z
 ───────────────
-     x - 1     
+     x - 1
 ```
 
 ----
@@ -435,7 +435,7 @@ julia> apart(expr)
  2⋅x - 1       1     3
 ────────── - ───── + ─
  2           x + 4   x
-x  + x + 1            
+x  + x + 1
 
 ```
 
@@ -569,9 +569,9 @@ julia> expand_trig(sin(x + y))
 sin(x)⋅cos(y) + sin(y)⋅cos(x)
 
 julia> expand_trig(tan(2*x))
-  2⋅tan(x) 
+  2⋅tan(x)
 ───────────
-       2   
+       2
 1 - tan (x)
 ```
 
@@ -685,7 +685,7 @@ julia> z, t, c = symbols("z t c")
 
 However, the recommended way is to use `@syms` for symbol construction with assumptions:
 
-```
+```jldoctest simplification
 julia> @syms x::positive, y::positive
 (x, y)
 
@@ -694,7 +694,7 @@ julia> @syms a::real, b::real
 
 julia> @syms z, t, c
 (z, t, c)
-
+```
 
 
 ----
@@ -746,7 +746,7 @@ powsimp
 ```jldoctest simplification
 julia> powsimp(x^a*x^b)
  a + b
-x     
+x
 
 julia> powsimp(x^a*y^a) |> string
 "(x*y)^a"
@@ -807,9 +807,9 @@ rational numbers, and identity 2 holds, it will be applied automatically.
 ```jldoctest simplification
 julia> (z*t)^2
  2  2
-t ⋅z 
+t ⋅z
 
-julia> sqrt(x*y) 
+julia> sqrt(x*y)
 √x⋅√y
 ```
 
@@ -832,7 +832,7 @@ they would be automatically split apart again.
 ```jldoctest simplification
 julia> powsimp(z^2*t^2)
  2  2
-t ⋅z 
+t ⋅z
 
 julia> powsimp(sqrt(x)*sqrt(y))
 √x⋅√y
@@ -861,11 +861,11 @@ from right to left, respectively.
 ```jldoctest simplification
 julia> expand_power_exp(x^(a + b))
  a  b
-x ⋅x 
+x ⋅x
 
 julia> expand_power_base((x*y)^a)
  a  a
-x ⋅y 
+x ⋅y
 ```
 
 ----
@@ -946,7 +946,7 @@ julia> expand_power_exp(x^5) |> string
 ```jldoctest simplification
 julia> powdenest((x^a)^b)
  a⋅b
-x  
+x
 ```
 
 ----
@@ -983,7 +983,7 @@ And as before, this can be manually overridden with `force=True`.
 ```jldoctest simplification
 julia> powdenest((z^a)^b, force=true)
  a⋅b
-z 
+z
 ```
 
 ----
@@ -1247,7 +1247,7 @@ julia> binomial(n, k)
 
 ----
 
-The factorial function is closely related to the [gamma  function](http://en.wikipedia.org/wiki/Gamma_function). 
+The factorial function is closely related to the [gamma  function](http://en.wikipedia.org/wiki/Gamma_function).
 $\Gamma(z) = \int_0^\infty t^{z - 1}e^{-t}dt$ is implemented in  `gamma(z)`, which for positive integer has:
 `z` is the same as `(z - 1)!`.
 
@@ -1370,7 +1370,7 @@ To rewrite `hyper` in terms of more standard functions, use
 
 ```jldoctest simplification
 julia> sympy.hyperexpand(sympy.hyper([1, 1], [2], z))
--log(1 - z) 
+-log(1 - z)
 ────────────
      z
 ```
@@ -1595,7 +1595,7 @@ into standard rational function form using `cancel()`.
 julia> frac = cancel(frac)
 a₀⋅a₁⋅a₂⋅a₃⋅a₄ + a₀⋅a₁⋅a₂ + a₀⋅a₁⋅a₄ + a₀⋅a₃⋅a₄ + a₀ + a₂⋅a₃⋅a₄ + a₂ + a₄
 ─────────────────────────────────────────────────────────────────────────
-                 a₁⋅a₂⋅a₃⋅a₄ + a₁⋅a₂ + a₁⋅a₄ + a₃⋅a₄ + 1                 
+                 a₁⋅a₂⋅a₃⋅a₄ + a₁⋅a₂ + a₁⋅a₄ + a₃⋅a₄ + 1
 ```
 
 ----
@@ -1764,7 +1764,7 @@ julia> a = a[randperm(length(a))]
 julia> orig_frac = frac = cancel(list_to_frac(a))
 a₀⋅a₁⋅a₂⋅a₃⋅a₄ + a₀⋅a₁⋅a₄ + a₀⋅a₃⋅a₄ + a₁⋅a₂⋅a₃ + a₁⋅a₂⋅a₄ + a₁ + a₃ + a₄
 ─────────────────────────────────────────────────────────────────────────
-                 a₀⋅a₁⋅a₂⋅a₃ + a₀⋅a₁ + a₀⋅a₃ + a₁⋅a₂ + 1 
+                 a₀⋅a₁⋅a₂⋅a₃ + a₀⋅a₁ + a₀⋅a₃ + a₁⋅a₂ + 1
 ```
 
 ----
@@ -1784,5 +1784,3 @@ at each stage (hint: think of what happens to $a_0$ in the formula $a_0 +
 !!! note
 
     Answer: a0 is the only symbol that does not appear in the denominator
-
-
