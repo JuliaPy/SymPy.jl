@@ -97,7 +97,7 @@ be combined logically. For example, this will be `true`:
 
 ```jldoctest 𝑄
 julia> ask(𝑄.positive(y) & 𝑄.negative(-x^2 - 1))
-true
+
 ```
 
 The above use `&` as an infix operation for the binary operator

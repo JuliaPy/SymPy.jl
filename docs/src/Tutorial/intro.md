@@ -384,7 +384,9 @@ julia> dsolve(Eq(y(t).diff(t, t) - y(t), exp(t)), y(t)) |> string # work around 
 julia> y = SymFunction("y")
 y
 
-julia> dsolve(y''(t) - y(t) - exp(t), y(t)) |> string  
+julia> D = Differential(t);
+
+julia> dsolve(D(D(y))(t) - y(t) - exp(t), y(t)) |> string
 "Eq(y(t), C2*exp(-t) + (C1 + t/2)*exp(t))"
 ```
 
@@ -394,7 +396,7 @@ Even more so, `@syms` allows the specification of symbolic functions, as follows
 julia> @syms y()::real t
 (y, t)
 
-julia> dsolve(y''(t) - y(t) - exp(t), y(t)) |> string
+julia> dsolve(D(D(y))(t) - y(t) - exp(t), y(t)) |> string
 "Eq(y(t), C2*exp(-t) + (C1 + t/2)*exp(t))"
 ```
 ----
@@ -450,7 +452,7 @@ julia> @syms ν z
 julia> besselj(ν, z).rewrite(sympy.jn)
 √2⋅√z⋅jn(ν - 1/2, z)
 ────────────────────
-         √π  
+         √π
 ```
 
 ----
@@ -533,4 +535,3 @@ There are other symbolic packages for `Julia`:
 * [SymbolicUtils](https://github.com/JuliaSymbolics/SymbolicUtils.jl)
 
 SymPy is an attractive alternative as `PyCall` makes most all of its functinality directly available and SymPy is fairly feature rich.
-

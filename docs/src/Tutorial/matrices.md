@@ -472,6 +472,7 @@ julia> using Test
 
 julia> @test_throws  Exception M1^-1
 Test Passed
+  Expression: M1 ^ -1
       Thrown: PyCall.PyError
 
 ```
@@ -891,9 +892,9 @@ julia> M = Sym[1 2 3 0 0; 4 10 0 0 1]
 
 julia> M.nullspace()
 3-element Vector{Matrix{Sym}}:
- [-15; 6; … ; 0; 0]
- [0; 0; … ; 1; 0]
- [1; -1/2; … ; 0; 1]
+ [-15; 6; … ; 0; 0;;]
+ [0; 0; … ; 1; 0;;]
+ [1; -1/2; … ; 0; 1;;]
 
 ```
 
@@ -934,8 +935,8 @@ julia> M = Sym[1 1 2; 2 1 3; 3 1 4]
 
 julia> M.columnspace()
 2-element Vector{Matrix{Sym}}:
- [1; 2; 3]
- [1; 1; 1]
+ [1; 2; 3;;]
+ [1; 1; 1;;]
 
 ```
 
@@ -1010,9 +1011,9 @@ returns a list of tuples of the form `(eigenvalue:algebraic multiplicity,
 ```jldoctest matrices
 julia> M.eigenvects()
 3-element Vector{Tuple{Sym, Int64, Vector{Matrix{Sym}}}}:
- (-2, 1, [[0; 1; 1; 1]])
- (3, 1, [[1; 1; 1; 1]])
- (5, 2, [[1; 1; 1; 0], [0; -1; 0; 1]])
+ (-2, 1, [[0; 1; 1; 1;;]])
+ (3, 1, [[1; 1; 1; 1;;]])
+ (5, 2, [[1; 1; 1; 0;;], [0; -1; 0; 1;;]])
 
 ```
 
@@ -1133,8 +1134,7 @@ julia> @syms lambda
 (lambda,)
 
 julia> p = M.charpoly(lambda)
-PurePoly(lambda**4 - 11*lambda**3 + 29*lambda**2 + 35*lambda - 150, lambda, do
-main='ZZ')
+PurePoly(lambda**4 - 11*lambda**3 + 29*lambda**2 + 35*lambda - 150, lambda, domain='ZZ')
 
 julia> factor(p) |>  string
 "PurePoly(lambda^4 - 11*lambda^3 + 29*lambda^2 + 35*lambda - 150, lambda, domain='ZZ')"
@@ -1214,7 +1214,7 @@ julia> m = Sym[-2*cosh(q/3) exp(-q) 1; exp(q) -2*cosh(q/3) 1; 1 1 -2*cosh(q/3)]
 
 julia> m.nullspace()
 1-element Vector{Matrix{Sym}}:
- [-(-2*exp(q)*cosh(q/3) - 4*cosh(q/3)^2 - 1 - 2*exp(-q)*cosh(q/3))/(4*exp(q)*cosh(q/3)^2 + 4*cosh(q/3) + exp(-q)); -(1 - 4*cosh(q/3)^2)/(2*cosh(q/3) + exp(-q)); 1]
+ [-(-2*exp(q)*cosh(q/3) - 4*cosh(q/3)^2 - 1 - 2*exp(-q)*cosh(q/3))/(4*exp(q)*cosh(q/3)^2 + 4*cosh(q/3) + exp(-q)); -(1 - 4*cosh(q/3)^2)/(2*cosh(q/3) + exp(-q)); 1;;]
 
 ```
 

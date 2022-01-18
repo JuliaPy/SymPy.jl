@@ -496,7 +496,7 @@ equal by evaluating them numerically at random points.
 
 ```jldoctest gotchas
 julia> a = cos(x)^2 - sin(x)^2
-     2         2   
+     2         2
 - sin (x) + cos (x)
 
 julia> b = cos(2*x)
@@ -604,8 +604,7 @@ julia> ex = x^2 - 2x + 2
  2
 x  - 2⋅x + 2
 
-julia> fn = lambdify(ex)
-#99 (generic function with 1 method)
+julia> fn = lambdify(ex);
 
 julia> fn(1) - ex(1)
 0
@@ -735,4 +734,3 @@ document.
 ## Further Reading
 
 For more discussion on the topics covered in this section, see :ref:`gotchas`.
-

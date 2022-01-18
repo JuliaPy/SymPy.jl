@@ -668,8 +668,8 @@ end
     # issue 298 lambdify for results of dsolve
     @vars t
     F = SymFunction("F")
-    diffeq = F'(t) - 3*F(t)
-    res = dsolve(diffeq, F(t), ics=(F, 0, 2))  # 2exp(3t)
+    diffeq = diff(F(t),t) - 3*F(t)
+    res = dsolve(diffeq, F(t), ics=Dict(F(0) => 2))  # 2exp(3t)
     @test lambdify(res)(1) ≈ 2*exp(3*1)
 
     # issue 304 wrong values for sind, ...

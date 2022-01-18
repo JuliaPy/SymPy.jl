@@ -1036,7 +1036,7 @@ julia> @syms x::positive, y::positive
 (x, y)
 
 julia> @syms n::real
-n
+(n,)
 ```
 
 ----
@@ -1571,7 +1571,6 @@ julia> @syms a[0:4]
 (Sym[a₀, a₁, a₂, a₃, a₄],)
 
 julia> frac = list_to_frac(a); string(frac)
-
 "a₀ + 1/(a₁ + 1/(a₂ + 1/(a₃ + 1/a₄)))"
 ```
 
@@ -1635,17 +1634,18 @@ it from the expression, and take the reciprocal to get the `f` part.
 julia> l = Sym[]
 Sym[]
 
-julia> a0,a1,a2,a3,a4,a5 = a; # destructure
+julia> a0,a1,a2,a3,a4 = a; # destructure
+
 
 julia> frac = apart(frac, a0); string(frac)
-"a0 + (a2*a3*a4 + a2 + a4)/(a1*a2*a3*a4 + a1*a2 + a1*a4 + a3*a4 + 1)"
+"a₀ + (a₂*a₃*a₄ + a₂ + a₄)/(a₁*a₂*a₃*a₄ + a₁*a₂ + a₁*a₄ + a₃*a₄ + 1)"
 
 julia> push!(l,  a0)
-1-element Array{Sym,1}:
+1-element Vector{Sym}:
  a₀
 
 julia> frac = 1/(frac - a0); string(frac)
-"(a1*a2*a3*a4 + a1*a2 + a1*a4 + a3*a4 + 1)/(a2*a3*a4 + a2 + a4)"
+"(a₁*a₂*a₃*a₄ + a₁*a₂ + a₁*a₄ + a₃*a₄ + 1)/(a₂*a₃*a₄ + a₂ + a₄)"
 ```
 
 ----
@@ -1716,7 +1716,7 @@ julia> frac = apart(frac, a4);
 julia> push!(l, a4);
 
 julia> list_to_frac(l) |> string
-"a0 + 1/(a1 + 1/(a2 + 1/(a3 + 1/a4)))"
+"a₀ + 1/(a₁ + 1/(a₂ + 1/(a₃ + 1/a₄)))"
 ```
 
 ----
