@@ -162,43 +162,78 @@ Example:
 julia> using SymPy
 
 julia> @syms α, x, f(), g()
+(α, x, f, g)
 
 julia> ∂ = Differential(x)
+Differential(x)
 
 julia> eqn = ∂(f(x)) ~ α * x
+d
+──(f(x)) = x⋅α
+dx
 
 julia> dsolve(eqn)
+f(x) = C₁⋅sin(x) + C₂⋅cos(x)
+             2
+            x ⋅α
+f(x) = C₁ + ────
+             2
 
 julia> dsolve(eqn(α=>2); ics=Dict(f(0)=>1))  # fill in parameter, initial condition
+        2
+2
 
 julia> eqn = ∂(∂(f(x))) ~ -f(x)
+  2
+ d
+───(f(x)) = -f(x)
+  2
+dx
 
 julia> dsolve(eqn)
 
 julia> dsolve(eqn; ics = Dict(f(0)=>1, ∂(f)(0) => -1))
-
-# alternative to Differential for 1-D functions
+f(x) = -sin(x) + cos(x)
 julia> eqn = f''(x) - f(x) - exp(x);
 
-julia> dsolve(eqn, ics=Dict(f(0) => 1, f(1) => Sym(1//2))) # not just 1//2
+julia> dsolve(eqn, ics=Dict(f(0) => 1, f(1) => Sym(1//2))) |> print # not just 1//2
+Eq(f(x), (x/2 + (-exp(2) - 2 + E)/(-2 + 2*exp(2)))*exp(x) + (-E + 3*exp(2))*exp(-x)/(-2 + 2*exp(2)))
+
 ```
 
 Systems
 
 ```jldoctest dsolve
 julia> @syms x() y() t g
+(x, y, t, g)
 
 julia> ∂ = Differential(t)
+Differential(t)
 
 julia> eqns = [∂(x(t)) ~ y(t), ∂(y(t)) ~ x(t)]
+2-element Vector{Sym}:
+ Eq(Derivative(x(t), t), y(t))
+ Eq(Derivative(y(t), t), x(t))
 
 julia> dsolve(eqns)
+2-element Vector{Sym}:
+ Eq(x(t), -C1*exp(-t) + C2*exp(t))
+  Eq(y(t), C1*exp(-t) + C2*exp(t))
 
 julia> dsolve(eqns, ics = Dict(x(0) => 1, y(0) => 2))
+2-element Vector{Sym}:
+ Eq(x(t), 3*exp(t)/2 - exp(-t)/2)
+ Eq(y(t), 3*exp(t)/2 + exp(-t)/2)
 
 julia> eqns = [∂(∂(x(t))) ~ 0, ∂(∂(y(t))) ~ -g]
+2-element Vector{Sym}:
+  Eq(Derivative(x(t), (t, 2)), 0)
+ Eq(Derivative(y(t), (t, 2)), -g)
 
 julia> dsolve(eqns)  # can't solve for initial conditions though! (NotAlgebraic)
+2-element Vector{Sym}:
+           x(t) = C₁ + C₂⋅t
+ Eq(y(t), C3 + C4*t - g*t^2/2)
 ```
 
 """

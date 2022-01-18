@@ -42,7 +42,7 @@ julia> sqrt(u(t)^2), sqrt(v(t)^2) # real values have different simplification ru
 
 Such functions are undefined functions in SymPy, and can be used symbolically, such as with taking derivatives:
 
-```jldoctest
+```
 @syms x y u()
 diff(u(x), x)
 diff(u(x, y), x)

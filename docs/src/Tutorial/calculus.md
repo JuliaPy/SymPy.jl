@@ -523,7 +523,7 @@ Sometimes, a  symbolic value  is  needed to have a  proper limit:
 
 ```jldoctest calculus
 julia> limit((pi/2-x-acos(x))/x^3, x=>0)
--∞
+∞
 
 julia> limit((PI/2-x-acos(x))/x^3, x=>0)
 1/6
@@ -838,6 +838,9 @@ julia> h = sympy.Symbol("h")
 h
 
 julia> d2fdx2.as_finite_difference([-3*h,-h,2*h])
+┌ Warning: `vendor()` is deprecated, use `BLAS.get_config()` and inspect the output instead
+│   caller = npyinitialize() at numpy.jl:67
+└ @ PyCall ~/.julia/packages/PyCall/3fwVL/src/numpy.jl:67
 f(-3⋅h)   f(-h)   2⋅f(2⋅h)
 ─────── - ───── + ────────
      2        2        2

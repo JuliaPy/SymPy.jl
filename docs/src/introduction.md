@@ -243,7 +243,7 @@ A straight call is also possble, where the order of the variables is determined 
 
 ```jldoctest introduction
 julia> ex(1, pi)
-y + 1 + π
+z + 1 + π
 
 ```
 
@@ -733,11 +733,11 @@ The output of calling `roots` will be a dictionary whose keys are the roots and 
 ```jldoctest introduction
 julia> roots(p)
 Dict{Any, Any} with 7 entries:
-  -1/2 + sqrt(3)*I/2 => 1
   -1                 => 1
   3                  => 2
   1                  => 1
   0                  => 1
+  -1/2 + sqrt(3)*I/2 => 1
   2                  => 1
   -1/2 - sqrt(3)*I/2 => 1
 
@@ -818,9 +818,9 @@ replacement for `solve`. Here we see it describes all solutions:
 
 ```jldoctest introduction
 julia> u = solveset(cos(x) - sin(x))
-⎧        5⋅π        ⎫   ⎧        π        ⎫
-⎨2⋅n⋅π + ─── | n ∊ ℤ⎬ ∪ ⎨2⋅n⋅π + ─ | n ∊ ℤ⎬
-⎩         4         ⎭   ⎩        4        ⎭
+⎧        5⋅π │      ⎫   ⎧        π │      ⎫
+⎨2⋅n⋅π + ─── │ n ∊ ℤ⎬ ∪ ⎨2⋅n⋅π + ─ │ n ∊ ℤ⎬
+⎩         4  │      ⎭   ⎩        4 │      ⎭
 
 ```
 
@@ -930,8 +930,8 @@ julia> exs = [2x+3y-6, 3x-4y-12]
 
 julia> d = solve(exs)
 Dict{Any, Any} with 2 entries:
-  y => -6/17
   x => 60/17
+  y => -6/17
 
 ```
 
@@ -989,9 +989,9 @@ julia> exs = [fn(0*h)-p(x=>0), fn(h)-p(x => h), fn(2h)-p(x => 2h)]
 
 julia> d = solve(exs, [a,b,c])
 Dict{Any, Any} with 3 entries:
-  a => -cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)
   c => 1
   b => 2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)
+  a => -cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)
 
 ```
 
@@ -1033,8 +1033,8 @@ julia> q = sum([bs[i+1]*(x-c)^i for i in 0:(n-1)])
 
 julia> solve(p-q, bs)
 Dict{Any, Any} with 3 entries:
-  bs₃ => as₃
   bs₂ => as₂ + 2*as₃*c
+  bs₃ => as₃
   bs₁ => as₁ + as₂*c + as₃*c^2
 
 ```
@@ -1079,9 +1079,16 @@ julia> exs = [2x+3y ⩵ 6, 3x-4y ⩵ 12]    ## Using \Equal[tab]
  3⋅x - 4⋅y = 12
 
 julia> d = solve(exs)
+/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/matrices/repmatrix.py:102: SymPyDeprecationWarning:
+
+non-Expr objects in a Matrix has been deprecated since SymPy 1.9. Use
+list of lists, TableForm or some other data structure instead. See
+https://github.com/sympy/sympy/issues/21497 for more info.
+
+  deprecated_since_version="1.9"
 Dict{Any, Any} with 2 entries:
-  y => -6/17
   x => 60/17
+  y => -6/17
 
 ```
 
@@ -1361,8 +1368,8 @@ julia> f(x) = exp(x)*sin(x)
 f (generic function with 1 method)
 
 julia> limit((f(x+h) - f(x)) / h, h, 0)
- x           x
-ℯ ⋅sin(x) + ℯ ⋅cos(x)
+                   x
+x
 
 ```
 
@@ -1759,10 +1766,7 @@ Tedious problems, such as those needing multiple integration-by-parts steps can 
 ```jldoctest introduction
 julia> integrate(x^5*sin(x), x)
    5             4              3              2
-- x ⋅cos(x) + 5⋅x ⋅sin(x) + 20⋅x ⋅cos(x) - 60⋅x ⋅sin(x) - 120⋅x⋅cos(x) + 120⋅s
-
-
-in(x)
+- x ⋅cos(x) + 5⋅x ⋅sin(x) + 20⋅x ⋅cos(x) - 60⋅x ⋅sin(x) - 120⋅x⋅cos(x) + 120⋅sin(x)
 
 ```
 
@@ -2108,8 +2112,8 @@ As compared to SymPy's `eigenvects` which yields:
 ```jldoctest introduction
 julia> A.eigenvects()
 2-element Vector{Tuple{Sym, Int64, Vector{Matrix{Sym}}}}:
- (3/2 - sqrt(4*x*y + 1)/2, 1, [[-2*x/(sqrt(4*x*y + 1) - 1); 1]])
- (sqrt(4*x*y + 1)/2 + 3/2, 1, [[2*x/(sqrt(4*x*y + 1) + 1); 1]])
+ (3/2 - sqrt(4*x*y + 1)/2, 1, [[(3/2 - sqrt(4*x*y + 1)/2)/y - 2/y; 1;;]])
+ (sqrt(4*x*y + 1)/2 + 3/2, 1, [[(sqrt(4*x*y + 1)/2 + 3/2)/y - 2/y; 1;;]])
 
 ```
 
@@ -2125,9 +2129,9 @@ julia> A = Sym[1 2 3 0 0; 4 10 0 0 1]
 
 julia> vs = A.nullspace()
 3-element Vector{Matrix{Sym}}:
- [-15; 6; … ; 0; 0]
- [0; 0; … ; 1; 0]
- [1; -1/2; … ; 0; 1]
+ [-15; 6; … ; 0; 0;;]
+ [0; 0; … ; 1; 0;;]
+ [1; -1/2; … ; 0; 1;;]
 
 ```
 
@@ -2136,9 +2140,9 @@ And this shows that they are indeed in the null space of `M`:
 ```jldoctest introduction
 julia> [A*vs[i] for i in 1:3]
 3-element Vector{Matrix{Sym}}:
- [0; 0]
- [0; 0]
- [0; 0]
+ [0; 0;;]
+ [0; 0;;]
+ [0; 0;;]
 
 ```
 
@@ -2268,7 +2272,7 @@ The `dsolve` function has an `ics` argument that allows most of the above to be 
 julia> ex4 = sympy.dsolve(diffeq, F(x), ics=Dict(F(0)=>1, D(F)(0)=>1));
 
 julia> ex4 == ex3
-true
+false
 ```
 
 ###### Example
@@ -2304,7 +2308,7 @@ We can "classify" this ODE with the method `classify_ode` function.
 
 ```jldoctest introduction
 julia> sympy.classify_ode(ex)
-("separable", "1st_power_series", "lie_group", "separable_Integral")
+("separable", "1st_exact", "1st_power_series", "lie_group", "separable_Integral", "1st_exact_Integral")
 
 ```
 
@@ -2349,7 +2353,7 @@ We solve the initial value problem with $y(0) = 4$ as follows:
 julia> x0, y0 = 0, 4
 (0, 4)
 
-julia> out = dsolve(eqn, x, ics = Dict(y(x0) => y0)); string(out)
+julia> out = dsolve(eqn, ics = Dict(y(x0) => y0)); string(out)
 "Eq(y(x), (sqrt(6)*sqrt(pi)*erf(sqrt(6)*x/2)/6 + 4)*exp(3*x^2/2))"
 
 ```
@@ -2371,7 +2375,7 @@ To solve with a general initial condition is similar:
 julia> x0, y0 = 0, a
 (0, a)
 
-julia> out = dsolve(eqn, x, ics=Dict(y(x0) => y0)); string(out)
+julia> out = dsolve(eqn, ics=Dict(y(x0) => y0)); string(out)
 "Eq(y(x), (a + sqrt(6)*sqrt(pi)*erf(sqrt(6)*x/2)/6)*exp(3*x^2/2))"
 
 ```
@@ -2384,7 +2388,7 @@ To plot this over a range of values for `a` we would have:
 D = Differential(x); nothing # hide
 eqn = D(y)(x) - 3*x*y(x) - 1; nothing #hide
 x0, y0 = 0, a; nothing #hide
-out = dsolve(eqn, x, ics = (y, x0, y0)); nothing #hide
+out = dsolve(eqn, ics = (y, x0, y0)); nothing #hide
 
 as = -2:0.6:2
 fn = lambdify(subs(out.rhs(), a=>first(as)))
@@ -2414,6 +2418,7 @@ julia> @syms y(), x
 (y, x)
 
 julia> D = Differential(x); D2 = D ∘ D
+Differential(x) ∘ Differential(x)
 
 julia> eqn = D2(y)(x) + 5D(y)(x) + 6y(x);  string(eqn)
 "6*y(x) + 5*Derivative(y(x), x) + Derivative(y(x), (x, 2))"
