@@ -210,7 +210,7 @@ julia> aug = [A b]
  1  1  2  3
 
 julia> linsolve(sympy.Matrix(aug), (x,y,z)) # not {(-y - 1, y, 2)}!
-∅  
+∅
 
 ```
 
@@ -227,8 +227,8 @@ julia> aug = [A b]
  1  1  1  1
  1  1  2  3
 
-julia> linsolve(aug, (x,y,z))  
-{(-y - 1, y, 2)}  
+julia> linsolve(aug, (x,y,z))
+{(-y - 1, y, 2)}
 ```
 
 Finally,  linear equations  are  solved in `Julia`  with  the `\` (backslash) operator:
@@ -264,7 +264,7 @@ julia> M = sympy.Matrix(((1, 1, 1, 1), (1, 1, 2, 3)))
 julia> system = A, b = M[:, 1:end-1], M[:, end]
 (Sym[1 1 1; 1 1 2], Sym[1, 3])
 
-julia> linsolve(system, x, y, z)  
+julia> linsolve(system, x, y, z)
 {(-y - 1, y, 2)}
 
 ```
@@ -389,7 +389,7 @@ julia> complex_soln = (sympy.ImageSet(img_lamda, S.Integers), S(1)/3)
 julia> soln = sympy.FiniteSet(real_soln, complex_soln)
 {(log(sin(1/3)), 1/3), ({2⋅n⋅ⅈ⋅π - ⅈ⋅(ⅈ⋅sin(1/3) mod -2⋅π) | n ∊ ℤ}, 1/3)}
 
-julia> nonlinsolve(system, (x, y)) 
+julia> nonlinsolve(system, (x, y))
 {({2⋅n⋅ⅈ⋅π + log(sin(1/3)) | n ∊ ℤ}, 1/3)}
 
 ```
@@ -437,7 +437,7 @@ julia> nonlinsolve(system, (a, b))
    1. The order of solution corresponds the order of given symbols.
 
    2. Currently `nonlinsolve` doesn't return solution in form of `LambertW` (if there is solution present in the form of `LambertW`).
-   
+
    `solve` can be used for such cases:
 
 ```python
@@ -698,10 +698,12 @@ f
 
 ```
 
-or the `@syms` macro, as in `@syms f()` to define symbolic functions. For these objects, rather than use `diff` to specify derivatives, the prime notation can be used. We then have, with `f` defined above:
+or the `@syms` macro, as in `@syms f()` to define symbolic functions. The `Differential` function (who's functionality is lifted from `ModelingToolkit`). Can simplify things:
 
 ```jldoctest solvers
-julia> diffeq = Eq(f''(x) - 2*f'(x) + f(x), sin(x)); string(diffeq)
+julia> D = Differential(x);
+
+julia> diffeq = Eq(D(D(f))(x) - 2*D(f)(x) + f(x), sin(x)); string(diffeq)
 "Eq(f(x) - 2*Derivative(f(x), x) + Derivative(f(x), (x, 2)), sin(x))"
 
 julia> dsolve(diffeq, f(x))  |> string
@@ -713,14 +715,14 @@ julia> dsolve(diffeq, f(x))  |> string
 Or:
 
 ```jldoctest solvers
-julia> dsolve(f'(x)*(1 - sin(f(x))), f(x))
+julia> dsolve(D(f)(x)*(1 - sin(f(x))), f(x))
 f(x) = C₁
 
 ```
 
-This interface allows a different specification of initial conditions than does `sympy.dsolve`.
+Initial conditions can be specified using a dictionary.
 
-For the initial condition `f'(x0) = y0`, this would be specified with a tuple `(f', x0, y0)`.
+For the initial condition `f'(x0) = y0`, this would be specified as `Dict(D(f)(x0) => y0)`.
 
 For example, to solve the exponential equation $f'(x) = f(x), f(0) = a$ we would have:
 
@@ -728,7 +730,7 @@ For example, to solve the exponential equation $f'(x) = f(x), f(0) = a$ we would
 julia> @syms x, a, f()
 (x, a, f)
 
-julia> dsolve(f'(x) - f(x), f(x), ics = (f, 0, a)) |>  string
+julia> dsolve(D(f)(x) - f(x), f(x), ics = Dict(f(0) => a)) |>  string
 "Eq(f(x), a*exp(x))"
 
 ```
@@ -736,10 +738,12 @@ julia> dsolve(f'(x) - f(x), f(x), ics = (f, 0, a)) |>  string
 To solve the simple harmonic equation, where two initial conditions are specified, we combine the tuple for each within another tuple:
 
 ```jldoctest solvers
-julia> ics = ((f, 0, 1), (f', 0, 2))
-((f, 0, 1), (f', 0, 2))
+julia> ics = Dict(f(0) => 1, D(f)(0) => 2)
+Dict{Sym, Int64} with 2 entries:
+  Subs(Derivative(f(x), x), x, 0) => 2
+  f(0)                            => 1
 
-julia> dsolve(f''(x) - f(x), f(x), ics=ics) |> string
+julia> dsolve(D(D(f))(x) - f(x), f(x), ics=ics) |> string
 "Eq(f(x), 3*exp(x)/2 - exp(-x)/2)"
 
 ```

@@ -16,7 +16,9 @@ using Test
     sympy.dsolve(eq)  # array is not SymbolicObject
 
 
+    ## Removed
     ## version 0.4+ allow use of u'(x) in lieu of diff(u(x), x) and `ivpsolve`
+    ## This will be deprecated in favor of Differential(x)
     u = SymFunction("u")
     a, x, y, y0, y1 = symbols("a, x, y, y0, y1")
 
@@ -35,11 +37,34 @@ using Test
     # based on initial condition
     dsolve(u'(x) - (u(x)-1)*u(x)*(u(x)+1), u(x), ics=(u, 0, 1//2))
 
+    ## ---
+
+    ## use Differential, not u' or u''
+    ## use Dict to specify ics from SymPy, not internal one
+    @syms a x y0 y1 u()
+    ∂ = Differential(x)
+
+    @test dsolve(∂(u)(x) - a*u(x), u(x), ics=Dict(u(0) => 1)) == Eq(u(x), exp(a*x))
+    @test dsolve(∂(u)(x) - a*u(x), u(x), ics=Dict(u(0) => y1)) == Eq(u(x), y1*exp(a*x))
+    dsolve(∂(u)(x) - a*u(x), u(x), ics=Dict(u(y0)=>y1)) # == Eq(u(x), y1 * exp(a*(x - y0)))
+    dsolve(x*∂(u)(x) + x*u(x) + 1, u(x), ics=Dict(u(1) => 1))
+    𝒂 = 2
+    dsolve((∂(u)(x))^2 - 𝒂*u(x), u(x), ics=Dict(u(0) => 0))
+    dsolve(∂(∂(u))(x) - 𝒂 * u(x), u(x), ics=Dict(u(0)=> 1, ∂(u)(0) => 0))
+
+    F, G, K = SymFunction("F, G, K")
+    eqn = F(x)*∂(u)(y)*y + G(x)*u(y) + K(x)
+    dsolve(eqn, u(y), ics=Dict(u(1) => 0))
+
+    ## dsolve eqn has two answers, but we want to eliminate one
+    # based on initial condition
+    dsolve(∂(u)(x) - (u(x)-1)*u(x)*(u(x)+1), u(x), ics=Dict(u(0)=> Sym(1//2)))
+
+    ## ----
     ## rhs works
     u = SymFunction("u")
-    @vars x y
-    @vars a positive=true
-    eqn = u'(x) - a * u(x) * (1 - u(x))
+    @syms x y a::positive
+    eqn = ∂(u)(x) - a * u(x) * (1 - u(x))
     out = dsolve(eqn)
     eq = rhs(out)    # just the right hand side
     C1 = first(setdiff(free_symbols(eq), (x,a)))
@@ -48,10 +73,12 @@ using Test
 
 
     ## dsolve and system of equations issue #291
-    @vars t real=true
-    x,y = SymFunction("x,y")
-    eq1 = Eq(diff(x(t),t),x(t)*y(t)*sin(t))
-    eq2 = Eq(diff(y(t),t),y(t)^2*sin(t))
+    @syms t x() y()
+    ∂ = Differential(t)
+    eq1 = ∂(x(t)) ~ x(t)*y(t)*sin(t)
+    eq2 = ∂(y(t)) ~ y(t)^2*sin(t)
+#    eq1 = Eq(diff(x(t),t),x(t)*y(t)*sin(t))
+#    eq2 = Eq(diff(y(t),t),y(t)^2*sin(t))
     out = dsolve([eq1, eq2]) # vector
     out = dsolve((eq1, eq2)) # tuple
     Dict(lhs.(collect(out)) .=> rhs.(collect(out))) # turn python set into a dictionary

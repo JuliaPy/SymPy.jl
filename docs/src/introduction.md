@@ -703,7 +703,7 @@ julia> real_roots(p)
 
 !!! note "Why `string`?"
     The uses of `string(p)` above and elsewhere throughout the introduction is only for technical reasons related to doctesting and how `Documenter.jl` parses  the expected output. This usage is not idiomatic, or suggested; it  only allows the cell  to  be tested programatically for  regressions. Similarly, expected errors  are  wrapped in `try`-`catch` blocks just  for testing purposes.
-	
+
 
 In this example, the degree of `p` is 8, but only the 6 real roots
 returned, the double root of $3$ is accounted for. The two complex
@@ -1709,7 +1709,7 @@ Integration is implemented in SymPy through the `integrate` function. There are 
 Basic integrals are implemented:
 
 ```jldoctest introduction
-julia> integrate(x^3, x) 
+julia> integrate(x^3, x)
  4
 x
 ──
@@ -2005,7 +2005,7 @@ well, SymPy has a class for matrices. `SymPy`, through `PyCall`, automatically m
 
 
 Constructing matrices with symbolic entries follows `Julia`'s conventions:
-	
+
 ```jldoctest introduction
 julia> @syms x,y
 (x, y)
@@ -2196,22 +2196,18 @@ The `dsolve` function in SymPy has an extensive list of named
 arguments to control the underlying algorithm. These can be passed
 through with the appropriate keyword arguments. (To use SymPy's `ics` argument, the `sympy.dsolve` method must be called directly.)
 
-The `SymFunction` objects have the `'` method defined to
-find a derivative. 
-The above could also have been expressed  more familiarly through:
+The definition of the differential equation expects the cumbersome `diff(ex, var)` to provide the derivative. The `Differential` function lessens the visual noise (with a design taken from `ModelingToolkit`). The above would be:
 
 ```jldoctest introduction
-julia> diffeq = F''(x) - 2F'(x) + F(x) - sin(x); string(diffeq)
-"F(x) - sin(x) - 2*Derivative(F(x), x) + Derivative(F(x), (x, 2))"
+julia> D = Differential(x)
+Differential(x)
+
+julia> diffeq = D(D(F))(x) - 2D(F)(x) + F(x) ~ sin(x); string(diffeq)
+"Eq(F(x) - 2*Derivative(F(x), x) + Derivative(F(x), (x, 2)), sin(x))"
 
 julia> sympy.dsolve(diffeq, F(x)) |> string
 "Eq(F(x), (C1 + C2*x)*exp(x) + cos(x)/2)"
-
 ```
-
-!!! note
-    Using the `adjoint` operator for differentiation as a convenience is nice, but it has potential issues, as it preferences treating `SymFunction` objects as functions of a single variable and makes their  usages within  arrays possible problematic, as the  recursive `adjoint` function will not perform the generic  task. 
-
 
 
 This solution has two constants, $C_1$ and $C_2$, that would be found from initial conditions. Say we know $F(0)=0$ and $F'(0)=1$, can we find the constants? To work with the returned expression, it is most convenient to get just the right hand side. The `rhs` method will return the right-hand side of a relation:
@@ -2266,6 +2262,14 @@ julia> ex3 = ex2(Sym("C2") => 3//2); string(ex3)
 ```
 
 
+The `dsolve` function has an `ics` argument that allows most of the above to be done internally:
+
+```jldoctest introduction
+julia> ex4 = sympy.dsolve(diffeq, F(x), ics=Dict(F(0)=>1, D(F)(0)=>1));
+
+julia> ex4 == ex3
+true
+```
 
 ###### Example
 
@@ -2285,7 +2289,9 @@ We proceed through:
 julia> @syms t, m, k, alpha=>"α", v()
 (t, m, k, α, v)
 
-julia> ex = Eq( (m/k)*v'(t), alpha^2 - v(t)^2 )
+julia> D = Differential(t);
+
+julia> ex = Eq( (m/k)*D(v)(t), alpha^2 - v(t)^2 )
   d
 m⋅──(v(t))
   dt          2    2
@@ -2328,7 +2334,9 @@ To illustrate, we follow an example from
 julia> @syms y(), a, x
 (y, a, x)
 
-julia> eqn = y'(x) - 3*x*y(x) - 1; string(eqn)
+julia> D = Differential(x);
+
+julia> eqn = D(y)(x) - 3*x*y(x) - 1; string(eqn)
 "-3*x*y(x) + Derivative(y(x), x) - 1"
 
 ```
@@ -2341,7 +2349,7 @@ We solve the initial value problem with $y(0) = 4$ as follows:
 julia> x0, y0 = 0, 4
 (0, 4)
 
-julia> out = dsolve(eqn, x, ics = (y, x0, y0)); string(out)
+julia> out = dsolve(eqn, x, ics = Dict(y(x0) => y0)); string(out)
 "Eq(y(x), (sqrt(6)*sqrt(pi)*erf(sqrt(6)*x/2)/6 + 4)*exp(3*x^2/2))"
 
 ```
@@ -2363,7 +2371,7 @@ To solve with a general initial condition is similar:
 julia> x0, y0 = 0, a
 (0, a)
 
-julia> out = dsolve(eqn, x, ics=(y, x0, y0)); string(out)
+julia> out = dsolve(eqn, x, ics=Dict(y(x0) => y0)); string(out)
 "Eq(y(x), (a + sqrt(6)*sqrt(pi)*erf(sqrt(6)*x/2)/6)*exp(3*x^2/2))"
 
 ```
@@ -2372,9 +2380,9 @@ julia> out = dsolve(eqn, x, ics=(y, x0, y0)); string(out)
 To plot this over a range of values for `a` we would have:
 
 ```@example plots
-y = SymFunction("y"); nothing #hide
-a, x = symbols("a,x");  nothing #hide
-eqn = y'(x) - 3*x*y(x) - 1; nothing #hide
+@syms a x y() ; nothing # hide
+D = Differential(x); nothing # hide
+eqn = D(y)(x) - 3*x*y(x) - 1; nothing #hide
 x0, y0 = 0, a; nothing #hide
 out = dsolve(eqn, x, ics = (y, x0, y0)); nothing #hide
 
@@ -2405,7 +2413,9 @@ $y'$ at $x_0=0$.
 julia> @syms y(), x
 (y, x)
 
-julia> eqn = y''(x) + 5y'(x) + 6y(x);  string(eqn)
+julia> D = Differential(x); D2 = D ∘ D
+
+julia> eqn = D2(y)(x) + 5D(y)(x) + 6y(x);  string(eqn)
 "6*y(x) + 5*Derivative(y(x), x) + Derivative(y(x), (x, 2))"
 
 ```
@@ -2413,7 +2423,7 @@ julia> eqn = y''(x) + 5y'(x) + 6y(x);  string(eqn)
 To solve with $y(0) = 1$ and $y'(0) = 1$ we have:
 
 ```jldoctest introduction
-julia> out = dsolve(eqn, x, ics=((y, 0, 1), (y', 0, 1))); string(out)
+julia> out = dsolve(eqn, ics=Dict(y(0)=> 1, D(y)(0) => 1)); string(out)
 "Eq(y(x), (4 - 3*exp(-x))*exp(-2*x))"
 
 ```
@@ -2423,10 +2433,10 @@ julia> out = dsolve(eqn, x, ics=((y, 0, 1), (y', 0, 1))); string(out)
 To make a plot, we only need the right-hand-side of the answer:
 
 ```@example plots
-y = SymFunction("y"); nothing #hide
-x = symbols("x"); nothing #hide
-eqn = y''(x) + 5y'(x) + 6y(x); nothing  #hide
-out = dsolve(eqn, x, ics=((y, 0, 1), (y', 0, 1))); nothing #hide
+@syms y() x; nothing #hide
+D = Differential(x); nothing # hide
+eqn = D(D(y))(x) + 5D(y)(x) + 6y(x); nothing  #hide
+out = dsolve(eqn, ics=Dict(y(0) => 1, D(y)(0) => 1)); nothing #hide
 plot(out.rhs(), -1/3, 2)
 savefig("plot-10.svg"); nothing  # hide
 ```
@@ -2442,10 +2452,11 @@ page, we solve $y''(x) +y(x) = e^x$ over $[0,1]$ with conditions
 $y(0)=1$, $y(1) = 1/2$:
 
 ```jldoctest introduction
-julia> eqn = y''(x) + y(x) - exp(x); string(eqn)
+julia> eqn = D(D(y))(x) + y(x) - exp(x); string(eqn)
 "y(x) - exp(x) + Derivative(y(x), (x, 2))"
 
-julia> dsolve(eqn, x, ics=((y, 0, 1), (y, 1, 1//2))) |> string
+julia> dsolve(eqn, ics=Dict(y(0)=>1, y(1) => Sym(1//2))) |> string
 "Eq(y(x), exp(x)/2 + (-E - cos(1) + 1)*sin(x)/(2*sin(1)) + cos(x)/2)"
-
 ```
+
+(the wrapping of `Sym(1//2)` is necessary to avoid a premature conversion to floating point.)

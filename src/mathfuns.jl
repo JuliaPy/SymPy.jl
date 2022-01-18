@@ -152,57 +152,97 @@ linsolve(Ts::Tuple, args...; kwargs...) where {T <: SymbolicObject} =
 """
    dsolve(eqn, var, args..,; ics=nothing, kwargs...)
 
-Call `sympy.dsolve` with possible difference for initial condition specification.
+Call `sympy.dsolve`.
 
-For problems with an initial condition, the `ics` argument may be specified. This is *different* from the `ics` argument of `sympy.dsolve`. (Call directly if that is preferred.)
-
-Here `ics` allows the specification of a term like `f(x0) = y0` as a tuple `(f, x0, y0)`. Similarly, a term like `f''(x0)=y0` is specified through `(f'', x0, y0)`. If more than one initial condition is needed, a tuple of tuples is used, as in `((f,x0,y0), (f',x0,z0))`.
-
+The initial conditions are specified with a dictionary.
 
 Example:
 
 ```jldoctest dsolve
 julia> using SymPy
 
-julia> @syms x y()
-(x, y)
+julia> @syms α, x, f(), g()
 
-julia> eqn = y'(x) - y(x);
+julia> ∂ = Differential(x)
 
-julia> dsolve(eqn, y(x), ics=(y,0,1)) |> string # technical to avoid  parsing issue with doctesting
-"Eq(y(x), exp(x))"
+julia> eqn = ∂(f(x)) ~ α * x
 
-julia> eqn = y''(x) - y(x) - exp(x);
+julia> dsolve(eqn)
 
-julia> dsolve(eqn, y(x), ics=((y,0,1), (y, 1, 1//2))) |> string
-"Eq(y(x), (x/2 + (-exp(2) - 2 + E)/(-2 + 2*exp(2)))*exp(x) + (-E + 3*exp(2))*exp(-x)/(-2 + 2*exp(2)))"
+julia> dsolve(eqn(α=>2); ics=Dict(f(0)=>1))  # fill in parameter, initial condition
 
+julia> eqn = ∂(∂(f(x))) ~ -f(x)
+
+julia> dsolve(eqn)
+
+julia> dsolve(eqn; ics = Dict(f(0)=>1, ∂(f)(0) => -1))
+
+# alternative to Differential for 1-D functions
+julia> eqn = f''(x) - f(x) - exp(x);
+
+julia> dsolve(eqn, ics=Dict(f(0) => 1, f(1) => Sym(1//2))) # not just 1//2
 ```
+
+Systems
+
+```jldoctest dsolve
+julia> @syms x() y() t g
+
+julia> ∂ = Differential(t)
+
+julia> eqns = [∂(x(t)) ~ y(t), ∂(y(t)) ~ x(t)]
+
+julia> dsolve(eqns)
+
+julia> dsolve(eqns, ics = Dict(x(0) => 1, y(0) => 2))
+
+julia> eqns = [∂(∂(x(t))) ~ 0, ∂(∂(y(t))) ~ -g]
+
+julia> dsolve(eqns)  # can't solve for initial conditions though! (NotAlgebraic)
+```
+
 """
-function dsolve(eqn::Sym, args...; ics=nothing, kwargs...)
-    if isa(ics, Nothing)
-        sympy.dsolve(eqn, args...; kwargs...)
+function dsolve(eqn, args...;
+                ics::Union{Nothing, AbstractDict, Tuple}=nothing,
+                kwargs...)
+    if isa(ics, Tuple) # legacy
+        _dsolve(eqn, args...; ics=ics, kwargs...)
     else
-        if isempty(args)
-            var = first(free_symbols(eqn))
-        else
-            var = first(args)
-        end
-        # var might be f(x) or x, we want `x`
-        if Introspection.classname(var) != "Symbol"
-            var = first(var.args)
-        end
-        ## if we have one initial condition, can be passed in a (u,x0,y0) *or* ((u,x0,y0),)
-        ## if more than one a tuple of tuples
-        if eltype(ics) <: Tuple
-            _dsolve(eqn, var, ics; kwargs...)
-        else
-            _dsolve(eqn, var, (ics,); kwargs...)
-        end
+        sympy.dsolve(eqn, args...; ics=ics, kwargs...)
     end
 end
 
-function _dsolve(eqn::Sym, var::Sym, ics; kwargs...)
+rhs(x::SymbolicObject) = pycall_hasproperty(x, :rhs) ? x.rhs : x
+lhs(x::SymbolicObject) = pycall_hasproperty(x, :lhs) ? x.lhs : x
+
+
+export dsolve, rhs, lhs
+
+## ---- deprecate ----
+## used with ics=(u,0,1) style
+function _dsolve(eqn::Sym, args...; ics=nothing, kwargs...)
+
+    Base.depwarn("Use of tuple(s), `(u, x₀, u₀)`, to specify initial conditions is deprecated. Use a dictionary: `ics=Dict(u(x₀) => u₀)`.", :_dsolve)
+
+    if isempty(args)
+        var = first(free_symbols(eqn))
+    else
+        var = first(args)
+    end
+    # var might be f(x) or x, we want `x`
+    if Introspection.classname(var) != "Symbol"
+        var = first(var.args)
+    end
+    ## if we have one initial condition, can be passed in a (u,x0,y0) *or* ((u,x0,y0),)
+    ## if more than oneq a tuple of tuples
+    if eltype(ics) <: Tuple
+        __dsolve(eqn, var, ics; kwargs...)
+    else
+        __dsolve(eqn, var, (ics,); kwargs...)
+        end
+end
+
+function __dsolve(eqn::Sym, var::Sym, ics; kwargs...)
     if length(ics) == 0
         throw(ArgumentError("""Some initial value specification is needed.
 Specifying the function, as in `dsolve(ex, f(x))`, is deprecated.
@@ -226,11 +266,6 @@ Use `sympy.dsolve(ex, f(x); kwargs...)` directly for that underlying interface.
         return length(output) == 1 ? output[1] : output
     end
 end
-
-rhs(x::SymbolicObject) = pycall_hasproperty(x, :rhs) ? x.rhs : x
-lhs(x::SymbolicObject) = pycall_hasproperty(x, :lhs) ? x.lhs : x
-
-export dsolve, rhs, lhs
 
 ## Helper.
 ## out is an equation in var with constants. Args are intial conditions
@@ -257,6 +292,17 @@ function _solve_ivp(out, var, args, o)
     out([Pair(k,v) for (k,v) in sols]...)
 end
 
-# For System Of Ordinary Differential Equations
-# may need to collect return values
-dsolve(eqs::Union{Array, Tuple}, args...; kwargs...) = sympy.dsolve(eqs, args...; kwargs...)
+# # For System Of Ordinary Differential Equations
+# # may need to collect return values
+# dsolve(eqs::Union{Array, Tuple}, args...; kwargs...) = sympy.dsolve(eqs, args...; kwargs...)
+
+
+
+# # Solve a *system* of equations
+# function dsolve(eqs::Vector{T}, args...; ics=nothing, kwargs...) where {T <: Sym}
+#     fns = sympy.solvers.ode.ode._extract_funcs(eqs)
+
+#     # handle ics
+
+#     sympy.solvers.ode.systems.dsolve_system
+# end
