@@ -3,7 +3,7 @@
 """
     SymFunction
 
-A type and constructor to Create symbolic functions. Such objects can be used
+A type and constructor to create symbolic functions. Such objects can be used
 for specifying differential equations. The macro [`@syms`](@ref) is also available for constructing `SymFunction`s (`@syms f()`)
 
 ## Examples:
@@ -29,7 +29,7 @@ julia> F,G,H = SymFunction("F, G, H")
 ```
 
 
-For symbolic functions *not* wrapped in the `SymFunction` type, the `sympy.Function` constructor can be used, as can the [`symbols`](@ref) function to construct symbolic functions (`F=sympy.Function(F,"real=true")`; `F = sympy.symbols("F", cls=sympy.Function, real=true)`).
+For symbolic functions *not* wrapped in the `SymFunction` type, the `sympy.Function` constructor can be used, as can the [`symbols`](@ref) function to construct symbolic functions (`F=sympy.Function("F", real=true)`; `F = sympy.symbols("F", cls=sympy.Function, real=true)`).
 
 ```jldoctest symfunction
 julia> @syms u(), v()::real, t
@@ -42,10 +42,15 @@ julia> sqrt(u(t)^2), sqrt(v(t)^2) # real values have different simplification ru
 
 Such functions are undefined functions in SymPy, and can be used symbolically, such as with taking derivatives:
 
-```
-@syms x y u()
-diff(u(x), x)
-diff(u(x, y), x)
+```jldoctest symfunction
+julia> @syms x y u()
+(x, y, u)
+
+julia> diff(u(x), x) |> string
+"Derivative(u(x), x)"
+
+julia> diff(u(x, y), x) |> string
+"Derivative(u(x, y), x)"
 ```
 
 
@@ -64,12 +69,12 @@ u2(D(f⁻¹)(f(x)) => u1) # f''/[f']^3
 SymFunction
 
 ## SymFunction has a `n` field to allow u', u'', etc to work
-## However, it seems better to be more consistent ModelingToolkit
-## and use D = Differential(x) to inicate derivatives, e.g. D(u)
+## However, it seems better to be more consistent with ModelingToolkit
+## and use `D = Differential(x)` to inicate derivatives, e.g. `D(u)`
 ## This `n` will be deprecated
 mutable struct SymFunction <: SymbolicObject
     __pyobject__::PyCall.PyObject
-    n::Int
+    n::Int  # <-- remove
 end
 
 
@@ -103,11 +108,9 @@ end
 (∂::Differential)(u::SymFunction) = diff(u(∂.x), ∂.x)
 export Differential
 
-# all that's needed but using things to deprecate now
+# after deprecation, these two methods need to be exposed:
 # Base.show(io::IO, u::SymFunction) = print(io, "$(string(Sym(u.__pyobject__)))")
 #(u::SymFunction)(args...) = u.__pyobject__(PyObject.(args)...)
-
-## -----------------------
 
 ## ---- deprecate. Remove once u'(x) syntax is removed ----
 ## support legacy

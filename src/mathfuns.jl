@@ -234,6 +234,19 @@ julia> dsolve(eqns)  # can't solve for initial conditions though! (NotAlgebraic)
 2-element Vector{Sym}:
            x(t) = C₁ + C₂⋅t
  Eq(y(t), C3 + C4*t - g*t^2/2)
+
+julia> @syms t x() y()
+(t, x, y)
+
+julia> eq = (D(x)(t) ~ x(t)*y(t)*sin(t), D(y)(t) ~ y(t)^2 * sin(t))
+(Eq(Derivative(x(t), t), x(t)*y(t)*sin(t)), Eq(Derivative(y(t), t), y(t)^2*sin(t)))
+julia> dsolve(eq)  # returns a set to be `collect`ed:
+PyObject {Eq(y(t), -1/(C1 - cos(t))), Eq(x(t), -exp(C1)/(C2*exp(C1) - cos(t)))}
+
+julia> dsolve(eq) |> collect
+2-element Vector{Any}:
+               Eq(y(t), -1/(C1 - cos(t)))
+ Eq(x(t), -exp(C1)/(C2*exp(C1) - cos(t)))
 ```
 
 """
@@ -330,14 +343,3 @@ end
 # # For System Of Ordinary Differential Equations
 # # may need to collect return values
 # dsolve(eqs::Union{Array, Tuple}, args...; kwargs...) = sympy.dsolve(eqs, args...; kwargs...)
-
-
-
-# # Solve a *system* of equations
-# function dsolve(eqs::Vector{T}, args...; ics=nothing, kwargs...) where {T <: Sym}
-#     fns = sympy.solvers.ode.ode._extract_funcs(eqs)
-
-#     # handle ics
-
-#     sympy.solvers.ode.systems.dsolve_system
-# end
