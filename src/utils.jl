@@ -144,6 +144,33 @@ For non-symbolic expressions, `simplify` returns its first argument.
 simplify(x,args...;kwargs...) = x
 
 ##################################################
+##
+## access documentation of SymPy
+"""
+    SymPy.Doc(f::Symbol, [module=sympy])
+
+Return docstring of `f` found within the specified module.
+
+Examples
+```
+SymPy.Doc(:sin)
+SymPy.Doc(:det, sympy.matrices)
+## add module to query
+SymPy.pyimport_conda("sympy.crypto.crypto", "sympy")
+SymPy.Doc(:padded_key, sympy.crypto)
+```
+"""
+struct Doc
+    u
+    m
+end
+Doc(u::Union{Symbol, Function}) = Doc(Symbol(u), sympy)
+function Base.show(io::IO, u::Doc)
+    v = getproperty(u.m, Symbol(u.u)).__doc__
+    print(io, v)
+end
+
+##################################################
 # avoid type piracy. After we call `pytype` mappings, some
 # objects are automatically converted and no longer PyObjects
 function pycall_hasproperty(x::PyCall.PyObject, k)
