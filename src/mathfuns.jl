@@ -238,15 +238,15 @@ julia> dsolve(eqns)  # can't solve for initial conditions though! (NotAlgebraic)
 julia> @syms t x() y()
 (t, x, y)
 
-julia> eq = (D(x)(t) ~ x(t)*y(t)*sin(t), D(y)(t) ~ y(t)^2 * sin(t))
+julia> eq = (∂(x)(t) ~ x(t)*y(t)*sin(t), ∂(y)(t) ~ y(t)^2 * sin(t))
 (Eq(Derivative(x(t), t), x(t)*y(t)*sin(t)), Eq(Derivative(y(t), t), y(t)^2*sin(t)))
 julia> dsolve(eq)  # returns a set to be `collect`ed:
-PyObject {Eq(y(t), -1/(C1 - cos(t))), Eq(x(t), -exp(C1)/(C2*exp(C1) - cos(t)))}
+PyObject {Eq(x(t), -exp(C1)/(C2*exp(C1) - cos(t))), Eq(y(t), -1/(C1 - cos(t)))}
 
 julia> dsolve(eq) |> collect
 2-element Vector{Any}:
-               Eq(y(t), -1/(C1 - cos(t)))
  Eq(x(t), -exp(C1)/(C2*exp(C1) - cos(t)))
+               Eq(y(t), -1/(C1 - cos(t)))
 ```
 
 """
