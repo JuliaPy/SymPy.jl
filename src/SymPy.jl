@@ -53,7 +53,7 @@ import Base: +, -, *, /, //, \, ^
 export @vars, Sym, sympify, symbols, @symfuns, @syms
 export SymMatrix, SymFunction
 export PI, IM, oo, zoo, True, False
-export N, subs
+export N, subs, doit
 
 export sympy, sympy_core, sympy_matrices, import_from#, import_sympy
 export free_symbols

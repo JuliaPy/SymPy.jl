@@ -133,6 +133,69 @@ subs(;kwargs...)                      = ex -> subs(ex; kwargs...)
 subs(dict::Dict; kwargs...)           = ex -> subs(ex, dict...; kwargs...)
 subs(d::Pair...; kwargs...)           = ex -> subs(ex, [(p.first, p.second) for p in d]...; kwargs...)
 
+
+##################################################
+## doit
+##
+"""
+`doit` evaluates objects that are not evaluated by default.
+
+Examples:
+
+```jldoctest doit
+julia> @syms x f()
+(x, f)
+
+julia> D = Differential(x)
+Differential(x)
+
+julia> df = D(f(x))
+d
+──(f(x))
+dx
+
+julia> dfx = subs(df, (f(x), x^2))
+d ⎛ 2⎞
+──⎝x ⎠
+dx
+
+julia> doit(dfx)
+2⋅x
+```
+
+Set `deep=true` to apply `doit` recursively to force evaluation of nested expressions:
+
+```jldoctest doit
+julia> @syms g()
+
+julia> dgfx = g(dfx)
+ ⎛d ⎛ 2⎞⎞
+g⎜──⎝x ⎠⎟
+ ⎝dx    ⎠
+
+julia> doit(dgfx)
+ ⎛d ⎛ 2⎞⎞
+g⎜──⎝x ⎠⎟
+ ⎝dx    ⎠
+
+julia> doit(dgfx, deep=true)
+g(2⋅x)
+```
+
+There is also a curried form of `doit`:
+```jldoctest doit
+julia> dfx |> doit
+2⋅x
+
+julia> dgfx |> doit(deep=true)
+g(2⋅x)
+
+```
+
+"""
+doit(ex::T; deep::Bool=false) where {T<:SymbolicObject} = ex.doit(deep=deep)
+doit(; deep::Bool=false)      where {T<:SymbolicObject} = ex -> doit(ex, deep=deep)
+
 ## simplify(ex::SymbolicObject, ...) is exported
 """
     simplify
