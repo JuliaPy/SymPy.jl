@@ -72,6 +72,20 @@ import PyCall
     @test ex(x=>2, y=>2) == 0
     @test ex.subs(Dict(x=>1)) == 0
 
+    ### doit
+    @syms x f() g()
+    D = Differential(x)
+    df = D(f(x))
+    dfx = subs(df, f(x), x^2)
+    @test dfx.doit() == 2*x
+    @test doit(dfx) == 2*x
+    @test dfx |> doit == 2*x
+    # use deep=true to force nested evaluations
+    dgfx = g(dfx)
+    @test dgfx.doit(deep=true) == g(2*x)
+    @test doit(dgfx, deep=true) == g(2*x)
+    @test dgfx |> doit(deep=true) == g(2*x)
+
     ## match, replace, xreplace, rewrite
     x,y,z = symbols("x, y, z")
     a,b,c = map(Wild, (:a,:b,:c))
