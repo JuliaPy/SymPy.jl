@@ -836,11 +836,10 @@ dx
 
 julia> h = sympy.Symbol("h")
 h
+```
 
+```julia
 julia> d2fdx2.as_finite_difference([-3*h,-h,2*h])
-┌ Warning: `vendor()` is deprecated, use `BLAS.get_config()` and inspect the output instead
-│   caller = npyinitialize() at numpy.jl:67
-└ @ PyCall ~/.julia/packages/PyCall/3fwVL/src/numpy.jl:67
 f(-3⋅h)   f(-h)   2⋅f(2⋅h)
 ─────── - ───── + ────────
      2        2        2
@@ -863,10 +862,9 @@ manually:
 the `finite_diff_weights` function that is not exported:
 
 
-```jldoctest calculus
+```julia
 julia> sympy.finite_diff_weights(2, [-3, -1, 2], 0)[end][end]
-2/15
-
+-2/15
 ```
 
 ----
@@ -904,10 +902,11 @@ julia> xs = [-3, 1, 2]
 
 julia> @syms ys[1:3]
 (Sym[ys₁, ys₂, ys₃],)
+```
 
+```julia
 julia> sympy.apply_finite_diff(1, xs, ys, 0)
   3⋅ys₁   ys₂   2⋅ys₃
 - ───── - ─── + ─────
-    20     4      5  
+    20     4      5
 ```
-

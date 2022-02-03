@@ -20,7 +20,11 @@ SymPy's [website](http://docs.sympy.org/latest/index.html).
 Plotting is provided through  `Plots` recipes. For details, see
 the help page for [`sympy_plotting`](@ref).
 
-The package documentation provides many examples.
+The package [documentation](https://docs.juliahub.com/SymPy/) provides many examples.
+
+Access to SymPy's help system for most functions is available through `SymPy.Doc`.
+
+
 
 """
 module SymPy

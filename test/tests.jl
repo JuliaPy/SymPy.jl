@@ -827,6 +827,10 @@ end
     @syms x
     @test limit(ceil(x), x=>0, dir="+") != limit(ceil(x), x=>0, dir="-")
     @test limit(floor(x), x=>0, dir="+") != limit(floor(x), x=>0, dir="-")
+
+    ## Issue #433 add sympy docstrings, clean up docstring
+    sprint(io -> show(io, SymPy.Doc(:sin)))
+
 end
 
 @test SymPy.convert_expr(sympy.Indexed(sympy.IndexedBase(:x), 1, -2)) == :(x[1, -2])
