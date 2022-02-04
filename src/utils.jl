@@ -191,7 +191,6 @@ julia> dfx |> doit
 
 julia> dgfx |> doit(deep=true)
 g(2⋅x)
-
 ```
 
 """
