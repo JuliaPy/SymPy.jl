@@ -1129,7 +1129,7 @@ expensive to calculate.
 
 * note missing `b` is not needed with `Julia`:
 
-```jldoctest
+```julia
 julia> @syms lambda
 (lambda,)
 
@@ -1143,7 +1143,7 @@ julia> factor(p) |>  string
 
 As an aside, we can get prettier output by adjusting how `lambda` should print, as follows:
 
-```
+```julia
 julia> @syms lambda=>"λ"
 (λ,)
 

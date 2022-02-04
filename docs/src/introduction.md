@@ -71,12 +71,6 @@ julia> ys = [Sym("y$i") for i in 1:5]
  y₃
  y₄
  y₅
-5-element Vector{Sym}:
- y₁
- y₂
- y₃
- y₄
- y₅
 ```
 
 The former much more succinct, but the latter pattern of use when the number of terms is a variable.
@@ -722,7 +716,7 @@ root. The `roots` function of SymPy does.
 
 The output of calling `roots` will be a dictionary whose keys are the roots and values the multiplicity.
 
-```jldoctest
+```julia
 julia> roots(p)
 Dict{Any, Any} with 7 entries:
   -1                 => 1
@@ -742,7 +736,7 @@ julia> p = x^5 - x + 1
  5
 x  - x + 1
 
-julia> roots(p)
+julia> sympy.roots(p)
 Dict{Any, Any}()
 
 ```
@@ -962,7 +956,7 @@ unknowns. When that is not the case, one can specify the variables to
 solve for as a vector. In this example, we find a quadratic polynomial
 that approximates $\cos(x)$ near $0$:
 
-```jldoctest
+```julia
 julia> a,b,c,h = symbols("a,b,c,h", real=true)
 (a, b, c, h)
 
@@ -990,7 +984,7 @@ Dict{Any, Any} with 3 entries:
 Again, a dictionary is returned. The polynomial itself can be found by
 substituting back in for `a`, `b`, and `c`:
 
-```jldoctest introduction
+```julia
 julia> quad_approx = p.subs(d); string(quad_approx)
 "x^2*(-cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)) + x*(2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)) + 1"
 
@@ -1002,7 +996,7 @@ Finally for `solve`, we show one way to re-express the polynomial $a_2x^2 + a_1x
 as $b_2(x-c)^2 + b_1(x-c) + b_0$ using `solve` (and not, say, an
 expansion theorem.)
 
-```jldoctest introduction
+```julia
 julia> n = 3
 3
 
@@ -1057,7 +1051,7 @@ julia> solve(x ⩵ 1)
 
 Here is an alternative way of asking a previous question on a pair of linear equations:
 
-```jldoctest
+```julia
 julia> x, y = symbols("x,y", real=true)
 (x, y)
 
@@ -1227,7 +1221,7 @@ julia> limit(ex, x => a)
 
 In a previous example, we defined `quad_approx`:
 
-```jldoctest introduction
+```julia
 julia> quad_approx  |>  string
 "x^2*(-cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)) + x*(2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)) + 1"
 
@@ -1235,7 +1229,7 @@ julia> quad_approx  |>  string
 
 The limit as `h` goes to $0$ gives `1 - x^2/2`, as expected:
 
-```jldoctest introduction
+```julia
 julia> limit(quad_approx, h => 0)
      2
     x
@@ -1283,7 +1277,7 @@ f (generic function with 1 method)
 
 A numeric attempt might be done along these lines:
 
-```jldoctest
+```julia
 julia> hs = [10.0^(-i) for i in 6:16]
 11-element Vector{Float64}:
  1.0e-6
@@ -1744,7 +1738,7 @@ julia> integrate(x^2, (x, 0, 1))
 
 Tedious problems, such as those needing multiple integration-by-parts steps can be done easily:
 
-```jldoctest
+```julia
 julia> integrate(x^5*sin(x), x)
    5             4              3              2
 - x ⋅cos(x) + 5⋅x ⋅sin(x) + 20⋅x ⋅cos(x) - 60⋅x ⋅sin(x) - 120⋅x⋅cos(x) + 120⋅sin(x)
@@ -1757,7 +1751,7 @@ The SymPy tutorial says:
 
 The tutorial gives the following example:
 
-```jldoctest
+```julia
 julia> ex = (x^4 + x^2*exp(x) - x^2 - 2*x*exp(x) - 2*x - exp(x))*exp(x)/((x - 1)^2*(x + 1)^2*(exp(x) + 1))
 ⎛ 4    2  x    2        x          x⎞  x
 ⎝x  + x ⋅ℯ  - x  - 2⋅x⋅ℯ  - 2⋅x - ℯ ⎠⋅ℯ
@@ -1769,7 +1763,7 @@ julia> ex = (x^4 + x^2*exp(x) - x^2 - 2*x*exp(x) - 2*x - exp(x))*exp(x)/((x - 1)
 
 With indefinite integral:
 
-```jldoctest introduction
+```julia
 julia> integrate(ex, x) |> string
 "log(exp(x) + 1) + exp(x)/(x^2 - 1)"
 

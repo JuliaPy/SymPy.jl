@@ -169,6 +169,7 @@ Set `deep=true` to apply `doit` recursively to force evaluation of nested expres
 
 ```jldoctest doit
 julia> @syms g()
+(g,)
 
 julia> dgfx = g(dfx)
  ⎛d ⎛ 2⎞⎞

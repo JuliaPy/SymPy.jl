@@ -173,7 +173,6 @@ d
 dx
 
 julia> dsolve(eqn)
-f(x) = C₁⋅sin(x) + C₂⋅cos(x)
              2
             x ⋅α
 f(x) = C₁ + ────

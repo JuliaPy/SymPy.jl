@@ -364,7 +364,7 @@ argument to `evalf`.  Let's compute the first 100 digits of `\pi`.
 
 ##### In `Julia`:
 
-```jldoctest
+```julia
 julia> PI.evalf(100)
 3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068
 ```
