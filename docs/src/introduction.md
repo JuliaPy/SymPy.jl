@@ -916,9 +916,8 @@ julia> exs = [2x+3y-6, 3x-4y-12]
 ```
 
 ```jldoctest introduction
-julia> d = solve(exs) # Dict(x=>60/17, y=>-6/17)
-Dict{Any, Any} with 2 entries:
-[...]
+julia> d = solve(exs); # Dict(x=>60/17, y=>-6/17)
+
 ```
 
 
