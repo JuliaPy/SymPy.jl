@@ -913,12 +913,11 @@ julia> exs = [2x+3y-6, 3x-4y-12]
 2-element Vector{Sym}:
   2⋅x + 3⋅y - 6
  3⋅x - 4⋅y - 12
+```
 
-julia> d = solve(exs)
-Dict{Any, Any} with 2 entries:
-  x => 60/17
-  y => -6/17
-
+```jldoctest introduction
+julia> d = solve(exs) # Dict(x=>60/17, y=>-6/17)
+[...]
 ```
 
 
