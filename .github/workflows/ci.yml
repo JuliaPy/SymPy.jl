@@ -53,20 +53,19 @@ jobs:
       - uses: julia-actions/setup-julia@v1
         with:
           version: '1'
+     - run: |
+          pip3 install sympy
       - run: |
-          pip3 install scipy
           julia --project=docs -e '
             using Pkg
             Pkg.develop(PackageSpec(path=pwd()))
             Pkg.instantiate()'
       - run: |
-          pip3 install scipy
           julia --project=docs -e '
             using Documenter: doctest
             using SymPy
             doctest(SymPy)'
       - run: julia --project=docs docs/make.jl
-          pip3 install scipy
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCUMENTER_KEY: ${{ secrets.DOCUMENTER_KEY }}
