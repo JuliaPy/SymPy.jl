@@ -182,16 +182,11 @@ f(x) = C₁ + ────
 ```
 
 ```jldoctest dsolve
-julia> dsolve(eqn(α=>2); ics=Dict(f(0)=>1))  # fill in parameter, initial condition
-        2
-f(x) = x  + 1
+julia> dsolve(eqn(α=>2); ics=Dict(f(0)=>1)) |> print # fill in parameter, initial condition
+Eq(f(x), x^2 + 1)
 
-julia> eqn = ∂(∂(f(x))) ~ -f(x)
-  2
- d
-───(f(x)) = -f(x)
-  2
-dx
+julia> eqn = ∂(∂(f(x))) ~ -f(x); print(eqn)
+Eq(Derivative(f(x), (x, 2)), -f(x))
 
 julia> dsolve(eqn)
 f(x) = C₁⋅sin(x) + C₂⋅cos(x)
@@ -244,7 +239,9 @@ julia> @syms t x() y()
 
 julia> eq = (∂(x)(t) ~ x(t)*y(t)*sin(t), ∂(y)(t) ~ y(t)^2 * sin(t))
 (Eq(Derivative(x(t), t), x(t)*y(t)*sin(t)), Eq(Derivative(y(t), t), y(t)^2*sin(t)))
+```
 
+```julia
 julia> dsolve(eq)  # returns a set to be `collect`ed:
 PyObject {Eq(x(t), -exp(C1)/(C2*exp(C1) - cos(t))), Eq(y(t), -1/(C1 - cos(t)))}
 ```
