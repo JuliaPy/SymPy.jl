@@ -228,9 +228,7 @@ julia> aug = [A b]
  1  1  2  3
 
 julia> linsolve(aug, (x,y,z)) # {(-y - 1, y, 2)};
-┌ Warning: `vendor()` is deprecated, use `BLAS.get_config()` and inspect the output instead
-│   caller = npyinitialize() at numpy.jl:67
-└ @ PyCall ~/.julia/packages/PyCall/L0fLP/src/numpy.jl:67
+
 ```
 
 Finally,  linear equations  are  solved in `Julia`  with  the `\` (backslash) operator:

@@ -105,7 +105,7 @@ Use `solve` to solve algebraic equations.
 
 Examples:
 
-```jldoctest solve
+```julia
 julia> using SymPy
 
 julia> @syms x y a b c d
@@ -181,7 +181,7 @@ f(x) = C₁ + ────
 
 julia> dsolve(eqn(α=>2); ics=Dict(f(0)=>1))  # fill in parameter, initial condition
         2
-2
+f(x) = x  + 1
 
 julia> eqn = ∂(∂(f(x))) ~ -f(x)
   2
@@ -191,14 +191,15 @@ julia> eqn = ∂(∂(f(x))) ~ -f(x)
 dx
 
 julia> dsolve(eqn)
+f(x) = C₁⋅sin(x) + C₂⋅cos(x)
 
 julia> dsolve(eqn; ics = Dict(f(0)=>1, ∂(f)(0) => -1))
 f(x) = -sin(x) + cos(x)
+
 julia> eqn = f''(x) - f(x) - exp(x);
 
 julia> dsolve(eqn, ics=Dict(f(0) => 1, f(1) => Sym(1//2))) |> print # not just 1//2
 Eq(f(x), (x/2 + (-exp(2) - 2 + E)/(-2 + 2*exp(2)))*exp(x) + (-E + 3*exp(2))*exp(-x)/(-2 + 2*exp(2)))
-
 ```
 
 Systems

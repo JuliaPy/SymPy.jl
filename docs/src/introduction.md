@@ -65,7 +65,7 @@ julia> @syms xs[1:5]
 (Sym[xs₁, xs₂, xs₃, xs₄, xs₅],)
 
 julia> ys = [Sym("y$i") for i in 1:5]
-julia> 5-element Vector{Sym}:
+5-element Vector{Sym}:
  y₁
  y₂
  y₃
@@ -236,18 +236,10 @@ This calling style will be equivalent to the last:
 ```jldoctest introduction
 julia> ex(x=>1, y=>pi)
 z + 1 + π
-
 ```
 
-A straight call is also possble, where the order of the variables is determined by `free_symbols`:
-
-```jldoctest introduction
-julia> ex(1, pi)
-x + 1 + π
-
-```
-
-This is useful for expressions of a single variable, but being more explicit through the use of paired values would be recommended.
+A straight call is also possble, where the order of the variables is determined by `free_symbols`.
+This is useful for expressions of a single variable, but being more explicit through the use of paired values is recommended.
 
 ## Conversion from symbolic to numeric
 
@@ -730,7 +722,7 @@ root. The `roots` function of SymPy does.
 
 The output of calling `roots` will be a dictionary whose keys are the roots and values the multiplicity.
 
-```jldoctest introduction
+```jldoctest
 julia> roots(p)
 Dict{Any, Any} with 7 entries:
   -1                 => 1
@@ -970,7 +962,7 @@ unknowns. When that is not the case, one can specify the variables to
 solve for as a vector. In this example, we find a quadratic polynomial
 that approximates $\cos(x)$ near $0$:
 
-```jldoctest introduction
+```jldoctest
 julia> a,b,c,h = symbols("a,b,c,h", real=true)
 (a, b, c, h)
 
@@ -1023,13 +1015,9 @@ julia> @syms as[1:3]
 julia> @syms bs[1:3]
 (Sym[bs₁, bs₂, bs₃],)
 
-julia> p = sum([as[i+1]*x^i for i in 0:(n-1)])
-                2
-2
+julia> p = sum([as[i+1]*x^i for i in 0:(n-1)]);
 
-julia> q = sum([bs[i+1]*(x-c)^i for i in 0:(n-1)])
-                              2
-2
+julia> q = sum([bs[i+1]*(x-c)^i for i in 0:(n-1)]);
 
 julia> solve(p-q, bs)
 Dict{Any, Any} with 3 entries:
@@ -1069,7 +1057,7 @@ julia> solve(x ⩵ 1)
 
 Here is an alternative way of asking a previous question on a pair of linear equations:
 
-```jldoctest introduction
+```jldoctest
 julia> x, y = symbols("x,y", real=true)
 (x, y)
 
@@ -1079,13 +1067,6 @@ julia> exs = [2x+3y ⩵ 6, 3x-4y ⩵ 12]    ## Using \Equal[tab]
  3⋅x - 4⋅y = 12
 
 julia> d = solve(exs)
-/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/matrices/repmatrix.py:102: SymPyDeprecationWarning:
-
-non-Expr objects in a Matrix has been deprecated since SymPy 1.9. Use
-list of lists, TableForm or some other data structure instead. See
-https://github.com/sympy/sympy/issues/21497 for more info.
-
-  deprecated_since_version="1.9"
 Dict{Any, Any} with 2 entries:
   x => 60/17
   y => -6/17
@@ -1302,7 +1283,7 @@ f (generic function with 1 method)
 
 A numeric attempt might be done along these lines:
 
-```jldoctest introduction
+```jldoctest
 julia> hs = [10.0^(-i) for i in 6:16]
 11-element Vector{Float64}:
  1.0e-6
@@ -1763,7 +1744,7 @@ julia> integrate(x^2, (x, 0, 1))
 
 Tedious problems, such as those needing multiple integration-by-parts steps can be done easily:
 
-```jldoctest introduction
+```jldoctest
 julia> integrate(x^5*sin(x), x)
    5             4              3              2
 - x ⋅cos(x) + 5⋅x ⋅sin(x) + 20⋅x ⋅cos(x) - 60⋅x ⋅sin(x) - 120⋅x⋅cos(x) + 120⋅sin(x)
@@ -1776,7 +1757,7 @@ The SymPy tutorial says:
 
 The tutorial gives the following example:
 
-```jldoctest introduction
+```jldoctest
 julia> ex = (x^4 + x^2*exp(x) - x^2 - 2*x*exp(x) - 2*x - exp(x))*exp(x)/((x - 1)^2*(x + 1)^2*(exp(x) + 1))
 ⎛ 4    2  x    2        x          x⎞  x
 ⎝x  + x ⋅ℯ  - x  - 2⋅x⋅ℯ  - 2⋅x - ℯ ⎠⋅ℯ
@@ -2024,7 +2005,7 @@ julia> M = [1 x; x 1]
 Construction of symbolic matrices can *also* be done through the `Matrix` constructor, which must be qualified. It is passed a vector or row vectors but any symbolic values *must* be converted into `PyObject`s:
 
 ```jldoctest introduction
-julia> import PyCall: PyObject
+julia> import SymPy.PyCall: PyObject
 
 julia> A = sympy.Matrix([[1,PyObject(x)], [PyObject(y), 2]])
 2×2 Matrix{Sym}:

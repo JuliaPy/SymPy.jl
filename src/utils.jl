@@ -143,6 +143,8 @@ subs(d::Pair...; kwargs...)           = ex -> subs(ex, [(p.first, p.second) for 
 Examples:
 
 ```jldoctest doit
+julia> using SymPy
+
 julia> @syms x f()
 (x, f)
 
