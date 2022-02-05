@@ -143,6 +143,8 @@ subs(d::Pair...; kwargs...)           = ex -> subs(ex, [(p.first, p.second) for 
 Examples:
 
 ```jldoctest doit
+julia> using SymPy
+
 julia> @syms x f()
 (x, f)
 
@@ -167,6 +169,7 @@ Set `deep=true` to apply `doit` recursively to force evaluation of nested expres
 
 ```jldoctest doit
 julia> @syms g()
+(g,)
 
 julia> dgfx = g(dfx)
  ⎛d ⎛ 2⎞⎞
@@ -189,7 +192,6 @@ julia> dfx |> doit
 
 julia> dgfx |> doit(deep=true)
 g(2⋅x)
-
 ```
 
 """

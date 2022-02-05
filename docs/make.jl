@@ -1,3 +1,7 @@
+ENV["PLOTS_TEST"] = "true"
+ENV["GKSwstype"] = "100"
+
+
 using Documenter
 using SymPy
 
@@ -18,7 +22,7 @@ pages = [
         "Solvers" => "Tutorial/solvers.md",
         "Matrices" => "Tutorial/matrices.md",
         "Advanced expression  manipulation" => "Tutorial/manipulation.md"
-    ],      
+    ],
     "Reference/API" => "reference.md"
     ],
 )

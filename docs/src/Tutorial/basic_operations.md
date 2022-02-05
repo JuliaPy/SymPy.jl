@@ -120,18 +120,18 @@ julia> expr(x => 0)
 ```jldoctest basicoperations
 julia> expr = x^y
  y
-x 
+x
 
 julia> expr = expr(y => x^y)
  ⎛ y⎞
  ⎝x ⎠
-x    
+x
 
 julia> expr = expr(y => x^x)
  ⎛ ⎛ x⎞⎞
  ⎜ ⎝x ⎠⎟
  ⎝x    ⎠
-x       
+x
 
 ```
 
@@ -364,7 +364,7 @@ argument to `evalf`.  Let's compute the first 100 digits of `\pi`.
 
 ##### In `Julia`:
 
-```jldoctest basicoperations
+```julia
 julia> PI.evalf(100)
 3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117068
 ```
@@ -414,7 +414,7 @@ user's discretion by setting the `chop` flag to True.
 
 ```jldoctest basicoperations
 julia> _one = cos(Sym(1))^2 + sin(Sym(1))^2
-   2         2   
+   2         2
 cos (1) + sin (1)
 
 julia> (_one - 1).evalf()
@@ -506,12 +506,12 @@ julia> fn.(a)
 
 !!!  note "Technical note"
     The `lambdify`  function converts a symbolic  expression into  a `Julia`  expression, and then creates a function using `invokelatest`  to avoid  world  age issues.
-	
+
 More performant functions can be produced using the following pattern:
-	
+
 ```jldoctest basicoperations
 julia> ex = sin(x)^2 + x^2
- 2      2   
+ 2      2
 x  + sin (x)
 
 julia> body = convert(Expr, ex)
@@ -587,4 +587,3 @@ julia> fn(0)
 !!! note "TODO"
 
     Write an advanced numerics section
-

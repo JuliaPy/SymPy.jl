@@ -811,7 +811,7 @@ U factor:
 julia> prod(diag(out.L)) * prod(diag(out.U))
   ⎛    1⎞
 x⋅⎜x - ─⎟
-  ⎝    x⎠ 
+  ⎝    x⎠
 ```
 
 ### RREF
@@ -1129,7 +1129,7 @@ expensive to calculate.
 
 * note missing `b` is not needed with `Julia`:
 
-```jldoctest matrices
+```julia
 julia> @syms lambda
 (lambda,)
 
@@ -1138,13 +1138,12 @@ PurePoly(lambda**4 - 11*lambda**3 + 29*lambda**2 + 35*lambda - 150, lambda, doma
 
 julia> factor(p) |>  string
 "PurePoly(lambda^4 - 11*lambda^3 + 29*lambda^2 + 35*lambda - 150, lambda, domain='ZZ')"
-
 ```
 
 
 As an aside, we can get prettier output by adjusting how `lambda` should print, as follows:
 
-```
+```julia
 julia> @syms lambda=>"λ"
 (λ,)
 
@@ -1210,7 +1209,7 @@ julia> m = Sym[-2*cosh(q/3) exp(-q) 1; exp(q) -2*cosh(q/3) 1; 1 1 -2*cosh(q/3)]
 3×3 Matrix{Sym}:
  -2*cosh(q/3)       exp(-q)             1
        exp(q)  -2*cosh(q/3)             1
-            1             1  -2*cosh(q/3) 
+            1             1  -2*cosh(q/3)
 
 julia> m.nullspace()
 1-element Vector{Matrix{Sym}}:
@@ -1335,4 +1334,3 @@ SymPy issue tracker [#sympyissues-fn]_ to get detailed help from the community.
     * [#mathematicazero-fn] How mathematica tests zero https://reference.wolfram.com/language/ref/PossibleZeroQ.html
     * [#matlabzero-fn] How matlab tests zero https://www.mathworks.com/help/symbolic/mupad_ref/iszero.html
 	* [#sympyissues-fn] https://github.com/sympy/sympy/issues
-

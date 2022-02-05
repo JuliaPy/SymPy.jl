@@ -228,9 +228,7 @@ julia> aug = [A b]
  1  1  2  3
 
 julia> linsolve(aug, (x,y,z)) # {(-y - 1, y, 2)};
-┌ Warning: `vendor()` is deprecated, use `BLAS.get_config()` and inspect the output instead
-│   caller = npyinitialize() at numpy.jl:67
-└ @ PyCall ~/.julia/packages/PyCall/L0fLP/src/numpy.jl:67
+
 ```
 
 Finally,  linear equations  are  solved in `Julia`  with  the `\` (backslash) operator:
@@ -740,10 +738,7 @@ julia> dsolve(D(f)(x) - f(x), f(x), ics = Dict(f(0) => a)) |>  string
 To solve the simple harmonic equation, where two initial conditions are specified, we combine the tuple for each within another tuple:
 
 ```jldoctest solvers
-julia> ics = Dict(f(0) => 1, D(f)(0) => 2)
-Dict{Sym, Int64} with 2 entries:
-  f(0)                            => 1
-  Subs(Derivative(f(x), x), x, 0) => 2
+julia> ics = Dict(f(0) => 1, D(f)(0) => 2);
 
 julia> dsolve(D(D(f))(x) - f(x), f(x), ics=ics) |> string
 "Eq(f(x), 3*exp(x)/2 - exp(-x)/2)"
