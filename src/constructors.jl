@@ -142,7 +142,6 @@ function _gensyms(xs...)
 end
 
 
-
 ## avoid PyObject conversion as possible
 Sym(x::T) where {T <: Number} = sympify(x)
 Sym(x::Rational{T}) where {T} = Sym(numerator(x))/Sym(denominator(x))

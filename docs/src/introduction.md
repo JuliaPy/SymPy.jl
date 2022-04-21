@@ -214,8 +214,8 @@ julia> @syms x,y,z
 julia> ex = x + y + z
 x + y + z
 
-julia> ex.subs((x,1), (y,pi))
-x + y + z
+julia> ex.subs([(x,1), (y,PI)])
+z + 1 + π
 
 ```
 
