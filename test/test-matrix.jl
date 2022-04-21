@@ -174,4 +174,8 @@ using LinearAlgebra
     @test exp(A) == [exp(Sym(1)) 0; 0 exp(a)]
     B,B1 = convert(SymMatrix,A), convert(SymMatrix,A1)
     @test B*B1 == convert(SymMatrix, A*A1)
+
+    ## Issue #462 missing pytypemapping
+    U = sympy.Matrix(sympy.MatrixSymbol("U",2,2))
+    @test U isa Matrix{Sym}
 end
