@@ -16,5 +16,5 @@ include("test-logical.jl")
 #include("test-permutations.jl")
 include("test-physics.jl")
 include("test-external-module.jl")
-include("test-latexify.jl"
+include("test-latexify.jl")
 include("test-ode.jl")
