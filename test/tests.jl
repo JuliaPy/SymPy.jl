@@ -471,7 +471,7 @@ import PyCall
         Sym(big(2))
         Sym(big(2.0))                   # may need mpmath (e.g., conda install mpmath)
 
-#        sympy.__version__ != "1.9" && (@test limit(besselj(Sym(1),1/x), x, 0) == Sym(0))
+        VersionNumber(sympy.__version__) != v"1.9" && (@test limit(besselj(Sym(1),1/x), x, 0) == Sym(0))
         complex(N(SymPy.mpmath.hankel2(2, pi)))
         SymPy.mpmath.bei(2, 3.5)
         SymPy.mpmath.bei(1+im, 2+3im)
@@ -749,7 +749,7 @@ end
     u = Heaviside(t)
     λ = lambdify(u)
     @test all((iszero(λ(-1)), isone(λ(1))))
-    if parse(Float64, sympy.__version__) >= 1.9
+    if VersionNumber(sympy.__version__) >= v"1.9"
         @test λ(0) == 1//2
     else
         @test isnan(λ(0))
