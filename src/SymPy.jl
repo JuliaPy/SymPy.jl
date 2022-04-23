@@ -156,8 +156,9 @@ function __init__()
     basictype = sympy_core.basic.Basic
     pytype_mapping(basictype, Sym)
 
-    pytype_mapping(sympy_matrices.Matrix, Array{Sym})
-    pytype_mapping(sympy_matrices.MatrixBase, Array{Sym})
+    pytype_mapping(sympy_matrices.Matrix, Matrix{Sym})
+    pytype_mapping(sympy_matrices.MatrixBase, Matrix{Sym})
+    pytype_mapping(sympy_matrices.MutableDenseMatrix, Matrix{Sym})
 
     pytype_mapping(sympy.FiniteSet, Set)
 

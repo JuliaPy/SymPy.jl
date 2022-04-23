@@ -8,28 +8,34 @@
 
 
 ## for mapping sympy.Matrix -> Array{Sym} this is used
-function Base.convert(::Type{Array{Sym}}, x::PyCall.PyObject)
+function Base.convert(::Type{Array{Sym,N}}, x::PyCall.PyObject) where {N}
     if PyCall.hasproperty(x, :__class__)
         nm = Symbol(x.__class__.__name__)
         _convert(Val(nm), x)
     else
+        @show x
         ## error?
         x
     end
 end
 
 function _convert(::Val{:MutableDenseMatrix}, x)
+    MM = x.tolist()
+    length(size(MM)) == 2 && return MM
     sh = x.shape
-    reshape(x.tolist(), sh)
+    reshape(MM, sh)
 end
 
 function _convert(::Type{Val{T}}, x) where {T}
+    @show :T
     x
 end
 
-function Base.convert(::Type{Array{T}}, M::SymMatrix) where {T <: SymbolicObject}
+function Base.convert(::Type{Array{T,N}}, M::SymMatrix) where {T <: SymbolicObject, N}
+    MM = M.tolist()
+    length(size(MM)) == N && return MM
     sh = M.shape
-    reshape(M.tolist(), sh)
+    reshape(MM,sh)
 end
 
 
