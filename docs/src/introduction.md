@@ -852,7 +852,8 @@ For such an equation, a numeric method would be needed, similar to the `Roots` p
 
 ```jldoctest introduction
 julia> nsolve(cos(x) - x, 1)
-0.7390851332151606416553120876738734040134117589007574649656806357732846548836
+0.73908513321516064165531208767387340401341175890075746496568063577328465488
+36
 
 ```
 
@@ -1047,28 +1048,28 @@ julia> solve(x ⩵ 1)
 
 ```
 
+Also, consistent with the interface from `Symbolics` the infix tilde, `~`, can be used for `Eq`.
+
+
 Here is an alternative way of asking a previous question on a pair of linear equations:
 
 ```julia
-julia> x, y = symbols("x,y", real=true)
+julia> @syms x::real y::real
 (x, y)
 
-julia> exs = [2x+3y ⩵ 6, 3x-4y ⩵ 12]    ## Using \Equal[tab]
-2-element Vector{Sym}:
-  2⋅x + 3⋅y = 6
- 3⋅x - 4⋅y = 12
+julia> exs = (2x+3y ~ 6, 3x-4y ~ 12)
+(Eq(2*x + 3*y, 6), Eq(3*x - 4*y, 12))
 
 julia> d = solve(exs)
 Dict{Any, Any} with 2 entries:
   x => 60/17
   y => -6/17
-
 ```
 
 Here  is  one other way  to  express  the same
 
 ```jldoctest introduction
-julia> Eq.( [2x+3y,3x-4y], [6,12]) |>  solve == d
+julia> Eq.( (2x+3y,3x-4y), (6,12)) |>  solve == d
 true
 ```
 

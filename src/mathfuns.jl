@@ -130,28 +130,14 @@ Dict{Any, Any} with 2 entries:
     A very nice example using `solve` is a [blog](https://newptcai.github.io/euclidean-plane-geometry-with-julia.html) entry on [Napolean's theorem](https://en.wikipedia.org/wiki/Napoleon%27s_theorem) by Xing Shi Cai.
 """
 solve() = ()
-solve(V::Vector{T}, args...; kwargs...) where {T <: SymbolicObject} =
-    sympy.solve(V, args...; kwargs...)
+
 
 """
     nonlinsolve
 
 Note: if passing variables in use a tuple (e.g., `(x,y)`) and *not* a vector (e.g., `[x,y]`).
 """
-nonlinsolve(V::AbstractArray{T,N}, args...; kwargs...) where {T <: SymbolicObject, N} =
-    sympy.nonlinsolve(V, args...; kwargs...)
-
-linsolve(V::AbstractArray{T,N}, args...; kwargs...) where {T <: SymbolicObject, N} =
-    sympy.linsolve(V, args...; kwargs...)
-linsolve(Ts::Tuple, args...; kwargs...) where {T <: SymbolicObject} =
-    sympy.linsolve(Ts, args...; kwargs...)
-
-nsolve(V::AbstractArray{T,N}, args...; kwargs...) where {T <: SymbolicObject, N} =
-    sympy.nsolve(V, args...; kwargs...)
-nsolve(Ts::Tuple, args...; kwargs...) where {T <: SymbolicObject} =
-    sympy.nsolve(Ts, args...; kwargs...)
-
-
+nonlinsolve()
 
 
 ## dsolve allowing initial condiation to be specified
@@ -222,6 +208,13 @@ julia> eqns = [∂(x(t)) ~ y(t), ∂(y(t)) ~ x(t)]
  Eq(Derivative(y(t), t), x(t))
 
 julia> dsolve(eqns)
+/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/matrices/repmatrix.py:102: SymPyDeprecationWarning:
+
+non-Expr objects in a Matrix has been deprecated since SymPy 1.9. Use
+list of lists, TableForm or some other data structure instead. See
+https://github.com/sympy/sympy/issues/21497 for more info.
+
+  deprecated_since_version="1.9"
 2-element Vector{Sym}:
  Eq(x(t), -C1*exp(-t) + C2*exp(t))
   Eq(y(t), C1*exp(-t) + C2*exp(t))
@@ -277,7 +270,24 @@ lhs(x::SymbolicObject) = pycall_hasproperty(x, :lhs) ? x.lhs : x
 
 export dsolve, rhs, lhs
 
+## ----
+
+## Add methods for "solve functions"
+for meth ∈ (:solve, :linsolve, :nonlinsolve, :nsolve, :dsolve)
+    m = Symbol(meth)
+    @eval begin
+        ($meth)(V::AbstractArray{T,N}, args...; kwargs...) where {T <: SymbolicObject, N} = sympy.$meth(V, args...; kwargs...)
+        ($meth)(Ts::NTuple{N,T}, args...; kwargs...) where {N, T <: SymbolicObject} =
+            sympy.$meth(Ts, args...; kwargs...)
+        ($meth)(Ts::Tuple, args...; kwargs...) =
+            sympy.$meth(Ts, args...; kwargs...)
+    end
+end
+
+
+
 ## ---- deprecate ----
+
 ## used with ics=(u,0,1) style
 function _dsolve(eqn::Sym, args...; ics=nothing, kwargs...)
 
