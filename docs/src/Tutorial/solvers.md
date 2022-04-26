@@ -265,14 +265,7 @@ julia> system = A, b = M[:, 1:end-1], M[:, end]
 (Sym[1 1 1; 1 1 2], Sym[1, 3])
 
 julia> linsolve(system, x, y, z)
-ERROR: MethodError: no method matching linsolve(::Tuple{Matrix{Sym}, Vector{Sym}}, ::Sym, ::Sym, ::Sym)
-Closest candidates are:
-  linsolve(!Matched::AbstractArray{T, N}, ::Any...; kwargs...) where {T<:SymPy.SymbolicObject, N} at ~/julia/SymPy/src/mathfuns.jl:152
-  linsolve(!Matched::Tuple{Vararg{T, N}}, ::Any...; kwargs...) where {N, T<:SymPy.SymbolicObject} at ~/julia/SymPy/src/mathfuns.jl:154
-  linsolve(!Matched::SymPy.SymbolicObject, ::Any...; kwargs...) at ~/julia/SymPy/src/importexport.jl:117
-Stacktrace:
- [1] top-level scope
-   @ none:1
+{(-y - 1, y, 2)}
 
 ```
 
