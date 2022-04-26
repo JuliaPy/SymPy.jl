@@ -951,7 +951,7 @@ result in different output forms. For example
 
 * The printing support is through `show`, but we can use SymPy's:
 
-```jldoctest manipulation
+```
 julia> uexpr = UnevaluatedExpr(S.One*5/7)*UnevaluatedExpr(S.One*3/4)
 5/7⋅3/4
 

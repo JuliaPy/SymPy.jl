@@ -851,9 +851,8 @@ julia> try  solve(cos(x) - x)  catch err "error" end # wrap command for doctest 
 For such an equation, a numeric method would be needed, similar to the `Roots` package. For example:
 
 ```jldoctest introduction
-julia> nsolve(cos(x) - x, 1)
-0.7390851332151606416553120876738734040134117589007574649656806357732846548836
-
+julia> nsolve(cos(x) - x, 1) ≈ 0.73908513321516064165
+true
 ```
 
 Though it can't solve everything, the `solve` function can also solve
@@ -867,7 +866,9 @@ julia> @syms a::real, b::real, c::real
 julia> p = a*x^2 + b*x + c
    2
 a⋅x  + b⋅x + c
+```
 
+```
 julia> solve(p, x)
 2-element Vector{Sym}:
  (-b + sqrt(-4*a*c + b^2))/(2*a)
@@ -894,7 +895,7 @@ julia> solveset(p, x)
 If the `x` value is not given, `solveset` will error and  `solve` will try to find a
 solution over all the free variables:
 
-```jldoctest introduction
+```
 julia> solve(p)
 1-element Vector{Dict{Any, Any}}:
  Dict(a => -(b*x + c)/x^2)
@@ -1047,28 +1048,28 @@ julia> solve(x ⩵ 1)
 
 ```
 
+Also, consistent with the interface from `Symbolics` the infix tilde, `~`, can be used for `Eq`.
+
+
 Here is an alternative way of asking a previous question on a pair of linear equations:
 
 ```julia
-julia> x, y = symbols("x,y", real=true)
+julia> @syms x::real y::real
 (x, y)
 
-julia> exs = [2x+3y ⩵ 6, 3x-4y ⩵ 12]    ## Using \Equal[tab]
-2-element Vector{Sym}:
-  2⋅x + 3⋅y = 6
- 3⋅x - 4⋅y = 12
+julia> exs = (2x+3y ~ 6, 3x-4y ~ 12)
+(Eq(2*x + 3*y, 6), Eq(3*x - 4*y, 12))
 
 julia> d = solve(exs)
 Dict{Any, Any} with 2 entries:
   x => 60/17
   y => -6/17
-
 ```
 
 Here  is  one other way  to  express  the same
 
 ```jldoctest introduction
-julia> Eq.( [2x+3y,3x-4y], [6,12]) |>  solve == d
+julia> Eq.( (2x+3y,3x-4y), (6,12)) |>  solve == d
 true
 ```
 
@@ -2279,7 +2280,7 @@ m⋅──(v(t))
 
 We can "classify" this ODE with the method `classify_ode` function.
 
-```jldoctest introduction
+```
 julia> sympy.classify_ode(ex)
 ("separable", "1st_exact", "1st_power_series", "lie_group", "separable_Integral", "1st_exact_Integral")
 
@@ -2287,7 +2288,7 @@ julia> sympy.classify_ode(ex)
 
 It is linear, but not solvable. Proceeding with `dsolve` gives:
 
-```jldoctest introduction
+```
 julia> dsolve(ex, v(t)) |> string
 "Eq(v(t), -α/tanh(log(exp(k*α*(C1 - 2*t)))/(2*m)))"
 
