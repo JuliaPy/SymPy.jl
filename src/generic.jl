@@ -35,6 +35,8 @@ Base.mod(x::SymbolicObject, args...)= Mod(x, args...)
 #Base.mod2pi
 #Base.fldmod
 
+# so we can compare numbers with ≈
+Base.rtoldefault(::Type{<:SymbolicObject}) = eps()
 
 function Base.round(x::Sym; kwargs...)
     length(free_symbols(x)) > 0 && throw(ArgumentError("can't round a symbolic expression"))
