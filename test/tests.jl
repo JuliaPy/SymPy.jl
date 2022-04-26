@@ -209,9 +209,13 @@ import PyCall
     @test length(elements(as)) == 1
 
     ## nsolve -- not method for arrays, issue 268
+    ## Add interface for nsolve
     @vars z1 z2z1 positive=true
-    @test_throws MethodError nsolve([z1^2-1, z1+z2z1-2], [z1,z2z1], [1,1])  # non symbolic first argument
-    @test all(N.(sympy.nsolve([z1^2-1, z1+z2z1-2], [z1,z2z1], (1,1))) .≈ [1.0, 1.0])
+    #@test_throws MethodError nsolve([z1^2-1, z1+z2z1-2], [z1,z2z1], [1,1])  # non symbolic first argument
+    @test all(N.(nsolve([z1^2-1, z1+z2z1-2], [z1,z2z1], (1,1))) .≈ [1.0, 1.0])
+
+
+
 
     ## issue 355: direct definition of LinearAlgebra.:\
     @test_throws SingularException Sym[1 1; 1 1] \ [1, 2]
