@@ -202,19 +202,10 @@ julia> @syms x() y() t g
 julia> ∂ = Differential(t)
 Differential(t)
 
-julia> eqns = [∂(x(t)) ~ y(t), ∂(y(t)) ~ x(t)]
-2-element Vector{Sym}:
- Eq(Derivative(x(t), t), y(t))
- Eq(Derivative(y(t), t), x(t))
+julia> eqns = (∂(x(t)) ~ y(t), ∂(y(t)) ~ x(t))
+(Eq(Derivative(x(t), t), y(t)), Eq(Derivative(y(t), t), x(t)))
 
 julia> dsolve(eqns)
-/Users/verzani/.julia/conda/3/lib/python3.7/site-packages/sympy/matrices/repmatrix.py:102: SymPyDeprecationWarning:
-
-non-Expr objects in a Matrix has been deprecated since SymPy 1.9. Use
-list of lists, TableForm or some other data structure instead. See
-https://github.com/sympy/sympy/issues/21497 for more info.
-
-  deprecated_since_version="1.9"
 2-element Vector{Sym}:
  Eq(x(t), -C1*exp(-t) + C2*exp(t))
   Eq(y(t), C1*exp(-t) + C2*exp(t))

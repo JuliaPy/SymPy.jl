@@ -851,10 +851,8 @@ julia> try  solve(cos(x) - x)  catch err "error" end # wrap command for doctest 
 For such an equation, a numeric method would be needed, similar to the `Roots` package. For example:
 
 ```jldoctest introduction
-julia> nsolve(cos(x) - x, 1)
-0.73908513321516064165531208767387340401341175890075746496568063577328465488
-36
-
+julia> nsolve(cos(x) - x, 1) ≈ 0.73908513321516064165
+true
 ```
 
 Though it can't solve everything, the `solve` function can also solve
@@ -868,7 +866,9 @@ julia> @syms a::real, b::real, c::real
 julia> p = a*x^2 + b*x + c
    2
 a⋅x  + b⋅x + c
+```
 
+```
 julia> solve(p, x)
 2-element Vector{Sym}:
  (-b + sqrt(-4*a*c + b^2))/(2*a)
@@ -895,7 +895,7 @@ julia> solveset(p, x)
 If the `x` value is not given, `solveset` will error and  `solve` will try to find a
 solution over all the free variables:
 
-```jldoctest introduction
+```
 julia> solve(p)
 1-element Vector{Dict{Any, Any}}:
  Dict(a => -(b*x + c)/x^2)
@@ -2280,7 +2280,7 @@ m⋅──(v(t))
 
 We can "classify" this ODE with the method `classify_ode` function.
 
-```jldoctest introduction
+```
 julia> sympy.classify_ode(ex)
 ("separable", "1st_exact", "1st_power_series", "lie_group", "separable_Integral", "1st_exact_Integral")
 
@@ -2288,7 +2288,7 @@ julia> sympy.classify_ode(ex)
 
 It is linear, but not solvable. Proceeding with `dsolve` gives:
 
-```jldoctest introduction
+```
 julia> dsolve(ex, v(t)) |> string
 "Eq(v(t), -α/tanh(log(exp(k*α*(C1 - 2*t)))/(2*m)))"
 
