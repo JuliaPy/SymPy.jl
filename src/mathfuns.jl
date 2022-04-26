@@ -146,6 +146,13 @@ linsolve(V::AbstractArray{T,N}, args...; kwargs...) where {T <: SymbolicObject, 
 linsolve(Ts::Tuple, args...; kwargs...) where {T <: SymbolicObject} =
     sympy.linsolve(Ts, args...; kwargs...)
 
+nsolve(V::AbstractArray{T,N}, args...; kwargs...) where {T <: SymbolicObject, N} =
+    sympy.nsolve(V, args...; kwargs...)
+nsolve(Ts::Tuple, args...; kwargs...) where {T <: SymbolicObject} =
+    sympy.nsolve(Ts, args...; kwargs...)
+
+
+
 
 ## dsolve allowing initial condiation to be specified
 
