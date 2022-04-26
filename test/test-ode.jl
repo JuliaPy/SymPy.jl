@@ -49,7 +49,7 @@ using Test
     dsolve(∂(u)(x) - a*u(x), u(x), ics=Dict(u(y0)=>y1)) # == Eq(u(x), y1 * exp(a*(x - y0)))
     dsolve(x*∂(u)(x) + x*u(x) + 1, u(x), ics=Dict(u(1) => 1))
     𝒂 = 2
-    dsolve((∂(u)(x))^2 - 𝒂*u(x), u(x), ics=Dict(u(0) => 0))
+    dsolve((∂(u)(x))^2 - 𝒂 * u(x), u(x), ics=Dict(u(0) => 0, ∂(u)(0) => 0))
     dsolve(∂(∂(u))(x) - 𝒂 * u(x), u(x), ics=Dict(u(0)=> 1, ∂(u)(0) => 0))
 
     F, G, K = SymFunction("F, G, K")
