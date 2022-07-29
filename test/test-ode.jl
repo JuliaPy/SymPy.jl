@@ -1,7 +1,7 @@
 using SymPy
 using Test
 
-@testset "ODes" begin
+@testset "ODEs" begin
     ## ODEs
     x, a = Sym("x, a")
     F = SymFunction("F")
