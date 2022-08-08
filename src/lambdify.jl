@@ -41,13 +41,16 @@ __ALL__(xs...) = all(xs)
 __ZERO__(xs...) = 0
 # not quite a match; NaN not θ(0) when evaluated at 0 w/o second argument
 __HEAVISIDE__ = (a...)  -> (a[1] < 0 ? 0 : (a[1] > 0 ? 1 : (length(a) > 1 ? a[2] : NaN)))
+__POW__(x, y::Int) = Base.literal_pow(^, x, Val(y)) # otherwise
+__POW__(a,b) = (a)^(b)
 #  __SYMPY__ALL__,
 fn_map = Dict(
     "Add" => :+,
     "Sub" => :-,
     "Mul" => :*, # :(SymPy.__PROD__)
     "Div" => :/,
-    "Pow" => :^,
+    #    "Pow" => :^,
+    "Pow" => :(SymPy.__POW__),
     "re"  => :real,
     "im"  => :imag,
     "Abs" => :abs,
@@ -115,8 +118,8 @@ function walk_expression(ex; values=Dict(), fns=Dict())
 end
 
 """
-    lambdify(ex, vars=free_symbols(); 
-             fns=Dict(), values=Dict, use_julia_code=false, 
+    lambdify(ex, vars=free_symbols();
+             fns=Dict(), values=Dict, use_julia_code=false,
              invoke_latest=true)
 
 Take a symbolic expression and return a `Julia` function or expression to build a function.
@@ -140,7 +143,7 @@ julia> @syms x y z
 (x, y, z)
 
 julia> ex = x^2 * sin(x)
- 2       
+ 2
 x ⋅sin(x)
 
 julia> fn = lambdify(ex);

@@ -768,6 +768,11 @@ end
     @test lambdify(p)(2) == 2
     @test lambdify(p)(-2) == (-2)^2
 
+    ## Issue #474 with rational powers
+    @syms x
+    ex = 1/(2*x*sympy.pi^(1//4))
+    @test N(ex(2)) ≈ lambdify(ex)(2)
+
     ## Issue catch all for N; floats only
     @syms x
     ex = integrate(sqrt(1 + (1/x)^2), (x, 1/sympy.E, sympy.E))
