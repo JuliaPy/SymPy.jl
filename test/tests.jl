@@ -777,6 +777,21 @@ end
     @syms x
     ex = integrate(sqrt(1 + (1/x)^2), (x, 1/sympy.E, sympy.E))
     @test N(ex) ≈ 3.196198513599507
+
+    ## Issue #472
+    @syms x
+    a = Sym(1)/2
+    @test round(x) == x
+    @test round(a) == 0
+    @test round(a, RoundUp) == 1
+    @test round(PI; digits = 2) * 100 == 314  # this one is odd
+    @test trunc(x) == x
+    @test trunc(PI) == 3
+    @test trunc(-PI) == -3
+    @test typeof(trunc(PI)) == typeof(PI)
+    M = [PI -PI; a x]
+    @test round.(M) == [3 -3; 0 x]
+
 end
 
 @testset "generic programming, issue 223" begin

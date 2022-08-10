@@ -38,15 +38,33 @@ Base.mod(x::SymbolicObject, args...)= Mod(x, args...)
 # so we can compare numbers with ≈
 Base.rtoldefault(::Type{<:SymbolicObject}) = eps()
 
-function Base.round(x::Sym; kwargs...)
-    length(free_symbols(x)) > 0 && throw(ArgumentError("can't round a symbolic expression"))
-    round(N(x); kwargs...)
+
+# SymPy round only has a digits argument and errors on symbols
+# here we relax it a git
+function Base.round(x::Sym, r::RoundingMode=RoundNearest; digits=nothing, kwargs...)
+    x.is_number != true && return x
+    digits === nothing && return _round(x, r)
+    return x.round(digits)
+end
+_round(x::Sym, r::RoundingMode{:Nearest}) =  x.round()
+_round(x::Sym, r::RoundingMode) = begin
+    Sym(round(N(x), r))
+end
+function Base.round(::Type{T}, x::Sym, r::RoundingMode=RoundNearest) where {T <: Integer}
+    r != RoundToZero && (x = round(x, r))
+    convert(T, trunc(x))
 end
 
-function Base.trunc(x::Sym; kwargs...)
-    length(free_symbols(x)) > 0 && throw(ArgumentError("can't truncate a symbolic expression"))
-    trunc(N(x); kwargs...)
+
+#trunc(x) returns the nearest integral value of the same type as x whose absolute value is less than or equal to the absolute value of x.
+function Base.trunc(x::Sym)
+    x.is_real == true || return x
+    y = x.evalf().floor()
+    x.is_positive && return y
+    return 1 + y
 end
+
+
 
 # check on type of number
 # these are boolean: true/false; not tru/false/nothing,as in SymPy
