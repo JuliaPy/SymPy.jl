@@ -515,7 +515,7 @@ julia> ex = sin(x)^2 + x^2
 x  + sin (x)
 
 julia> body = convert(Expr, ex)
-:(x ^ 2 + sin(x) ^ 2)
+:(SymPy.__POW__(x, 2) + SymPy.__POW__(sin(x), 2))
 
 julia> syms = Symbol.(free_symbols(ex))
 1-element Vector{Symbol}:
