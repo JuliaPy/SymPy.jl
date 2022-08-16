@@ -777,6 +777,14 @@ end
     @syms x
     ex = integrate(sqrt(1 + (1/x)^2), (x, 1/sympy.E, sympy.E))
     @test N(ex) ≈ 3.196198513599507
+
+    ## Issue #477 non typestable ops
+    @test Base.Broadcast.combine_eltypes(+, (zero(Sym), zero(Sym))) == Sym
+    @test Base.Broadcast.combine_eltypes(-, (zero(Sym), zero(Sym))) == Sym
+    @test Base.Broadcast.combine_eltypes(*, (zero(Sym), zero(Sym))) == Sym
+    @test Base.Broadcast.combine_eltypes(/, (zero(Sym), zero(Sym))) == Sym
+    @test Base.Broadcast.combine_eltypes(^, (zero(Sym), zero(Sym))) == Sym
+
 end
 
 @testset "generic programming, issue 223" begin
