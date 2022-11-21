@@ -196,7 +196,7 @@ g(2⋅x)
 
 """
 doit(ex::T; deep::Bool=false) where {T<:SymbolicObject} = ex.doit(deep=deep)
-doit(; deep::Bool=false)      where {T<:SymbolicObject} = ex -> doit(ex, deep=deep)
+doit(; deep::Bool=false)                                = ((ex::T) where {T<:SymbolicObject}) -> doit(ex, deep=deep)
 
 ## simplify(ex::SymbolicObject, ...) is exported
 """
