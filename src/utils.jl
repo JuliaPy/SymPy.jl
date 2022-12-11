@@ -133,6 +133,16 @@ subs(;kwargs...)                      = ex -> subs(ex; kwargs...)
 subs(dict::Dict; kwargs...)           = ex -> subs(ex, dict...; kwargs...)
 subs(d::Pair...; kwargs...)           = ex -> subs(ex, [(p.first, p.second) for p in d]...; kwargs...)
 
+##################################################
+## map(f, x) where x is symbolic
+## special case python containers
+function Base.map(f, x::SymbolicObject)
+    is_(:Equality, x) && return f(lhs(x)) ~ f(rhs(x))
+    is_(:FiniteSet, x) && return Set(map(f, elements(x)))
+    # default
+    f(x)
+end
+
 
 ##################################################
 ## doit
@@ -244,6 +254,12 @@ end
 
 pycall_hasproperty(x::SymbolicObject, k) = pycall_hasproperty(PyCall.PyObject(x), k)
 pycall_hasproperty(x, k) = false
+
+function pycall_getproperty(x::SymbolicObject, k, default=nothing)
+    o = PyCall.PyObject(x)
+    pycall_hasproperty(o, k) && return getproperty(o, k)
+    return default
+end
 
 # simple helper for boolean properties
 # x.is_finite -> is_(:finite, x)
