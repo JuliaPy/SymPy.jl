@@ -472,7 +472,6 @@ julia> using Test
 
 julia> @test_throws  Exception M1^-1
 Test Passed
-  Expression: M1 ^ -1
       Thrown: PyCall.PyError
 
 ```
@@ -798,7 +797,7 @@ There is no reason  to,  but generic `Julia` methods  could be used:
 
 ```jldoctest matrices
 julia> out  = lu(A)
-LU{Sym, Matrix{Sym}}
+LU{Sym, Matrix{Sym}, Vector{Int64}}
 L factor:
 2×2 Matrix{Sym}:
    1  0

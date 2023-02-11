@@ -215,10 +215,8 @@ julia> dsolve(eqns, ics = Dict(x(0) => 1, y(0) => 2))
  Eq(x(t), 3*exp(t)/2 - exp(-t)/2)
  Eq(y(t), 3*exp(t)/2 + exp(-t)/2)
 
-julia> eqns = [∂(∂(x(t))) ~ 0, ∂(∂(y(t))) ~ -g]
-2-element Vector{Sym}:
-  Eq(Derivative(x(t), (t, 2)), 0)
- Eq(Derivative(y(t), (t, 2)), -g)
+julia> eqns = (∂(∂(x(t))) ~ 0, ∂(∂(y(t))) ~ -g)
+(Eq(Derivative(x(t), (t, 2)), 0), Eq(Derivative(y(t), (t, 2)), -g))
 
 julia> dsolve(eqns)  # can't solve for initial conditions though! (NotAlgebraic)
 2-element Vector{Sym}:

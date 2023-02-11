@@ -71,6 +71,7 @@ x - 1
 
 julia> using SpecialFunctions
 
+
 julia> simplify(gamma(x)/gamma(x - 2))
 (x - 2)⋅(x - 1)
 
