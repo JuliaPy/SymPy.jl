@@ -848,6 +848,11 @@ end
     ## Issue #433 add sympy docstrings, clean up docstring
     sprint(io -> show(io, SymPy.Doc(:sin)))
 
+    ## Issue 456 use free_symbols() not .free_symbols in call
+    @syms x y
+    df = sympy.diff(sin(y-x),x)
+    @test df(x, PI/2) == -sin(x)
+
 end
 
 @test SymPy.convert_expr(sympy.Indexed(sympy.IndexedBase(:x), 1, -2)) == :(x[1, -2])

@@ -49,7 +49,7 @@ end
 
 ## without specification, variables to substitute for come from ordering of `free_symbols`:
 function (ex::Sym)(args...)
-    xs = ex.free_symbols
+    xs = free_symbols(ex)
     for (var, val) in zip(xs, args)
         ex = ex.subs(var, Sym(val))
     end
