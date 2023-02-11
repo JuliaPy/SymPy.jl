@@ -228,6 +228,7 @@ julia> aug = [A b]
  1  1  2  3
 
 julia> linsolve(aug, (x,y,z)) # {(-y - 1, y, 2)};
+{(-y - 1, y, 2)}
 
 ```
 

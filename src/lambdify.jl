@@ -149,7 +149,7 @@ x ⋅sin(x)
 julia> fn = lambdify(ex);
 
 julia> fn(pi)
-1.2086779438644711e-15
+0.0
 
 julia> ex = x + 2y + 3z
 x + 2⋅y + 3⋅z
