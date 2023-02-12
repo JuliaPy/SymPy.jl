@@ -193,7 +193,7 @@ julia> dsolve(eqn, ics=Dict(f(0) => 1, f(1) => Sym(1//2))) |> print # not just 1
 Eq(f(x), (x/2 + (-exp(2) - 2 + E)/(-2 + 2*exp(2)))*exp(x) + (-E + 3*exp(2))*exp(-x)/(-2 + 2*exp(2)))
 ```
 
-Systems
+Systems. Use a tuple, not a vector, of equations, as such are now deprecated by SymPy.
 
 ```jldoctest dsolve
 julia> @syms x() y() t g

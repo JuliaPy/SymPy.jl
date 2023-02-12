@@ -12,8 +12,8 @@ using Test
 
     t, = @vars t
     X, Y = SymFunction("X, Y")
-    eq = [Eq(diff(X(t),t), 12*t*X(t) + 8*Y(t)), Eq(diff(Y(t),t), 21*X(t) + 7*t*Y(t))]
-    sympy.dsolve(eq)  # array is not SymbolicObject
+    eq = (Eq(diff(X(t),t), 12*t*X(t) + 8*Y(t)), Eq(diff(Y(t),t), 21*X(t) + 7*t*Y(t)))
+    sympy.dsolve(eq)  # use tuple, not array is not SymbolicObject
 
 
     ## Removed
@@ -79,7 +79,7 @@ using Test
     eq2 = ∂(y(t)) ~ y(t)^2*sin(t)
 #    eq1 = Eq(diff(x(t),t),x(t)*y(t)*sin(t))
 #    eq2 = Eq(diff(y(t),t),y(t)^2*sin(t))
-    out = dsolve([eq1, eq2]) # vector
+#    out = dsolve([eq1, eq2]) # vector -- deprecated
     out = dsolve((eq1, eq2)) # tuple
     Dict(lhs.(collect(out)) .=> rhs.(collect(out))) # turn python set into a dictionary
 
