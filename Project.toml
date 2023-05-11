@@ -15,7 +15,7 @@ SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 [compat]
 CommonEq = "0.2"
 CommonSolve = "0.2"
-Latexify = "0.15"
+Latexify = "0.15, 0.16"
 PyCall = "1.91"
 RecipesBase = "0.7, 0.8, 1.0, 1.1"
 SpecialFunctions = "0.8, 0.9, 0.10, 1.0, 2"
