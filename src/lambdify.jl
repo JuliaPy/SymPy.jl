@@ -72,6 +72,7 @@ fn_map = Dict(
     "Greater" => :(>),
     "conjugate" => :conj,
     "atan2" => :atan,
+    "TupleArg" => :tuple,
     "Heaviside" => :(SymPy.__HEAVISIDE__),
 )
 
@@ -79,6 +80,30 @@ map_fn(key, fn_map) = haskey(fn_map, key) ? fn_map[key] : Symbol(key)
 
 Base.convert(::Type{Expr}, x::SymbolicObject) = walk_expression(x)
 
+"""
+    walk_expression(ex; values=Dict(), fns=Dict())
+
+Convert a symbolic SymPy expression into a `Julia` expression. This is needed to use functions in external packages in lambdified functions.
+
+## Example
+```
+using SymPy
+@syms x y
+ex = sympy.hyper((2,2),(3,3),x) * y
+```
+
+Calling `lambdify(ex)` will fail to make a valid function, as `hyper` is implemented in `HypergeometricFunctions.pFq`. So, we have:
+
+```
+using HypergeometricFunctions
+d = Dict("hyper" => :pFq)
+body = SymPy.walk_expression(ex, fns=d)
+syms = Symbol.(free_symbols(ex))
+fn = eval(Expr(:function, Expr(:call, gensym(), syms...), body));
+fn(1,1) # 1.6015187080185656
+```
+
+"""
 function walk_expression(ex; values=Dict(), fns=Dict())
 
     fns_map = merge(fn_map, fns)
