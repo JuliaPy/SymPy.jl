@@ -82,13 +82,35 @@ function LinearAlgebra.norm(A::AbstractArray{T,N}) where {T <: SymbolicObject,N}
     A.norm()
 end
 
-function LinearAlgebra.eigvals(a::Matrix{Sym})
-    Sym[k for k in keys(a.eigenvals())]
+function _eigenvects(a::Matrix{Sym})
+    ds =  a.eigenvects()
+    ks = getindex.(ds, 1)
+    d = Dict(u[1] => u[2:3] for u ∈ ds)
+    ((k,d[k]...) for k ∈ sympy.ordered(ks))
 end
 
+function LinearAlgebra.eigvals(a::Matrix{Sym})
+    out = Sym[]
+    for eiv ∈ _eigenvects(a)
+        for k ∈ 1:eiv[2]
+            tmp = eiv[1]
+            push!(out, tmp)
+        end
+    end
+    out
+end
+
+
 function LinearAlgebra.eigvecs(a::Matrix{Sym})
-    ds =  a.eigenvects()
-    hcat((hcat(di[3]...) for di in ds)...)
+    m = similar(a)
+    j = 1
+    for eiv ∈ _eigenvects(a)
+        for k ∈ 1:eiv[2]
+            m[:,j] .= eiv[3][k]
+            j += 1
+        end
+    end
+    m
 end
 
 # solve Ax=b for x, avoiding generic `lu`, which can be very slow for bigger n values
