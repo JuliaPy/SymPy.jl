@@ -106,7 +106,7 @@ function LinearAlgebra.eigvecs(a::Matrix{Sym})
     j = 1
     for eiv ∈ _eigenvects(a)
         for k ∈ 1:eiv[2]
-            m[:,j] .= eiv[3][k]
+            m[:,j] = eiv[3][k]
             j += 1
         end
     end
