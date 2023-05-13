@@ -178,4 +178,19 @@ using LinearAlgebra
     ## Issue #462 missing pytypemapping
     U = sympy.Matrix(sympy.MatrixSymbol("U",2,2))
     @test U isa Matrix{Sym}
+
+    ## Issue 495 with eigenvals
+    a = Sym[-5 -6 3; 3 4 -3; 0 0 -2]
+    ls = eigvals(a)
+    @test ls == sort(ls)
+    vs = eigvecs(a)
+    for i ∈ 1:3
+        λ, v = ls[i], vs[:,i]
+        @test (a * v - λ * v == 0 *v)
+    end
+
+    a=Sym["a" "b"; "c" "d"]
+    ls = eigvals(a)
+    vs = eigvecs(a)
+    @test simplify.(vs * Diagonal(ls) * inv(vs) -a) == 0*a
 end

@@ -2076,8 +2076,8 @@ Occasionally, the SymPy method has more content:
 ```jldoctest introduction
 julia> eigvecs(M)
 2×2 Matrix{Sym}:
- -1  1
-  1  1
+ 1  -1
+ 1   1
 
 ```
 
