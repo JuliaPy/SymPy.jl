@@ -2,12 +2,11 @@
 
 This document provides an introduction to using `SymPy` within `Julia`.
 It owes an enormous debt to the tutorial for using SymPy within Python which may be found
-[here](http://docs.sympy.org/dev/tutorial/index.html). The overall structure and many examples are taken from that work, with adjustments and additions to illustrate the differences due to using `SymPy` within `Julia`.
+[here](http://docs.sympy.org/dev/tutorial/index.html).
 
 
-After installing `SymPy`, which is discussed in the package's `README`
-file, we must first load it into `Julia` with the standard command
-`using`:
+Assuming it has been properly installed, here we first load the
+package into `Julia` with the standard command `using`:
 
 
 ```@setup introduction
@@ -20,7 +19,6 @@ julia> using SymPy
 
 ```
 
-The start up time is a bit lengthy (~4s).
 
 ## Symbols
 
@@ -30,35 +28,70 @@ immediately evaluate to a value, rather the "symbolicness" propagates
 when interacted with. To keep things manageable, SymPy does some
 simplifications along the way.
 
-Symbolic expressions are primarily of the `Sym` type and can be constructed in the standard way:
+
+The `@syms` macro makes creating one or more variables very easy:
+
+```jldoctest introduction
+julia @syms x
+(x,)
+
+julia> @syms α b c
+(α, b, c)
+
+```
+
+This macro creates variables in the local scope, no assignment is needed. The last example shows that symbols may be Unicode.
+
+Additionally you can specify how the variables are displayed using pair notation:
+
+```
+julia> @syms a1=>"α₁" a2=>"α₂"
+(α₁, α₂)
+
+```
+
+In this example, the Julia variables `a1` and `a2` are defined to store SymPy
+symbols with the "pretty" names `α₁` and `α₂` respectively.
+
+
+There are other means, described in the following, to create symbolic variables, but the `@syms` macro is the suggested one to use.
+
+The `sympy.symbols` constructor is exported as `symbols`, as it is a common means for creating symbolic variables in other documentation. Here the variables are passed as a string with names separated by space or commas, allowing the
+creation of one or more variables:
+
+```jldoctest introduction
+julia> a = symbols("a")
+a
+
+julia> a, b, c = symbols("a b c")
+(a, b, c)
+
+```
+
+The documentation for the Python function is available from within `Julia` using the `SymPy.@doc` macro, as in `SymPy.@doc sympy.symbols`.
+
+In `Julia`, the symbolic expressions are primarily instances the `Sym` type, which holds an instance to an underlying `PyObject`. This type can be used as a constructor in the standard way:
 
 ```jldoctest introduction
 julia> x = Sym("x")
 x
 
-```
-
-This creates a symbolic object `x`, which can be manipulated through further function calls.
-
-
-There are the `@syms` and `@vars` macros that makes creating multiple variables a
-bit less typing, as it creates variables in the local scope -- no
-assignment is necessary. Compare these similar ways to create symbolic
-variables:
-
-```jldoctest introduction
-julia> @syms a b c
-(a, b, c)
-
-julia> @vars u v w
-(u, v, w)
-
-julia> a,b,c = Sym("a,b,c")
+julia> a,b,c = Sym("a, b, c")
 (a, b, c)
 
 ```
 
-Here are two ways to make related variables:
+ One caveat is that `Sym` can not create a variable from a function name in Base.
+
+The `sympify` function is used by SymPy to convert arbitrary expressions to a type useful within SymPy. It too can be used to create variables (and more):
+
+```{julia}
+sympify("x")  # sympy.sympify is exported
+```
+
+### Ranges of symbolic variables
+
+Here are two ways to make sequenced variables:
 
 ```jldoctest introduction
 julia> @syms xs[1:5]
@@ -75,16 +108,41 @@ julia> ys = [Sym("y$i") for i in 1:5]
 
 The former much more succinct, but the latter pattern of use when the number of terms is a variable.
 
+The `symbols` constructor also has non-Julian range patterns available:
 
-The `@syms` macro is recommended, and will be modeled in the following, as it makes the specification of assumptions and symbolic functions more natural.
+```jldoctext introduction
+julia> symbols("x:3")
+(x0, x1, x2)
+
+julia> symbols("x:2:2")
+(x00, x01, x10, x11)
+```
+
 
 ### Assumptions
 
-Finally, there is the `symbols` constructor for producing symbolic objects. With `symbols` it is
-possible to pass assumptions onto the variables. A list of possible
-assumptions is
-[here](http://docs.sympy.org/dev/modules/core.html#module-sympy.core.assumptions). Some
-examples are:
+SymPy has "core assumptions" that can be asserted for a variable. These include being real, positive, etc. A list of possible assumptions is
+[here](http://docs.sympy.org/dev/modules/core.html#module-sympy.core.assumptions).
+
+The `@syms` macro allows annotations, akin to type annotations, to specify assumptions on new variables:
+
+```jldoctest introduction
+julia> @syms u1::positive u2::(real, nonzero)
+(u1, u2)
+```
+
+Skipping ahead, there are some functions from the `assumptions` module of `SymPy` to query these properties:
+
+```jldoctest introduction
+julia> ask(𝑄.positive(u1)), ask(𝑄.positive(u2)), ask(𝑄.positive(u2^2)), ask(𝑄.real(u2))
+(true, nothing, nothing, true)
+
+```
+
+Despite it easy to see that a non-zero real variable (`u2`) when squared will be positive, this is not identified.
+
+
+The `symbols` constructor uses keyword arguments to pass in assumptions. It is illustrated below as they apply to all the variables that are created, which can be more convenient at times.
 
 ```jldoctest introduction
 julia> u = symbols("u")
@@ -101,67 +159,62 @@ julia> alpha = symbols("alpha", integer=true, positive=true)
 
 ```
 
-As seen, the `symbols` function can be used to make one or more variables with zero, one or more assumptions.
-
 We jump ahead for a second to illustrate, but here we see that `solve` will respect these assumptions, by failing to find solutions to these equations:
 
 ```jldoctest introduction
+julia> @syms x::real
+(x,)
+
 julia> solve(x^2 + 1)   # ±i are not real
 Any[]
 
 ```
 
 ```jldoctest introduction
-julia> solve(y1 + 1)    # -1 is not positive
+julia> @syms x::positive
+(x,)
+
+julia> solve(x + 1)    # -1 is not positive
 Any[]
 
 ```
 
-The `@syms` macro allows annotations, akin to type annotations, to specify assumptions on new variables:
+!!! warning
+    SymPy can easily create two variables with the same stringified name but different assumptions and will treat these as distinct.
 
 ```jldoctest introduction
-julia> @syms u1::positive u2::positive
-(u1, u2)
+julia> @syms x::real=>"x" y=>"x"
+(x, x)
 
-julia> solve(u1 + u2)  # empty, though solving u1 - u2 is not.
-Any[]
+julia> x, y
+(x, x)
+
+julia> string(x) == string(y)
+true
+
+julia> x == y
+false
+
+julia> hash(x) == hash(y)
+false
+
 ```
 
-The `@vars` macro can also have assumptions passed in as follows; the assumptions apply to each variable.
 
-```jldoctest introduction
-julia> @vars u1 u2 positive=true
-(u1, u2)
-
-julia> solve(u1 + u2)  # empty, though solving u1 - u2 is not.
-Any[]
-
-```
-
-Additionally you can rename arguments using pair notation:
-```
-julia> @syms a1=>"α₁" a2=>"α₂"
-(α₁, α₂)
-```
-
-In this example, the Julia variables `a1` and `a2` are defined to store SymPy
-symbols with the "pretty" names `α₁` and `α₂` respectively.
-
-As can be seen, there are several ways to create symbolic values, but
-the recommended way is to use `@syms`. One caveat is that one can't
-use `Sym` to create a variable from a function name in Base.
 
 ### Special constants
 
 `Julia` has its math constants, like `pi` and `e`, `SymPy` as well. A few of these have `Julia` counterparts provided by `SymPy`. For example, these two constants are defined (where `oo` is for infinity):
 
 ```jldoctest introduction
-julia> PI,  oo
+julia> PI, oo
 (pi, oo)
 
 ```
 
 (The pretty printing of SymPy objects does not work for tuples.)
+
+These are aliases to `sympy.pi` and `sympy.oo`. There are a few others.
 
 Numeric values themselves can be symbolic. This example shows the
 difference. The first `asin` call dispatches to `Julia`'s `asin`
