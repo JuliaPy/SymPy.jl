@@ -407,8 +407,38 @@ x⋅⎝x⋅y + y  + y + 1⎠
 
 ```
 
+The above uses factoring. Other simplifications are possible. For example, powers:
 
+```jldoctest introduction
+julia> @syms m::integer n::integer
+(m, n)
 
+julia> x^m / x^n
+ m  -n
+x ⋅x
+
+julia> simplify(x^m / x^n)
+ m - n
+x
+
+```
+
+Simplification rules can also be made by hand using `Wild` to create wild cards. This shows a simple trigonometric substitution:
+
+```jldoctest introduction
+julia> x_ = Wild("x")
+x
+
+julia> ex = sin(2x)
+sin(2⋅x)
+
+julia> replace(ex, sin(2x_) => 2sin(x_)*cos(x_))
+2⋅sin(x)⋅cos(x)
+
+```
+
+!!! note
+    With version 1.9 of `Julia` an extension for the `TermInterface` package is provided which allows `Metatheory` rules to be applied to symbolic expressions.
 
 ### Trigsimp
 
@@ -440,10 +470,18 @@ julia> simplify(sin(2theta) - 2sin(theta)*cos(theta))
 
 ```
 
+Unlike the example above, `trigsimp` replaces the product with the double angle:
+
+```jldoctest introduction
+julia> sympy.trigsimp(2* sin(theta) * cos(theta))
+sin(2⋅θ)
+
+```
+
 The `expand_trig` function will expand such expressions:
 
 ```jldoctest introduction
-julia> expand_trig(sin(2theta))
+julia> sympy.expand_trig(sin(2theta))
 2⋅sin(θ)⋅cos(θ)
 
 ```
@@ -2791,9 +2829,9 @@ x |> ex(x) |> N
 
 The first step requires a conversion of the value in `Julia` to a Python object, this is handled by `PyCall` and is essentially zero-cost.
 
-The substitution step, is done within SymPy and runs at the speed pf Python.
+The substitution step, is done within SymPy and runs at the speed of Python.
 
-The last step converts the resulting python object computed by SymPy into a value on the `Julia` side. The `N` is just one way to do this. By default, a mapping takes basic SymPy objects and wraps them in the `Sym` type for dispatch. The `N` method makes a `Julia`n numeric type, essentially calling `convert(T,x)` for a run-time determined type `T`.
+The last step converts the resulting python object computed by SymPy into a value on the `Julia` side. The `N` call is just one way to do this. By default, a mapping takes basic SymPy objects and wraps them in the `Sym` type for dispatch. The `N` method makes a `Julia`n numeric type, essentially calling `convert(T,x)` for a run-time determined type `T`.
 
 While two steps are  mostly zero cost, it can be much more performant to create a native `Julia` function to do the work directly.
 
@@ -2827,7 +2865,7 @@ julia> l(3), ex(3)
 
 ## Using other SymPy modules
 
-The SymPy package has numerous external modules beyond those exposed immediately by `SymPy.jl`.
+The SymPy library has numerous external modules beyond those exposed immediately by `SymPy`.
 
 ```jldoctest introduction
 julia> stats = SymPy.PyCall.pyimport_conda("sympy.stats", "sympy");
@@ -2845,8 +2883,9 @@ X
 julia> stats.E(X)
 μ
 
-julia> stats.E(X^2) |> println
-μ^2 + σ^2
+julia> stats.E(X^2)
+ 2    2
+μ  + σ
 
 julia> stats.variance(X)
  2
@@ -2872,7 +2911,7 @@ sqrt(2)*(-sqrt(2)*pi*exp(1/2)*erf(sqrt(2)/2)/2 + sqrt(2)*pi*exp(1/2)/2)*exp(-1/2
 
 The familiar  answer could be found by calling `N` or `evalf`.
 
-We do one more distribution, the uniform over $[a,b]$:
+We show one more distribution, the uniform over $[a,b]$:
 
 ```jldoctest introduction
 julia> @syms a::real b::real
@@ -2889,7 +2928,7 @@ julia> stats.variance(U) |> simplify |> factor |> println
 ```
 
 
-Not all modules are so simple to incorporate. PyCall does a good job of converting the arguments from `Julia` to Python, but the conversion from a Python (SymPy) structure back to a workable `Julia` structure can be difficult.
+Not all modules are so simple to incorporate. PyCall does a good job of converting the arguments from `Julia` to Python, but the conversion from a Python (SymPy) structure back to a workable `Julia` structure can require some massaging.
 
 For example, the return value of `solveset` offers a challenge:
 
@@ -2911,7 +2950,7 @@ PyObject <class 'sympy.sets.sets.FiniteSet'>
 
 PyCall is instructed in `SymPy` to map SymPy objects as `Sym` objects, so `FiniteSet` is only relevant when the object is being interacted with using `Julia` methods, Here `collect` will fail on `u`, but `Set` will work with splatting, as the finite set is iterable. This set can then be collected:
 
-```jldoctest introduction
+```julia
 julia> collect(Set(u...))
 2-element Vector{Any}:
  -√2

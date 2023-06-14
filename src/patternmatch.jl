@@ -32,7 +32,7 @@ end
 
 In the expression replace a mathcing pattern with the value. Returns the modified expression.
 
-## Extended help
+# Extended help
 
 From: [SymPy Docs](http://docs.sympy.org/dev/modules/core.html)
 
