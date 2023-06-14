@@ -1,6 +1,6 @@
 name = "SymPy"
 uuid = "24249f21-da20-56a4-8eb1-6a02cf4ae2e6"
-version = "1.1.11"
+version = "1.1.9"
 
 [deps]
 CommonEq = "3709ef60-1bee-4518-9f2f-acd86f176c50"
@@ -12,6 +12,12 @@ PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 
+[weakdeps]
+TermInterface = "8ea1fca8-c5ef-4a55-8b96-4e9afe9c9a3c"
+
+[extensions]
+SymPyTermInterfaceExt = "TermInterface"
+
 [compat]
 CommonEq = "0.2"
 CommonSolve = "0.2"
@@ -19,10 +25,12 @@ Latexify = "0.15, 0.16"
 PyCall = "1.91"
 RecipesBase = "0.7, 0.8, 1.0, 1.1"
 SpecialFunctions = "0.8, 0.9, 0.10, 1.0, 2"
+TermInterface = "0.3"
 julia = "1.0"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+TermInterface = "8ea1fca8-c5ef-4a55-8b96-4e9afe9c9a3c"
 
 [targets]
 test = ["Test"]
