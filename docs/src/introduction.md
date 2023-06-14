@@ -391,7 +391,7 @@ A straight call (e.g. `ex(1, PI)`)  is also possble, where the order of the vari
 
 ## Simplification
 
-The `simplify` function in SymPy "simplifies" a given expression. As metioned in the SymPy documentation, simplification is not a well-defined term and strategies employed may differ between versions. The `simplify` function depends on over a dozen other functions, such as `powsimp`, `trigsimp`, `radsimp`, `logcombine`, and `together`. The `simplify` function is exported by the `SymPy` package, the others called through the `sympy` module.
+The `simplify` function in SymPy "simplifies" a given expression. As mentioned in the SymPy documentation, simplification is not a well-defined term and strategies employed may differ between versions. The `simplify` function depends on over a dozen other functions, such as `powsimp`, `trigsimp`, `radsimp`, `logcombine`, and `together`. The `simplify` function is exported by the `SymPy` package, the others called through the `sympy` module.
 
 
 To illustrate, we have:
