@@ -391,24 +391,26 @@ A straight call (e.g. `ex(1, PI)`)  is also possble, where the order of the vari
 
 ## Simplification
 
-XXX -- SIMPLIFY -- XXX
-XXX -- a form of substitution -- XXX
-XXX -- list various XXXsimp functions -- XXX
+The `simplify` function in SymPy "simplifies" a given expression. As metioned in the SymPy documentation, simplification is not a well-defined term and strategies employed may differ between versions. The `simplify` function depends on over a dozen other functions, such as `powsimp`, `trigsimp`, `radsimp`, `logcombine`, and `together`. The `simplify` function is exported by the `SymPy` package, the others called through the `sympy` module.
 
 
-A more broad-brush approach is to let `SymPy` simplify the values. In this case, the common value of `x` is factored out:
+To illustrate, we have:
 
 ```jldoctest introduction
+julia> @syms x y;
+
+julia> q = x*y + x*y^2 + x^2*y + x;
+
 julia> simplify(q)
   ⎛       2        ⎞
 x⋅⎝x⋅y + y  + y + 1⎠
 
 ```
 
-The `simplify` function attempts to apply the dozens of functions related to simplification that are part of SymPy. It is also possible to apply these functions one at a time, for example `trigsimp` does trigonometric simplifications.
 
 
-### Trigonometric simplification
+
+### Trigsimp
 
 For trigonometric expressions, `simplify` will use `trigsimp` to simplify:
 
@@ -2781,18 +2783,21 @@ The `Symbolics` documentation describes its `build_function` method as follows: 
 
 The SymPy docs say it can transform SymPy expressions to lambda functions which can be used to calculate numerical values very fast.
 
-The typical way to evaluate a symbolic expression at some value and gather the output as number in Julia would follow this pipeline:
+The typical way to evaluate a symbolic expression at some value and gather the output as a number in Julia would follow this pipeline:
 
 ```
 x |> ex(x) |> N
 ```
 
-The first step requires a conversion of the value in `Julia` to a Python object, this is handled by `PyCall` and is essentially zero-cost. The substitution step, is done within SymPy and runs at the speed pf Python. The last step converts the resulty python object computed by SymPy into a value on the `Julia` side. The `N` is just one way to do this. XXX convert(T, X), pytype_mapping, ...
+The first step requires a conversion of the value in `Julia` to a Python object, this is handled by `PyCall` and is essentially zero-cost.
 
+The substitution step, is done within SymPy and runs at the speed pf Python.
 
-By creating a native function, the use of `PyCall` to call the SymPy functions is avoided, resulting in speedier evaluations.
+The last step converts the resulting python object computed by SymPy into a value on the `Julia` side. The `N` is just one way to do this. By default, a mapping takes basic SymPy objects and wraps them in the `Sym` type for dispatch. The `N` method makes a `Julia`n numeric type, essentially calling `convert(T,x)` for a run-time determined type `T`.
 
-The `SymPy` version in this package does not utilize the underlying SymPy function, rather it walks the expression tree in SymPy, creates a corresponding `Julia` expression, and then creates a function in `Julia` from that.
+While two steps are  mostly zero cost, it can be much more performant to create a native `Julia` function to do the work directly.
+
+The `SymPy` version in this package does not utilize the underlying SymPy `lambdify` function, rather it walks the expression tree in SymPy, creates a corresponding `Julia` expression, and then creates a function in `Julia` from that.
 
 
 To see the creation of an expression, we have:
@@ -2948,5 +2953,7 @@ More germaine to this example, the `combinatorics` module is imported by default
 
 ```
 pytype_mapping(sympy.combinatorics.permutations.Permutation, SymPermutation)
-pytype_mapping(combinatorics.perm_groups.PermutationGroup, SymPermutationGro
+pytype_mapping(combinatorics.perm_groups.PermutationGroup, SymPermutationGroup)
 ```
+
+Here, `SymPermutation` and `SymPermutationGroup` are subtypes of the abstract `SymbolicObject` type.
