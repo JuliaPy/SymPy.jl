@@ -6,7 +6,7 @@ The `Julia` package [SymPy](https://github.com/JuliaPy/SymPy.jl) uses the `PyCal
 
 The `PyCall` package does the heavy lifting for `SymPy`. In fact, this package can be skipped altogether, if so inclined. For example, we can import the underlying Python module as follows:
 
-```jldoctest sympy
+```julia
 julia> using PyCall
 
 julia> sympy = pyimport("sympy")
@@ -15,7 +15,7 @@ julia> sympy = pyimport("sympy")
 
 Using the dot-call notation of Python, we can create a symbolic variable, and a symbolic expression:
 
-```jldoctest sympy
+```julia
 julia> x = sympy.symbols("x")
 PyObject x
 
@@ -25,7 +25,7 @@ PyObject sin(x)
 
 The symbolic expression can be evaluated at a symbolic value returning an object accessible via pycall. In the following, this is then converted to a floating point number in `Julia`:
 
-```jldoctest sympy
+```julia
 julia> z = y.subs(x, sympy.pi)
 PyObject 0
 
@@ -47,7 +47,7 @@ PyObject 0
 
 The `SymPy` package provides a more Julian interface to such tasks;
 
-```jldoctest sympy
+```julia
 julia> using SymPy
 WARNING: using SymPy.sympy in module Main conflicts with an existing identifier.
 

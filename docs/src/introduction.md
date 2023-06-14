@@ -1,12 +1,10 @@
 # A SymPy introduction
 
 This document provides an introduction to using `SymPy` within `Julia`.
-It owes an enormous debt to the tutorial for using SymPy within Python which may be found
+It owes an enormous debt to SymPy documentation and the tutorial for using SymPy within Python which may be found
 [here](http://docs.sympy.org/dev/tutorial/index.html).
 
-
-Assuming it has been properly installed, here we first load the
-package into `Julia` with the standard command `using`:
+Here we first load the package into `Julia`:
 
 
 ```@setup introduction
@@ -25,22 +23,33 @@ julia> using SymPy
 At the core of `SymPy` is the introduction of symbolic variables that
 differ quite a bit from `Julia`'s variables. Symbolic variables do not
 immediately evaluate to a value, rather the "symbolicness" propagates
-when interacted with. To keep things manageable, SymPy does some
-simplifications along the way.
+when interacted with. To keep the resulting expressions manageable,
+SymPy does some simplifications along the way.
 
 
-The `@syms` macro makes creating one or more variables very easy:
+The `@syms` macro makes creating one or more symbolic variables very easy:
 
 ```jldoctest introduction
-julia @syms x
+julia> @syms x
 (x,)
-
-julia> @syms α b c
-(α, b, c)
 
 ```
 
-This macro creates variables in the local scope, no assignment is needed. The last example shows that symbols may be Unicode.
+```jldoctest introduction
+julia> @syms a b c
+(a, b, c)
+
+```
+
+This macro creates variables in the local scope, no assignment is needed.
+
+This example shows that symbols may be Unicode:
+
+```jldoctest introduction
+julia> @syms α, β, γ
+(α, β, γ)
+
+```
 
 Additionally you can specify how the variables are displayed using pair notation:
 
@@ -50,8 +59,7 @@ julia> @syms a1=>"α₁" a2=>"α₂"
 
 ```
 
-In this example, the Julia variables `a1` and `a2` are defined to store SymPy
-symbols with the "pretty" names `α₁` and `α₂` respectively.
+The user can type `a1`, say, but, as seen, the variable prints as `α₁`.
 
 
 There are other means, described in the following, to create symbolic variables, but the `@syms` macro is the suggested one to use.
@@ -70,7 +78,7 @@ julia> a, b, c = symbols("a b c")
 
 The documentation for the Python function is available from within `Julia` using the `SymPy.@doc` macro, as in `SymPy.@doc sympy.symbols`.
 
-In `Julia`, the symbolic expressions are primarily instances the `Sym` type, which holds an instance to an underlying `PyObject`. This type can be used as a constructor in the standard way:
+In `Julia`, the symbolic expressions are primarily instances of the `Sym` type, which holds an instance to an underlying `PyObject`. This type can be used as a constructor in the standard way:
 
 ```jldoctest introduction
 julia> x = Sym("x")
@@ -81,7 +89,6 @@ julia> a,b,c = Sym("a, b, c")
 
 ```
 
- One caveat is that `Sym` can not create a variable from a function name in Base.
 
 The `sympify` function is used by SymPy to convert arbitrary expressions to a type useful within SymPy. It too can be used to create variables (and more):
 
@@ -139,7 +146,7 @@ julia> ask(𝑄.positive(u1)), ask(𝑄.positive(u2)), ask(𝑄.positive(u2^2)),
 
 ```
 
-Despite it easy to see that a non-zero real variable (`u2`) when squared will be positive, this is not identified.
+Despite it easy to see that a non-zero real variable (`u2`) when squared will be positive, this is not identified in the assumptions.
 
 
 The `symbols` constructor uses keyword arguments to pass in assumptions. It is illustrated below as they apply to all the variables that are created, which can be more convenient at times.
@@ -228,9 +235,116 @@ julia> [asin(1), asin(Sym(1))]
 
 ```
 
+## Basics of SymPy
+
+As seen, SymPy has symbolic variables and numbers can be symbolic. These are used to build symbolic expressions. In `SymPy` most all of these have the `Sym` type, a subtype of the `SymbolicObject` type. The `Sym` type is immutable; assignment is necessary to modify a variable.
+
+In the Python library, there are two basic method types for interacting with expressions: ones that are defined in the `sympy` module and called using `fn(args...)` style, and ones that are methods of the object and called using Python's dot call notation `obj.fn(args...; kwargs...)`.
+
+The `SymPy` package essentially merges the Python style and `Julia`'s style as follows:
+
+* Promotion rules are established to promote `Julia` number types to symbolic values so that expressions like `pi * x` will first promote `pi` and `x` to two symbolic values (with `pi` being converted to the exact `sympy.pi`) and then the SymPy multiplication operator is called on the two symbolic values. The result is wrapped in the `Sym` type.
+* For generic methods in `Julia`, such as `sin`, a new method specialized on the first argument being symbolic  is defined to call the underlying `sympy` function. (Essentially, the method `sin(x::Sym) = sympy.sin(x)` is added.)
+* For a selection of `sympy` methods, an exported function is defined. (For example a method like `simplify(x::Sym) = sympy.simplify(x)` is defined and exported.)
+* For object methods and properties in Python, the dot-call notation is used to call these methods. There is a selection of methods for which a `Julia`n style is also added. For example, `ex.subs(...)` and `subs(ex, ...)` are both calling styles for the `subs` method of the expression `ex`.
+* When a SymPy function is called, `PyCall` converts the arguments to a Python object, which works as desired in most all cases.
+
+Expressions in SymPy are simplified to some extent but are not immediately evaluated if there are symbols involved. Expressions are stored in a tree-like manner that can be explored using some basic functions. Here we look at `x*sin(x^2)`:
+
+```jldoctest introduction
+julia> @syms x
+(x,)
+
+julia> ex = x * sin(x^2); println(ex)
+x*sin(x^2)
+
+julia> SymPy.Introspection.func(ex)
+PyObject <class 'sympy.core.mul.Mul'>
+
+julia> a,b = SymPy.Introspection.args(ex)
+(x, sin(x^2))
+
+julia> a.is_Atom
+true
+
+julia> SymPy.Introspection.func(b)
+PyObject sin
+
+julia> b.is_Atom
+false
+
+julia> SymPy.Introspection.args(b)
+(x^2,)
+
+julia> SymPy.Introspection.func(x^2)
+PyObject <class 'sympy.core.power.Pow'>
+```
+
+The point is not to discuss the introspection functions, but rather to show the tree-like structure:
+
+```
+x*sin(x^2)
+   / \
+  x  sin
+      |
+     Pow
+	 / \
+	x   2
+```
+
+SymPy uses the term `Atom` to describe the leaves of this tree. An atom is an expression with no subexpressions.
+
+
 ## Substitution
 
-SymPy provides a means to substitute values in for the symbolic expressions. The specification requires an expression, a variable in the expression to substitute in for, and a new value. For example, this is one way to make a polynomial in a new variable:
+SymPy provides several  means to substitute values in for the symbolic expressions:
+
+* `subs`: substitution of subexpressions as defined by the objects themselves
+* `replace`: replace matching subexpressions of `self` with `value`
+* `xreplace`: exact node replacement in expr tree; also capable of using matching rules
+
+We discuss `subs` here which uses "old/new" pairs to indicate the substitution.
+
+
+The method `subs` is a method of an object, but for this widely used task, a `Julia`n method `subs` is also defined. Consider the simplest case:
+
+```jldoctest introduction
+julia> ex = x * sin(x^2); println(ex)
+x*sin(x^2)
+
+julia> subs(ex, x^2, x)
+x⋅sin(x)
+
+```
+
+Above, the old/new pair is separated by a comma. Pairs notation is suggested instead:
+
+```jldoctest introduction
+julia> subs(ex, x => x^2) |> println
+x^2*sin(x^4)
+
+```
+
+`Julia`'s call notation is used for substitution, so we can more directly write:
+
+```jldoctest introduction
+julia> ex = x^2 + x^4; println(ex)
+x^4 + x^2
+
+julia> ex(x^2 => x^5) |> println
+x^10 + x^5
+
+```
+
+Of some note, above `x^4` is treated like `(x^2)^2` and so an `x^10` term is returned after the substitution. The `subs` method simplifies arguments; `xreplace` method only replaces exact expressions in syntax tree:
+
+```jldoctest introduction
+julia> ex.xreplace(Dict(x^2 => x^5)) |> println
+x^5 + x^4
+
+```
+
+For example, this is one way to make a polynomial in a new variable:
 
 ```jldoctest introduction
 julia> @syms x y
@@ -240,7 +354,7 @@ julia> ex = x^2 + 2x + 1
  2
 x  + 2⋅x + 1
 
-julia> ex.subs(x, y)
+julia> ex(x => y)
  2
 y  + 2⋅y + 1
 
@@ -250,15 +364,14 @@ y  + 2⋅y + 1
 Substitution can also be numeric:
 
 ```jldoctest introduction
-julia> ex.subs(x, 0)
+julia> ex(x => 0)
 1
-
 
 ```
 
-The output has no free variables, but is still symbolic.
+The output has no free variables, but is still a symbolic quantity.
 
-Expressions with more than one variable can have multiple substitutions, where each is expressed as a tuple:
+Expressions with more than one variables can have multiple substitutions (performed from left to right):
 
 ```jldoctest introduction
 julia> @syms x,y,z
@@ -267,41 +380,88 @@ julia> @syms x,y,z
 julia> ex = x + y + z
 x + y + z
 
-julia> ex.subs([(x,1), (y,PI)])
+julia> ex(x => 1, y=> PI)
 z + 1 + π
 
 ```
 
-!!! note
+A straight call (e.g. `ex(1, PI)`)  is also possble, where the order of the variables is determined by `free_symbols`. While useful for expressions of a single variable, being explicit through the use of paired values is recommended.
 
-    The calling pattern for `subs` is different from a typical `Julia` function call. The `subs` call is `object.method(arguments)` whereas a more "`Julia`n" function call is `method(objects, other objects....)`, as `Julia` offers multiple dispatch of methods. `SymPy` uses the Python calling method, adding in `Julia`n style when appropriate for generic usage within `Julia`. `SymPy` imports most all generic functions from the underlying `sympy` module and specializes them on a symbolic first argument.
 
-    For `subs`, the simple substitution `ex.object(x,a)` is similar to simple function evaluation, so `Julia`'s call notation will work. To specify the pairing off of `x` and `a`, the `=>`  pairs notation is used.
 
-This calling style will be equivalent to the last:
+## Simplification
+
+XXX -- SIMPLIFY -- XXX
+XXX -- a form of substitution -- XXX
+XXX -- list various XXXsimp functions -- XXX
+
+
+A more broad-brush approach is to let `SymPy` simplify the values. In this case, the common value of `x` is factored out:
 
 ```jldoctest introduction
-julia> ex(x=>1, y=>pi)
-z + 1 + π
+julia> simplify(q)
+  ⎛       2        ⎞
+x⋅⎝x⋅y + y  + y + 1⎠
+
 ```
 
-A straight call is also possble, where the order of the variables is determined by `free_symbols`.
-This is useful for expressions of a single variable, but being more explicit through the use of paired values is recommended.
+The `simplify` function attempts to apply the dozens of functions related to simplification that are part of SymPy. It is also possible to apply these functions one at a time, for example `trigsimp` does trigonometric simplifications.
+
+
+### Trigonometric simplification
+
+For trigonometric expressions, `simplify` will use `trigsimp` to simplify:
+
+```jldoctest introduction
+julia> @syms theta::real
+(theta,)
+
+julia> p = cos(theta)^2 + sin(theta)^2
+   2         2
+sin (θ) + cos (θ)
+
+```
+
+Calling either `simplify` or `trigsimp` will apply the Pythagorean identity:
+
+```jldoctest introduction
+julia> simplify(p)
+1
+
+```
+
+While often forgotten,  the `trigsimp` function is, of course,  aware of the double angle formulas:
+
+```jldoctest introduction
+julia> simplify(sin(2theta) - 2sin(theta)*cos(theta))
+0
+
+```
+
+The `expand_trig` function will expand such expressions:
+
+```jldoctest introduction
+julia> expand_trig(sin(2theta))
+2⋅sin(θ)⋅cos(θ)
+
+```
 
 ## Conversion from symbolic to numeric
 
 SymPy provides two identical means to convert a symbolic math
-expression to a number. One is `evalf`, the other `N`. Within `Julia`
-we decouple this, using `N` to also convert to a `Julian` value and
-`evalf` to leave the conversion as a symbolic object.  The `N`
-function converts symbolic integers, rationals, irrationals, and
-complex values, while attempting to find an appropriate `Julia` type
-for the value.
+expression to a number. One is the `evalf` method, the other the `N`
+function. Within `Julia` we decouple these, using `N` to also convert
+to a `Julian` value and; `evalf` leaving the conversion as a symbolic
+object.
+
+The `N` function converts symbolic integers, rationals,
+irrationals, and complex values, while attempting to find an
+appropriate `Julia` type for the value.
 
 To see the difference, we use both on `PI`:
 
 ```jldoctest introduction
-julia> N(PI)  # converts to underlying pi irrational
+julia> N(PI)  # converts to underlying pi Irrational
 π = 3.1415926535897...
 
 ```
@@ -309,13 +469,12 @@ julia> N(PI)  # converts to underlying pi irrational
 Whereas, `evalf` will produce a symbolic numeric value:
 
 ```jldoctest introduction
-julia> (PI).evalf()
+julia> PI.evalf()
 3.14159265358979
 
 ```
 
-
-The `evalf` call allows for a precision argument to be passed through the second argument. This is how 30 digits of $\pi$ can be extracted:
+The `evalf` call allows for a precision argument to be passed through the second argument. This is how $30$ digits of $\pi$ can be extracted:
 
 ```jldoctest introduction
 julia> PI.evalf(30)
@@ -323,7 +482,7 @@ julia> PI.evalf(30)
 
 ```
 
-This is a SymPy, symbolic number, not a `Julia` object. Composing with `N`
+The output of an `evalf` call is is a symbolic number, not a `Julia` object. Composing with `N` we can see the difference:
 
 ```jldoctest introduction
 julia> N(PI.evalf(30))
@@ -331,29 +490,37 @@ julia> N(PI.evalf(30))
 
 ```
 
-will produce a `Julia` number,
+Explicit conversion via the `convert(T, ex)` pattern can also be used to convert a symbolic number to a `Julia`n one. This is
+necessary at times when `N` does not give the desired type.
 
-
-Explicit conversion via `convert(T, ex)` can also be done, and is
-necessary at times if `N` does not give the desired type.
 
 ## Algebraic expressions
 
-`SymPy` overloads many of `Julia`'s functions to work with symbolic objects, such as seen above with `asin`. The usual mathematical operations such as `+`, `*`, `-`, `/` etc. work through `Julia`'s promotion mechanism, where numbers are promoted to symbolic objects, others dispatch internally to related `SymPy` functions.
+As mentioned, `SymPy` overloads many of `Julia`'s functions to work with symbolic objects, such as seen above with `sin` and `asin`. The usual mathematical operations such as `+`, `*`, `-`, `/` etc. work through `Julia`'s promotion mechanism, where numbers are promoted to symbolic objects, others dispatch internally to related `SymPy` functions.
 
 In most all  cases, thinking about this distinction between numbers and symbolic numbers is unnecessary, as numeric values passed to `SymPy` functions are typically promoted to symbolic expressions. This conversion will take math constants to their corresponding `SymPy` counterpart, rational expressions to rational expressions, and floating point values to floating point values. However there are edge cases. An expression like `1//2 * pi * x` will differ from the seemingly identical  `1//2 * (pi * x)`. The former will produce a floating point value from `1//2 * pi` before being promoted to a symbolic instance. Using the symbolic value `PI` makes this expression work either way.
+
+!!! note
+    The `sympy.nsimplify` function can be used to convert floating point values to rational values, but it is suggested to convert rational value in `Julia` to symbolic values, rather than rely on later conversions.
 
 Most of `Julia`'s
 [mathematical](http://julia.readthedocs.org/en/latest/manual/mathematical-operations/#elementary-functions)
 functions are overloaded to work with symbolic expressions. `Julia`'s
 generic definitions are used, as possible. This also introduces some
-edge cases. For example, `x^(-2)` will balk due to the negative,
-integer exponent, but either `x^(-2//1)` or `x^Sym(-2)` will work as
-expected, as the former call first dispatches to a generic defintion,
-but the latter two expressions do not.
+edge cases. For example, `x^(-2)` will work, but `k=-2; x^l` will balk due to the non-literal, negative, integer exponent. However, either `k = -2//1` or `k = Sym(-2)` will work as
+expected with `x^k`, as the former call first dispatches to a generic definition not defined for negative integer exponents unless `x` is one, but the latter two expressions do not.
 
 
-`SymPy` makes it very easy to work with polynomial and rational expressions. First we create some variables:
+## Polynomial and rational expressions
+
+`SymPy` makes it very easy to work with polynomial and rational expressions, as illustrated in the following section.
+
+
+### The expand, factor, and collect functions
+
+A typical polynomial expression in a single variable can be written in two common ways, expanded or factored form. Using `factor` and `expand` can move between the two.
+
+For example,
 
 ```jldoctest introduction
 julia> @syms x y z
@@ -361,16 +528,9 @@ julia> @syms x y z
 
 ```
 
-### The expand, factor, collect, and simplify functions
-
-A typical polynomial expression in a single variable can be written in two common ways, expanded or factored form. Using `factor` and `expand` can move between the two.
-
-For example,
-
 ```jldoctest introduction
-julia> p = x^2 + 3x + 2
- 2
-x  + 3⋅x + 2
+julia> p = x^2 + 3x + 2; println(p)
+x^2 + 3*x + 2
 
 julia> factor(p)
 (x + 1)⋅(x + 2)
@@ -381,18 +541,16 @@ julia> factor(p)
 Or
 
 ```jldoctest introduction
-julia> expand(prod((x-i) for i in 1:5))
- 5       4       3        2
-x  - 15⋅x  + 85⋅x  - 225⋅x  + 274⋅x - 120
+julia> expand(prod((x-i) for i in 1:5)) |> println
+x^5 - 15*x^4 + 85*x^3 - 225*x^2 + 274*x - 120
 
 ```
 
 The `factor` function factors over the rational numbers, so something like this with obvious factors is not finished:
 
 ```jldoctest introduction
-julia> factor(x^2 - 2)
- 2
-x  - 2
+julia> factor(x^2 - 2) |> println
+x^2 - 2
 
 ```
 
@@ -425,17 +583,6 @@ x⋅y  + x + y⋅⎝x  + x⎠
 ```
 
 These are identical expressions, though viewed differently.
-
-A more broad-brush approach is to let `SymPy` simplify the values. In this case, the common value of `x` is factored out:
-
-```jldoctest introduction
-julia> simplify(q)
-  ⎛       2        ⎞
-x⋅⎝x⋅y + y  + y + 1⎠
-
-```
-
-The `simplify` function attempts to apply the dozens of functions related to simplification that are part of SymPy. It is also possible to apply these functions one at a time, for example `trigsimp` does trigonometric simplifications.
 
 The SymPy tutorial illustrates that `expand` can also result in simplifications through this example:
 
@@ -524,9 +671,7 @@ x  - 6⋅x  + 11⋅x - 6
 
 ```
 
-The `cancel` function instructs SymPy to perform cancellations. It
-takes rational functions and puts them in a canonical $p/q$ form with
-no common (rational) factors and leading terms which are integers:
+The `cancel` function instructs SymPy to cancel common factors in a rational expression.
 
 ```jldoctest introduction
 julia> cancel(r)
@@ -539,7 +684,7 @@ x  - 5⋅x + 6
 
 ## Powers
 
-The SymPy [tutorial](http://docs.sympy.org/dev/tutorial/simplification.html#powers) offers a thorough explanation on powers and which get simplified and under what conditions. Basically
+The SymPy [tutorial](http://docs.sympy.org/dev/tutorial/simplification.html#powers) offers a thorough explanation on powers and how the rules of powers are applied during simplification. Basically
 
 * $x^a x^b = x^{a+b}$ is always true. However
 
@@ -562,7 +707,7 @@ julia> simplify(x^a * y^a - (x*y)^a)
 However, without assumptions this is not the case
 
 ```jldoctest introduction
-julia> @syms x,y,a
+julia> @syms x, y, a
 (x, y, a)
 
 julia> simplify(x^a * y^a - (x*y)^a)
@@ -579,43 +724,195 @@ julia> powsimp(x^a * y^a - (x*y)^a, force=true)
 
 ```
 
-## Trigonometric simplification
+## More on polynomials
 
-For trigonometric expressions, `simplify` will use `trigsimp` to simplify:
+(The following section is borrowed almost directly from the SymPy documentation [Examples from Wester's Article](https://docs.sympy.org/latest/modules/polys/wester.html)) and shows more methods for working with polynomial expressions.
+
+The following are reasonably high-degree polynomials:
 
 ```jldoctest introduction
-julia> @syms theta::real
-(theta,)
+julia> @syms x
+(x,)
 
-julia> p = cos(theta)^2 + sin(theta)^2
-   2         2
-sin (θ) + cos (θ)
+julia> f = 64*x^34 - 21*x^47 - 126*x^8 - 46*x^5 - 16*x^60 - 81
+      60       47       34        8       5
+- 16⋅x   - 21⋅x   + 64⋅x   - 126⋅x  - 46⋅x  - 81
 
+julia> g = 72*x^60 - 25*x^25 - 19*x^23 - 22*x^39 - 83*x^52 + 54*x^10 + 81
+    60       52       39       25       23       10
+72⋅x   - 83⋅x   - 22⋅x   - 25⋅x   - 19⋅x   + 54⋅x   + 81
+
+julia> h = 34*x^19 - 25*x^16 + 70*x^7 + 20*x^3 - 91*x - 86
+    19       16       7       3
+34⋅x   - 25⋅x   + 70⋅x  + 20⋅x  - 91⋅x - 86
 ```
 
-Calling either `simplify` or `trigsimp` will apply the Pythagorean identity:
+There are no common divisors of `f` and `g`, as `gcd` illustrates:
 
 ```jldoctest introduction
-julia> simplify(p)
+julia> gcd(f,g)
 1
 
 ```
 
-While often forgotten,  the `trigsimp` function is, of course,  aware of the double angle formulas:
+Multiplying both terms by `h` and expanding gives a known g.c.d. of `h`, verified through:
 
 ```jldoctest introduction
-julia> simplify(sin(2theta) - 2sin(theta)*cos(theta))
+julia> gcd(expand(f*h), expand(g*h)) - h
 0
 
 ```
 
-The `expand_trig` function will expand such expressions:
+The resultant of two polynomials is a polynomial expression of their coefficients that is equal to zero if and only if the polynomials have a common root :
 
 ```jldoctest introduction
-julia> expand_trig(sin(2theta))
-2⋅sin(θ)⋅cos(θ)
+julia> sympy.resultant(expand(f*h), expand(g*h))
+0
+```
+
+The following shows high-degree polynomials can easily be factored:
+
+```jldoctest introduction
+julia> factor(expand(f*g)) |> println
+-(16*x^60 + 21*x^47 - 64*x^34 + 126*x^8 + 46*x^5 + 81)*(72*x^60 - 83*x^52 - 22*x^39 - 25*x^25 - 19*x^23 + 54*x^10 + 81)
 
 ```
+
+
+Similar functionality extends to multivariable polynomials
+
+```jldoctest introduction
+julia> @syms x y z
+(x, y, z)
+
+julia> f = 24*x*y^19*z^8 - 47*x^17*y^5*z^8 + 6*x^15*y^9*z^2 - 3*x^22 + 5
+     22       17  5  8      15  9  2         19  8
+- 3⋅x   - 47⋅x  ⋅y ⋅z  + 6⋅x  ⋅y ⋅z  + 24⋅x⋅y  ⋅z  + 5
+
+julia> g = 34*x^5*y^8*z^13 + 20*x^7*y^7*z^7 + 12*x^9*y^16*z^4 + 80*y^14*z
+    9  16  4       7  7  7       5  8  13       14
+12⋅x ⋅y  ⋅z  + 20⋅x ⋅y ⋅z  + 34⋅x ⋅y ⋅z   + 80⋅y  ⋅z
+
+julia> h = 11*x^12*y^7*z^13 - 23*x^2*y^8*z^10 + 47*x^17*y^5*z^8
+    17  5  8       12  7  13       2  8  10
+47⋅x  ⋅y ⋅z  + 11⋅x  ⋅y ⋅z   - 23⋅x ⋅y ⋅z
+
+julia> gcd(expand(f*h), expand(g*h)) - h
+0
+
+julia> factor(expand(f*g)) |> println
+-2*y^7*z*(6*x^9*y^9*z^3 + 10*x^7*z^6 + 17*x^5*y*z^12 + 40*y^7)*(3*x^22 + 47*x^17*y^5*z^8 - 6*x^15*y^9*z^2 - 24*x*y^19*z^8 - 5)
+```
+
+Symbolic powers also can be used:
+
+```jldoctest introduction
+julia> @syms n
+(n,)
+
+julia> gcd(x^n - x^(2*n), x^n)
+ n
+x
+
+julia> gcd(x^(n + 4), x^(n + 1) + 3*x^n)
+ n
+x
+
+julia> sympy.resultant(3*x^4 + 3*x^3 + x^2 - x - 2, x^3 - 3*x^2 + x + 5)
+0
+
+```
+
+Factoring can be done over different fields, not just the rationals. This shows factoring over complex terms:
+
+```jldoctest introduction
+julia> f = 4*x^4 + 8*x^3 + 77*x^2 + 18*x + 153
+   4      3       2
+4⋅x  + 8⋅x  + 77⋅x  + 18⋅x + 153
+
+julia> factor(f, gaussian=true)
+  ⎛    3⋅ⅈ⎞ ⎛    3⋅ⅈ⎞
+4⋅⎜x - ───⎟⋅⎜x + ───⎟⋅(x + 1 - 4⋅ⅈ)⋅(x + 1 + 4⋅ⅈ)
+  ⎝     2 ⎠ ⎝     2 ⎠
+
+julia> factor(f, extension=sympy.I)
+  ⎛    3⋅ⅈ⎞ ⎛    3⋅ⅈ⎞
+4⋅⎜x - ───⎟⋅⎜x + ───⎟⋅(x + 1 - 4⋅ⅈ)⋅(x + 1 + 4⋅ⅈ)
+  ⎝     2 ⎠ ⎝     2 ⎠
+```
+
+In the following  we make a variable for a symbolic $\sqrt{2}$:
+
+```jldoctest introduction
+julia> const φ = sqrt(Sym(2))
+√2
+
+julia> f = x^3 + (φ - 2)*x^2 - (2*φ + 3)*x - 3*φ
+ 3    2
+x  + x ⋅(-2 + √2) - x⋅(2⋅√2 + 3) - 3⋅√2
+
+julia> g = x^2 - 2
+ 2
+x  - 2
+```
+
+Trying to cancel `f/g` leaves the expression unchanged; to make `cancel` recognize algebraic properties of $\sqrt{2}$
+the `extension` keyword is needed:
+
+```jldoctest introduction
+julia> cancel(f/g) |> println
+(x^3 - 2*x^2 + sqrt(2)*x^2 - 3*x - 2*sqrt(2)*x - 3*sqrt(2))/(x^2 - 2)
+
+julia> cancel(f/g, extension=true) |> println
+(x^2 - 2*x - 3)/(x - sqrt(2))
+
+julia> cancel(f/g, extension=φ) |> println
+(x^2 - 2*x - 3)/(x - sqrt(2))
+
+```
+
+Factoring over modular integers (prime only) is possible using the keyword `modulus`:
+
+```jldoctest introduction
+julia> f = x^4 - 3*x^2 + 1;
+
+julia> factor(f) |> println
+(x^2 - x - 1)*(x^2 + x - 1)
+
+julia> factor(f, modulus=2) |> println
+(x^2 + x + 1)^2
+
+julia> factor(f, modulus=5) |> println
+(x - 2)^2*(x + 2)^2
+
+```
+
+## The Poly class in SymPy
+
+The expression `x^4 - 3x^2 + 1` is stored internally as other expressions are, using the expression tree to build up from the atoms. However, for polynomials, more efficient and advantageous representations are possible. The dense polynomial representation is possible by storing just the coefficients relative to a known basis. For example:
+
+```jldoctest introduction
+julia> f = x^4 - 2x^2 + 1
+ 4      2
+x  - 2⋅x  + 1
+
+julia> println(sympy.srepr(f))
+Add(Pow(Symbol('x'), Integer(4)), Mul(Integer(-1), Integer(2), Pow(Symbol('x'), Integer(2))), Integer(1))
+
+julia> p = sympy.Poly(f, x)
+Poly(x**4 - 2*x**2 + 1, x, domain='ZZ')
+
+julia> p.rep
+PyObject DMP([mpz(1), mpz(0), mpz(-2), mpz(0), mpz(1)], ZZ, None)
+
+```
+
+Storing `p` using just coefficients may be more efficient for many task, such as addition and multiplication, but not, as it will be much more efficient to store `f^100` than `p^100`.
+
+One advantage of the `Poly` class is specific methods become available as the structure is assumed. For example, we will see the `coeffs` method used to extract the coefficients.
+
+The domain shown when `p` is displayed refers to assumptions on the coefficients. Above is a symbol for integers, `QQ` is for rational numbers, `RR` for real numbers, `CC` for complex (along with other variants, like `ZZ_I` for complex integers.
+
 
 
 ## Coefficients
@@ -726,8 +1023,8 @@ rational `SymPy` can have success:
 
 
 ```jldoctest introduction
-julia> p = (x-3)^2*(x-2)*(x-1)*x*(x+1)*(x^2 + x + 1);  string(p)
-"x*(x - 3)^2*(x - 2)*(x - 1)*(x + 1)*(x^2 + x + 1)"
+julia> p = (x-3)^2*(x-2)*(x-1)*x*(x+1)*(x^2 + x + 1);  println(p)
+x*(x - 3)^2*(x - 2)*(x - 1)*(x + 1)*(x^2 + x + 1)
 
 julia> real_roots(p)
 6-element Vector{Sym}:
@@ -740,8 +1037,8 @@ julia> real_roots(p)
 
 ```
 
-!!! note "Why `string`?"
-    The uses of `string(p)` above and elsewhere throughout the introduction is only for technical reasons related to doctesting and how `Documenter.jl` parses  the expected output. This usage is not idiomatic, or suggested; it  only allows the cell  to  be tested programatically for  regressions. Similarly, expected errors  are  wrapped in `try`-`catch` blocks just  for testing purposes.
+!!! note "Why `println`?"
+    The uses of `println(p)` above and elsewhere throughout the introduction is only for technical reasons related to doctesting and how `Documenter.jl` parses  the expected output. This usage is not idiomatic, or suggested; it  only allows the cell  to  be tested programatically for  regressions. Similarly, expected errors  are  wrapped in `try`-`catch` blocks just  for testing purposes.
 
 
 In this example, the degree of `p` is 8, but only the 6 real roots
@@ -850,13 +1147,18 @@ julia> solve(cos(x) - sin(x))
 
 Though there are infinitely many correct solutions, these are within a certain range.
 
+!!! note "Using `~` to specify an equation"
+    The above solved an equation $\cos(x) = \sin(x)$ by subtracting and solving the mathematically equivalent $\cos(x) - \sin(x) = 0$, the $0$ being assumed by `SymPy` when an explicit equation is not specified. Alternatively, the `~` can be used in place of `=` when representing an equation, as in `solve(cos(x) ~ sin(x), x)`.
+
+
+
 The
 [solveset](http://docs.sympy.org/latest/modules/solvers/solveset.html)
-function appears in version 1.0 of SymPy and is an intended
+function appeared in version 1.0 of SymPy and is an intended
 replacement for `solve`. Here we see it describes all solutions:
 
 ```jldoctest introduction
-julia> u = solveset(cos(x) - sin(x))
+julia> u = solveset(cos(x) ~ sin(x))
 ⎧        5⋅π │      ⎫   ⎧        π │      ⎫
 ⎨2⋅n⋅π + ─── │ n ∊ ℤ⎬ ∪ ⎨2⋅n⋅π + ─ │ n ∊ ℤ⎬
 ⎩         4  │      ⎭   ⎩        4 │      ⎭
@@ -868,7 +1170,7 @@ dictionary. To get the values requires some work. For *finite sets* we collect t
 with `collect`, but first we must convert to a `Julia` `Set`:
 
 ```jldoctest introduction
-julia> v = solveset(x^2 - 4)
+julia> v = solveset(x^2 ~ 4, x)
 {-2, 2}
 
 julia> collect(Set(v...))
@@ -888,9 +1190,22 @@ julia> elements(v)
 
 ```
 
-The `elements` function does not work for more complicated (non-finite) sets, such as `u`. For these, the `contains` method may be useful to query the underlying elements
+The `elements` function does not work for more complicated (non-finite) sets, such as `u`. For these, the `contains` method may be useful to query the underlying elements.
 
+```jldoctest introduction
+julia> solveset(cos(x) ~ sin(x), x).contains(PI/4)
+True
+```
 
+The output is a symbolic `True`. This can be converted via `N` or compared to `rrue`, but not directly used within a conditional argument:
+
+```jldoctest introduction
+julia> N(True), True == true, True === true
+(true, true, false)
+
+```
+
+----
 
 Solving within Sympy has limits. For example, there is no symbolic solution here:
 
@@ -954,34 +1269,33 @@ julia> solve(p)
  Dict(a => -(b*x + c)/x^2)
 ```
 
-Systems of equations can be solved as well. We specify them within a
-vector of expressions, `[ex1, ex2, ..., exn]` where a found solution
-is one where all the expressions are 0. For example, to solve this
+Systems of equations can be solved as well. For example, to solve this
 linear system: $2x + 3y = 6, 3x - 4y=12$, we have:
 
 ```jldoctest introduction
 julia> @syms x::real, y::real
 (x, y)
 
-julia> exs = [2x+3y-6, 3x-4y-12]
-2-element Vector{Sym}:
-  2⋅x + 3⋅y - 6
- 3⋅x - 4⋅y - 12
+julia> exs = (2x+3y ~ 6, 3x-4y ~ 12)
+(Eq(2*x + 3*y, 6), Eq(3*x - 4*y, 12))
+
 ```
 
 ```jldoctest introduction
 julia> d = solve(exs); # Dict(x=>60/17, y=>-6/17)
 ```
 
+!!! note
+    We formed a tuple of equations above. A matrix of equations is now deprecated within SymPy and the automatic conversion of `PyCall` does that conversion.
 
 
-We can "check our work" by plugging into each equation. We take advantage of how the `subs` function allows us to pass in a dictionary:
+We can "check our work" by plugging into each equation. We take advantage of how the `subs` function, used implicitly, allows us to pass in a dictionary:
 
 ```jldoctest introduction
-julia> map(ex -> ex.subs(d), exs)
+julia> [ex(d) for ex ∈ exs]
 2-element Vector{Sym}:
- 0
- 0
+ True
+ True
 
 ```
 
@@ -999,13 +1313,14 @@ julia> A \ b
  -6/17
 ```
 
-(Rather than use a generic  `lu` solver through `Julia` (which  proved slow for larger  systems),  the `\` operator utilizes  `solve` to perform this  computation.)
+!!! note
+    Rather than use a generic  `lu` solver through `Julia` (which  proved slow for larger  systems),  the `\` operator utilizes  `solve` to perform this  computation.
 
 
 
 In the previous example, the system had two equations and two
 unknowns. When that is not the case, one can specify the variables to
-solve for as a vector. In this example, we find a quadratic polynomial
+solve for in a tuple. In this example, we find a quadratic polynomial
 that approximates $\cos(x)$ near $0$:
 
 ```julia
@@ -1019,13 +1334,13 @@ a⋅x  + b⋅x + c
 julia> fn = cos
 cos (generic function with 14 methods)
 
-julia> exs = [fn(0*h)-p(x=>0), fn(h)-p(x => h), fn(2h)-p(x => 2h)]
+julia> exs = [fn(0*h)-p(x => 0), fn(h)-p(x => h), fn(2h)-p(x => 2h)]
 3-element Vector{Sym}:
                            1 - c
        -a*h^2 - b*h - c + cos(h)
  -4*a*h^2 - 2*b*h - c + cos(2*h)
 
-julia> d = solve(exs, [a,b,c])
+julia> d = solve(exs, (a,b,c))
 Dict{Any, Any} with 3 entries:
   a => -cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)
   c => 1
@@ -1037,12 +1352,12 @@ Again, a dictionary is returned. The polynomial itself can be found by
 substituting back in for `a`, `b`, and `c`:
 
 ```julia
-julia> quad_approx = p.subs(d); string(quad_approx)
-"x^2*(-cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)) + x*(2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)) + 1"
+julia> quad_approx = p.subs(d); println(quad_approx)
+x^2*(-cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)) + x*(2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)) + 1
 
 ```
 
-Taking the "limit" as $h$ goes to 0 produces the answer $1 - x^2/2$, as  will be shown.
+Taking the "limit" as $h$ goes to $0$ produces the answer $1 - x^2/2$, as  will be shown later.
 
 Finally for `solve`, we show one way to re-express the polynomial $a_2x^2 + a_1x + a_0$
 as $b_2(x-c)^2 + b_1(x-c) + b_0$ using `solve` (and not, say, an
@@ -1065,7 +1380,7 @@ julia> p = sum([as[i+1]*x^i for i in 0:(n-1)]);
 
 julia> q = sum([bs[i+1]*(x-c)^i for i in 0:(n-1)]);
 
-julia> solve(p-q, bs)
+julia> solve(p ~ q, bs)
 Dict{Any, Any} with 3 entries:
   bs₁ => as₁ + as₂*c + as₃*c^2
   bs₂ => as₂ + 2*as₃*c
@@ -1087,6 +1402,8 @@ julia> solve(Eq(x, 1))
 
 gives 1, as expected from solving `x == 1`.
 
+The previously used infix operator `~` simply calls `Eq` to construct an equality.
+
 In addition to `Eq`, there are `Lt`, `Le`, `Ge`, `Gt`. The Unicode
 operators (e.g., `\leq`  and not  `\leq`)  are not aliased to these, but there are alternatives
 `\ll[tab]`, `\leqq[tab]`, `\Equal[tab]`, `\geqq[tab]`, `\gg[tab]` and
@@ -1101,31 +1418,7 @@ julia> solve(x ⩵ 1)
 
 ```
 
-Also, consistent with the interface from `Symbolics` the infix tilde, `~`, can be used for `Eq`.
-
-
-Here is an alternative way of asking a previous question on a pair of linear equations:
-
-```julia
-julia> @syms x::real y::real
-(x, y)
-
-julia> exs = (2x+3y ~ 6, 3x-4y ~ 12)
-(Eq(2*x + 3*y, 6), Eq(3*x - 4*y, 12))
-
-julia> d = solve(exs)
-Dict{Any, Any} with 2 entries:
-  x => 60/17
-  y => -6/17
-```
-
-Here  is  one other way  to  express  the same
-
-```jldoctest introduction
-julia> Eq.( (2x+3y,3x-4y), (6,12)) |>  solve == d
-true
-```
-
+The infix tilde, `~`,  consistent with the interface from `Symbolics` , is recommended for readability over `⩵`.
 
 ## Plotting
 
@@ -1138,8 +1431,7 @@ part of the `Plots` interface.
 In particular, the following methods of `plot` are defined:
 
 * `plot(ex::Sym, a, b)` will plot the expression of single variable over the interval `[a,b]`
-* `plot!(ex::Sym, a, b)` will add to the current plot a plot of  the expression of single variable over the interval `[a,b]`
-* `plot(exs::Vector{Sym}, a, b)` will plot each expression over `[a,b]`
+* `plot!(ex::Sym, a, b)` will add to the current plot a plot of  the expression of single variable over the interval `[a,b]`, or, when not specified, the current plotting limits
 * `plot(ex1, ex2, a, b)` will plot a parametric plot of the two expressions over the interval `[a,b]`.
 * `contour(xs, ys, ex::Sym)` will make a contour plot of the expression of two variables over the grid specifed by the `xs` and `ys`.
 * `surface(xs, ys, ex::Sym)` will make a surface plot of the expression of two variables over the grid specifed by the `xs` and `ys`.
@@ -1150,7 +1442,7 @@ For example:
 ```@example plots
 using SymPy, Plots
 @syms x
-plot(x^2 - 2, -2,2)
+plot(x^2 - 2, -2, 2)
 savefig("plot-1.svg"); nothing  # hide
 ```
 
@@ -1220,7 +1512,7 @@ julia> limit(sin(x)/x, x, 0)
 Alternatively, the second and third arguments can be specified as a pair:
 
 ```jldoctest introduction
-julia> limit(sin(x)/x, x=>0)
+julia> limit(sin(x)/x, x => 0)
 1
 
 ```
@@ -1240,15 +1532,15 @@ This example computes what L'Hopital reportedly paid a Bernoulli for
 julia> @syms a::positive
 (a,)
 
-julia> ex = (sqrt(2a^3*x-x^4) - a*(a^2*x)^(1//3)) / (a - (a*x^3)^(1//4));  string(ex)
-"(-a^(5/3)*x^(1/3) + sqrt(2*a^3*x - x^4))/(-a^(1/4)*(x^3)^(1/4) + a)"
+julia> ex = (sqrt(2a^3*x-x^4) - a*(a^2*x)^(1//3)) / (a - (a*x^3)^(1//4));  println(ex)
+(-a^(5/3)*x^(1/3) + sqrt(2*a^3*x - x^4))/(-a^(1/4)*(x^3)^(1/4) + a)
 
 ```
 
 Substituting $x=a$ gives an indeterminate form:
 
 ```jldoctest introduction
-julia> ex(x=>a)         # or subs(ex, x, a)
+julia> ex(x=>a)
 nan
 
 ```
@@ -1274,8 +1566,8 @@ julia> limit(ex, x => a)
 In a previous example, we defined `quad_approx`:
 
 ```julia
-julia> quad_approx  |>  string
-"x^2*(-cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)) + x*(2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)) + 1"
+julia> quad_approx |> println
+x^2*(-cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)) + x*(2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)) + 1
 
 ```
 
@@ -1308,9 +1600,13 @@ julia> limit(sign(x), x => 0, dir="-"), limit(sign(x), x => 0, dir="+")
 
 ```
 
-(The `limit` function finds the *right* limit by default. To be
-careful, either plot or check that both the left and right limit exist
-and are equal.)
+The `limit` function finds the *right* limit by default. The direction `"+-"` will check both, erroring if the two do not agree, as below with a message of "ValueError('The limit does not exist since left hand limit = -1 and right hand limit = 1')"
+
+```jldoctest introduction
+julia> try(limit(sign(x), x => 0, dir="+-")) catch err "error" end
+"error"
+
+```
 
 
 #### Numeric limits
@@ -1322,8 +1618,8 @@ limits. An example of Gruntz is the right limit at $0$ of the
 function:
 
 ```jldoctest introduction
-julia> f(x) = 1/x^(log(log(log(log(1/x)))) - 1)
-f (generic function with 1 method)
+julia> j(x) = 1/x^(log(log(log(log(1/x)))) - 1)
+j (generic function with 1 method)
 
 ```
 
@@ -1344,7 +1640,7 @@ julia> hs = [10.0^(-i) for i in 6:16]
  1.0e-15
  1.0e-16
 
-julia> ys = [f(h) for h in hs]
+julia> ys = [r(h) for h in hs]
 11-element Vector{Float64}:
  6.146316238971239e-7
  1.4298053954169988e-7
@@ -1377,7 +1673,7 @@ julia> [hs ys]
 With a values appearing to approach $0$. However, in fact these values will ultimately head  off to $\infty$:
 
 ```jldoctest introduction
-julia> limit(f(x), x, 0, dir="+")
+julia> limit(j(x), x, 0, dir="+")
 ∞
 
 ```
@@ -1391,12 +1687,11 @@ One *could* use limits to implement the definition of a derivative:
 julia> @syms x, h
 (x, h)
 
-julia> f(x) = exp(x)*sin(x)
-f (generic function with 1 method)
+julia> j(x) = exp(x) * sin(x)
+j (generic function with 1 method)
 
-julia> limit((f(x+h) - f(x)) / h, h, 0)
-                   x
-x
+julia> limit((j(x+h) - j(x)) / h, h, 0) |> println
+(sin(x) + cos(x))*exp(x)
 
 ```
 
@@ -1405,7 +1700,7 @@ However, it would be pretty inefficient, as `SymPy` already does a great job wit
 The same derivative computed above by a limit could be found with:
 
 ```jldoctest introduction
-julia> diff(f(x), x)
+julia> diff(j(x), x)
  x           x
 ℯ ⋅sin(x) + ℯ ⋅cos(x)
 
@@ -1423,16 +1718,16 @@ x ⋅(log(x) + 1)
 Or, higher order  derivatives:
 
 ```jldoctest introduction
-julia> diff(exp(-x^2), (x, 2)) |>  string
-"2*(2*x^2 - 1)*exp(-x^2)"
+julia> diff(exp(-x^2), (x, 2)) |>  println
+2*(2*x^2 - 1)*exp(-x^2)
 
 ```
 
 As an alternate to specifying the number of derivatives, multiple variables can be passed to `diff`:
 
 ```jldoctest introduction
-julia> diff(exp(-x^2), x, x, x) |>  string     # same as diff(..., (x, 3))
-"4*x*(3 - 2*x^2)*exp(-x^2)"
+julia> diff(exp(-x^2), x, x, x) |>  println     # same as diff(..., (x, 3))
+4*x*(3 - 2*x^2)*exp(-x^2)
 
 ```
 
@@ -1444,10 +1739,10 @@ other functions, such as `solve`. For example, here we find the
 critical points where the derivative is $0$ of some rational function:
 
 ```jldoctest introduction
-julia> f(x) = (12x^2 - 1) / (x^3)
-f (generic function with 1 method)
+julia> j(x) = (12x^2 - 1) / (x^3)
+j (generic function with 1 method)
 
-julia> diff(f(x), x) |> solve
+julia> diff(j(x), x) |> solve
 2-element Vector{Sym}:
  -1/2
   1/2
@@ -1460,14 +1755,14 @@ julia> diff(f(x), x) |> solve
 The `diff` function makes finding partial derivatives as easy as specifying the variable to differentiate in. This  example computes the mixed partials of an expression in `x` and `y`:
 
 ```jldoctest introduction
-julia> @syms x,y
+julia> @syms x y
 (x, y)
 
 julia> ex = x^2*cos(y)
  2
 x ⋅cos(y)
 
-julia> [diff(ex,v1, v2) for v1 in [x,y], v2 in [x,y]]  # also hessian(ex, (x,y))
+julia> [diff(ex, v1, v2) for v1 in [x,y], v2 in [x,y]]  # also hessian(ex, (x,y))
 2×2 Matrix{Sym}:
     2⋅cos(y)  -2⋅x⋅sin(y)
  -2⋅x⋅sin(y)  -x^2*cos(y)
@@ -1492,8 +1787,8 @@ julia> ex = sympy.Derivative(exp(x*y), x, (y, 2))
 These expressions are evaluated with the `doit` method:
 
 ```jldoctest introduction
-julia> ex.doit() |> string
-"x*(x*y + 2)*exp(x*y)"
+julia> ex.doit() |> println
+x*(x*y + 2)*exp(x*y)
 
 ```
 
@@ -1620,25 +1915,25 @@ w
 ─
 2
 
-julia> A = w*h + 1//2 * (pi * r^2);   string(A)
-"h*w + pi*w^2/8"
+julia> A = w*h + 1//2 * (pi * r^2);   println(A)
+h*w + pi*w^2/8
 
-julia> p = w + 2h + pi*r; string(p)
-"2*h + w + pi*w/2"
+julia> p = w + 2h + pi*r; println(p)
+2*h + w + pi*w/2
 
 ```
 
-(There is a subtlety above, as m `1//2*pi*r^2` will lose exactness, as
+(There is a subtlety above: using `1//2*pi*r^2` will lose exactness, as
 the products will be done left to right, and `1//2*pi` will be
 converted to an approximate floating point value before multiplying
-`r^2`, as such we rewrite the terms. It may be easier to use `PI`
+`r^2`. As such we rewrite the terms. It may be easier to use `PI`
 instead of `pi`.)
 
 We want to solve for `h` from when `p=P` (our fixed value) and
-substitute back into `A`. We solve `P-p==0`:
+substitute back into `A`. We solve taking the first solution.
 
 ```jldoctest introduction
-julia> h0 =  solve(P-p, h)[1]
+julia> h0 =  solve(p ~ P, h)[1]
 P   π⋅w   w
 ─ - ─── - ─
 2    4    2
@@ -1709,27 +2004,27 @@ julia> c = solve(diff(A1, w), w)[1]
 The answer will be the larger of `A1` at `b` or `c`:
 
 ```jldoctest introduction
-julia> atb = A1(w => b); string(atb)
-"pi*P^2/(2*(2 + pi)^2) + 2*P*(-pi*P/(2*(2 + pi)) - P/(2 + pi) + P/2)/(2 + pi)"
+julia> atb = A1(w => b); println(atb)
+pi*P^2/(2*(2 + pi)^2) + 2*P*(-pi*P/(2*(2 + pi)) - P/(2 + pi) + P/2)/(2 + pi)
 
-julia> atc = A1(w => c);  string(atc)
-"pi*P^2/(2*(pi + 4)^2) + 2*P*(-pi*P/(2*(pi + 4)) - P/(pi + 4) + P/2)/(pi + 4)"
+julia> atc = A1(w => c);  println(atc)
+pi*P^2/(2*(pi + 4)^2) + 2*P*(-pi*P/(2*(pi + 4)) - P/(pi + 4) + P/2)/(pi + 4)
 
 ```
 
 A simple comparison isn't revealing:
 
 ```jldoctest introduction
-julia> atc - atb |> string
-"-pi*P^2/(2*(2 + pi)^2) + pi*P^2/(2*(pi + 4)^2) - 2*P*(-pi*P/(2*(2 + pi)) - P/(2 + pi) + P/2)/(2 + pi) + 2*P*(-pi*P/(2*(pi + 4)) - P/(pi + 4) + P/2)/(pi + 4)"
+julia> atc - atb |> println
+-pi*P^2/(2*(2 + pi)^2) + pi*P^2/(2*(pi + 4)^2) - 2*P*(-pi*P/(2*(2 + pi)) - P/(2 + pi) + P/2)/(2 + pi) + 2*P*(-pi*P/(2*(pi + 4)) - P/(pi + 4) + P/2)/(pi + 4)
 
 ```
 
 But after simplifying, we can see that this expression is positive if $P$ is:
 
 ```jldoctest introduction
-julia> simplify(atc - atb) |> string
-"2*P^2/(16 + pi^3 + 20*pi + 8*pi^2)"
+julia> simplify(atc - atb) |> println
+2*P^2/(16 + pi^3 + 20*pi + 8*pi^2)
 
 ```
 
@@ -1738,7 +2033,7 @@ With this observation, we conclude the maximum area happens at `c` with area `at
 ### Integrals
 
 Integration is implemented in SymPy through the `integrate` function. There are two basic calls:
-`integrate(f(x), x)` will find the indefinite integral ($\int f(x) dx$) and when endpoints are specified through `integrate(f(x), (x, a, b))` the definite integral will be found ($\int_a^b f(x) dx$). The special form `integrate(ex, x, a, b)` can be used for single integrals, but the specification through a tuple is needed for multiple integrals.
+`integrate(f(x), x)` will find the indefinite integral ($\int f(x) dx$) and when endpoints are specified through `integrate(f(x), (x, a, b))` the definite integral will be found ($\int_a^b f(x) dx$). The special form `integrate(ex, x, a, b)` can be used for single integrals, but the specification through a tuple is needed for multiple integrals, so isn't illustrated here.
 
 Basic integrals are implemented:
 
@@ -1791,7 +2086,7 @@ julia> integrate(x^2, (x, 0, 1))
 Tedious problems, such as those needing multiple integration-by-parts steps can be done easily:
 
 ```julia
-julia> integrate(x^5*sin(x), x)
+julia> integrate(x^5 * sin(x), x)
    5             4              3              2
 - x ⋅cos(x) + 5⋅x ⋅sin(x) + 20⋅x ⋅cos(x) - 60⋅x ⋅sin(x) - 120⋅x⋅cos(x) + 120⋅sin(x)
 
@@ -1816,8 +2111,8 @@ julia> ex = (x^4 + x^2*exp(x) - x^2 - 2*x*exp(x) - 2*x - exp(x))*exp(x)/((x - 1)
 With indefinite integral:
 
 ```julia
-julia> integrate(ex, x) |> string
-"log(exp(x) + 1) + exp(x)/(x^2 - 1)"
+julia> integrate(ex, x) |> println
+log(exp(x) + 1) + exp(x)/(x^2 - 1)
 
 ```
 
@@ -1859,8 +2154,8 @@ julia> integ = sympy.Integral(sin(x^2), x)
 ```
 
 ```jldoctest introduction
-julia> integ.doit()  |>  string
-"3*sqrt(2)*sqrt(pi)*fresnels(sqrt(2)*x/sqrt(pi))*gamma(3/4)/(8*gamma(7/4))"
+julia> integ.doit()  |>  println
+3*sqrt(2)*sqrt(pi)*fresnels(sqrt(2)*x/sqrt(pi))*gamma(3/4)/(8*gamma(7/4))
 
 ```
 
@@ -1868,11 +2163,11 @@ julia> integ.doit()  |>  string
 ### Taylor series
 
 The `series` function can compute series expansions around a point to a specified order. For example,
-the following command finds 4 terms of the series expansion of `exp(sin(x))` in `x` about $c=0$:
+the following command finds four terms of the series expansion of `exp(sin(x))` in `x` about $c=0$:
 
 ```jldoctest introduction
-julia> s1 = series(exp(sin(x)), x, 0, 4); string(s1)
-"1 + x + x^2/2 + O(x^4)"
+julia> s1 = series(exp(sin(x)), x, 0, 4); println(s1)
+1 + x + x^2/2 + O(x^4)
 
 ```
 
@@ -1884,22 +2179,22 @@ that the remainder is no bigger in  size than a constant times $x^4$,  as $x\rig
 Consider what happens when we multiply series of different orders:
 
 ```jldoctest introduction
-julia> s2 = series(cos(exp(x)), x, 0, 6); string(s2)
-"cos(1) - x*sin(1) + x^2*(-sin(1)/2 - cos(1)/2) - x^3*cos(1)/2 + x^4*(-cos(1)/4 + 5*sin(1)/24) + x^5*(-cos(1)/24 + 23*sin(1)/120) + O(x^6)"
+julia> s2 = series(cos(exp(x)), x, 0, 6); println(s2)
+cos(1) - x*sin(1) + x^2*(-sin(1)/2 - cos(1)/2) - x^3*cos(1)/2 + x^4*(-cos(1)/4 + 5*sin(1)/24) + x^5*(-cos(1)/24 + 23*sin(1)/120) + O(x^6)
 
 ```
 
 ```jldoctest introduction
-julia> simplify(s1 * s2) |> string
-"cos(1) + sqrt(2)*x*cos(pi/4 + 1) - 3*x^2*sin(1)/2 - sqrt(2)*x^3*sin(pi/4 + 1) + O(x^4)"
+julia> simplify(s1 * s2) |> println
+cos(1) + sqrt(2)*x*cos(pi/4 + 1) - 3*x^2*sin(1)/2 - sqrt(2)*x^3*sin(pi/4 + 1) + O(x^4)
 
 ```
 
 The big "O" term is $x^4$, as smaller order terms in `s2` are covered in this term. The big "O" notation is sometimes not desired, in which case the `removeO` function can be employed:
 
 ```jldoctest introduction
-julia> s1.removeO() |> string
-"x^2/2 + x + 1"
+julia> s1.removeO() |> println
+x^2/2 + x + 1
 
 ```
 
@@ -1913,8 +2208,8 @@ julia> s1.removeO() |> string
 julia> @syms i, n
 (i, n)
 
-julia> summation(i^2, (i, 1, n)) |> string
-"n^3/3 + n^2/2 + n/6"
+julia> summation(i^2, (i, 1, n)) |> println
+n^3/3 + n^2/2 + n/6
 
 ```
 
@@ -1924,8 +2219,8 @@ Like `Integrate` and `Derivative`, there is also a `Sum` function to stage the t
 Some famous sums can be computed:
 
 ```jldoctest introduction
-julia> sn = sympy.Sum(1/i^2, (i, 1, n)); string(sn)
-"Sum(i^(-2), (i, 1, n))"
+julia> sn = sympy.Sum(1/i^2, (i, 1, n)); println(sn)
+Sum(i^(-2), (i, 1, n))
 
 julia> sn.doit()
 harmonic(n, 2)
@@ -1935,8 +2230,8 @@ harmonic(n, 2)
 And from this a limit is available:
 
 ```jldoctest introduction
-julia> limit(sn.doit(), n, oo) |> string
-"pi^2/6"
+julia> limit(sn.doit(), n, oo) |> println
+pi^2/6
 
 ```
 
@@ -1969,8 +2264,8 @@ The generic definitions of vector operations will work as expected with symbolic
 ```jldoctest introduction
 julia> using LinearAlgebra
 
-julia> dot(v,w) |> string
-"2*y + 3*conjugate(x) + 1"
+julia> dot(v,w) |> println
+2*y + 3*conjugate(x) + 1
 
 ```
 
@@ -2034,7 +2329,6 @@ such as `Matrix{Sym}` objects (matrices with symbolic entries). As
 well, SymPy has a class for matrices. `SymPy`, through `PyCall`, automatically maps mutable SymPy matrices into `Julia`n matrices of type `Array{Sym}`.
 
 
-
 Constructing matrices with symbolic entries follows `Julia`'s conventions:
 
 ```jldoctest introduction
@@ -2048,20 +2342,11 @@ julia> M = [1 x; x 1]
 
 ```
 
-Construction of symbolic matrices can *also* be done through the `Matrix` constructor, which must be qualified. It is passed a vector or row vectors but any symbolic values *must* be converted into `PyObject`s:
+!!! note
+    However, SymPy may throw a deprecation order when mapping a `Matrix{Sym}` argument for a function, as the underlying `sympy.Matrix` class is for symbolic numbers only since this [change](https://github.com/sympy/sympy/issues/21497). The suggestion is to use a "list of lists, TableForm, NumPy array, or some
+other data structure instead". A tuple of tuples will map to a list of lists.
 
-```jldoctest introduction
-julia> import SymPy.PyCall: PyObject
-
-julia> A = sympy.Matrix([[1,PyObject(x)], [PyObject(y), 2]])
-2×2 Matrix{Sym}:
- 1  x
- y  2
-```
-
-(otherwise, an entry like `[1,x]` will be mapped to a `Vector{Sym}` prior to passing to `sympy.Matrix` and the processing get's done differently, and not as desired.)
-
-Alternatively, using tuples will avoid  the behind-the-scenes conversion:
+Here is an example of a tuple of tuples forming a matrix:
 
 ```jldoctest introduction
 julia> A = sympy.Matrix( ((1,x),  (y,2)) )
@@ -2070,10 +2355,11 @@ julia> A = sympy.Matrix( ((1,x),  (y,2)) )
  y  2
 ```
 
-Either is useful if copying SymPy examples, but otherwise unneccesary, these are immediately mapped into `Julia` arrays by `PyCall`.
-**Unless** an immutable array is desired, and then the `sympy.ImmutableMatrix` constructor is used.
+This is useful if copying SymPy examples, but otherwise unneccesary, these are immediately mapped into `Julia` arrays by `PyCall` --
+**unless** an immutable array is desired, and then the `sympy.ImmutableMatrix` constructor is used.
 
 
+Some more examples:
 
 ```jldoctest introduction
 julia> diagm(0=>ones(Sym, 5))
@@ -2083,6 +2369,11 @@ julia> diagm(0=>ones(Sym, 5))
  0  0  1  0  0
  0  0  0  1  0
  0  0  0  0  1
+
+julia> M = [1 x; x 1]
+2×2 Matrix{Sym}:
+ 1  x
+ x  1
 
 julia> M^2
 2×2 Matrix{Sym}:
@@ -2094,15 +2385,6 @@ julia> det(M)
 1 - x
 ```
 
-Similarly,
-
-```jldoctest introduction
-julia> A^2
-2×2 Matrix{Sym}:
- x⋅y + 1      3⋅x
-     3⋅y  x⋅y + 4
-
-```
 
 We can call `Julia`'s generic matrix functions in the usual manner, e.g:
 
@@ -2121,7 +2403,8 @@ julia> A.det()
 
 ```
 
-(Actually, `det(A)` avoids the generic `Julia` implementation, but a determinant  can be found  using  `Julia`'s  generic `lu` function, as long as no pivoting is specified.)
+!!! note
+    Actually, `det(A)` avoids the generic `Julia` implementation. A better example might be `qr(M)` versus `M.QRdecomposition()` to see a generic `Julia` implementation for `Matrix{Sym}` against SymPy's method for matrices.
 
 
 Occasionally, the SymPy method has more content:
@@ -2146,7 +2429,7 @@ julia> A.eigenvects()
 
 (This is a bit misleading, as the generic `eigvecs` fails on `M`, so the value is basically just repackaged from `A.eigenvects()`.)
 
-This example from the tutorial shows the `nullspace` function:
+This example from the SymPy tutorial shows the `nullspace` method:
 
 ```jldoctest introduction
 julia> A = Sym[1 2 3 0 0; 4 10 0 0 1]
@@ -2162,7 +2445,7 @@ julia> vs = A.nullspace()
 
 ```
 
-And this shows that they are indeed in the null space of `M`:
+This confirms that values found are indeed in the null space of `A`:
 
 ```jldoctest introduction
 julia> [A*vs[i] for i in 1:3]
@@ -2208,8 +2491,8 @@ julia> @syms F()
 With this, we can  construct a  differential equation. Following the SymPy tutorial, we solve $f''(x) - 2f'(x) + f(x) = \sin(x)$:
 
 ```jldoctest introduction
-julia> diffeq = Eq(diff(F(x), x, 2) - 2*diff(F(x)) + F(x), sin(x)); string(diffeq)
-"Eq(F(x) - 2*Derivative(F(x), x) + Derivative(F(x), (x, 2)), sin(x))"
+julia> diffeq = diff(F(x), x, 2) - 2*diff(F(x)) + F(x) ~ sin(x); println(diffeq)
+Eq(F(x) - 2*Derivative(F(x), x) + Derivative(F(x), (x, 2)), sin(x))
 
 ```
 
@@ -2217,15 +2500,15 @@ julia> diffeq = Eq(diff(F(x), x, 2) - 2*diff(F(x)) + F(x), sin(x)); string(diffe
 With this, we just need the `dsolve` function. This is called as `dsolve(eq)` or `dsolve(eq, F(x))`:
 
 ```jldoctest introduction
-julia> ex = dsolve(diffeq, F(x)); string(ex)
-"Eq(F(x), (C1 + C2*x)*exp(x) + cos(x)/2)"
+julia> ex = dsolve(diffeq, F(x)); println(ex)
+Eq(F(x), (C1 + C2*x)*exp(x) + cos(x)/2)
 
 ```
 
 
 The `dsolve` function in SymPy has an extensive list of named
 arguments to control the underlying algorithm. These can be passed
-through with the appropriate keyword arguments. (To use SymPy's `ics` argument, the `sympy.dsolve` method must be called directly.)
+through with the appropriate keyword arguments.
 
 The definition of the differential equation expects the cumbersome `diff(ex, var)` to provide the derivative. The `Differential` function lessens the visual noise (with a design taken from `ModelingToolkit`). The above would be:
 
@@ -2233,19 +2516,19 @@ The definition of the differential equation expects the cumbersome `diff(ex, var
 julia> D = Differential(x)
 Differential(x)
 
-julia> diffeq = D(D(F))(x) - 2D(F)(x) + F(x) ~ sin(x); string(diffeq)
-"Eq(F(x) - 2*Derivative(F(x), x) + Derivative(F(x), (x, 2)), sin(x))"
+julia> diffeq = D(D(F))(x) - 2D(F)(x) + F(x) ~ sin(x); println(diffeq)
+Eq(F(x) - 2*Derivative(F(x), x) + Derivative(F(x), (x, 2)), sin(x))
 
-julia> sympy.dsolve(diffeq, F(x)) |> string
-"Eq(F(x), (C1 + C2*x)*exp(x) + cos(x)/2)"
+julia> sympy.dsolve(diffeq, F(x)) |> println
+Eq(F(x), (C1 + C2*x)*exp(x) + cos(x)/2)
 ```
 
 
 This solution has two constants, $C_1$ and $C_2$, that would be found from initial conditions. Say we know $F(0)=0$ and $F'(0)=1$, can we find the constants? To work with the returned expression, it is most convenient to get just the right hand side. The `rhs` method will return the right-hand side of a relation:
 
 ```jldoctest introduction
-julia> ex1 = ex.rhs(); string(ex1)
-"(C1 + C2*x)*exp(x) + cos(x)/2"
+julia> ex1 = rhs(ex); println(ex1)
+(C1 + C2*x)*exp(x) + cos(x)/2
 
 ```
 
@@ -2268,8 +2551,8 @@ julia> solve(ex1(x => 0), C1)
 We see that $C1=-1/2$, which we substitute in:
 
 ```jldoctest introduction
-julia> ex2 = ex1(C1 => -Sym(1//2)); string(ex2)
-"(C2*x - 1/2)*exp(x) + cos(x)/2"
+julia> ex2 = ex1(C1 => -Sym(1//2)); println(ex2)
+(C2*x - 1/2)*exp(x) + cos(x)/2
 
 ```
 
@@ -2287,8 +2570,8 @@ julia> solve( diff(ex2, x)(x => 0) - 1, C2 )
 This gives `C2=3/2`. Again we substitute in to get our answer:
 
 ```jldoctest introduction
-julia> ex3 = ex2(Sym("C2") => 3//2); string(ex3)
-"(3*x/2 - 1/2)*exp(x) + cos(x)/2"
+julia> ex3 = ex2(Sym("C2") => 3//2); println(ex3)
+(3*x/2 - 1/2)*exp(x) + cos(x)/2
 
 ```
 
@@ -2296,15 +2579,16 @@ julia> ex3 = ex2(Sym("C2") => 3//2); string(ex3)
 The `dsolve` function has an `ics` argument that allows most of the above to be done internally:
 
 ```jldoctest introduction
-julia> ex4 = sympy.dsolve(diffeq, F(x), ics=Dict(F(0)=>1, D(F)(0)=>1));
+julia> ex4 = dsolve(diffeq, F(x), ics=Dict(F(0)=>0, D(F)(0)=>1));
 
-julia> ex4 == ex3
-false
+julia> ex3 - rhs(ex4)  # need rhs to extract the solution
+0
+
 ```
 
 ###### Example
 
-We do one more example, this one borrowed from [here](http://nbviewer.ipython.org/github/garth-wells/IA-maths-Ipython/blob/master/notebooks/Lecture1.ipynb).
+This example is borrowed from [here](http://nbviewer.ipython.org/github/garth-wells/IA-maths-Ipython/blob/master/notebooks/Lecture1.ipynb).
 
 > Find the variation of speed with time of a parachutist subject to a drag force of $k\cdot v^2$.
 
@@ -2322,12 +2606,8 @@ julia> @syms t, m, k, alpha=>"α", v()
 
 julia> D = Differential(t);
 
-julia> ex = Eq( (m/k)*D(v)(t), alpha^2 - v(t)^2 )
-  d
-m⋅──(v(t))
-  dt          2    2
-────────── = α  - v (t)
-    k
+julia> ex = (m/k)*D(v)(t) ~ alpha^2 - v(t)^2; println(ex)
+Eq(m*Derivative(v(t), t)/k, α^2 - v(t)^2)
 
 ```
 
@@ -2342,24 +2622,18 @@ julia> sympy.classify_ode(ex)
 It is linear, but not solvable. Proceeding with `dsolve` gives:
 
 ```
-julia> dsolve(ex, v(t)) |> string
-"Eq(v(t), -α/tanh(log(exp(k*α*(C1 - 2*t)))/(2*m)))"
+julia> u = dsolve(ex, v(t));
+
+julia> println(rhs(u))
+-α/tanh(log(exp(α*(C1*m - 2*k*t)))/(2*m))
 
 ```
 
 
-### Initial Value Problems
+###### Example
 
-Solving an initial value problem can be a bit tedious with `SymPy`.
-The first example shows the steps. This is because the `ics` argument
-for `sympy.dsolve` only works for a few types of equations. These do not
-include, by default, the familiar "book" examples, such as $y'(x) =
-a\cdot y(x)$.
-
-To work around this, `SymPy.jl` extends the function `sympy.dsolve` to allow
-a specification of the initial conditions when solving.  Each initial condition is specified with 3-tuple. For example, `v(t0)=v0` is specified with `(v, t0, v0)`.  The conditions on the values functions may use `v`, `v'`, ...
-To illustrate, we follow an example from
-[Wolfram](https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html).
+We follow an example from
+[Wolfram](https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html), solving first order ODE: $y'(t) - 3t\cdot y(t) = 1$:
 
 ```jldoctest introduction
 julia> @syms y(), a, x
@@ -2367,12 +2641,10 @@ julia> @syms y(), a, x
 
 julia> D = Differential(x);
 
-julia> eqn = D(y)(x) - 3*x*y(x) - 1; string(eqn)
-"-3*x*y(x) + Derivative(y(x), x) - 1"
+julia> eqn = D(y)(x) - 3*x*y(x) - 1; println(eqn)
+-3*x*y(x) + Derivative(y(x), x) - 1
 
 ```
-
-
 
 We solve the initial value problem with $y(0) = 4$ as follows:
 
@@ -2380,16 +2652,19 @@ We solve the initial value problem with $y(0) = 4$ as follows:
 julia> x0, y0 = 0, 4
 (0, 4)
 
-julia> out = dsolve(eqn, ics = Dict(y(x0) => y0)); string(out)
-"Eq(y(x), (sqrt(6)*sqrt(pi)*erf(sqrt(6)*x/2)/6 + 4)*exp(3*x^2/2))"
+julia> ics = Dict(y(x0) => y0);
+
+julia> out = dsolve(eqn, ics = ics);
+
+julia> println(rhs(out))
+(sqrt(6)*sqrt(pi)*erf(sqrt(6)*x/2)/6 + 4)*exp(3*x^2/2)
 
 ```
 
 Verifying this requires combining some operations:
 
 ```jldoctest introduction
-julia> u = out.rhs(); string(u)
-"(sqrt(6)*sqrt(pi)*erf(sqrt(6)*x/2)/6 + 4)*exp(3*x^2/2)"
+julia> u = rhs(out);
 
 julia> diff(u, x) - 3*x*u - 1
 0
@@ -2402,8 +2677,12 @@ To solve with a general initial condition is similar:
 julia> x0, y0 = 0, a
 (0, a)
 
-julia> out = dsolve(eqn, ics=Dict(y(x0) => y0)); string(out)
-"Eq(y(x), (a + sqrt(6)*sqrt(pi)*erf(sqrt(6)*x/2)/6)*exp(3*x^2/2))"
+julia> ics = Dict(y(x0) => y0);
+
+julia> out = dsolve(eqn, ics=ics);
+
+julia> println(rhs(out))
+(a + sqrt(6)*sqrt(pi)*erf(sqrt(6)*x/2)/6)*exp(3*x^2/2)
 
 ```
 
@@ -2418,12 +2697,12 @@ x0, y0 = 0, a; nothing #hide
 out = dsolve(eqn, ics = (y, x0, y0)); nothing #hide
 
 as = -2:0.6:2
-fn = lambdify(subs(out.rhs(), a=>first(as)))
+fna = lambdify(subs(rhs(out), a=>first(as)))
 xs = range(-1.8, 1.8, length=500)
-p = plot(xs, fn.(xs), legend=false, ylim=(-4,4))
+p = plot(xs, fna.(xs), legend=false, ylim=(-4,4))
 for aᵢ in as[2:end]
-    fn  = lambdify(subs(out.rhs(), a=>aᵢ))
-    plot!(p, xs, fn.(xs))
+    fni  = lambdify(subs(rhs(out), a=>aᵢ))
+    plot!(p, xs, fni.(xs))
 end
 p
 savefig("plot-9.svg"); nothing #hide
@@ -2436,8 +2715,8 @@ The comment from the example is "This plots several integral curves of the equat
 
 ##### Example
 
-We continue with another example from the Wolfram documentation, that
-of solving $y'' + 5y' + 6y=0$ with values prescribed for both $y$ and
+We continue with another example from the Wolfram documentation:
+solving $y'' + 5y' + 6y=0$ with values prescribed for both $y$ and
 $y'$ at $x_0=0$.
 
 ```jldoctest introduction
@@ -2447,20 +2726,20 @@ julia> @syms y(), x
 julia> D = Differential(x); D2 = D ∘ D
 Differential(x) ∘ Differential(x)
 
-julia> eqn = D2(y)(x) + 5D(y)(x) + 6y(x);  string(eqn)
-"6*y(x) + 5*Derivative(y(x), x) + Derivative(y(x), (x, 2))"
+julia> eqn = D2(y)(x) + 5D(y)(x) + 6y(x);  println(eqn)
+6*y(x) + 5*Derivative(y(x), x) + Derivative(y(x), (x, 2))
 
 ```
 
 To solve with $y(0) = 1$ and $y'(0) = 1$ we have:
 
 ```jldoctest introduction
-julia> out = dsolve(eqn, ics=Dict(y(0)=> 1, D(y)(0) => 1)); string(out)
-"Eq(y(x), (4 - 3*exp(-x))*exp(-2*x))"
+julia> ics=Dict(y(0) => 1, D(y)(0) => 1);
+
+julia> out = dsolve(eqn, ics=ics); println(rhs(out))
+(4 - 3*exp(-x))*exp(-2*x)
 
 ```
-
-(That is we combine *all* initial conditions with a tuple.)
 
 To make a plot, we only need the right-hand-side of the answer:
 
@@ -2469,7 +2748,7 @@ To make a plot, we only need the right-hand-side of the answer:
 D = Differential(x); nothing # hide
 eqn = D(D(y))(x) + 5D(y)(x) + 6y(x); nothing  #hide
 out = dsolve(eqn, ics=Dict(y(0) => 1, D(y)(0) => 1)); nothing #hide
-plot(out.rhs(), -1/3, 2)
+plot(rhs(out), -1/3, 2)
 savefig("plot-10.svg"); nothing  # hide
 ```
 
@@ -2484,11 +2763,190 @@ page, we solve $y''(x) +y(x) = e^x$ over $[0,1]$ with conditions
 $y(0)=1$, $y(1) = 1/2$:
 
 ```jldoctest introduction
-julia> eqn = D(D(y))(x) + y(x) - exp(x); string(eqn)
-"y(x) - exp(x) + Derivative(y(x), (x, 2))"
+julia> eqn = D(D(y))(x) + y(x) - exp(x); println(eqn)
+y(x) - exp(x) + Derivative(y(x), (x, 2))
 
-julia> dsolve(eqn, ics=Dict(y(0)=>1, y(1) => Sym(1//2))) |> string
-"Eq(y(x), exp(x)/2 + (-E - cos(1) + 1)*sin(x)/(2*sin(1)) + cos(x)/2)"
+julia> ics = Dict(y(0)=>1, y(1) => Sym(1//2));
+
+julia> dsolve(eqn, ics=ics) |> println
+Eq(y(x), exp(x)/2 + (-E - cos(1) + 1)*sin(x)/(2*sin(1)) + cos(x)/2)
 ```
 
-(the wrapping of `Sym(1//2)` is necessary to avoid a premature conversion to floating point.)
+!!! note
+    The wrapping of `Sym(1//2)` is necessary to avoid a premature conversion to floating point when the dictionary, `ics`, is converted to a Python dictionary by `PyCall`.
+
+## The lambdify function
+
+The `Symbolics` documentation describes its `build_function` method as follows: "`build_function` is kind of like if `lambdify` ate its spinach." This is true, but what is `lambdify` in the comparison?
+
+The SymPy docs say it can transform SymPy expressions to lambda functions which can be used to calculate numerical values very fast.
+
+The typical way to evaluate a symbolic expression at some value and gather the output as number in Julia would follow this pipeline:
+
+```
+x |> ex(x) |> N
+```
+
+The first step requires a conversion of the value in `Julia` to a Python object, this is handled by `PyCall` and is essentially zero-cost. The substitution step, is done within SymPy and runs at the speed pf Python. The last step converts the resulty python object computed by SymPy into a value on the `Julia` side. The `N` is just one way to do this. XXX convert(T, X), pytype_mapping, ...
+
+
+By creating a native function, the use of `PyCall` to call the SymPy functions is avoided, resulting in speedier evaluations.
+
+The `SymPy` version in this package does not utilize the underlying SymPy function, rather it walks the expression tree in SymPy, creates a corresponding `Julia` expression, and then creates a function in `Julia` from that.
+
+
+To see the creation of an expression, we have:
+
+```jldoctest introduction
+julia> @syms x; ex = x*sin(x - 2)
+x⋅sin(x - 2)
+
+julia> convert(Expr, ex)
+:(x * sin(-2 + x))
+
+```
+
+The `sympy.julia_code` function is SymPy's means to stringify an expression into `Julia` code, in combination with `Meta.parse`, this can also create the expression.
+
+Converting the expression to a function can be done many different ways, some more performant than what is the default with `lambdify`.
+
+First, the variables in the expression must be identified, these can be passed in via the `vars` keyword or will be determined by default with the `free_symbols` function. The order of the variables is important when calling the create function. Finally, `invokelatest` is used to create a function object made by combining the variables and the function body.
+
+```jldoctest introduction
+julia> l = lambdify(ex);
+
+julia> l(3), ex(3)
+(2.5244129544236893, 3*sin(1))
+
+```
+
+## Using other SymPy modules
+
+The SymPy package has numerous external modules beyond those exposed immediately by `SymPy.jl`.
+
+```jldoctest introduction
+julia> stats = SymPy.PyCall.pyimport_conda("sympy.stats", "sympy");
+
+```
+
+The `stats` module holds several probability functions, similar to the `Distributions` package of `Julia`. This set of commands creates a normally distributed random variable, `X`, with symbolic parameters:
+
+```jldoctest introduction
+julia> @syms μ, σ::positive;
+
+julia> X = stats.Normal("X", μ, σ)
+X
+
+julia> stats.E(X)
+μ
+
+julia> stats.E(X^2) |> println
+μ^2 + σ^2
+
+julia> stats.variance(X)
+ 2
+σ
+
+```
+
+The methods in the `stats` module are qualified with the module name above. `SymPy` provides the `import_from` function to import all such methods creating functions which dispatch on a symbolic first argument. This is not shown.
+
+Next we see that statements like $P(X > \mu)$ can be answered specifying the inequality using `Gt` in the following:
+
+```jldoctest introduction
+julia> stats.P(Gt(X, μ))
+1/2
+```
+
+A typical calculation for the normal distribution is the area one or more standard deviations larger than the mean:
+
+```jldoctest introduction
+julia> stats.P(Gt(X, μ + 1σ)) |> println
+sqrt(2)*(-sqrt(2)*pi*exp(1/2)*erf(sqrt(2)/2)/2 + sqrt(2)*pi*exp(1/2)/2)*exp(-1/2)/(2*pi)
+```
+
+The familiar  answer could be found by calling `N` or `evalf`.
+
+We do one more distribution, the uniform over $[a,b]$:
+
+```jldoctest introduction
+julia> @syms a::real b::real
+(a, b)
+
+julia> U = stats.Uniform("U", a, b)
+U
+
+julia> stats.E(U) |> simplify |> println
+a/2 + b/2
+
+julia> stats.variance(U) |> simplify |> factor |> println
+(a - b)^2/12
+```
+
+
+Not all modules are so simple to incorporate. PyCall does a good job of converting the arguments from `Julia` to Python, but the conversion from a Python (SymPy) structure back to a workable `Julia` structure can be difficult.
+
+For example, the return value of `solveset` offers a challenge:
+
+```jldoctest introduction
+julia> @syms x
+(x,)
+
+julia> u = solveset(x^2 - 2, x)
+{-√2, √2}
+```
+
+Here `u` has the Python class `FiniteSet`:
+
+```jldoctest introduction
+julia> u.__class__
+PyObject <class 'sympy.sets.sets.FiniteSet'>
+
+```
+
+PyCall is instructed in `SymPy` to map SymPy objects as `Sym` objects, so `FiniteSet` is only relevant when the object is being interacted with using `Julia` methods, Here `collect` will fail on `u`, but `Set` will work with splatting, as the finite set is iterable. This set can then be collected:
+
+```jldoctest introduction
+julia> collect(Set(u...))
+2-element Vector{Any}:
+ -√2
+  √2
+
+```
+
+The output of many integration problems is a piecewise function:
+
+```jldoctest introduction
+julia> @syms n::integer x::real
+(n, x)
+
+julia> u = integrate(x^n, x)
+⎧ n + 1
+⎪x
+⎪──────  for n ≠ -1
+⎨n + 1
+⎪
+⎪log(x)  otherwise
+⎩
+
+```
+
+The conversion to a `Julia` object is a bit cumbersome, in the following we work through the `args` of the expression and pull our the condition and arguments as an underlying `ExprCondPair` in SymPy for which `cond` and `args` are useful properties:
+
+
+```jldoctest introduction
+julia> [c.cond => c.args for c ∈ u.args]
+2-element Vector{Pair{Sym, Tuple{Sym, Sym}}}:
+ Ne(n, -1) => (x^(n + 1)/(n + 1), Ne(n, -1))
+      True => (log(x), True)
+
+```
+
+Such is not automated. However some conversions are. `PyCall` allows the definition of a mapping between a python type and a `Julia` type (`pytype_mapping`).
+By default, python objects with class `sympy_core.basic.Basic` are mapped to `Sym` objects in `Julia`, a simple wrapper to control dispatch.
+More germaine to this example, the `combinatorics` module is imported by default in `SymPy`. It required managing the automatic mapping of types so that different dispatch rules could be used to follow the syntax of the module. The rules were:
+
+```
+pytype_mapping(sympy.combinatorics.permutations.Permutation, SymPermutation)
+pytype_mapping(combinatorics.perm_groups.PermutationGroup, SymPermutationGro
+```
