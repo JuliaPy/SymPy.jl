@@ -6,8 +6,6 @@
 
 # SymPy Package to bring Python's `SymPy` functionality into `Julia` via `PyCall`
 
-
-
 SymPy  (`http://sympy.org/`)  is a Python library for symbolic mathematics.
 
 With the excellent `PyCall` package of `julia`, one has access to the

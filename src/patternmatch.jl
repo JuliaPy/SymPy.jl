@@ -28,6 +28,11 @@ end
 
 """
     replace(expression, pattern, value, ...)
+    replace(expression, pattern => value; kwargs...)
+
+In the expression replace a mathcing pattern with the value. Returns the modified expression.
+
+# Extended help
 
 From: [SymPy Docs](http://docs.sympy.org/dev/modules/core.html)
 
@@ -199,4 +204,8 @@ end
 
 function Base.replace(ex::Sym, query::Any, value; exact=true, kwargs...)
     ex.replace(query, value; exact=exact, kwargs...)
+end
+
+function Base.replace(ex::Sym, qv::Pair; kwargs...)
+    replace(ex, first(qv), last(qv); kwargs...)
 end
