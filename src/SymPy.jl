@@ -266,7 +266,4 @@ end
 ### Add generic methods and new methods
 include("importexport.jl")
 
-if !isdefined(Base, :get_extension)
-    include("../ext/SymPyTermInterfaceExt.jl")
-end
 end # module

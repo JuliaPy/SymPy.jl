@@ -1,7 +1,6 @@
 module SymPyTermInterfaceExt
 
-import SymPy
-import TermInterface
+using SymPy, TermInterface
 
 #==
 Check if x represents an expression tree. If returns true, it will be assumed that operation(::T) and arguments(::T) methods are defined. Definining these three should allow use of SymbolicUtils.simplify on custom types. Optionally symtype(x) can be defined to return the expected type of the symbolic expression.
@@ -43,7 +42,7 @@ end
 #==
 Construct a new term with the operation f and arguments args, the term should be similar to t in type. if t is a SymbolicUtils.Term object a new Term is created with the same symtype as t. If not, the result is computed as f(args...). Defining this method for your term type will reduce any performance loss in performing f(args...) (esp. the splatting, and redundant type computation). T is the symtype of the output term. You can use SymbolicUtils.promote_symtype to infer this type. The exprhead keyword argument is useful when creating Exprs.
 ==#
-function TermInterface.similarterm(t::SymPy.SymbolicObject, f, args, symtype=T;
+function TermInterface.similarterm(t::SymPy.SymbolicObject, f, args, symtype=nothing;
                                    metadata=nothing, exprhead=exprhead(t))
     f(args...) # default
 end
