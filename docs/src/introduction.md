@@ -850,13 +850,11 @@ Symbolic powers also can be used:
 julia> @syms n
 (n,)
 
-julia> gcd(x^n - x^(2*n), x^n)
- n
-x
+julia> gcd(x^n - x^(2*n), x^n) |> println
+x^n
 
-julia> gcd(x^(n + 4), x^(n + 1) + 3*x^n)
- n
-x
+julia> gcd(x^(n + 4), x^(n + 1) + 3*x^n) |> println
+x^n
 
 julia> sympy.resultant(3*x^4 + 3*x^3 + x^2 - x - 2, x^3 - 3*x^2 + x + 5)
 0
@@ -931,7 +929,7 @@ julia> factor(f, modulus=5) |> println
 
 The expression `x^4 - 3x^2 + 1` is stored internally as other expressions are, using the expression tree to build up from the atoms. However, for polynomials, more efficient and advantageous representations are possible. The dense polynomial representation is possible by storing just the coefficients relative to a known basis. For example:
 
-```jldoctest introduction
+```julia
 julia> f = x^4 - 2x^2 + 1
  4      2
 x  - 2⋅x  + 1
@@ -1713,7 +1711,7 @@ julia> [hs ys]
 With a values appearing to approach $0$. However, in fact these values will ultimately head  off to $\infty$:
 
 ```jldoctest introduction
-julia> limit(j(x), x, 0, dir="+")
+julia> limit(j(x), x => 0, dir="+")
 ∞
 
 ```
@@ -1730,7 +1728,7 @@ julia> @syms x, h
 julia> j(x) = exp(x) * sin(x)
 j (generic function with 1 method)
 
-julia> limit((j(x+h) - j(x)) / h, h, 0) |> println
+julia> limit((j(x+h) - j(x)) / h, h => 0) |> println
 (sin(x) + cos(x))*exp(x)
 
 ```
