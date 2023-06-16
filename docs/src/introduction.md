@@ -847,16 +847,11 @@ julia> factor(expand(f*g)) |> println
 Symbolic powers also can be used:
 
 ```jldoctest introduction
-julia> @syms n
-(n,)
+julia> @syms x::real, n::integer
+(x, n)
 
-julia> gcd(x^n - x^(2*n), x^n)
- n
-x
-
-julia> gcd(x^(n + 4), x^(n + 1) + 3*x^n)
- n
-x
+julia> gcd(x^n - x^(2*n), x^n) |> println
+x^n
 
 julia> sympy.resultant(3*x^4 + 3*x^3 + x^2 - x - 2, x^3 - 3*x^2 + x + 5)
 0
@@ -931,7 +926,7 @@ julia> factor(f, modulus=5) |> println
 
 The expression `x^4 - 3x^2 + 1` is stored internally as other expressions are, using the expression tree to build up from the atoms. However, for polynomials, more efficient and advantageous representations are possible. The dense polynomial representation is possible by storing just the coefficients relative to a known basis. For example:
 
-```jldoctest introduction
+```julia
 julia> f = x^4 - 2x^2 + 1
  4      2
 x  - 2⋅x  + 1
@@ -1713,7 +1708,7 @@ julia> [hs ys]
 With a values appearing to approach $0$. However, in fact these values will ultimately head  off to $\infty$:
 
 ```jldoctest introduction
-julia> limit(j(x), x, 0, dir="+")
+julia> limit(j(x), x => 0, dir="+")
 ∞
 
 ```
@@ -1724,14 +1719,14 @@ julia> limit(j(x), x, 0, dir="+")
 One *could* use limits to implement the definition of a derivative:
 
 ```jldoctest introduction
-julia> @syms x, h
+julia> @syms x::real, h::real
 (x, h)
 
-julia> j(x) = exp(x) * sin(x)
+julia> j(x) = x * exp(x)
 j (generic function with 1 method)
 
-julia> limit((j(x+h) - j(x)) / h, h, 0) |> println
-(sin(x) + cos(x))*exp(x)
+julia> limit((j(x+h) - j(x)) / h, h => 0) |> println
+x*exp(x) + exp(x)
 
 ```
 
@@ -1741,8 +1736,8 @@ The same derivative computed above by a limit could be found with:
 
 ```jldoctest introduction
 julia> diff(j(x), x)
- x           x
-ℯ ⋅sin(x) + ℯ ⋅cos(x)
+   x    x
+x⋅ℯ  + ℯ
 
 ```
 
