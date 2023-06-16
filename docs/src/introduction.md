@@ -1725,10 +1725,10 @@ One *could* use limits to implement the definition of a derivative:
 julia> @syms x, h
 (x, h)
 
-julia> j(x) = exp(x) * sin(x)
-j (generic function with 1 method)
+julia> je(x) = exp(x) * sin(x)
+je (generic function with 1 method)
 
-julia> limit((j(x+h) - j(x)) / h, h => 0) |> println
+julia> limit((je(x+h) - je(x)) / h, h => 0) |> println
 (sin(x) + cos(x))*exp(x)
 
 ```
@@ -1738,7 +1738,7 @@ However, it would be pretty inefficient, as `SymPy` already does a great job wit
 The same derivative computed above by a limit could be found with:
 
 ```jldoctest introduction
-julia> diff(j(x), x)
+julia> diff(je(x), x)
  x           x
 ℯ ⋅sin(x) + ℯ ⋅cos(x)
 
