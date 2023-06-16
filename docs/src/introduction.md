@@ -847,7 +847,7 @@ julia> factor(expand(f*g)) |> println
 Symbolic powers also can be used:
 
 ```jldoctest introduction
-julia> @syms x, n
+julia> @syms x::real, n::integer
 (x, n)
 
 julia> gcd(x^n - x^(2*n), x^n) |> println
