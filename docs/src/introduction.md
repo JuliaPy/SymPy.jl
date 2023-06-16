@@ -853,9 +853,6 @@ julia> @syms x::real, n::integer
 julia> gcd(x^n - x^(2*n), x^n) |> println
 x^n
 
-julia> gcd(x^(n + 4), x^(n + 1) + 3*x^n) |> println
-x^n
-
 julia> sympy.resultant(3*x^4 + 3*x^3 + x^2 - x - 2, x^3 - 3*x^2 + x + 5)
 0
 
@@ -1722,14 +1719,14 @@ julia> limit(j(x), x => 0, dir="+")
 One *could* use limits to implement the definition of a derivative:
 
 ```jldoctest introduction
-julia> @syms x, h
+julia> @syms x::real, h::real
 (x, h)
 
-julia> je(x) = exp(x) * sin(x)
-je (generic function with 1 method)
+julia> j(x) = x * exp(x)
+j (generic function with 1 method)
 
-julia> limit((je(x+h) - je(x)) / h, h => 0) |> println
-(sin(x) + cos(x))*exp(x)
+julia> limit((j(x+h) - j(x)) / h, h => 0) |> println
+x*exp(x) + exp(x)
 
 ```
 
@@ -1738,9 +1735,9 @@ However, it would be pretty inefficient, as `SymPy` already does a great job wit
 The same derivative computed above by a limit could be found with:
 
 ```jldoctest introduction
-julia> diff(je(x), x)
- x           x
-ℯ ⋅sin(x) + ℯ ⋅cos(x)
+julia> diff(j(x), x)
+   x    x
+x⋅ℯ  + ℯ
 
 ```
 
