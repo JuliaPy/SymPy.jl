@@ -134,6 +134,11 @@ function walk_expression(ex; values=Dict(), fns=Dict())
         return walk_expression.(Introspection.args(ex), values=values, fns=fns)
     elseif fn == "Indexed"
         return Expr(:ref, [walk_expression(a, values=values, fns=fns) for a in Introspection.args(ex)]...)
+    elseif fn == "Pow"
+        a, b = Introspection.args(ex)
+        b == 1//2 && return Expr(:call, :sqrt, walk_expression(a, values=values, fns=fns))
+        b == 1//3 && return Expr(:call, :cbrt, walk_expression(a, values=values, fns=fns))
+        return Expr(:call, :^,  [walk_expression(aᵢ, values=values, fns=fns) for aᵢ in (a,b)]...)
     elseif haskey(vals_map, fn)
         return vals_map[fn]
     end
