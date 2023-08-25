@@ -2,11 +2,9 @@ if lowercase(get(ENV, "CI", "false")) == "true"
     include("install_dependencies.jl")
 end
 
-
-
-
 using SymPy
 using Test
+import SymbolicUtils  # test loading extension
 
 include("tests.jl")
 include("test-math.jl")
