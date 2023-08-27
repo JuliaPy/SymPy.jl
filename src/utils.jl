@@ -70,6 +70,11 @@ function (ex::Sym)(kvs::Pair...)
     ex
 end
 
+# useful to convert sympy.core.containers.Tuple
+convert(::Type{Tuple}, b::Sym) = Tuple(b)
+function Base.Tuple(b::Sym)
+    Tuple(bᵢ for  bᵢ ∈ b.__pyobject__)
+end
 ##################################################
 ## subs
 ##
