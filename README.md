@@ -15,6 +15,10 @@ This `SymPy` package provides a light interface for  the
 features of the SymPy library that makes working with SymPy objects a bit
 easier.
 
+(The [SymPyPythonCall](https://github.com/jverzani/SymPyPythonCall.jl/) package provides an
+alternative relying on the [PythonCall](https://github.com/cjdoris/PythonCall.jl)
+package for interfacing with `Python`.)
+
 The documentation inludes an introduction document and a version of
 the SymPy tutorial translated from the Python syntax into Julia.
 
