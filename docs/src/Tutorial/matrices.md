@@ -974,9 +974,9 @@ julia> M = Sym[3 -2  4 -2; 5  3 -3 -2; 5 -2  2 -2; 5 -2 -3  3]
 
 julia> M.eigenvals()
 Dict{Any, Any} with 3 entries:
-  -2 => 1
   3  => 1
   5  => 2
+  -2 => 1
 
 ```
 
