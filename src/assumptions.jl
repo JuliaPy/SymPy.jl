@@ -350,7 +350,7 @@ end
 ## export
 #export Q
 
-const 𝑄 = Q
+#const 𝑄 = Q
 
 """
     𝑄
@@ -362,6 +362,5 @@ Exported  symbol for  [`SymPy.Q`](@ref), a  Julia  module implementing `sympy.Q`
     At one time, the symbol `Q` was exported for this. To avoid namespace clutter, the unicode alternative is now used. Legacy code would need a definition like `const Q = SymPy.Q`  to work.
 
 """
-𝑄
-export  𝑄
-
+const 𝑄 = Q
+export 𝑄
