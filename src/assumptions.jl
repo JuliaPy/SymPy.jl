@@ -350,8 +350,6 @@ end
 ## export
 #export Q
 
-#const 𝑄 = Q
-
 """
     𝑄
 
