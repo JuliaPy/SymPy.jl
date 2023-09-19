@@ -18,5 +18,5 @@ Order   = [:function, :constant, :macro, :type, :module]
 ```
 
 ```@docs
-SymPy.𝑄
+𝑄
 ```
