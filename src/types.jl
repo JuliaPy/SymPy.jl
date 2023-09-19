@@ -61,6 +61,7 @@ export Lambda
 ## this allows most things to flow though PyCall
 PyCall.PyObject(x::SymbolicObject) = x.__pyobject__
 ## Override this so that using symbols as keys in a dict works
+hash(x::SymbolicObject, h::UInt64) = hash(PyObject(x), h)
 hash(x::SymbolicObject) = hash(PyObject(x))
 ==(x::SymbolicObject, y::SymbolicObject) = PyObject(x) == PyObject(y)
 
