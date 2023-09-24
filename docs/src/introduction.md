@@ -1210,8 +1210,8 @@ julia> v = solveset(x^2 ~ 4, x)
 
 julia> collect(Set(v...))
 2-element Vector{Any}:
- -2
   2
+ -2
 
 ```
 
@@ -1220,8 +1220,8 @@ This composition is done in the `elements` function:
 ```jldoctest introduction
 julia> elements(v)
 2-element Vector{Sym}:
- -2
   2
+ -2
 
 ```
 

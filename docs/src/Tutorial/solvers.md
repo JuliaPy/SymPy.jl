@@ -519,8 +519,8 @@ julia> solveset(x^3 - 6*x^2 + 9*x, x)
 ```jldoctest solvers
 julia> roots(x^3 - 6*x^2 + 9*x, x)  |>  d -> convert(Dict{Sym, Any}, d) # prettier priting
 Dict{Sym, Any} with 2 entries:
-  3 => 2
   0 => 1
+  3 => 2
 ```
 
 ----
