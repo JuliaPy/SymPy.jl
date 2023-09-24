@@ -354,14 +354,14 @@ export 𝑄
 ## export
 #export Q
 
-"""
-    Q
+# """
+#     Q
 
-Unexported  symbol for  [`SymPy.𝑄`](@ref), a  Julia  module implementing `sympy.Q`. "Questions" can be asked through the patterns
-`𝑄.query(value)`
+# Unexported  symbol for  [`SymPy.𝑄`](@ref), a  Julia  module implementing `sympy.Q`. "Questions" can be asked through the patterns
+# `𝑄.query(value)`
 
-!!! note
-    At one time, the symbol `Q` was exported. To avoid namespace clutter, the unicode alternative is now used. Legacy code would need a definition like `import SymPy: Q` to work.
+# !!! note
+#     At one time, the symbol `Q` was exported. To avoid namespace clutter, the unicode alternative is now used. Legacy code would need a definition like `import SymPy: Q` to work.
 
-"""
+# """
 const Q = 𝑄
