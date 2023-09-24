@@ -104,6 +104,9 @@ The above use `&` as an infix operation for the binary operator
 `And`. Values can also be combined with `Or`, `Not`, `Xor`, `Nand`,
 `Nor`, `Implies`, `Equivalent`, and `satisfiable`.
 
+!!! note "typing `𝑄`"
+    𝑄 is entered as  [slash]itQ[tab]) or `SymPy.Q.query(value)` *but  not* as `sympy.Q.query(value)`
+
 !!! note "Matrix predicates"
     As `SymPy.jl` converts symbolic matrices into Julia's `Array`
 type and not as matrices within Python, the predicate functions from SymPy for
@@ -253,7 +256,7 @@ function positive_definite(M::Array{T,2}) where {T <: SymPy.Sym}
     no_false = 0
     no_nothing = 0
     for i in 1:m
-        a = SymPy.ask(Q.positive(det(M[1:i, 1:i])))
+        a = SymPy.ask(𝑄.positive(det(M[1:i, 1:i])))
         if a == nothing no_nothing += 1 end
         if a == false no_false += 1 end
     end
@@ -355,7 +358,7 @@ export 𝑄
     Q
 
 Unexported  symbol for  [`SymPy.𝑄`](@ref), a  Julia  module implementing `sympy.Q`. "Questions" can be asked through the patterns
-`𝑄.query(value)` (𝑄 is entered as  [slash]itQ[tab]) or `SymPy.Q.query(value)` *but  not* as `sympy.Q.query(value)`
+`𝑄.query(value)`
 
 !!! note
     At one time, the symbol `Q` was exported. To avoid namespace clutter, the unicode alternative is now used. Legacy code would need a definition like `import SymPy: Q` to work.
