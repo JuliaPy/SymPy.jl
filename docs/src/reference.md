@@ -13,6 +13,6 @@ end
 ```
 
 ```@autodocs
-Modules = [SymPy, SymPy.Q, SymPy.Introspection]
+Modules = [SymPy, SymPy.𝑄, SymPy.Introspection]
 Order   = [:function, :constant, :macro, :type, :module]
 ```
