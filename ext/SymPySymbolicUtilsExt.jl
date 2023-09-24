@@ -21,7 +21,7 @@ end
 Returns the head (a function object) performed by an expression tree. Called only if istree(::T) is true. Part of the API required for simplify to work. Other required methods are arguments and istree
 ==#
 function SymbolicUtils.operation(x::SymPy.SymbolicObject)
-    @assert istree(x)
+    @assert SymbolicUtils.istree(x)
     nm = Symbol(SymPy.Introspection.funcname(x))
 
     λ = get(SymPy.Introspection.funcname2function, nm, nothing)
