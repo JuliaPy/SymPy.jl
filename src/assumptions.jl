@@ -53,7 +53,7 @@ export ask
     𝑄
     SymPy.Q
 
-Documentation for the `SymPy.Q` module, exported as `𝑄`.
+The`SymPy.𝑄` module adds features of the `sympy.Q` module. Also accesible through `SymPy.Q`.
 
 SymPy allows for
 [assumptions](https://docs.sympy.org/latest/modules/assumptions/index.html)
@@ -71,7 +71,7 @@ julia> @vars y real=true positive=true
 (y,)
 ```
 
-The `Q` module exposes a means to *q*uery the assumptions on a
+The `𝑄` module exposes a means to *q*uery the assumptions on a
 variable. For example,
 
 ```jldoctest 𝑄
@@ -109,7 +109,7 @@ The above use `&` as an infix operation for the binary operator
 type and not as matrices within Python, the predicate functions from SymPy for
 matrices are not used, though a replacement is given.
 """
-module Q
+module 𝑄
 import SymPy
 import PyCall
 import LinearAlgebra: det, norm
@@ -345,20 +345,20 @@ end
 
 
 end
+export 𝑄
 
 ## Issue  #354; request to *not*  export  Q
 ## export
 #export Q
 
 """
-    𝑄
+    Q
 
-Exported  symbol for  [`SymPy.Q`](@ref), a  Julia  module implementing `sympy.Q`. "Questions" can be asked through the patterns
+Unexported  symbol for  [`SymPy.𝑄`](@ref), a  Julia  module implementing `sympy.Q`. "Questions" can be asked through the patterns
 `𝑄.query(value)` (𝑄 is entered as  [slash]itQ[tab]) or `SymPy.Q.query(value)` *but  not* as `sympy.Q.query(value)`
 
 !!! note
-    At one time, the symbol `Q` was exported for this. To avoid namespace clutter, the unicode alternative is now used. Legacy code would need a definition like `const Q = SymPy.Q`  to work.
+    At one time, the symbol `Q` was exported. To avoid namespace clutter, the unicode alternative is now used. Legacy code would need a definition like `import SymPy: Q` to work.
 
 """
-const 𝑄 = Q
-export 𝑄
+const Q = 𝑄
