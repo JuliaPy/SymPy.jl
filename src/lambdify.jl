@@ -245,7 +245,11 @@ function  lambdify(ex::Sym, vars=free_symbols(ex);
               fns=Dict(), values=Dict(),
               use_julia_code=false,
               invoke_latest=true)
-    isempty(vars) && (val = N(ex); return (ts...) -> val)
+    if isempty(vars)
+        val′ = convert(Expr, ex)
+        val = isa(val′, Symbol) ? getfield(Main, val′) : val′
+        return (ts...) -> val
+    end
     body = convert_expr(ex, fns=fns, values=values, use_julia_code=use_julia_code)
     ex = expr_to_function(body, vars)
     if invoke_latest
