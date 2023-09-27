@@ -156,7 +156,7 @@ Take a symbolic expression and return a `Julia` function or expression to build 
 
 * `ex::Sym` a symbolic expression with 0, 1, or more free symbols
 
-* `vars` a container of symbols to use for the function arguments. The default is `free_symbols` which has a specific ordering. Specifying `vars` allows this default ordering of arguments to be customized.
+* `vars` a container of symbols to use for the function arguments. The default is `free_symbols` which has a specific ordering. Specifying `vars` allows this default ordering of arguments to be customized. If `vars` is empty, such as when the symbolic expression has *no* free symbols, a variable arg constant function is returned.
 
 * `fns::Dict`, `vals::Dict`: Dictionaries that allow customization of the function that walks the expression `ex` and creates the corresponding AST for a Julia expression. See `SymPy.fn_map` and `SymPy.val_map` for the default mappings of sympy functions and values into `Julia`'s AST.
 
@@ -245,7 +245,16 @@ function  lambdify(ex::Sym, vars=free_symbols(ex);
               fns=Dict(), values=Dict(),
               use_julia_code=false,
               invoke_latest=true)
-
+    if isempty(vars)
+        # can't call N(ex) here...
+        v = ex.evalf()
+        if v.is_real == True
+            val = convert(Real, v)
+        else
+            val = Complex(convert(Real, real(v)), convert(Real, imag(v)))
+        end
+        return (ts...) -> val
+    end
     body = convert_expr(ex, fns=fns, values=values, use_julia_code=use_julia_code)
     ex = expr_to_function(body, vars)
     if invoke_latest
