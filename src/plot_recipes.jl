@@ -138,7 +138,7 @@ using RecipesBase
 ## A vector field plot can be visualized as an n × n collection of arrows
 ## over the region xlims × ylims
 ## These arrows are defined by:
-## * fx, fy giving the components of each. These are callbable objects, such as
+## * fx, fy giving the components of each. These are callable objects, such as
 ##   (x,y) -> sin(y)
 ## * Fyx  A function F(y,x), useful for visualizing first-order ODE y'=F(y(x),x).
 ##   note reverse order of y and x.
