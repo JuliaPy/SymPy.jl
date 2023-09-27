@@ -246,8 +246,13 @@ function  lambdify(ex::Sym, vars=free_symbols(ex);
               use_julia_code=false,
               invoke_latest=true)
     if isempty(vars)
-        val′ = convert(Expr, ex)
-        val = isa(val′, Symbol) ? getfield(Main, val′) : val′
+        # can't call N(ex) here...
+        v = ex.evalf()
+        if v.is_real == True
+            val = convert(Real, v)
+        else
+            val = Complex(convert(Real, real(v)), convert(Real, imag(v)))
+        end
         return (ts...) -> val
     end
     body = convert_expr(ex, fns=fns, values=values, use_julia_code=use_julia_code)
