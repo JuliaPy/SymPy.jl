@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Advanced expression  manipulation · SymPy</title><meta name="title" content="Advanced expression  manipulation · SymPy"/><meta property="og:title" content="Advanced expression  manipulation · SymPy"/><meta property="twitter:title" content="Advanced expression  manipulation · SymPy"/><meta name="description" content="Documentation for SymPy."/><meta property="og:description" content="Documentation for SymPy."/><meta property="twitter:description" content="Documentation for SymPy."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">SymPy</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../../introduction/">Examples</a></li><li><span class="tocitem">SymPy tutorial</span><ul><li><a class="tocitem" href="../">About</a></li><li><a class="tocitem" href="../intro/">Introduction</a></li><li><a class="tocitem" href="../gotchas/">Gotchas</a></li><li><a class="tocitem" href="../basic_operations/">Basic operations</a></li><li><a class="tocitem" href="../simplification/">Simplification</a></li><li><a class="tocitem" href="../calculus/">Calculus</a></li><li><a class="tocitem" href="../solvers/">Solvers</a></li><li><a class="tocitem" href="../matrices/">Matrices</a></li><li class="is-active"><a class="tocitem" href>Advanced expression  manipulation</a><ul class="internal"><li><a class="tocitem" href="#Understanding-Expression-Trees"><span>Understanding Expression Trees</span></a></li><li><a class="tocitem" href="#Recursing-through-an-Expression-Tree"><span>Recursing through an Expression Tree</span></a></li><li><a class="tocitem" href="#Prevent-expression-evaluation"><span>Prevent expression evaluation</span></a></li></ul></li></ul></li><li><a class="tocitem" href="../../reference/">Reference/API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">SymPy tutorial</a></li><li class="is-active"><a href>Advanced expression  manipulation</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Advanced expression  manipulation</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaPy/SymPy.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaPy/SymPy.jl/blob/master/docs/src/Tutorial/manipulation.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Advanced-Expression-Manipulation"><a class="docs-heading-anchor" href="#Advanced-Expression-Manipulation">Advanced Expression Manipulation</a><a id="Advanced-Expression-Manipulation-1"></a><a class="docs-heading-anchor-permalink" href="#Advanced-Expression-Manipulation" title="Permalink"></a></h1><p><a href="https://docs.sympy.org/latest/tutorial/manipulation.html">From</a>  (version 1.3)</p><p>In this section, we discuss some ways that we can perform advanced manipulation of expressions.</p><h2 id="Understanding-Expression-Trees"><a class="docs-heading-anchor" href="#Understanding-Expression-Trees">Understanding Expression Trees</a><a id="Understanding-Expression-Trees-1"></a><a class="docs-heading-anchor-permalink" href="#Understanding-Expression-Trees" title="Permalink"></a></h2><div class="admonition is-info"><header class="admonition-header">Quick Tip</header><div class="admonition-body"><p>To play with the <code>srepr</code> form of expressions in the SymPy Live shell, change the output format to <code>Repr</code> in the settings.</p></div></div><p>Before we can do this, we need to understand how expressions are represented in SymPy.  A mathematical expression is represented as a tree.  Let us take the expression <code>2^x + xy</code>, i.e., <code>2**x + x*y</code>.  We can see what this expression looks like internally by using <code>srepr</code></p><pre><code class="language-python hljs">    &gt;&gt;&gt; from sympy import *
+    &gt;&gt;&gt; x, y, z = symbols(&#39;x y z&#39;)
+
+    &gt;&gt;&gt; expr = 2**x + x*y
+    &gt;&gt;&gt; srepr(expr)
+    &quot;Add(Pow(Integer(2), Symbol(&#39;x&#39;)), Mul(Symbol(&#39;x&#39;), Symbol(&#39;y&#39;)))&quot;</code></pre><h5 id="In-Julia:"><a class="docs-heading-anchor" href="#In-Julia:">In <code>Julia</code>:</a><a id="In-Julia:-1"></a><a class="docs-heading-anchor-permalink" href="#In-Julia:" title="Permalink"></a></h5><ul><li>We replace the import command with a <code>using</code> command, as this will import functions (not Classes though) from <code>sympy</code></li></ul><pre><code class="language-julia-repl hljs">julia&gt; using SymPy
+
+julia&gt; @syms x, y, z
+(x, y, z)
+
+julia&gt; expr = 2^x + x*y
+ x
+2  + x⋅y
+
+julia&gt; srepr(expr)
+&quot;Add(Pow(Integer(2), Symbol(&#39;x&#39;)), Mul(Symbol(&#39;x&#39;), Symbol(&#39;y&#39;)))&quot;
+</code></pre><hr/><p>The easiest way to tear this apart is to look at a diagrm of the expression tree. Here is a <a href="https://docs.sympy.org/latest/tutorial/manipulation.html#understanding-expression-trees">diagram</a>.</p><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>This comes from <code>dotprint(2**x + x*y, labelfunc=srepr)</code>. But we don&#39;t render digraph objects here</p></div></div><p>First, let&#39;s look at the leaves of this tree.  Symbols are instances of the class Symbol.  While we have been doing</p><pre><code class="language-python hljs">    &gt;&gt;&gt; x = symbols(&#39;x&#39;)</code></pre><h5 id="In-Julia:-2"><a class="docs-heading-anchor" href="#In-Julia:-2">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-2" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; x = symbols(&quot;x&quot;)
+x
+</code></pre><hr/><p>we could have also done</p><pre><code class="language-python hljs">    &gt;&gt;&gt; x = Symbol(&#39;x&#39;)</code></pre><h5 id="In-Julia:-3"><a class="docs-heading-anchor" href="#In-Julia:-3">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-3" title="Permalink"></a></h5><ul><li>this can be done, but <code>@syms</code> would be suggested:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; x = sympy.Symbol(&quot;x&quot;)
+x
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; @syms x
+(x,)
+</code></pre><hr/><p>Either way, we get a Symbol with the name &quot;x&quot; [#symbols-fn]_.  For the number in the expression, 2, we got <code>Integer(2)</code>.  <code>Integer</code> is the SymPy class for integers.  It is similar to the Python built-in type <code>int</code>, except that <code>Integer</code> plays nicely with other SymPy types.</p><p>When we write <code>2**x</code>, this creates a <code>Pow</code> object.  <code>Pow</code> is short for &quot;power&quot;.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; srepr(2**x)
+    &quot;Pow(Integer(2), Symbol(&#39;x&#39;))&quot;</code></pre><h5 id="In-Julia:-4"><a class="docs-heading-anchor" href="#In-Julia:-4">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-4" title="Permalink"></a></h5><ul><li>we replace <code>**</code> by <code>^</code></li></ul><pre><code class="language-julia-repl hljs">julia&gt; srepr(2^x)
+&quot;Pow(Integer(2), Symbol(&#39;x&#39;))&quot;
+</code></pre><hr/><p>We could have created the same object by calling <code>Pow(2, x)</code></p><pre><code class="language-python hljs">    &gt;&gt;&gt; Pow(2, x)
+    2**x</code></pre><h5 id="In-Julia:-5"><a class="docs-heading-anchor" href="#In-Julia:-5">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-5" title="Permalink"></a></h5><ul><li><code>Pow</code> is <em>not</em> a function, rather a managed property, so we must qualify it, as it wasn&#39;t brought in when loading the package</li></ul><pre><code class="language-julia-repl hljs">julia&gt; sympy.Pow(2, x)
+ x
+2
+</code></pre><hr/><p>Note that in the <code>srepr</code> output, we see <code>Integer(2)</code>, the SymPy version of integers, even though technically, we input <code>2</code>, a Python int.  In general, whenever you combine a SymPy object with a non-SymPy object via some function or operation, the non-SymPy object will be converted into a SymPy object.  The function that does this is <code>sympify</code> [#sympify-fn]_.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; type(2)
+    &lt;... &#39;int&#39;&gt;
+    &gt;&gt;&gt; type(sympify(2))
+    &lt;class &#39;sympy.core.numbers.Integer&#39;&gt;</code></pre><h5 id="In-Julia:-6"><a class="docs-heading-anchor" href="#In-Julia:-6">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-6" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; typeof(2)
+Int64
+
+julia&gt; typeof(sympify(2))
+Sym
+</code></pre><hr/><p>We have seen that <code>2**x</code> is represented as <code>Pow(2, x)</code>.  What about <code>x*y</code>?  As we might expect, this is the multiplication of <code>x</code> and <code>y</code>. The SymPy class for multiplication is <code>Mul</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; srepr(x*y)
+    &quot;Mul(Symbol(&#39;x&#39;), Symbol(&#39;y&#39;))&quot;</code></pre><h5 id="In-Julia:-7"><a class="docs-heading-anchor" href="#In-Julia:-7">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-7" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; srepr(x*y)
+&quot;Mul(Symbol(&#39;x&#39;), Symbol(&#39;y&#39;))&quot;
+</code></pre><hr/><p>Thus, we could have created the same object by writing <code>Mul(x, y)</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; Mul(x, y)
+    x*y</code></pre><h5 id="In-Julia:-8"><a class="docs-heading-anchor" href="#In-Julia:-8">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-8" title="Permalink"></a></h5><ul><li>Again, <code>Mul</code> is not a function, so it must be qualified</li></ul><pre><code class="language-julia-repl hljs">julia&gt; sympy.Mul(x, y)
+x⋅y
+</code></pre><hr/><p>Now we get to our final expression, <code>2**x + x*y</code>.  This is the addition of our last two objects, <code>Pow(2, x)</code>, and <code>Mul(x, y)</code>.  The SymPy class for addition is <code>Add</code>, so, as you might expect, to create this object, we use <code>Add(Pow(2, x), Mul(x, y))</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; Add(Pow(2, x), Mul(x, y))
+    2**x + x*y</code></pre><h5 id="In-Julia:-9"><a class="docs-heading-anchor" href="#In-Julia:-9">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-9" title="Permalink"></a></h5><ul><li>We <em>can</em> import these operations to avoid qualifying them as done here:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; import_from(sympy, (:Add, :Mul, :Pow), typ=:Any)
+
+julia&gt; Add(Pow(2, x), Mul(x, y))
+ x
+2  + x⋅y
+</code></pre><hr/><p>SymPy expression trees can have many branches, and can be quite deep or quite broad.  Here is a more complicated example</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = sin(x*y)/2 - x**2 + 1/y
+    &gt;&gt;&gt; srepr(expr)
+    &quot;Add(Mul(Integer(-1), Pow(Symbol(&#39;x&#39;), Integer(2))), Mul(Rational(1, 2),
+    sin(Mul(Symbol(&#39;x&#39;), Symbol(&#39;y&#39;)))), Pow(Symbol(&#39;y&#39;), Integer(-1)))&quot;</code></pre><h5 id="In-Julia:-10"><a class="docs-heading-anchor" href="#In-Julia:-10">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-10" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr = sin(x*y)/2 - x^2 + 1/y
+   2   sin(x⋅y)   1
+- x  + ──────── + ─
+          2       y
+
+julia&gt; srepr(expr)
+&quot;Add(Mul(Integer(-1), Pow(Symbol(&#39;x&#39;), Integer(2))), Mul(Rational(1, 2), sin(Mul(Symbol(&#39;x&#39;), Symbol(&#39;y&#39;)))), Pow(Symbol(&#39;y&#39;), Integer(-1)))&quot;
+</code></pre><hr/><p>Here is a <a href="https://docs.sympy.org/latest/tutorial/manipulation.html#understanding-expression-trees">diagram</a></p><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>produced with <code>dotprint(sin(x*y)/2 - x**2 + 1/y, labelfunc=srepr)</code>, but not rendered here</p></div></div><p>This expression reveals some interesting things about SymPy expression trees. Let&#39;s go through them one by one.</p><p>Let&#39;s first look at the term <code>x**2</code>.  As we expected, we see <code>Pow(x, 2)</code>. One level up, we see we have <code>Mul(-1, Pow(x, 2))</code>.  There is no subtraction class in SymPy.  <code>x - y</code> is represented as <code>x + -y</code>, or, more completely, <code>x + -1*y</code>, i.e., <code>Add(x, Mul(-1, y))</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; srepr(x - y)
+    &quot;Add(Symbol(&#39;x&#39;), Mul(Integer(-1), Symbol(&#39;y&#39;)))&quot;</code></pre><h5 id="In-Julia:-11"><a class="docs-heading-anchor" href="#In-Julia:-11">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-11" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; srepr(x - y)
+&quot;Add(Symbol(&#39;x&#39;), Mul(Integer(-1), Symbol(&#39;y&#39;)))&quot;
+</code></pre><hr/><p>Next, look at <code>1/y</code>.  We might expect to see something like <code>Div(1, y)</code>, but similar to subtraction, there is no class in SymPy for division.  Rather, division is represented by a power of -1.  Hence, we have <code>Pow(y, -1)</code>. What if we had divided something other than 1 by <code>y</code>, like <code>x/y</code>?  Let&#39;s see.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = x/y
+    &gt;&gt;&gt; srepr(expr)
+    &quot;Mul(Symbol(&#39;x&#39;), Pow(Symbol(&#39;y&#39;), Integer(-1)))&quot;</code></pre><h5 id="In-Julia:-12"><a class="docs-heading-anchor" href="#In-Julia:-12">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-12" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr = x/y
+x
+─
+y
+
+julia&gt; srepr(expr)
+&quot;Mul(Symbol(&#39;x&#39;), Pow(Symbol(&#39;y&#39;), Integer(-1)))&quot;
+</code></pre><hr/><p>We see that <code>x/y</code> is represented as <code>x*y**-1</code>, i.e., <code>Mul(x, Pow(y, -1))</code>.</p><p>Finally, let&#39;s look at the <code>sin(x*y)/2</code> term.  Following the pattern of the previous example, we might expect to see <code>Mul(sin(x*y), Pow(Integer(2), -1))</code>.  But instead, we have <code>Mul(Rational(1, 2), sin(x*y))</code>.  Rational numbers are always combined into a single term in a multiplication, so that when we divide by 2, it is represented as multiplying by 1/2.</p><p>Finally, one last note.  You may have noticed that the order we entered our expression and the order that it came out from <code>srepr</code> or in the graph were different.  You may have also noticed this phenomenon earlier in the tutorial.  For example</p><pre><code class="language-python hljs">     &gt;&gt;&gt; 1 + x
+     x + 1</code></pre><h5 id="In-Julia:-13"><a class="docs-heading-anchor" href="#In-Julia:-13">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-13" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; 1 + x
+x + 1
+</code></pre><hr/><p>This because in SymPy, the arguments of the commutative operations <code>Add</code> and <code>Mul</code> are stored in an arbitrary (but consistent!) order, which is independent of the order inputted (if you&#39;re worried about noncommutative multiplication, don&#39;t be.  In SymPy, you can create noncommutative Symbols using <code>Symbol(&#39;A&#39;, commutative=False)</code>, and the order of multiplication for noncommutative Symbols is kept the same as the input).  Furthermore, as we shall see in the next section, the printing order and the order in which things are stored internally need not be the same either.</p><div class="admonition is-info"><header class="admonition-header">Quick Tip</header><div class="admonition-body"><p>The way an expression is represented internally and the way it is printed are often not the same.</p></div></div><p>In general, an important thing to keep in mind when working with SymPy expression trees is this:  the internal representation of an expression and the way it is printed need not be the same.  The same is true for the input form.   If some expression manipulation algorithm is not working in the way you expected it to, chances are, the internal representation of the object is different from what you thought it was.</p><h2 id="Recursing-through-an-Expression-Tree"><a class="docs-heading-anchor" href="#Recursing-through-an-Expression-Tree">Recursing through an Expression Tree</a><a id="Recursing-through-an-Expression-Tree-1"></a><a class="docs-heading-anchor-permalink" href="#Recursing-through-an-Expression-Tree" title="Permalink"></a></h2><p>Now that you know how expression trees work in SymPy, let&#39;s look at how to dig our way through an expression tree.  Every object in SymPy has two very important attributes, <code>func</code>, and <code>args</code>.</p><h3 id="func"><a class="docs-heading-anchor" href="#func"><code>func</code></a><a id="func-1"></a><a class="docs-heading-anchor-permalink" href="#func" title="Permalink"></a></h3><p><code>func</code> is the head of the object. For example, <code>(x*y).func</code> is <code>Mul</code>. Usually it is the same as the class of the object (though there are exceptions to this rule).</p><p>Two notes about <code>func</code>.  First, the class of an object need not be the same as the one used to create it.  For example</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = Add(x, x)
+    &gt;&gt;&gt; expr.func
+    &lt;class &#39;sympy.core.mul.Mul&#39;&gt;</code></pre><h5 id="In-Julia:-14"><a class="docs-heading-anchor" href="#In-Julia:-14">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-14" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr = Add(x, x)
+2⋅x
+
+julia&gt; expr.func
+PyObject &lt;class &#39;sympy.core.mul.Mul&#39;&gt;
+</code></pre><ul><li>The output isn&#39;t as desired, as <code>PyObject</code>s don&#39;t show nicely here. We can ask for the name, which does display as desired:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; expr.func.__name__
+&quot;Mul&quot;
+</code></pre><ul><li>In <code>SymPy</code> the <code>func</code> and <code>args</code> properties are exported as functions in the module <code>SymPy.Introspection</code>.</li></ul><hr/><p>We created <code>Add(x, x)</code>, so we might expect <code>expr.func</code> to be <code>Add</code>, but instead we got <code>Mul</code>.  Why is that?  Let&#39;s take a closer look at <code>expr</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr
+    2*x</code></pre><h5 id="In-Julia:-15"><a class="docs-heading-anchor" href="#In-Julia:-15">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-15" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr
+2⋅x
+</code></pre><hr/><p><code>Add(x, x)</code>, i.e., <code>x + x</code>, was automatically converted into <code>Mul(2, x)</code>, i.e., <code>2*x</code>, which is a <code>Mul</code>.   SymPy classes make heavy use of the <code>__new__</code> class constructor, which, unlike <code>__init__</code>, allows a different class to be returned from the constructor.</p><p>Second, some classes are special-cased, usually for efficiency reasons [#singleton-fn]_.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; Integer(2).func
+    &lt;class &#39;sympy.core.numbers.Integer&#39;&gt;
+    &gt;&gt;&gt; Integer(0).func
+    &lt;class &#39;sympy.core.numbers.Zero&#39;&gt;
+    &gt;&gt;&gt; Integer(-1).func
+    &lt;class &#39;sympy.core.numbers.NegativeOne&#39;&gt;</code></pre><h5 id="In-Julia:-16"><a class="docs-heading-anchor" href="#In-Julia:-16">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-16" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; sympy.Integer(2).func.__name__
+&quot;Integer&quot;
+
+julia&gt; sympy.Integer(0).func.__name__
+&quot;Zero&quot;
+
+julia&gt; sympy.Integer(-1).func.__name__
+&quot;NegativeOne&quot;
+</code></pre><hr/><p>For the most part, these issues will not bother us.  The special classes <code>Zero</code>, <code>One</code>, <code>NegativeOne</code>, and so on are subclasses of <code>Integer</code>, so as long as you use <code>isinstance</code>, it will not be an issue.</p><h3 id="args"><a class="docs-heading-anchor" href="#args">args</a><a id="args-1"></a><a class="docs-heading-anchor-permalink" href="#args" title="Permalink"></a></h3><p><code>args</code> are the top-level arguments of the object.  <code>(x*y).args</code> would be <code>(x, y)</code>.  Let&#39;s look at some examples</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = 3*y**2*x
+    &gt;&gt;&gt; expr.func
+    &lt;class &#39;sympy.core.mul.Mul&#39;&gt;
+    &gt;&gt;&gt; expr.args
+    (3, x, y**2)</code></pre><h5 id="In-Julia:-17"><a class="docs-heading-anchor" href="#In-Julia:-17">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-17" title="Permalink"></a></h5><ul><li>The <code>args</code> property can be accessed exactly as <code>func</code></li></ul><pre><code class="language-julia-repl hljs">julia&gt; expr = 3*y^2*x
+     2
+3⋅x⋅y
+
+julia&gt; expr.func.__name__
+&quot;Mul&quot;
+
+julia&gt; expr.args
+(3, x, y^2)
+</code></pre><hr/><p>From this, we can see that <code>expr == Mul(3, y**2, x)</code>.  In fact, we can see that we can completely reconstruct <code>expr</code> from its <code>func</code> and its <code>args</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr.func(*expr.args)
+    3*x*y**2
+    &gt;&gt;&gt; expr == expr.func(*expr.args)
+    True</code></pre><h5 id="In-Julia:-18"><a class="docs-heading-anchor" href="#In-Julia:-18">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-18" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr.func(expr.args...)
+     2
+3⋅x⋅y
+
+julia&gt; expr == expr.func(expr.args...)
+true
+</code></pre><hr/><p>Note that although we entered <code>3*y**2*x</code>, the <code>args</code> are <code>(3, x, y**2)</code>. In a <code>Mul</code>, the Rational coefficient will come first in the <code>args</code>, but other than that, the order of everything else follows no special pattern.  To be sure, though, there is an order.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = y**2*3*x
+    &gt;&gt;&gt; expr.args
+    (3, x, y**2)</code></pre><h5 id="In-Julia:-19"><a class="docs-heading-anchor" href="#In-Julia:-19">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-19" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr = y^2*3*x
+     2
+3⋅x⋅y
+
+julia&gt; expr.args
+(3, x, y^2)</code></pre><hr/><p>Mul&#39;s <code>args</code> are sorted, so that the same <code>Mul</code> will have the same <code>args</code>.  But the sorting is based on some criteria designed to make the sorting unique and efficient that has no mathematical significance.</p><p>The <code>srepr</code> form of our <code>expr</code> is <code>Mul(3, x, Pow(y, 2))</code>.  What if we want to get at the <code>args</code> of <code>Pow(y, 2)</code>.  Notice that the <code>y**2</code> is in the third slot of <code>expr.args</code>, i.e., <code>expr.args[2]</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr.args[2]
+    y**2</code></pre><h5 id="In-Julia:-20"><a class="docs-heading-anchor" href="#In-Julia:-20">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-20" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr.args[2]
+x
+</code></pre><hr/><p>So to get the <code>args</code> of this, we call <code>expr.args[2].args</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr.args[2].args
+    (y, 2)</code></pre><h5 id="In-Julia:-21"><a class="docs-heading-anchor" href="#In-Julia:-21">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-21" title="Permalink"></a></h5><ul><li>Python uses 0-based indexing, so we bump the index by 1</li></ul><pre><code class="language-julia-repl hljs">julia&gt; expr.args[3].args
+(y, 2)
+</code></pre><hr/><p>Now what if we try to go deeper.  What are the args of <code>y</code>.  Or <code>2</code>. Let&#39;s see.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; y.args
+    ()
+    &gt;&gt;&gt; Integer(2).args
+    ()</code></pre><h5 id="In-Julia:-22"><a class="docs-heading-anchor" href="#In-Julia:-22">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-22" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; y.args
+()
+
+julia&gt; sympy.Integer(2).args
+()
+</code></pre><hr/><p>They both have empty <code>args</code>.  In SymPy, empty <code>args</code> signal that we have hit a leaf of the expression tree.</p><p>So there are two possibilities for a SymPy expression. Either it has empty <code>args</code>, in which case it is a leaf node in any expression tree, or it has <code>args</code>, in which case, it is a branch node of any expression tree.  When it has <code>args</code>, it can be completely rebuilt from its <code>func</code> and its <code>args</code>. This is expressed in the key invariant.</p><div class="admonition is-info"><header class="admonition-header">Key Invariant</header><div class="admonition-body"></div></div><p>Every well-formed SymPy expression must either have empty <code>args</code> or    satisfy <code>expr == expr.func(expr.args...)</code>.</p><p>(Recall that in Python if <code>a</code> is a tuple, then <code>f(*a)</code> means to call <code>f</code> with arguments from the elements of <code>a</code>, e.g., <code>f(*(1, 2, 3))</code> is the same as <code>f(1, 2, 3)</code>.)</p><p>This key invariant allows us to write simple algorithms that walk expression trees, change them, and rebuild them into new expressions.</p><h5 id="In-Julia:-23"><a class="docs-heading-anchor" href="#In-Julia:-23">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-23" title="Permalink"></a></h5><ul><li>Splatting replaces the <code>*a</code> term above, or <code>f(a...)</code>.</li></ul><hr/><h3 id="Walking-the-Tree"><a class="docs-heading-anchor" href="#Walking-the-Tree">Walking the Tree</a><a id="Walking-the-Tree-1"></a><a class="docs-heading-anchor-permalink" href="#Walking-the-Tree" title="Permalink"></a></h3><p>With this knowledge, let&#39;s look at how we can recurse through an expression tree.  The nested nature of <code>args</code> is a perfect fit for recursive functions. The base case will be empty <code>args</code>.  Let&#39;s write a simple function that goes through an expression and prints all the <code>args</code> at each level.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; def pre(expr):
+    ...     print(expr)
+    ...     for arg in expr.args:
+    ...         pre(arg)</code></pre><h5 id="In-Julia:-24"><a class="docs-heading-anchor" href="#In-Julia:-24">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-24" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; function pre(expr)
+       @show expr
+       for arg in expr.args
+         pre(arg)
+       end
+       end
+pre (generic function with 1 method)</code></pre><hr/><p>See how nice it is that <code>()</code> signals leaves in the expression tree.  We don&#39;t even have to write a base case for our recursion; it is handled automatically by the for loop.</p><p>Let&#39;s test our function.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = x*y + 1
+    &gt;&gt;&gt; pre(expr)
+    x*y + 1
+    1
+    x*y
+    x
+    y</code></pre><h5 id="In-Julia:-25"><a class="docs-heading-anchor" href="#In-Julia:-25">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-25" title="Permalink"></a></h5><ul><li>Here we see the output:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; expr = x*y + 1
+x⋅y + 1
+
+julia&gt; pre(expr)
+expr = x*y + 1
+expr = 1
+expr = x*y
+expr = x
+expr = y
+</code></pre><hr/><p>Can you guess why we called our function <code>pre</code>?  We just wrote a pre-order traversal function for our expression tree.   See if you can write a post-order traversal function.</p><p>Such traversals are so common in SymPy that the generator functions <code>preorder_traversal</code> and <code>postorder_traversal</code> are provided to make such traversals easy.  We could have also written our algorithm as</p><pre><code class="language-python hljs">    &gt;&gt;&gt; for arg in preorder_traversal(expr):
+    ...     print(arg)
+    x*y + 1
+    1
+    x*y
+    x
+    y</code></pre><h5 id="In-Julia:-26"><a class="docs-heading-anchor" href="#In-Julia:-26">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-26" title="Permalink"></a></h5><ul><li>The <code>preorder_traversal</code> function is not a function, so needs to be qualified:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; for arg in sympy.preorder_traversal(expr)
+         @show arg
+       end
+arg = x*y + 1
+arg = 1
+arg = x*y
+arg = x
+arg = y
+</code></pre><hr/><h2 id="Prevent-expression-evaluation"><a class="docs-heading-anchor" href="#Prevent-expression-evaluation">Prevent expression evaluation</a><a id="Prevent-expression-evaluation-1"></a><a class="docs-heading-anchor-permalink" href="#Prevent-expression-evaluation" title="Permalink"></a></h2><p>There are generally two ways to prevent the evaluation, either pass an <code>evaluate=False</code> parameter while constructing the expression, or create an evaluation stopper by wrapping the expression with <code>UnevaluatedExpr</code>.</p><p>For example:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; from sympy import Add
+    &gt;&gt;&gt; from sympy.abc import x, y, z
+    &gt;&gt;&gt; x + x
+    2*x
+    &gt;&gt;&gt; Add(x, x)
+    2*x
+    &gt;&gt;&gt; Add(x, x, evaluate=False)
+    x + x</code></pre><h5 id="In-Julia:-27"><a class="docs-heading-anchor" href="#In-Julia:-27">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-27" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; @syms x y z
+(x, y, z)
+
+julia&gt; x + x
+2⋅x
+
+julia&gt; Add(x, x)
+2⋅x
+
+julia&gt; Add(x, x, evaluate=False)
+x + x
+</code></pre><hr/><p>If you don&#39;t remember the class corresponding to the expression you want to build (operator overloading usually assumes <code>evaluate=True</code>), just use <code>sympify</code> and pass a string:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; from sympy import sympify
+    &gt;&gt;&gt; sympify(&quot;x + x&quot;, evaluate=False)
+    x + x</code></pre><h5 id="In-Julia:-28"><a class="docs-heading-anchor" href="#In-Julia:-28">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-28" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; sympify(&quot;x + x&quot;, evaluate=false)
+2⋅x
+</code></pre><hr/><p>Note that <code>evaluate=False</code> won&#39;t prevent future evaluation in later usages of the expression:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = Add(x, x, evaluate=False)
+    &gt;&gt;&gt; expr
+    x + x
+    &gt;&gt;&gt; expr + x
+    3*x</code></pre><h5 id="In-Julia:-29"><a class="docs-heading-anchor" href="#In-Julia:-29">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-29" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr = Add(x, x, evaluate=false)
+x + x
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; expr + x
+3⋅x</code></pre><hr/><p>That&#39;s why the class <code>UnevaluatedExpr</code> comes handy. <code>UnevaluatedExpr</code> is a method provided by SymPy which lets the user keep an expression unevaluated. By <em>unevaluated</em> it is meant that the value inside of it will not interact with the expressions outside of it to give simplified outputs. For example:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; from sympy import UnevaluatedExpr
+    &gt;&gt;&gt; expr = x + UnevaluatedExpr(x)
+    &gt;&gt;&gt; expr
+    x + x
+    &gt;&gt;&gt; x + expr
+    2*x + x</code></pre><h5 id="In-Julia:-30"><a class="docs-heading-anchor" href="#In-Julia:-30">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-30" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; import_from(sympy, (:UnevaluatedExpr,))
+
+julia&gt; expr
+x + x
+
+julia&gt; x + expr
+3⋅x
+</code></pre><hr/><p>The <code>x</code> remaining alone is the <code>x</code> wrapped by <code>UnevaluatedExpr</code>. To release it:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; (x + expr).doit()
+    3*x</code></pre><h5 id="In-Julia:-31"><a class="docs-heading-anchor" href="#In-Julia:-31">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-31" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; (x + expr).doit()
+3⋅x
+</code></pre><hr/><p>Other examples:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; from sympy import *
+    &gt;&gt;&gt; from sympy.abc import x, y, z
+    &gt;&gt;&gt; uexpr = UnevaluatedExpr(S.One*5/7)*UnevaluatedExpr(S.One*3/4)
+    &gt;&gt;&gt; uexpr
+    (5/7)*(3/4)
+    &gt;&gt;&gt; x*UnevaluatedExpr(1/x)
+    x*1/x</code></pre><h5 id="In-Julia:-32"><a class="docs-heading-anchor" href="#In-Julia:-32">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-32" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; @syms x y z
+(x, y, z)
+
+julia&gt; const S = sympy.S
+PyObject S
+
+julia&gt; uexpr = UnevaluatedExpr(S.One * 5/7) * UnevaluatedExpr(S.One * 3/4)
+5/7⋅3/4
+
+julia&gt; x * UnevaluatedExpr(1/x)
+  1
+x⋅─
+  x
+</code></pre><hr/><p>A point to be noted is that  <code>UnevaluatedExpr</code> cannot prevent the evaluation of an expression which is given as argument. For example:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr1 = UnevaluatedExpr(x + x)
+    &gt;&gt;&gt; expr1
+    2*x
+    &gt;&gt;&gt; expr2 = sympify(&#39;x + x&#39;, evaluate=False)
+    &gt;&gt;&gt; expr2
+    x + x</code></pre><h5 id="In-Julia:-33"><a class="docs-heading-anchor" href="#In-Julia:-33">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-33" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr1 = UnevaluatedExpr(x + x)
+2⋅x
+
+julia&gt; expr2 = sympify(&quot;x + x&quot;, evaluate=False)
+2⋅x
+</code></pre><hr/><p>Remember that <code>expr2</code> will be evaluated if included into another expression. Combine both of the methods to prevent both inside and outside evaluations:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; UnevaluatedExpr(sympify(&quot;x + x&quot;, evaluate=False)) + y
+    y + x + x</code></pre><h5 id="In-Julia:-34"><a class="docs-heading-anchor" href="#In-Julia:-34">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-34" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; UnevaluatedExpr(sympify(&quot;x + x&quot;, evaluate=False)) + y
+y + 2⋅x</code></pre><hr/><p><code>UnevalutedExpr</code> is supported by SymPy printers and can be used to print the result in different output forms. For example</p><pre><code class="language-python hljs">    &gt;&gt;&gt; from sympy import latex
+    &gt;&gt;&gt; uexpr = UnevaluatedExpr(S.One*5/7)*UnevaluatedExpr(S.One*3/4)
+    &gt;&gt;&gt; print(latex(uexpr))
+    \frac{5}{7} \frac{3}{4}</code></pre><h5 id="In-Julia:-35"><a class="docs-heading-anchor" href="#In-Julia:-35">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-35" title="Permalink"></a></h5><ul><li>The printing support is through <code>show</code>, but we can use SymPy&#39;s:</li></ul><pre><code class="nohighlight hljs">julia&gt; uexpr = UnevaluatedExpr(S.One*5/7)*UnevaluatedExpr(S.One*3/4)
+5/7⋅3/4
+
+julia&gt; sympy.latex(uexpr)
+&quot;\\frac{5}{7} \\frac{3}{4}&quot;
+
+</code></pre><hr/><p>In order to release the expression and get the evaluated LaTeX form, just use <code>.doit()</code>:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; print(latex(uexpr.doit()))
+    \frac{15}{28}</code></pre><h5 id="In-Julia:-36"><a class="docs-heading-anchor" href="#In-Julia:-36">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-36" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; sympy.latex(uexpr.doit())
+&quot;\\frac{15}{28}&quot;
+</code></pre><hr/><div class="admonition is-info"><header class="admonition-header">Footnotes</header><div class="admonition-body"><ul><li>[#symbols-fn] We have been using <code>symbols</code> instead of <code>Symbol</code> because it automatically splits apart strings into multiple <code>Symbol</code>\ s.    <code>symbols(&#39;x y z&#39;)</code> returns a tuple of three <code>Symbol</code>\ s.  <code>Symbol(&#39;x y  z&#39;)</code> returns a single <code>Symbol</code> called <code>x y z</code>.</li><li>[#sympify-fn] Technically, it is an internal function called <code>_sympify</code>, which differs from <code>sympify</code> in that it does not convert strings.  <code>x + &#39;2&#39;</code> is not allowed.</li><li>[#singleton-fn] Classes like <code>One</code> and <code>Zero</code> are singletonized, meaning that only one object is ever created, no matter how many times the class is called.  This is done for space efficiency, as these classes are very  common.  For example, <code>Zero</code> might occur very often in a sparse matrix represented densely.  As we have seen, <code>NegativeOne</code> occurs any time we  have <code>-x</code> or <code>1/x</code>.  It is also done for speed efficiency because singletonized objects can be compared by <code>is</code>.  The unique objects for each singletonized class can be accessed from the <code>S</code> object.</li></ul></div></div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../matrices/">« Matrices</a><a class="docs-footer-nextpage" href="../../reference/">Reference/API »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.1.0 on <span class="colophon-date" title="Thursday 28 September 2023 14:35">Thursday 28 September 2023</span>. Using Julia version 1.9.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Simplification · SymPy</title><meta name="title" content="Simplification · SymPy"/><meta property="og:title" content="Simplification · SymPy"/><meta property="twitter:title" content="Simplification · SymPy"/><meta name="description" content="Documentation for SymPy."/><meta property="og:description" content="Documentation for SymPy."/><meta property="twitter:description" content="Documentation for SymPy."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">SymPy</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../../introduction/">Examples</a></li><li><span class="tocitem">SymPy tutorial</span><ul><li><a class="tocitem" href="../">About</a></li><li><a class="tocitem" href="../intro/">Introduction</a></li><li><a class="tocitem" href="../gotchas/">Gotchas</a></li><li><a class="tocitem" href="../basic_operations/">Basic operations</a></li><li class="is-active"><a class="tocitem" href>Simplification</a><ul class="internal"><li><a class="tocitem" href="#simplify"><span><code>simplify</code></span></a></li><li><a class="tocitem" href="#Polynomial/Rational-Function-Simplification"><span>Polynomial/Rational Function Simplification</span></a></li><li><a class="tocitem" href="#Trigonometric-Simplification"><span>Trigonometric Simplification</span></a></li><li><a class="tocitem" href="#Powers"><span>Powers</span></a></li><li><a class="tocitem" href="#powsimp"><span>powsimp</span></a></li><li><a class="tocitem" href="#Exponentials-and-logarithms"><span>Exponentials and logarithms</span></a></li><li><a class="tocitem" href="#expand_log"><span>expand_log</span></a></li><li><a class="tocitem" href="#logcombine"><span>logcombine</span></a></li><li><a class="tocitem" href="#Special-Functions"><span>Special Functions</span></a></li><li><a class="tocitem" href="#rewrite"><span>rewrite</span></a></li><li><a class="tocitem" href="#hyperexpand"><span>hyperexpand</span></a></li></ul></li><li><a class="tocitem" href="../calculus/">Calculus</a></li><li><a class="tocitem" href="../solvers/">Solvers</a></li><li><a class="tocitem" href="../matrices/">Matrices</a></li><li><a class="tocitem" href="../manipulation/">Advanced expression  manipulation</a></li></ul></li><li><a class="tocitem" href="../../reference/">Reference/API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">SymPy tutorial</a></li><li class="is-active"><a href>Simplification</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Simplification</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaPy/SymPy.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaPy/SymPy.jl/blob/master/docs/src/Tutorial/simplification.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Simplification"><a class="docs-heading-anchor" href="#Simplification">Simplification</a><a id="Simplification-1"></a><a class="docs-heading-anchor-permalink" href="#Simplification" title="Permalink"></a></h1><p><a href="https://docs.sympy.org/latest/_sources/tutorial/simplification.rst.txt">From</a></p><hr/><p>To make this document easier to read, we are going to enable pretty printing.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; from sympy import *
+    &gt;&gt;&gt; x, y, z = symbols(&#39;x y z&#39;)
+    &gt;&gt;&gt; init_printing(use_unicode=True)</code></pre><h5 id="In-Julia:"><a class="docs-heading-anchor" href="#In-Julia:">In <code>Julia</code>:</a><a id="In-Julia:-1"></a><a class="docs-heading-anchor-permalink" href="#In-Julia:" title="Permalink"></a></h5><ul><li>&quot; not &#39; are used for strings:</li><li>pretty printing si enable by default</li><li>we will deliberatately  input extra functions from the <code>sympy</code> module such as <code>powsimp</code>, ...</li></ul><pre><code class="language-julia-repl hljs">julia&gt; using SymPy
+
+julia&gt; import_from(sympy)
+
+julia&gt; @syms x, y, z
+(x, y, z)</code></pre><hr/><h2 id="simplify"><a class="docs-heading-anchor" href="#simplify"><code>simplify</code></a><a id="simplify-1"></a><a class="docs-heading-anchor-permalink" href="#simplify" title="Permalink"></a></h2><p>Now let&#39;s jump in and do some interesting mathematics.  One of the most useful features of a symbolic manipulation system is the ability to simplify mathematical expressions.  SymPy has dozens of functions to perform various kinds of simplification.  There is also one general function called <code>simplify()</code> that attempts to apply all of these functions in an intelligent way to arrive at the simplest form of an expression.  Here are some examples</p><pre><code class="language-python hljs">    &gt;&gt;&gt; simplify(sin(x)**2 + cos(x)**2)
+    1
+    &gt;&gt;&gt; simplify((x**3 + x**2 - x - 1)/(x**2 + 2*x + 1))
+    x - 1
+    &gt;&gt;&gt; simplify(gamma(x)/gamma(x - 2))
+    (x - 2)⋅(x - 1)</code></pre><h5 id="In-Julia:-2"><a class="docs-heading-anchor" href="#In-Julia:-2">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-2" title="Permalink"></a></h5><ul><li>we need to load in <code>SpecialFunctions</code> to have access to <code>gamma</code>:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; simplify(sin(x)^2 + cos(x)^2)
+1
+
+julia&gt; simplify((x^3 + x^2 - x - 1)/(x^2 + 2*x + 1))
+x - 1
+
+julia&gt; using SpecialFunctions
+
+
+julia&gt; simplify(gamma(x)/gamma(x - 2))
+(x - 2)⋅(x - 1)
+</code></pre><hr/><p>Here, <code>gamma(x)</code> is <span>$\Gamma(x)$</span>, the <code>gamma function &lt;http://en.wikipedia.org/wiki/Gamma_function&gt;</code>_.  We see that <code>simplify()</code> is capable of handling a large class of expressions.</p><p>But <code>simplify()</code> has a pitfall.  It just applies all the major simplification operations in SymPy, and uses heuristics to determine the simplest result. But &quot;simplest&quot; is not a well-defined term.  For example, say we wanted to &quot;simplify&quot; <code>x^2 + 2x + 1</code> into <code>(x + 1)^2</code>:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; simplify(x**2 + 2*x + 1)
+     2
+    x  + 2⋅x + 1</code></pre><h5 id="In-Julia:-3"><a class="docs-heading-anchor" href="#In-Julia:-3">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-3" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; simplify(x^2 + 2*x + 1) |&gt; string
+&quot;x^2 + 2*x + 1&quot;</code></pre><hr/><p>We did not get what we want.  There is a function to perform this simplification, called <code>factor()</code>, which will be discussed below.</p><p>Another pitfall to <code>simplify()</code> is that it can be unnecessarily slow, since it tries many kinds of simplifications before picking the best one.  If you already know exactly what kind of simplification you are after, it is better to apply the specific simplification function(s) that apply those simplifications.</p><p>Applying specific simplification functions instead of <code>simplify()</code> also has the advantage that specific functions have certain guarantees about the form of their output.  These will be discussed with each function below.  For example, <code>factor()</code>, when called on a polynomial with rational coefficients, is guaranteed to factor the polynomial into irreducible factors. <code>simplify()</code> has no guarantees.  It is entirely heuristical, and, as we saw above, it may even miss a possible type of simplification that SymPy is capable of doing.</p><p><code>simplify()</code> is best when used interactively, when you just want to whittle down an expression to a simpler form.  You may then choose to apply specific functions once you see what <code>simplify()</code> returns, to get a more precise result.  It is also useful when you have no idea what form an expression will take, and you need a catchall function to simplify it.</p><h2 id="Polynomial/Rational-Function-Simplification"><a class="docs-heading-anchor" href="#Polynomial/Rational-Function-Simplification">Polynomial/Rational Function Simplification</a><a id="Polynomial/Rational-Function-Simplification-1"></a><a class="docs-heading-anchor-permalink" href="#Polynomial/Rational-Function-Simplification" title="Permalink"></a></h2><h3 id="expand"><a class="docs-heading-anchor" href="#expand">expand</a><a id="expand-1"></a><a class="docs-heading-anchor-permalink" href="#expand" title="Permalink"></a></h3><p><code>expand()</code> is one of the most common simplification functions in SymPy. Although it has a lot of scopes, for now, we will consider its function in expanding polynomial expressions. For example:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expand((x + 1)**2)
+     2
+    x  + 2⋅x + 1
+    &gt;&gt;&gt; expand((x + 2)*(x - 3))
+     2
+    x  - x - 6</code></pre><h5 id="In-Julia:-4"><a class="docs-heading-anchor" href="#In-Julia:-4">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-4" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expand((x + 1)^2) |&gt; string
+&quot;x^2 + 2*x + 1&quot;
+
+julia&gt; expand((x + 2)*(x - 3)) |&gt; string
+&quot;x^2 - x - 6&quot;</code></pre><hr/><p>Given a polynomial, <code>expand()</code> will put it into a canonical form of a sum of monomials.</p><p><code>expand()</code> may not sound like a simplification function.  After all, by its very name, it makes expressions bigger, not smaller.  Usually this is the case, but often an expression will become smaller upon calling <code>expand()</code> on it due to cancellation.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expand((x + 1)*(x - 2) - (x - 1)*x)
+    -2</code></pre><h5 id="In-Julia:-5"><a class="docs-heading-anchor" href="#In-Julia:-5">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-5" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expand((x + 1)*(x - 2) - (x - 1)*x)
+-2</code></pre><hr/><h3 id="factor"><a class="docs-heading-anchor" href="#factor">factor</a><a id="factor-1"></a><a class="docs-heading-anchor-permalink" href="#factor" title="Permalink"></a></h3><p><code>factor()</code> takes a polynomial and factors it into irreducible factors over the rational numbers.  For example:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; factor(x**3 - x**2 + x - 1)
+            ⎛ 2    ⎞
+    (x - 1)⋅⎝x  + 1⎠
+    &gt;&gt;&gt; factor(x**2*z + 4*x*y*z + 4*y**2*z)
+               2
+    z⋅(x + 2⋅y)</code></pre><h5 id="In-Julia:-6"><a class="docs-heading-anchor" href="#In-Julia:-6">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-6" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; factor(x^3 - x^2 + x - 1) |&gt; string
+&quot;(x - 1)*(x^2 + 1)&quot;
+julia&gt; factor(x^2*z + 4*x*y*z + 4*y^2*z) |&gt;  string
+&quot;z*(x + 2*y)^2&quot;</code></pre><hr/><p>For polynomials, <code>factor()</code> is the opposite of <code>expand()</code>.  <code>factor()</code> uses a complete multivariate factorization algorithm over the rational numbers, which means that each of the factors returned by <code>factor()</code> is guaranteed to be irreducible.</p><p>If you are interested in the factors themselves, <code>factor_list</code> returns a more structured output.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; factor_list(x**2*z + 4*x*y*z + 4*y**2*z)
+    (1, [(z, 1), (x + 2⋅y, 2)])</code></pre><h5 id="In-Julia:-7"><a class="docs-heading-anchor" href="#In-Julia:-7">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-7" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; factor_list(x^2*z + 4*x*y*z + 4*y^2*z)
+(1, Tuple{Sym, Int64}[(z, 1), (x + 2*y, 2)])</code></pre><hr/><p>Note that the input to <code>factor</code> and <code>expand</code> need not be polynomials in the strict sense.  They will intelligently factor or expand any kind of expression (though note that the factors may not be irreducible if the input is no longer a polynomial over the rationals).</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expand((cos(x) + sin(x))**2)
+       2                           2
+    sin (x) + 2⋅sin(x)⋅cos(x) + cos (x)
+    &gt;&gt;&gt; factor(cos(x)**2 + 2*cos(x)*sin(x) + sin(x)**2)
+                     2
+    (sin(x) + cos(x))</code></pre><h5 id="In-Julia:-8"><a class="docs-heading-anchor" href="#In-Julia:-8">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-8" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expand((cos(x) + sin(x))^2) |&gt; string
+&quot;sin(x)^2 + 2*sin(x)*cos(x) + cos(x)^2&quot;
+
+julia&gt; factor(cos(x)^2 + 2*cos(x)*sin(x) + sin(x)^2) |&gt; string
+&quot;(sin(x) + cos(x))^2&quot;</code></pre><hr/><h3 id="collect"><a class="docs-heading-anchor" href="#collect">collect</a><a id="collect-1"></a><a class="docs-heading-anchor-permalink" href="#collect" title="Permalink"></a></h3><p><code>collect()</code> collects common powers of a term in an expression.  For example</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = x*y + x - 3 + 2*x**2 - z*x**2 + x**3
+    &gt;&gt;&gt; expr
+     3    2        2
+    x  - x ⋅z + 2⋅x  + x⋅y + x - 3
+    &gt;&gt;&gt; collected_expr = collect(expr, x)
+    &gt;&gt;&gt; collected_expr
+     3    2
+    x  + x ⋅(-z + 2) + x⋅(y + 1) - 3</code></pre><h5 id="In-Julia:-9"><a class="docs-heading-anchor" href="#In-Julia:-9">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-9" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr = x*y + x - 3 + 2*x^2 - z*x^2 + x^3
+ 3    2        2
+x  - x ⋅z + 2⋅x  + x⋅y + x - 3
+
+julia&gt; collected_expr = collect(expr, x)
+ 3    2
+x  + x ⋅(2 - z) + x⋅(y + 1) - 3</code></pre><hr/><p><code>collect()</code> is particularly useful in conjunction with the <code>.coeff()</code> method.  <code>expr.coeff(x, n)</code> gives the coefficient of <code>x**n</code> in <code>expr</code>:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; collected_expr.coeff(x, 2)
+    -z + 2</code></pre><h5 id="In-Julia:-10"><a class="docs-heading-anchor" href="#In-Julia:-10">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-10" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; collected_expr.coeff(x, 2)
+2 - z</code></pre><hr/><div class="admonition is-info"><header class="admonition-header">TODO</header><div class="admonition-body"><p>Discuss coeff method in more detail in some other section (maybe basic expression manipulation tools)</p></div></div><h3 id="cancel"><a class="docs-heading-anchor" href="#cancel">cancel</a><a id="cancel-1"></a><a class="docs-heading-anchor-permalink" href="#cancel" title="Permalink"></a></h3><p><code>cancel()</code> will take any rational function and put it into the standard canonical form, <span>$\frac{p}{q}$</span>, where <span>$p$</span> and <span>$q$</span> are expanded polynomials with no common factors, and the leading coefficients of <span>$p$</span> and <span>$q$</span> do not have denominators (i.e., are integers).</p><pre><code class="language-python hljs">    &gt;&gt;&gt; cancel((x**2 + 2*x + 1)/(x**2 + x))
+    x + 1
+    ─────
+      x
+
+    &gt;&gt;&gt; expr = 1/x + (3*x/2 - 2)/(x - 4)
+    &gt;&gt;&gt; expr
+    3⋅x
+    ─── - 2
+     2        1
+    ─────── + ─
+     x - 4    x
+    &gt;&gt;&gt; cancel(expr)
+       2
+    3⋅x  - 2⋅x - 8
+    ──────────────
+         2
+      2⋅x  - 8⋅x
+
+    &gt;&gt;&gt; expr = (x*y**2 - 2*x*y*z + x*z**2 + y**2 - 2*y*z + z**2)/(x**2 - 1)
+    &gt;&gt;&gt; expr
+       2                2    2            2
+    x⋅y  - 2⋅x⋅y⋅z + x⋅z  + y  - 2⋅y⋅z + z
+    ───────────────────────────────────────
+                      2
+                     x  - 1
+    &gt;&gt;&gt; cancel(expr)
+     2            2
+    y  - 2⋅y⋅z + z
+    ───────────────
+         x - 1</code></pre><h5 id="In-Julia:-11"><a class="docs-heading-anchor" href="#In-Julia:-11">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-11" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; cancel((x^2 + 2*x + 1)/(x^2 + x))
+x + 1
+─────
+  x
+
+julia&gt; expr = 1/x + (3*x/2 - 2)/(x - 4)
+3⋅x
+─── - 2
+ 2        1
+─────── + ─
+ x - 4    x
+
+julia&gt; cancel(expr) |&gt;  string
+&quot;(3*x^2 - 2*x - 8)/(2*x^2 - 8*x)&quot;
+
+julia&gt; expr = (x*y^2 - 2*x*y*z + x*z^2 + y^2 - 2*y*z + z^2)/(x^2 - 1)
+   2                2    2            2
+x⋅y  - 2⋅x⋅y⋅z + x⋅z  + y  - 2⋅y⋅z + z
+───────────────────────────────────────
+                  2
+                 x  - 1
+
+julia&gt; cancel(expr)
+ 2            2
+y  - 2⋅y⋅z + z
+───────────────
+     x - 1</code></pre><hr/><p>Note that since <code>factor()</code> will completely factorize both the numerator and the denominator of an expression, it can also be used to do the same thing:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; factor(expr)
+           2
+    (y - z)
+    ────────
+     x - 1</code></pre><h5 id="In-Julia:-12"><a class="docs-heading-anchor" href="#In-Julia:-12">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-12" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; factor(expr)  |&gt; string
+&quot;(y - z)^2/(x - 1)&quot;</code></pre><hr/><p>However, if you are only interested in making sure that the expression is in canceled form, <code>cancel()</code> is more efficient than <code>factor()</code>.</p><h3 id="apart"><a class="docs-heading-anchor" href="#apart">apart</a><a id="apart-1"></a><a class="docs-heading-anchor-permalink" href="#apart" title="Permalink"></a></h3><p><code>apart()</code> performs a <code>partial fraction decomposition &lt;http://en.wikipedia.org/wiki/Partial_fraction_decomposition&gt;</code>_ on a rational function.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = (4*x**3 + 21*x**2 + 10*x + 12)/(x**4 + 5*x**3 + 5*x**2 + 4*x)
+    &gt;&gt;&gt; expr
+       3       2
+    4⋅x  + 21⋅x  + 10⋅x + 12
+    ────────────────────────
+      4      3      2
+     x  + 5⋅x  + 5⋅x  + 4⋅x
+    &gt;&gt;&gt; apart(expr)
+     2⋅x - 1       1     3
+    ────────── - ───── + ─
+     2           x + 4   x
+    x  + x + 1</code></pre><h5 id="In-Julia:-13"><a class="docs-heading-anchor" href="#In-Julia:-13">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-13" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr = (4*x^3 + 21*x^2 + 10*x + 12)/(x^4 + 5*x^3 + 5*x^2 + 4*x);  string(expr)
+&quot;(4*x^3 + 21*x^2 + 10*x + 12)/(x^4 + 5*x^3 + 5*x^2 + 4*x)&quot;
+
+julia&gt; apart(expr)
+ 2⋅x - 1       1     3
+────────── - ───── + ─
+ 2           x + 4   x
+x  + x + 1
+</code></pre><hr/><h2 id="Trigonometric-Simplification"><a class="docs-heading-anchor" href="#Trigonometric-Simplification">Trigonometric Simplification</a><a id="Trigonometric-Simplification-1"></a><a class="docs-heading-anchor-permalink" href="#Trigonometric-Simplification" title="Permalink"></a></h2><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>SymPy follows Python&#39;s naming conventions for inverse trigonometric functions, which is to append an <code>a</code> to the front of the function&#39;s name.  For example, the inverse cosine, or arc cosine, is called <code>acos()</code>.</p></div></div><pre><code class="language-python hljs">   &gt;&gt;&gt; acos(x)
+   acos(x)
+   &gt;&gt;&gt; cos(acos(x))
+   x
+   &gt;&gt;&gt; asin(1)
+   π
+   ─
+   2</code></pre><h5 id="In-Julia:-14"><a class="docs-heading-anchor" href="#In-Julia:-14">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-14" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; acos(x)
+acos(x)
+
+julia&gt; cos(acos(x))
+x
+
+julia&gt; asin(1)
+1.5707963267948966
+
+julia&gt; sympy.asin(1)
+π
+─
+2</code></pre><hr/><div class="admonition is-info"><header class="admonition-header">TODO</header><div class="admonition-body"><p>Can we actually do anything with inverse trig functions, simplification wise?</p></div></div><h3 id="trigsimp"><a class="docs-heading-anchor" href="#trigsimp">trigsimp</a><a id="trigsimp-1"></a><a class="docs-heading-anchor-permalink" href="#trigsimp" title="Permalink"></a></h3><p>To simplify expressions using trigonometric identities, use <code>trigsimp()</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; trigsimp(sin(x)^2 + cos(x)**2)
+    1
+    &gt;&gt;&gt; trigsimp(sin(x)**4 - 2*cos(x)**2*sin(x)**2 + cos(x)**4)
+    cos(4⋅x)   1
+    ──────── + ─
+       2       2
+    &gt;&gt;&gt; trigsimp(sin(x)*tan(x)/sec(x))
+       2
+    sin (x)</code></pre><h5 id="In-Julia:-15"><a class="docs-heading-anchor" href="#In-Julia:-15">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-15" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; trigsimp(sin(x)^2 + cos(x)^2)
+1
+
+julia&gt; trigsimp(sin(x)^4 - 2*cos(x)^2*sin(x)^2 + cos(x)^4)
+cos(4⋅x)   1
+──────── + ─
+   2       2
+
+julia&gt; trigsimp(sin(x)*tan(x)/sec(x)) |&gt; string
+&quot;sin(x)^2&quot;</code></pre><hr/><p><code>trigsimp()</code> also works with hyperbolic trig functions.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; trigsimp(cosh(x)**2 + sinh(x)**2)
+    cosh(2⋅x)
+    &gt;&gt;&gt; trigsimp(sinh(x)/tanh(x))
+    cosh(x)</code></pre><h5 id="In-Julia:-16"><a class="docs-heading-anchor" href="#In-Julia:-16">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-16" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; trigsimp(cosh(x)^2 + sinh(x)^2)
+cosh(2⋅x)
+
+julia&gt; trigsimp(sinh(x)/tanh(x))
+cosh(x)</code></pre><hr/><p>Much like <code>simplify()</code>, <code>trigsimp()</code> applies various trigonometric identities to the input expression, and then uses a heuristic to return the &quot;best&quot; one.</p><h3 id="expand_trig"><a class="docs-heading-anchor" href="#expand_trig">expand_trig</a><a id="expand_trig-1"></a><a class="docs-heading-anchor-permalink" href="#expand_trig" title="Permalink"></a></h3><p>To expand trigonometric functions, that is, apply the sum or double angle identities, use <code>expand_trig()</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expand_trig(sin(x + y))
+    sin(x)⋅cos(y) + sin(y)⋅cos(x)
+    &gt;&gt;&gt; expand_trig(tan(2*x))
+       2⋅tan(x)
+    ─────────────
+         2
+    - tan (x) + 1</code></pre><h5 id="In-Julia:-17"><a class="docs-heading-anchor" href="#In-Julia:-17">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-17" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expand_trig(sin(x + y))
+sin(x)⋅cos(y) + sin(y)⋅cos(x)
+
+julia&gt; expand_trig(tan(2*x))
+  2⋅tan(x)
+───────────
+       2
+1 - tan (x)</code></pre><hr/><p>Because <code>expand_trig()</code> tends to make trigonometric expressions larger, and <code>trigsimp()</code> tends to make them smaller, these identities can be applied in reverse using <code>trigsimp()</code></p><pre><code class="language-python hljs">    &gt;&gt;&gt; trigsimp(sin(x)*cos(y) + sin(y)*cos(x))
+    sin(x + y)</code></pre><h5 id="In-Julia:-18"><a class="docs-heading-anchor" href="#In-Julia:-18">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-18" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; trigsimp(sin(x)*cos(y) + sin(y)*cos(x))
+sin(x + y)</code></pre><hr/><div class="admonition is-info"><header class="admonition-header">TODO</header><div class="admonition-body"><p>It would be much better to teach individual trig rewriting functions here, but they don&#39;t exist yet.  See https://github.com/sympy/sympy/issues/3456.</p></div></div><h2 id="Powers"><a class="docs-heading-anchor" href="#Powers">Powers</a><a id="Powers-1"></a><a class="docs-heading-anchor-permalink" href="#Powers" title="Permalink"></a></h2><p>Before we introduce the power simplification functions, a mathematical discussion on the identities held by powers is in order.  There are three kinds of identities satisfied by exponents</p><ol><li><code>x^ax^b = x^{a + b}</code></li><li><code>x^ay^a = (xy)^a</code></li><li><code>(x^a)^b = x^{ab}</code></li></ol><p>Identity 1 is always true.</p><p>Identity 2 is not always true.  For example, if <span>$x = y = -1$</span> and <span>$a = \frac{1}{2}$</span>, then <span>$x^ay^a = \sqrt{-1}\sqrt{-1} = i\cdot i = -1$</span>, whereas <span>$(xy)^a = \sqrt{-1\cdot-1} = \sqrt{1} = 1$</span>.  However, identity 2 is true at least if <span>$x$</span> and <span>$y$</span> are nonnegative and <span>$a$</span> is real (it may also be true under other conditions as well).  A common consequence of the failure of identity 2 is that <span>$\sqrt{x}\sqrt{y} \neq \sqrt{xy}$</span>.</p><p>Identity 3 is not always true.  For example, if <span>$x = -1$</span>, <span>$a = 2$</span>, and <span>$b = \frac{1}{2}$</span>, then <span>$(x^a)^b = {\left ((-1)^2\right )}^{1/2} = \sqrt{1} = 1$</span> and <span>$x^{ab} = (-1)^{2\cdot1/2} = (-1)^1 = -1$</span>.  However, identity 3 is true when <span>$b$</span> is an integer (again, it may also hold in other cases as well).  Two common consequences of the failure of identity 3 are that <span>$\sqrt{x^2}\neq x$</span> and that <span>$\sqrt{\frac{1}{x}} \neq \frac{1}{\sqrt{x}}$</span>.</p><p>To summarize</p><ol><li><p>This: <span>$x^ax^b = x^{a + b}$</span> is always true</p></li><li><p>This: <span>$x^ay^a = (xy)^a$</span> is true when  <span>$x, y \geq 0$</span> and <span>$a \in \mathbb{R}$</span>; but note <span>$(-1)^{1/2}(-1)^{1/2} \neq (-1\cdot-1)^{1/2}$</span>       and <span>$\sqrt{x}\sqrt{y} \neq \sqrt{xy}$</span> in general</p></li><li><p>This: <span>$(x^a)^b = x^{ab}$</span>  when <span>$b \in \mathbb{Z}$</span>;                  but note <span>${\left((-1)^2\right )}^{1/2} \neq (-1)^{2\cdot1/2}$</span> and <span>$\sqrt{x^2}\neq x$</span> and <span>$\sqrt{\frac{1}{x}}\neq\frac{1}{\sqrt{x}}$</span> in general</p></li></ol><p>This is important to remember, because by default, SymPy will not perform simplifications if they are not true in general.</p><p>In order to make SymPy perform simplifications involving identities that are only true under certain assumptions, we need to put assumptions on our Symbols.  We will undertake a full discussion of the assumptions system later, but for now, all we need to know are the following.</p><ul><li><p>By default, SymPy Symbols are assumed to be complex (elements of <span>$\mathbb{C}$</span>).  That is, a simplification will not be applied to an expression with a given Symbol unless it holds for all complex numbers.</p></li><li><p>Symbols can be given different assumptions by passing the assumption to <code>symbols()</code>.  For the rest of this section, we will be assuming that <code>x</code> and <code>y</code> are positive, and that <code>a</code> and <code>b</code> are real.  We will leave <code>z</code>, <code>t</code>, and <code>c</code> as arbitrary complex Symbols to demonstrate what happens in that case.</p></li></ul><pre><code class="language-python hljs">    &gt;&gt;&gt; x, y = symbols(&#39;x y&#39;, positive=True)
+    &gt;&gt;&gt; a, b = symbols(&#39;a b&#39;, real=True)
+    &gt;&gt;&gt; z, t, c = symbols(&#39;z t c&#39;)</code></pre><h5 id="In-Julia:-19"><a class="docs-heading-anchor" href="#In-Julia:-19">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-19" title="Permalink"></a></h5><p>The same notation can be used:</p><pre><code class="language-julia-repl hljs">julia&gt; x, y = symbols(&quot;x y&quot;, positive=true)
+(x, y)
+
+julia&gt; a, b = symbols(&quot;a b&quot;, real=true)
+(a, b)
+
+julia&gt; z, t, c = symbols(&quot;z t c&quot;)
+(z, t, c)</code></pre><p>However, the recommended way is to use <code>@syms</code> for symbol construction with assumptions:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x::positive, y::positive
+(x, y)
+
+julia&gt; @syms a::real, b::real
+(a, b)
+
+julia&gt; @syms z, t, c
+(z, t, c)</code></pre><hr/><div class="admonition is-info"><header class="admonition-header">TODO:</header><div class="admonition-body"><p>Rewrite this using the new assumptions</p></div></div><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>In SymPy, <code>sqrt(x)</code> is just a shortcut to <code>x**Rational(1, 2)</code>.  They are exactly the same object.</p></div></div><pre><code class="language-python hljs">     &gt;&gt;&gt; sqrt(x) == x**Rational(1, 2)
+     True</code></pre><h5 id="In-Julia:-20"><a class="docs-heading-anchor" href="#In-Julia:-20">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-20" title="Permalink"></a></h5><ul><li>we can construction rational numbers with <code>//</code></li></ul><pre><code class="language-julia-repl hljs">julia&gt; sqrt(x) == x^(1//2)
+true</code></pre><hr/><h2 id="powsimp"><a class="docs-heading-anchor" href="#powsimp">powsimp</a><a id="powsimp-1"></a><a class="docs-heading-anchor-permalink" href="#powsimp" title="Permalink"></a></h2><p><code>powsimp()</code> applies identities 1 and 2 from above, from left to right.</p><pre><code class="language-python hljs">   &gt;&gt;&gt; powsimp(x**a*x**b)
+     a + b
+    x
+   &gt;&gt;&gt; powsimp(x**a*y**a)
+        a
+   (x⋅y)</code></pre><h5 id="In-Julia:-21"><a class="docs-heading-anchor" href="#In-Julia:-21">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-21" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; powsimp(x^a*x^b)
+ a + b
+x
+
+julia&gt; powsimp(x^a*y^a) |&gt; string
+&quot;(x*y)^a&quot;</code></pre><hr/><p>Notice that <code>powsimp()</code> refuses to do the simplification if it is not valid.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; powsimp(t**c*z**c)
+     c  c
+    t ⋅z</code></pre><h5 id="In-Julia:-22"><a class="docs-heading-anchor" href="#In-Julia:-22">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-22" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; powsimp(t^c*z^c)
+ c  c
+t ⋅z</code></pre><hr/><p>If you know that you want to apply this simplification, but you don&#39;t want to mess with assumptions, you can pass the <code>force=True</code> flag.  This will force the simplification to take place, regardless of assumptions.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; powsimp(t**c*z**c, force=True)
+         c
+    (t⋅z)</code></pre><h5 id="In-Julia:-23"><a class="docs-heading-anchor" href="#In-Julia:-23">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-23" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; powsimp(t^c*z^c, force=true)  |&gt;  string
+&quot;(t*z)^c&quot;</code></pre><hr/><p>Note that in some instances, in particular, when the exponents are integers or rational numbers, and identity 2 holds, it will be applied automatically.</p><pre><code class="language-python hljs">   &gt;&gt;&gt; (z*t)**2
+     2  2
+    t ⋅z
+   &gt;&gt;&gt; sqrt(x*y)
+    √x⋅√y</code></pre><h5 id="In-Julia:-24"><a class="docs-heading-anchor" href="#In-Julia:-24">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-24" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; (z*t)^2
+ 2  2
+t ⋅z
+
+julia&gt; sqrt(x*y)
+√x⋅√y</code></pre><hr/><p>This means that it will be impossible to undo this identity with <code>powsimp()</code>, because even if <code>powsimp()</code> were to put the bases together, they would be automatically split apart again.</p><pre><code class="language-python hljs">   &gt;&gt;&gt; powsimp(z**2*t**2)
+     2  2
+    t ⋅z
+   &gt;&gt;&gt; powsimp(sqrt(x)*sqrt(y))
+    √x⋅√y</code></pre><h5 id="In-Julia:-25"><a class="docs-heading-anchor" href="#In-Julia:-25">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-25" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; powsimp(z^2*t^2)
+ 2  2
+t ⋅z
+
+julia&gt; powsimp(sqrt(x)*sqrt(y))
+√x⋅√y</code></pre><hr/><h3 id="expand_power_exp-/-expand_power_base"><a class="docs-heading-anchor" href="#expand_power_exp-/-expand_power_base"><code>expand_power_exp</code> / <code>expand_power_base</code></a><a id="expand_power_exp-/-expand_power_base-1"></a><a class="docs-heading-anchor-permalink" href="#expand_power_exp-/-expand_power_base" title="Permalink"></a></h3><p><code>expand_power_exp()</code> and <code>expand_power_base()</code> apply identities 1 and 2 from right to left, respectively.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expand_power_exp(x**(a + b))
+     a  b
+    x ⋅x
+
+    &gt;&gt;&gt; expand_power_base((x*y)**a)
+     a  a
+    x ⋅y</code></pre><h5 id="In-Julia:-26"><a class="docs-heading-anchor" href="#In-Julia:-26">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-26" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expand_power_exp(x^(a + b))
+ a  b
+x ⋅x
+
+julia&gt; expand_power_base((x*y)^a)
+ a  a
+x ⋅y</code></pre><hr/><p>As with <code>powsimp()</code>, identity 2 is not applied if it is not valid.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expand_power_base((z*t)**c)
+         c
+    (t⋅z)</code></pre><h5 id="In-Julia:-27"><a class="docs-heading-anchor" href="#In-Julia:-27">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-27" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expand_power_base((z*t)^c) |&gt; string
+&quot;(t*z)^c&quot;</code></pre><hr/><p>And as with <code>powsimp()</code>, you can force the expansion to happen without fiddling with assumptions by using <code>force=True</code>.</p><pre><code class="language-python hljs">   &gt;&gt;&gt; expand_power_base((z*t)**c, force=True)
+     c  c
+    t ⋅z</code></pre><h5 id="In-Julia:-28"><a class="docs-heading-anchor" href="#In-Julia:-28">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-28" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expand_power_base((z*t)^c, force=true)
+ c  c
+t ⋅z</code></pre><hr/><p>As with identity 2, identity 1 is applied automatically if the power is a number, and hence cannot be undone with <code>expand_power_exp()</code>.</p><pre><code class="language-python hljs">   &gt;&gt;&gt; x**2*x**3
+     5
+    x
+   &gt;&gt;&gt; expand_power_exp(x**5)
+     5
+    x</code></pre><h5 id="In-Julia:-29"><a class="docs-heading-anchor" href="#In-Julia:-29">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-29" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; x^2*x^3  |&gt; string
+&quot;x^5&quot;
+
+julia&gt; expand_power_exp(x^5) |&gt; string
+&quot;x^5&quot;</code></pre><hr/><h3 id="powdenest"><a class="docs-heading-anchor" href="#powdenest">powdenest</a><a id="powdenest-1"></a><a class="docs-heading-anchor-permalink" href="#powdenest" title="Permalink"></a></h3><p><code>powdenest()</code> applies identity 3, from left to right.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; powdenest((x**a)**b)
+     a⋅b
+    x</code></pre><h5 id="In-Julia:-30"><a class="docs-heading-anchor" href="#In-Julia:-30">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-30" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; powdenest((x^a)^b)
+ a⋅b
+x</code></pre><hr/><p>As before, the identity is not applied if it is not true under the given assumptions.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; powdenest((z**a)**b)
+        b
+    ⎛ a⎞
+    ⎝z ⎠</code></pre><h5 id="In-Julia:-31"><a class="docs-heading-anchor" href="#In-Julia:-31">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-31" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; powdenest((z^a)^b) |&gt; string
+&quot;(z^a)^b&quot;</code></pre><hr/><p>And as before, this can be manually overridden with <code>force=True</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; powdenest((z**a)**b, force=True)
+     a⋅b
+    z</code></pre><h5 id="In-Julia:-32"><a class="docs-heading-anchor" href="#In-Julia:-32">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-32" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; powdenest((z^a)^b, force=true)
+ a⋅b
+z</code></pre><hr/><h2 id="Exponentials-and-logarithms"><a class="docs-heading-anchor" href="#Exponentials-and-logarithms">Exponentials and logarithms</a><a id="Exponentials-and-logarithms-1"></a><a class="docs-heading-anchor-permalink" href="#Exponentials-and-logarithms" title="Permalink"></a></h2><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>In SymPy, as in Python and most programming languages, <code>log</code> is the natural logarithm, also known as <code>ln</code>.  SymPy automatically provides an alias <code>ln = log</code> in case you forget this.</p></div></div><pre><code class="language-python hljs">    &gt;&gt;&gt; ln(x)
+    log(x)</code></pre><h5 id="In-Julia:-33"><a class="docs-heading-anchor" href="#In-Julia:-33">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-33" title="Permalink"></a></h5><ul><li><code>ln</code> is exported</li></ul><pre><code class="language-julia-repl hljs">julia&gt; ln(x)
+log(x)</code></pre><hr/><p>Logarithms have similar issues as powers.  There are two main identities</p><ol><li><p class="math-container">\[\log{(xy)} = \log{(x)} + \log{(y)}\]</p></li><li><p class="math-container">\[\log{(x^n)} = n\log{(x)}\]</p></li></ol><p>Neither identity is true for arbitrary complex <span>$x$</span> and <span>$y$</span>, due to the branch cut in the complex plane for the complex logarithm.  However, sufficient conditions for the identities to hold are if <span>$x$</span> and <span>$y$</span> are positive and <span>$n$</span> is real.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; x, y = symbols(&#39;x y&#39;, positive=True)
+    &gt;&gt;&gt; n = symbols(&#39;n&#39;, real=True)</code></pre><h5 id="In-Julia:-34"><a class="docs-heading-anchor" href="#In-Julia:-34">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-34" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; @syms x::positive, y::positive
+(x, y)
+
+julia&gt; @syms n::real
+(n,)</code></pre><hr/><p>As before, <code>z</code> and <code>t</code> will be Symbols with no additional assumptions.</p><p>Note that the identity <span>$\log{\left (\frac{x}{y}\right )} = \log(x) - \log(y)$</span> is a special case of identities 1 and 2 by <span>$\log{\left (\frac{x}{y}\right )} =$</span> <span>$\log{\left (x\cdot\frac{1}{y}\right )} =$</span> <span>$\log(x) + \log{\left( y^{-1}\right )} =$</span> <span>$\log(x) - \log(y)$</span>, and thus it also holds if <code>x</code> and <code>y</code> are positive, but may not hold in general.</p><p>We also see that <span>$\log{\left( e^x \right)} = x$</span> comes from <span>$\log{\left ( e^x \right)} = x\log(e) = x$</span>, and thus holds when <span>$x$</span> is real (and it can be verified that it does not hold in general for arbitrary complex <span>$x$</span>, for example, <span>$\log{\left (e^{x + 2\pi i}\right)} = \log{\left (e^x\right )} = x \neq x + 2\pi i$</span>).</p><h2 id="expand_log"><a class="docs-heading-anchor" href="#expand_log">expand_log</a><a id="expand_log-1"></a><a class="docs-heading-anchor-permalink" href="#expand_log" title="Permalink"></a></h2><p>To apply identities 1 and 2 from left to right, use <code>expand_log()</code>.  As always, the identities will not be applied unless they are valid.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expand_log(log(x*y))
+    log(x) + log(y)
+    &gt;&gt;&gt; expand_log(log(x/y))
+    log(x) - log(y)
+    &gt;&gt;&gt; expand_log(log(x**2))
+    2⋅log(x)
+    &gt;&gt;&gt; expand_log(log(x**n))
+    n⋅log(x)
+    &gt;&gt;&gt; expand_log(log(z*t))
+    log(t⋅z)</code></pre><h5 id="In-Julia:-35"><a class="docs-heading-anchor" href="#In-Julia:-35">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-35" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expand_log(log(x*y))
+log(x) + log(y)
+
+julia&gt; expand_log(log(x/y))
+log(x) - log(y)
+
+julia&gt; expand_log(log(x^2))
+2⋅log(x)
+
+julia&gt; expand_log(log(x^n))
+n⋅log(x)
+
+julia&gt; expand_log(log(z*t))
+log(t⋅z)
+</code></pre><hr/><p>As with <code>powsimp()</code> and <code>powdenest()</code>, <code>expand_log()</code> has a <code>force</code> option that can be used to ignore assumptions.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expand_log(log(z**2))
+       ⎛ 2⎞
+    log⎝z ⎠
+    &gt;&gt;&gt; expand_log(log(z**2), force=True)
+    2⋅log(z)</code></pre><h5 id="In-Julia:-36"><a class="docs-heading-anchor" href="#In-Julia:-36">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-36" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expand_log(log(z^2))
+   ⎛ 2⎞
+log⎝z ⎠</code></pre><pre><code class="language-julia-repl hljs">julia&gt; expand_log(log(z^2), force=true)
+2⋅log(z)</code></pre><hr/><h2 id="logcombine"><a class="docs-heading-anchor" href="#logcombine">logcombine</a><a id="logcombine-1"></a><a class="docs-heading-anchor-permalink" href="#logcombine" title="Permalink"></a></h2><p>To apply identities 1 and 2 from right to left, use <code>logcombine()</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; logcombine(log(x) + log(y))
+    log(x⋅y)
+    &gt;&gt;&gt; logcombine(n*log(x))
+       ⎛ n⎞
+    log⎝x ⎠
+    &gt;&gt;&gt; logcombine(n*log(z))
+    n⋅log(z)</code></pre><h5 id="In-Julia:-37"><a class="docs-heading-anchor" href="#In-Julia:-37">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-37" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; logcombine(log(x) + log(y))
+log(x⋅y)
+
+julia&gt; logcombine(n*log(x))
+   ⎛ n⎞
+log⎝x ⎠
+
+julia&gt; logcombine(n*log(z))
+n⋅log(z)</code></pre><hr/><p><code>logcombine()</code> also has a <code>force</code> option that can be used to ignore assumptions.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; logcombine(n*log(z), force=True)
+       ⎛ n⎞
+    log⎝z ⎠</code></pre><h5 id="In-Julia:-38"><a class="docs-heading-anchor" href="#In-Julia:-38">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-38" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; logcombine(n*log(z), force=true)
+   ⎛ n⎞
+log⎝z ⎠</code></pre><hr/><h2 id="Special-Functions"><a class="docs-heading-anchor" href="#Special-Functions">Special Functions</a><a id="Special-Functions-1"></a><a class="docs-heading-anchor-permalink" href="#Special-Functions" title="Permalink"></a></h2><p>SymPy implements dozens of special functions, ranging from functions in combinatorics to mathematical physics.</p><p>An extensive list of the special functions included with SymPy and their documentation is at the :ref:<code>Functions Module &lt;functions-contents&gt;</code> page.</p><p>For the purposes of this tutorial, let&#39;s introduce a few special functions in SymPy.</p><p>Let&#39;s define <code>x</code>, <code>y</code>, and <code>z</code> as regular, complex Symbols, removing any assumptions we put on them in the previous section.  We will also define <code>k</code>, <code>m</code>, and <code>n</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; x, y, z = symbols(&#39;x y z&#39;)
+    &gt;&gt;&gt; k, m, n = symbols(&#39;k m n&#39;)</code></pre><h5 id="In-Julia:-39"><a class="docs-heading-anchor" href="#In-Julia:-39">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-39" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; @syms x, y, z
+(x, y, z)
+
+julia&gt; @syms k, m, n
+(k, m, n)</code></pre><hr/><p>The <code>factorial &lt;http://en.wikipedia.org/wiki/Factorial&gt;</code>_ function is <code>factorial</code>.  <code>factorial(n)</code> represents <span>$n!= 1\cdot2\cdots(n - 1)\cdot n$</span>. <code>n!</code> represents the number of permutations of <code>n</code> distinct items.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; factorial(n)
+    n!</code></pre><h5 id="In-Julia:-40"><a class="docs-heading-anchor" href="#In-Julia:-40">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-40" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; factorial(n)
+n!</code></pre><hr/><p>The <code>binomial coefficient &lt;http://en.wikipedia.org/wiki/Binomial_coefficient&gt;</code>_ function is <code>binomial</code>.  <code>binomial(n, k)</code> represents <span>$\binom{n}{k}$</span>, the number of ways to choose <code>k</code> items from a set of <code>n</code> distinct items.  It is also often written as <code>nCk</code>, and is pronounced &quot;<code>n</code> choose <code>k</code>&quot;.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; binomial(n, k)
+    ⎛n⎞
+    ⎜ ⎟
+    ⎝k⎠</code></pre><h5 id="In-Julia:-41"><a class="docs-heading-anchor" href="#In-Julia:-41">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-41" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; binomial(n, k)
+⎛n⎞
+⎜ ⎟
+⎝k⎠</code></pre><hr/><p>The factorial function is closely related to the <a href="http://en.wikipedia.org/wiki/Gamma_function">gamma  function</a>. <span>$\Gamma(z) = \int_0^\infty t^{z - 1}e^{-t}dt$</span> is implemented in  <code>gamma(z)</code>, which for positive integer has: <code>z</code> is the same as <code>(z - 1)!</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; gamma(z)
+    Γ(z)</code></pre><h5 id="In-Julia:-42"><a class="docs-heading-anchor" href="#In-Julia:-42">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-42" title="Permalink"></a></h5><ul><li>recall, we need to load <code>SpecialFunctions</code> for <code>gamma</code> to be available</li></ul><pre><code class="language-julia-repl hljs">julia&gt; gamma(z)
+Γ(z)</code></pre><hr/><p>The <code>generalized hypergeometric function &lt;http://en.wikipedia.org/wiki/Generalized_hypergeometric_function&gt;</code> is <code>hyper</code>.  <code>hyper([a_1, ..., a_p], [b_1, ..., b_q], z)</code> represents <span>${}_pF_q\left(\begin{matrix} a_1, \cdots, a_p \\ b_1, \cdots, b_q \end{matrix} \middle| z \right)$</span>.  The most common case is <span>${}_2F_1$</span>, which is often referred to as the <code>ordinary hypergeometric function &lt;http://en.wikipedia.org/wiki/Hypergeometric_function&gt;</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; hyper([1, 2], [3], z)
+     ┌─  ⎛1, 2 │  ⎞
+     ├─  ⎜     │ z⎟
+    2╵ 1 ⎝ 3   │  ⎠</code></pre><h5 id="In-Julia:-43"><a class="docs-heading-anchor" href="#In-Julia:-43">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-43" title="Permalink"></a></h5><ul><li>as <code>[1,2]</code> is not symbolic, we qualify <code>hyper</code></li></ul><pre><code class="language-julia-repl hljs">julia&gt; sympy.hyper([1, 2], [3], z)
+ ┌─  ⎛1, 2 │  ⎞
+ ├─  ⎜     │ z⎟
+2╵ 1 ⎝ 3   │  ⎠</code></pre><hr/><h2 id="rewrite"><a class="docs-heading-anchor" href="#rewrite">rewrite</a><a id="rewrite-1"></a><a class="docs-heading-anchor-permalink" href="#rewrite" title="Permalink"></a></h2><p>A common way to deal with special functions is to rewrite them in terms of one another.  This works for any function in SymPy, not just special functions. To rewrite an expression in terms of a function, use <code>expr.rewrite(function)</code>.  For example,</p><pre><code class="language-python hljs">    &gt;&gt;&gt; tan(x).rewrite(sin)
+         2
+    2⋅sin (x)
+    ─────────
+     sin(2⋅x)
+    &gt;&gt;&gt; factorial(x).rewrite(gamma)
+    Γ(x + 1)</code></pre><h5 id="In-Julia:-44"><a class="docs-heading-anchor" href="#In-Julia:-44">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-44" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; tan(x).rewrite(sin) |&gt; string
+&quot;2*sin(x)^2/sin(2*x)&quot;</code></pre><pre><code class="language-julia-repl hljs">julia&gt; factorial(x).rewrite(gamma)
+Γ(x + 1)</code></pre><hr/><p>For some tips on applying more targeted rewriting, see the :ref:<code>tutorial-manipulation</code> section.</p><h3 id="expand_func"><a class="docs-heading-anchor" href="#expand_func">expand_func</a><a id="expand_func-1"></a><a class="docs-heading-anchor-permalink" href="#expand_func" title="Permalink"></a></h3><p>To expand special functions in terms of some identities, use <code>expand_func()</code>.  For example</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expand_func(gamma(x + 3))
+    x⋅(x + 1)⋅(x + 2)⋅Γ(x)</code></pre><h5 id="In-Julia:-45"><a class="docs-heading-anchor" href="#In-Julia:-45">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-45" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expand_func(gamma(x + 3))
+x⋅(x + 1)⋅(x + 2)⋅Γ(x)</code></pre><hr/><h2 id="hyperexpand"><a class="docs-heading-anchor" href="#hyperexpand">hyperexpand</a><a id="hyperexpand-1"></a><a class="docs-heading-anchor-permalink" href="#hyperexpand" title="Permalink"></a></h2><p>To rewrite <code>hyper</code> in terms of more standard functions, use <code>hyperexpand()</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; hyperexpand(hyper([1, 1], [2], z))
+    -log(-z + 1)
+    ─────────────
+         z</code></pre><h5 id="In-Julia:-46"><a class="docs-heading-anchor" href="#In-Julia:-46">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-46" title="Permalink"></a></h5><ul><li>As <code>[1,1]</code> is not symbolic, we qualify <code>hyperexpand</code>:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; sympy.hyperexpand(sympy.hyper([1, 1], [2], z))
+-log(1 - z)
+────────────
+     z</code></pre><hr/><p><code>hyperexpand()</code> also works on the more general Meijer G-function (see :py:meth:<code>its documentation &lt;sympy.functions.special.hyper.meijerg&gt;</code> for more information).</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = meijerg([[1],[1]], [[1],[]], -z)
+    &gt;&gt;&gt; expr
+    ╭─╮1, 1 ⎛1  1 │   ⎞
+    │╶┐     ⎜     │ -z⎟
+    ╰─╯2, 1 ⎝1    │   ⎠
+    &gt;&gt;&gt; hyperexpand(expr)
+     1
+     ─
+     z
+    ℯ</code></pre><h5 id="In-Julia:-47"><a class="docs-heading-anchor" href="#In-Julia:-47">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-47" title="Permalink"></a></h5><ul><li>again, we qualify <code>meijerg</code></li></ul><pre><code class="language-julia-repl hljs">julia&gt; expr = sympy.meijerg([[1],[1]], [[1],[]], -z)
+╭─╮1, 1 ⎛1  1 │   ⎞
+│╶┐     ⎜     │ -z⎟
+╰─╯2, 1 ⎝1    │   ⎠
+julia&gt; hyperexpand(expr) |&gt; string
+&quot;exp(1/z)&quot;</code></pre><hr/><h3 id="combsimp"><a class="docs-heading-anchor" href="#combsimp">combsimp</a><a id="combsimp-1"></a><a class="docs-heading-anchor-permalink" href="#combsimp" title="Permalink"></a></h3><p>To simplify combinatorial expressions, use <code>combsimp()</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; n, k = symbols(&#39;n k&#39;, integer = True)
+    &gt;&gt;&gt; combsimp(factorial(n)/factorial(n - 3))
+    n⋅(n - 2)⋅(n - 1)
+    &gt;&gt;&gt; combsimp(binomial(n+1, k+1)/binomial(n, k))
+    n + 1
+    ─────
+    k + 1</code></pre><h5 id="In-Julia:-48"><a class="docs-heading-anchor" href="#In-Julia:-48">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-48" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; @syms n::integer, k::integer
+(n, k)
+
+julia&gt; combsimp(factorial(n)/factorial(n - 3))
+n⋅(n - 2)⋅(n - 1)
+
+julia&gt; combsimp(binomial(n+1, k+1)/binomial(n, k))
+n + 1
+─────
+k + 1</code></pre><hr/><h3 id="gammasimp"><a class="docs-heading-anchor" href="#gammasimp">gammasimp</a><a id="gammasimp-1"></a><a class="docs-heading-anchor-permalink" href="#gammasimp" title="Permalink"></a></h3><p>To simplify expressions with gamma functions or combinatorial functions with non-integer argument, use <code>gammasimp()</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; gammasimp(gamma(x)*gamma(1 - x))
+       π
+    ────────
+    sin(π⋅x)</code></pre><h5 id="In-Julia:-49"><a class="docs-heading-anchor" href="#In-Julia:-49">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-49" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; gammasimp(gamma(x)*gamma(1 - x)) |&gt; string
+&quot;pi/sin(pi*x)&quot;</code></pre><hr/><h3 id="Example:-Continued-Fractions"><a class="docs-heading-anchor" href="#Example:-Continued-Fractions">Example: Continued Fractions</a><a id="Example:-Continued-Fractions-1"></a><a class="docs-heading-anchor-permalink" href="#Example:-Continued-Fractions" title="Permalink"></a></h3><p>Let&#39;s use SymPy to explore continued fractions.  A <code>continued fraction &lt;http://en.wikipedia.org/wiki/Continued_fraction&gt;</code>_ is an expression of the form</p><p class="math-container">\[~
+   a_0 + \cfrac{1}{a_1 + \cfrac{1}{a_2 + \cfrac{1}{ \ddots + \cfrac{1}{a_n}
+   }}}
+   ~\]</p><p>where <span>$a_0, \ldots, a_n$</span> are integers, and <span>$a_1, \ldots, a_n$</span> are positive. Acontinued fraction can also be infinite, but infinite objects are more difficult to represent in computers, so we will only examine the finite case here.</p><p>A continued fraction of the above form is often represented as a list <span>$[a_0; a_1, \ldots, a_n]$</span>.  Let&#39;s write a simple function that converts such a list to its continued fraction form.  The easiest way to construct a continued fraction from a list is to work backwards.  Note that despite the apparent symmetry of the definition, the first element, <code>a_0</code>, must usually be handled differently from the rest.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; def list_to_frac(l):
+    ...     expr = Integer(0)
+    ...     for i in reversed(l[1:]):
+    ...         expr += i
+    ...         expr = 1/expr
+    ...     return l[0] + expr
+    &gt;&gt;&gt; list_to_frac([x, y, z])
+          1
+    x + ─────
+            1
+        y + ─
+            z</code></pre><h5 id="In-Julia:-50"><a class="docs-heading-anchor" href="#In-Julia:-50">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-50" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt;  function list_to_frac(l)
+         expr = Sym(0)
+         for i in reverse(l[2:end])
+           expr += i
+           expr =  1/expr
+         end
+         l[1] + expr
+       end
+list_to_frac (generic function with 1 method)
+
+julia&gt; list_to_frac([x, y, z]) |&gt; string
+&quot;x + 1/(y + 1/z)&quot;</code></pre><hr/><p>We use <code>Integer(0)</code> in <code>list_to_frac</code> so that the result will always be a SymPy object, even if we only pass in Python ints.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; list_to_frac([1, 2, 3, 4])
+    43
+    ──
+    30</code></pre><h5 id="In-Julia:-51"><a class="docs-heading-anchor" href="#In-Julia:-51">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-51" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; list_to_frac([1, 2, 3, 4]) |&gt; N
+43//30</code></pre><hr/><p>Every finite continued fraction is a rational number, but we are interested in symbolics here, so let&#39;s create a symbolic continued fraction.  The <code>symbols()</code> function that we have been using has a shortcut to create numbered symbols.  <code>symbols(&#39;a0:5&#39;)</code> will create the symbols <code>a0</code>, <code>a1</code>, ..., <code>a4</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; syms = symbols(&#39;a0:5&#39;)
+    &gt;&gt;&gt; syms
+    (a₀, a₁, a₂, a₃, a₄)
+    &gt;&gt;&gt; a0, a1, a2, a3, a4 = syms
+    &gt;&gt;&gt; frac = list_to_frac(syms)
+    &gt;&gt;&gt; frac
+                 1
+    a₀ + ─────────────────
+                   1
+         a₁ + ────────────
+                      1
+              a₂ + ───────
+                        1
+                   a₃ + ──
+                        a₄</code></pre><h5 id="In-Julia:-52"><a class="docs-heading-anchor" href="#In-Julia:-52">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-52" title="Permalink"></a></h5><p>We can pass tensor-like notation to <code>@syms</code> to create containers of indexed variables</p><pre><code class="language-julia-repl hljs">julia&gt; @syms a[0:4]
+(Sym[a₀, a₁, a₂, a₃, a₄],)
+
+julia&gt; frac = list_to_frac(a); string(frac)
+&quot;a₀ + 1/(a₁ + 1/(a₂ + 1/(a₃ + 1/a₄)))&quot;</code></pre><hr/><p>This form is useful for understanding continued fractions, but lets put it into standard rational function form using <code>cancel()</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; frac = cancel(frac)
+    &gt;&gt;&gt; frac
+    a₀⋅a₁⋅a₂⋅a₃⋅a₄ + a₀⋅a₁⋅a₂ + a₀⋅a₁⋅a₄ + a₀⋅a₃⋅a₄ + a₀ + a₂⋅a₃⋅a₄ + a₂ + a₄
+    ─────────────────────────────────────────────────────────────────────────
+                     a₁⋅a₂⋅a₃⋅a₄ + a₁⋅a₂ + a₁⋅a₄ + a₃⋅a₄ + 1
+</code></pre><h5 id="In-Julia:-53"><a class="docs-heading-anchor" href="#In-Julia:-53">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-53" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; frac = cancel(frac)
+a₀⋅a₁⋅a₂⋅a₃⋅a₄ + a₀⋅a₁⋅a₂ + a₀⋅a₁⋅a₄ + a₀⋅a₃⋅a₄ + a₀ + a₂⋅a₃⋅a₄ + a₂ + a₄
+─────────────────────────────────────────────────────────────────────────
+                 a₁⋅a₂⋅a₃⋅a₄ + a₁⋅a₂ + a₁⋅a₄ + a₃⋅a₄ + 1</code></pre><hr/><p>Now suppose we were given <code>frac</code> in the above canceled form. In fact, we might be given the fraction in any form, but we can always put it into the above canonical form with <code>cancel()</code>.  Suppose that we knew that it could be rewritten as a continued fraction.  How could we do this with SymPy?  A continued fraction is recursively <span>$c + \frac{1}{f}$</span>, where <span>$c$</span> is an integer and <span>$f$</span> is a (smaller) continued fraction.  If we could write the expression in this form, we could pull out each <span>$c$</span> recursively and add it to a list.  We could then get a continued fraction with our <code>list_to_frac()</code> function.</p><p>The key observation here is that we can convert an expression to the form <code>c + \frac{1}{f}</code> by doing a partial fraction decomposition with respect to <code>c</code>. This is because <code>f</code> does not contain <code>c</code>.  This means we need to use the <code>apart()</code> function.  We use <code>apart()</code> to pull the term out, then subtract it from the expression, and take the reciprocal to get the <code>f</code> part.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; l = []
+    &gt;&gt;&gt; frac = apart(frac, a0)
+    &gt;&gt;&gt; frac
+                    a₂⋅a₃⋅a₄ + a₂ + a₄
+    a₀ + ───────────────────────────────────────
+         a₁⋅a₂⋅a₃⋅a₄ + a₁⋅a₂ + a₁⋅a₄ + a₃⋅a₄ + 1
+    &gt;&gt;&gt; l.append(a0)
+    &gt;&gt;&gt; frac = 1/(frac - a0)
+    &gt;&gt;&gt; frac
+    a₁⋅a₂⋅a₃⋅a₄ + a₁⋅a₂ + a₁⋅a₄ + a₃⋅a₄ + 1
+    ───────────────────────────────────────
+               a₂⋅a₃⋅a₄ + a₂ + a₄</code></pre><h5 id="In-Julia:-54"><a class="docs-heading-anchor" href="#In-Julia:-54">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-54" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; l = Sym[]
+Sym[]
+
+julia&gt; a0,a1,a2,a3,a4 = a; # destructure
+
+
+julia&gt; frac = apart(frac, a0); string(frac)
+&quot;a₀ + (a₂*a₃*a₄ + a₂ + a₄)/(a₁*a₂*a₃*a₄ + a₁*a₂ + a₁*a₄ + a₃*a₄ + 1)&quot;
+
+julia&gt; push!(l,  a0)
+1-element Vector{Sym}:
+ a₀
+
+julia&gt; frac = 1/(frac - a0); string(frac)
+&quot;(a₁*a₂*a₃*a₄ + a₁*a₂ + a₁*a₄ + a₃*a₄ + 1)/(a₂*a₃*a₄ + a₂ + a₄)&quot;</code></pre><hr/><p>Now we repeat this process</p><pre><code class="language-python hljs">    &gt;&gt;&gt; frac = apart(frac, a1)
+    &gt;&gt;&gt; frac
+             a₃⋅a₄ + 1
+    a₁ + ──────────────────
+         a₂⋅a₃⋅a₄ + a₂ + a₄
+    &gt;&gt;&gt; l.append(a1)
+    &gt;&gt;&gt; frac = 1/(frac - a1)
+    &gt;&gt;&gt; frac = apart(frac, a2)
+    &gt;&gt;&gt; frac
+             a₄
+    a₂ + ─────────
+         a₃⋅a₄ + 1
+    &gt;&gt;&gt; l.append(a2)
+    &gt;&gt;&gt; frac = 1/(frac - a2)
+    &gt;&gt;&gt; frac = apart(frac, a3)
+    &gt;&gt;&gt; frac
+         1
+    a₃ + ──
+         a₄
+    &gt;&gt;&gt; l.append(a3)
+    &gt;&gt;&gt; frac = 1/(frac - a3)
+    &gt;&gt;&gt; frac = apart(frac, a4)
+    &gt;&gt;&gt; frac
+    a₄
+    &gt;&gt;&gt; l.append(a4)
+    &gt;&gt;&gt; list_to_frac(l)
+                 1
+    a₀ + ─────────────────
+                   1
+         a₁ + ────────────
+                      1
+              a₂ + ───────
+                        1
+                   a₃ + ──
+                        a₄</code></pre><h5 id="In-Julia:-55"><a class="docs-heading-anchor" href="#In-Julia:-55">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-55" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; frac = apart(frac, a1);
+
+julia&gt; push!(l, a1);
+
+julia&gt; frac = 1/(frac - a1);
+
+julia&gt; frac = apart(frac, a2);
+
+julia&gt; push!(l, a2);
+
+julia&gt; frac = 1/(frac - a2);
+
+julia&gt; frac = apart(frac, a3);
+
+julia&gt; push!(l, a3);
+
+julia&gt; frac = 1/(frac - a3);
+
+julia&gt; frac = apart(frac, a4);
+
+julia&gt; push!(l, a4);
+
+julia&gt; list_to_frac(l) |&gt; string
+&quot;a₀ + 1/(a₁ + 1/(a₂ + 1/(a₃ + 1/a₄)))&quot;</code></pre><hr/><div class="admonition is-info"><header class="admonition-header">Quick tip</header><div class="admonition-body"><p>You can execute multiple lines at once in SymPy Live.  Typing <code>Shift-Enter</code> instead of <code>Enter</code> will enter a newline instead of executing.</p></div></div><p>Of course, this exercise seems pointless, because we already know that our <code>frac</code> is <code>list_to_frac([a0, a1, a2, a3, a4])</code>.  So try the following exercise.  Take a list of symbols and randomize them, and create the canceled continued fraction, and see if you can reproduce the original list.  For example</p><pre><code class="language-python hljs">    &gt;&gt;&gt; import random
+    &gt;&gt;&gt; l = list(symbols(&#39;a0:5&#39;))
+    &gt;&gt;&gt; random.shuffle(l)
+    &gt;&gt;&gt; orig_frac = frac = cancel(list_to_frac(l))
+    &gt;&gt;&gt; del l</code></pre><h5 id="In-Julia:-56"><a class="docs-heading-anchor" href="#In-Julia:-56">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-56" title="Permalink"></a></h5><ul><li><code>shuffle</code> from Python is <code>randperm</code> in the <code>Random</code> module</li></ul><pre><code class="language-julia hljs">julia&gt; using Random
+
+julia&gt; @syms a[0:4]
+(Sym[a₀, a₁, a₂, a₃, a₄],)
+
+julia&gt; a = a[randperm(length(a))]
+5-element Vector{Sym}:
+ a₄
+ a₀
+ a₃
+ a₂
+ a₁
+
+julia&gt; orig_frac = frac = cancel(list_to_frac(a))
+a₀⋅a₁⋅a₂⋅a₃⋅a₄ + a₀⋅a₁⋅a₄ + a₀⋅a₃⋅a₄ + a₁⋅a₂⋅a₃ + a₁⋅a₂⋅a₄ + a₁ + a₃ + a₄
+─────────────────────────────────────────────────────────────────────────
+                 a₀⋅a₁⋅a₂⋅a₃ + a₀⋅a₁ + a₀⋅a₃ + a₁⋅a₂ + 1</code></pre><hr/><p>Click on &quot;Run code block in SymPy Live&quot; on the definition of <code>list_to_frac()</code> above, and then on the above example, and try to reproduce <code>l</code> from <code>frac</code>.  I have deleted <code>l</code> at the end to remove the temptation for peeking (you can check your answer at the end by calling <code>cancel(list_to_frac(l))</code> on the list that you generate at the end, and comparing it to <code>orig_frac</code>.</p><p>See if you can think of a way to figure out what symbol to pass to <code>apart()</code> at each stage (hint: think of what happens to <span>$a_0$</span> in the formula <span>$a_0 + \frac{1}{a_1 + \cdots}$</span> when it is canceled).</p><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>Answer: a0 is the only symbol that does not appear in the denominator</p></div></div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../basic_operations/">« Basic operations</a><a class="docs-footer-nextpage" href="../calculus/">Calculus »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.1.0 on <span class="colophon-date" title="Thursday 28 September 2023 14:35">Thursday 28 September 2023</span>. Using Julia version 1.9.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

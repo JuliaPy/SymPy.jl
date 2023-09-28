@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Matrices · SymPy</title><meta name="title" content="Matrices · SymPy"/><meta property="og:title" content="Matrices · SymPy"/><meta property="twitter:title" content="Matrices · SymPy"/><meta name="description" content="Documentation for SymPy."/><meta property="og:description" content="Documentation for SymPy."/><meta property="twitter:description" content="Documentation for SymPy."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">SymPy</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../../introduction/">Examples</a></li><li><span class="tocitem">SymPy tutorial</span><ul><li><a class="tocitem" href="../">About</a></li><li><a class="tocitem" href="../intro/">Introduction</a></li><li><a class="tocitem" href="../gotchas/">Gotchas</a></li><li><a class="tocitem" href="../basic_operations/">Basic operations</a></li><li><a class="tocitem" href="../simplification/">Simplification</a></li><li><a class="tocitem" href="../calculus/">Calculus</a></li><li><a class="tocitem" href="../solvers/">Solvers</a></li><li class="is-active"><a class="tocitem" href>Matrices</a><ul class="internal"><li><a class="tocitem" href="#Basic-Operations"><span>Basic Operations</span></a></li><li><a class="tocitem" href="#Basic-Methods"><span>Basic Methods</span></a></li><li><a class="tocitem" href="#Matrix-Constructors"><span>Matrix Constructors</span></a></li><li><a class="tocitem" href="#Advanced-Methods"><span>Advanced Methods</span></a></li><li><a class="tocitem" href="#Nullspace"><span>Nullspace</span></a></li><li><a class="tocitem" href="#Columnspace"><span>Columnspace</span></a></li><li><a class="tocitem" href="#Eigenvalues,-Eigenvectors,-and-Diagonalization"><span>Eigenvalues, Eigenvectors, and Diagonalization</span></a></li><li><a class="tocitem" href="#Possible-Issues"><span>Possible Issues</span></a></li><li><a class="tocitem" href="#Zero-Testing"><span>Zero Testing</span></a></li></ul></li><li><a class="tocitem" href="../manipulation/">Advanced expression  manipulation</a></li></ul></li><li><a class="tocitem" href="../../reference/">Reference/API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">SymPy tutorial</a></li><li class="is-active"><a href>Matrices</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Matrices</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaPy/SymPy.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaPy/SymPy.jl/blob/master/docs/src/Tutorial/matrices.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Matrices"><a class="docs-heading-anchor" href="#Matrices">Matrices</a><a id="Matrices-1"></a><a class="docs-heading-anchor-permalink" href="#Matrices" title="Permalink"></a></h1><p><a href="https://docs.sympy.org/latest/tutorial/matrices.html">From</a></p><pre><code class="language-python hljs">    &gt;&gt;&gt; from sympy import *
+    &gt;&gt;&gt; init_printing(use_unicode=True)</code></pre><h5 id="In-Julia:"><a class="docs-heading-anchor" href="#In-Julia:">In <code>Julia</code>:</a><a id="In-Julia:-1"></a><a class="docs-heading-anchor-permalink" href="#In-Julia:" title="Permalink"></a></h5><ul><li>In <code>SymPy</code>, matrices can be store using <code>Julia</code>&#39;s <em>generic</em> <code>Matrix{T}</code> type where <code>T &lt;: Sym</code> <em>or</em> using SymPy&#39;s matrix type, wrapped in a <code>SymMatrix</code> type by <code>SymPy</code>. This tutorial shows how to use the underlying <code>SymMatrix</code> values. To construct a matrix of symbolic values is identical to construction a matrix of numeric values within <code>Julia</code>, and will be illustrated at the end.</li></ul><ul><li><p>methods for <code>SymMatrix</code> objects use the dot call syntax. As a convenience, this will also work for <code>Array{Sym}</code> objects. The returned value may be a <code>SymMatrix</code>, not an <code>Array{Sym}</code>.</p></li><li><p>The matrix constructor in SymPy using a vector of row vectors does <em>not</em> work in <code>SymPy</code>, as of newer versions (it does not work with version 1.5.1 of sympy and PyCall). This style is used in this document. The user of <code>SymPy</code> can eaesily avoid this specification, using Julia&#39;s matrix construction techniques.</p></li></ul><pre><code class="language-julia-repl hljs">julia&gt; using SymPy
+
+julia&gt; using LinearAlgebra
+</code></pre><hr/><p>To make a matrix in SymPy, use the <code>Matrix</code> object.  A matrix is constructed by providing a list of row vectors that make up the matrix.  For example, to construct the matrix</p><p class="math-container">\[~
+   \left[\begin{array}{cc}1 &amp; -1\\3 &amp; 4\\0 &amp; 2\end{array}\right]
+~\]</p><p>use</p><pre><code class="language-python hljs">    &gt;&gt;&gt; Matrix([[1, -1], [3, 4], [0, 2]])
+    ⎡1  -1⎤
+    ⎢     ⎥
+    ⎢3  4 ⎥
+    ⎢     ⎥
+    ⎣0  2 ⎦</code></pre><h5 id="In-Julia:-2"><a class="docs-heading-anchor" href="#In-Julia:-2">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-2" title="Permalink"></a></h5><ul><li>In <code>Julia</code>, the <code>Matrix</code> constructor is <em>not</em> exported, so must be qualified. Here we <em>avoid</em> the vector of row vectors above:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; sympy.Matrix([1 -1; 3 4; 0 2])
+3×2 Matrix{Sym}:
+ 1  -1
+ 3   4
+ 0   2
+</code></pre><p><em>However</em>, through the magic of <code>PyCall</code>, such matrices are converted into <code>Julia</code> matrices, of type <code>Array{Sym}</code>, so the familiar matrix operations for <code>Julia</code> users are available.</p><p>In fact, the above could be done in the more <code>Julia</code>n manner through</p><pre><code class="language-julia-repl hljs">julia&gt; Sym[1 -1; 3 4; 0 2]
+3×2 Matrix{Sym}:
+ 1  -1
+ 3   4
+ 0   2
+</code></pre><p>using an annotation to ensure the type. Alternatively, through promotion, just a single symbolic object will result in the same:</p><pre><code class="language-julia-repl hljs">julia&gt; [Sym(1) -1; 3 4; 0 2]
+3×2 Matrix{Sym}:
+ 1  -1
+ 3   4
+ 0   2
+</code></pre><hr/><p>To make it easy to make column vectors, a list of elements is considered to be a column vector.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; Matrix([1, 2, 3])
+    ⎡1⎤
+    ⎢ ⎥
+    ⎢2⎥
+    ⎢ ⎥
+    ⎣3⎦</code></pre><h5 id="In-Julia:-3"><a class="docs-heading-anchor" href="#In-Julia:-3">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-3" title="Permalink"></a></h5><p>For this use, <code>sympy.Matrix</code> does work, but again its usage is discouraged:</p><pre><code class="language-julia-repl hljs">julia&gt; sympy.Matrix([1, 2, 3])
+3×1 Matrix{Sym}:
+ 1
+ 2
+ 3
+</code></pre><ul><li>Again, this is converted into a <code>Vector{Sym}</code> object or entered directly:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; Sym[1,2,3]
+3-element Vector{Sym}:
+ 1
+ 2
+ 3
+</code></pre><div class="admonition is-info"><header class="admonition-header">Avoid `sympy.Matrix`</header><div class="admonition-body"><p>As shown, it is better to  avoid  the   <code>sympy.Matrix</code> constructor when possible, and when not, only pass in a  symbolic  array created through <code>Julia</code>&#39;s array semantics.</p></div></div><hr/><p>Matrices are manipulated just like any other object in SymPy or Python.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; M = Matrix([[1, 2, 3], [3, 2, 1]])
+    &gt;&gt;&gt; N = Matrix([0, 1, 1])
+    &gt;&gt;&gt; M*N
+    ⎡5⎤
+    ⎢ ⎥
+    ⎣3⎦</code></pre><h5 id="In-Julia:-4"><a class="docs-heading-anchor" href="#In-Julia:-4">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-4" title="Permalink"></a></h5><ul><li>In <code>Julia</code>, matrices are just matrices, and inherit all of the operations defined on them:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; M = Sym[1 2 3; 3 2 1]
+2×3 Matrix{Sym}:
+ 1  2  3
+ 3  2  1
+
+julia&gt; N = Sym[0, 1, 1]
+3-element Vector{Sym}:
+ 0
+ 1
+ 1
+
+julia&gt; M*N
+2-element Vector{Sym}:
+ 5
+ 3
+</code></pre><hr/><p>One important thing to note about SymPy matrices is that, unlike every other object in SymPy, they are mutable.  This means that they can be modified in place, as we will see below.  The downside to this is that <code>Matrix</code> cannot be used in places that require immutability, such as inside other SymPy expressions or as keys to dictionaries.  If you need an immutable version of <code>Matrix</code>, use <code>ImmutableMatrix</code>.</p><h5 id="In-Julia:-5"><a class="docs-heading-anchor" href="#In-Julia:-5">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-5" title="Permalink"></a></h5><p>A distinction is made between <code>ImmutableMatrix</code> and a mutable one. Mutable ones are mapped to <code>Julia</code> arrays, immutable ones are left as a symbolic object of type <code>SymMatrix</code>. The usual infix mathematical operations (but not dot broadcasting), 0-based indexing, and dot call syntax for methods maay  be used with these objects.</p><h2 id="Basic-Operations"><a class="docs-heading-anchor" href="#Basic-Operations">Basic Operations</a><a id="Basic-Operations-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-Operations" title="Permalink"></a></h2><h3 id="Shape"><a class="docs-heading-anchor" href="#Shape">Shape</a><a id="Shape-1"></a><a class="docs-heading-anchor-permalink" href="#Shape" title="Permalink"></a></h3><p>Here are some basic operations on <code>Matrix</code>.  To get the shape of a matrix use <code>shape</code></p><pre><code class="language-python hljs">    &gt;&gt;&gt; M = Matrix([[1, 2, 3], [-2, 0, 4]])
+    &gt;&gt;&gt; M
+    ⎡1   2  3⎤
+    ⎢        ⎥
+    ⎣-2  0  4⎦
+    &gt;&gt;&gt; M.shape
+    (2, 3)</code></pre><h5 id="In-Julia:-6"><a class="docs-heading-anchor" href="#In-Julia:-6">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-6" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; M = Sym[1 2 3; -2 0 4]
+2×3 Matrix{Sym}:
+  1  2  3
+ -2  0  4
+
+julia&gt; M.shape
+(2, 3)
+</code></pre><p>Or, the <code>Julia</code>n counterpart:</p><pre><code class="language-julia-repl hljs">julia&gt; size(M)
+(2, 3)
+</code></pre><hr/><h3 id="Accessing-Rows-and-Columns"><a class="docs-heading-anchor" href="#Accessing-Rows-and-Columns">Accessing Rows and Columns</a><a id="Accessing-Rows-and-Columns-1"></a><a class="docs-heading-anchor-permalink" href="#Accessing-Rows-and-Columns" title="Permalink"></a></h3><p>To get an individual row or column of a matrix, use <code>row</code> or <code>col</code>.  For example, <code>M.row(0)</code> will get the first row. <code>M.col(-1)</code> will get the last column.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; M.row(0)
+    [1  2  3]
+    &gt;&gt;&gt; M.col(-1)
+    ⎡3⎤
+    ⎢ ⎥
+    ⎣4⎦</code></pre><h5 id="In-Julia:-7"><a class="docs-heading-anchor" href="#In-Julia:-7">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-7" title="Permalink"></a></h5><ul><li>these 0-based operations are supported:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; M.row(0)
+1×3 Matrix{Sym}:
+ 1  2  3
+
+julia&gt; M.col(-1)
+2×1 Matrix{Sym}:
+ 3
+ 4
+</code></pre><p>The more familiar counterparts would be:</p><pre><code class="language-julia-repl hljs">julia&gt; M[1,:], M[:, end]
+(Sym[1, 2, 3], Sym[3, 4])
+</code></pre><hr/><h3 id="Deleting-and-Inserting-Rows-and-Columns"><a class="docs-heading-anchor" href="#Deleting-and-Inserting-Rows-and-Columns">Deleting and Inserting Rows and Columns</a><a id="Deleting-and-Inserting-Rows-and-Columns-1"></a><a class="docs-heading-anchor-permalink" href="#Deleting-and-Inserting-Rows-and-Columns" title="Permalink"></a></h3><p>To delete a row or column, use <code>row_del</code> or <code>col_del</code>.  These operations will modify the Matrix <strong>in place</strong>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; M.col_del(0)
+    &gt;&gt;&gt; M
+    ⎡2  3⎤
+    ⎢    ⎥
+    ⎣0  4⎦
+    &gt;&gt;&gt; M.row_del(1)
+    &gt;&gt;&gt; M
+    [2  3]</code></pre><h5 id="In-Julia:-8"><a class="docs-heading-anchor" href="#In-Julia:-8">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-8" title="Permalink"></a></h5><p>These methods do <strong>not</strong> work on <code>Array{Sym}</code> objects, use <code>Julia&#39;s</code> indexing notation to remove a row or column.</p><p>However, these methods <strong>do</strong> work on the <code>ImmutableMatrix</code> class:</p><pre><code class="language-julia-repl hljs">julia&gt; M = sympy.ImmutableMatrix([1 2 3; -2 0 4])  # avoid vector of row vector construction
+⎡1   2  3⎤
+⎢        ⎥
+⎣-2  0  4⎦
+
+julia&gt; M.col_del(0)
+⎡2  3⎤
+⎢    ⎥
+⎣0  4⎦
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; M.row_del(1)
+[1  2  3]
+</code></pre><div class="admonition is-info"><header class="admonition-header">Alert</header><div class="admonition-body"><p>For older versions of sympy, the following did not work (using symbolic  values as matrix entries without reverting to  their PyObjects  had shape issues);  this should work  now:</p></div></div><pre><code class="language-julia-repl hljs">julia&gt; @syms x
+(x,)
+
+julia&gt; sympy.ImmutableMatrix([x 1;  1  x])
+⎡x  1⎤
+⎢    ⎥
+⎣1  x⎦
+</code></pre><hr/><div class="admonition is-info"><header class="admonition-header">TODO</header><div class="admonition-body"><p>This is a mess. See issue 6992.</p></div></div><p>To insert rows or columns, use <code>row_insert</code> or <code>col_insert</code>.  These operations <strong>do not</strong> operate in place.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; M
+    [2  3]
+    &gt;&gt;&gt; M = M.row_insert(1, Matrix([[0, 4]]))
+    &gt;&gt;&gt; M
+    ⎡2  3⎤
+    ⎢    ⎥
+    ⎣0  4⎦
+    &gt;&gt;&gt; M = M.col_insert(0, Matrix([1, -2]))
+    &gt;&gt;&gt; M
+    ⎡1   2  3⎤
+    ⎢        ⎥
+    ⎣-2  0  4⎦</code></pre><h5 id="In-Julia:-9"><a class="docs-heading-anchor" href="#In-Julia:-9">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-9" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; M = sympy.ImmutableMatrix([2 3])
+[2  3]
+
+julia&gt; M = M.row_insert(1, Sym[0 4])
+⎡2  3⎤
+⎢    ⎥
+⎣0  4⎦
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; M = M.col_insert(0, Sym[1, -2])
+⎡1   2  3⎤
+⎢        ⎥
+⎣-2  0  4⎦
+</code></pre><hr/><p>Unless explicitly stated, the methods mentioned below do not operate in place. In general, a method that does not operate in place will return a new <code>Matrix</code> and a method that does operate in place will return <code>None</code>.</p><h5 id="In-Julia"><a class="docs-heading-anchor" href="#In-Julia">In <code>Julia</code></a><a id="In-Julia-1"></a><a class="docs-heading-anchor-permalink" href="#In-Julia" title="Permalink"></a></h5><p>This would be the case for the immutable matrices.</p><hr/><h2 id="Basic-Methods"><a class="docs-heading-anchor" href="#Basic-Methods">Basic Methods</a><a id="Basic-Methods-1"></a><a class="docs-heading-anchor-permalink" href="#Basic-Methods" title="Permalink"></a></h2><p>As noted above, simple operations like addition and multiplication are done just by using <code>+</code>, <code>*</code>, and <code>**</code>.  To find the inverse of a matrix, just raise it to the <code>-1</code> power.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; M = Matrix([[1, 3], [-2, 3]])
+    &gt;&gt;&gt; N = Matrix([[0, 3], [0, 7]])
+    &gt;&gt;&gt; M + N
+    ⎡1   6 ⎤
+    ⎢      ⎥
+    ⎣-2  10⎦
+    &gt;&gt;&gt; M*N
+    ⎡0  24⎤
+    ⎢     ⎥
+    ⎣0  15⎦
+    &gt;&gt;&gt; 3*M
+    ⎡3   9⎤
+    ⎢     ⎥
+    ⎣-6  9⎦
+    &gt;&gt;&gt; M**2
+    ⎡-5  12⎤
+    ⎢      ⎥
+    ⎣-8  3 ⎦
+    &gt;&gt;&gt; M**-1
+    ⎡1/3  -1/3⎤
+    ⎢         ⎥
+    ⎣2/9  1/9 ⎦
+    &gt;&gt;&gt; N**-1
+    Traceback (most recent call last):
+    ...
+    ValueError: Matrix det == 0; not invertible.</code></pre><h5 id="In-Julia:-10"><a class="docs-heading-anchor" href="#In-Julia:-10">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-10" title="Permalink"></a></h5><p>In <code>Julia</code>,  we  use <code>M1</code> instead  of <code>N</code>, an exported symbol of <code>SymPy</code>. Otherise, it  all looks similar:</p><pre><code class="language-julia-repl hljs">julia&gt; M = Sym[1 3; -2 3]
+2×2 Matrix{Sym}:
+  1  3
+ -2  3
+
+julia&gt; M1 = Sym[0 3; 0 7]
+2×2 Matrix{Sym}:
+ 0  3
+ 0  7
+
+julia&gt; M + M1
+2×2 Matrix{Sym}:
+  1   6
+ -2  10
+
+julia&gt; M*M1
+2×2 Matrix{Sym}:
+ 0  24
+ 0  15
+
+julia&gt; 3*M
+2×2 Matrix{Sym}:
+  3  9
+ -6  9
+
+julia&gt; M^2
+2×2 Matrix{Sym}:
+ -5  12
+ -8   3
+
+julia&gt; M^-1
+2×2 Matrix{Sym}:
+ 1/3  -1/3
+ 2/9   1/9</code></pre><p>Attempting to find the inverse of  <code>M1</code> will  error (we suppress its lengthy output)</p><pre><code class="language-julia-repl hljs">julia&gt; using Test
+
+julia&gt; @test_throws  Exception M1^-1
+Test Passed
+      Thrown: PyCall.PyError
+</code></pre><p>The above (except for the inverses) are using generic <code>Julia</code> definitions. For immutable matrices, we would have:</p><pre><code class="language-julia-repl hljs">julia&gt; M = sympy.ImmutableMatrix([1 3; -2 3])
+⎡1   3⎤
+⎢     ⎥
+⎣-2  3⎦
+
+julia&gt; M1 = sympy.ImmutableMatrix([0 3; 0 7])
+⎡0  3⎤
+⎢    ⎥
+⎣0  7⎦
+
+julia&gt; M + M1
+⎡1   6 ⎤
+⎢      ⎥
+⎣-2  10⎦
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; M*M1
+⎡0  24⎤
+⎢     ⎥
+⎣0  15⎦
+
+julia&gt; 3*M
+⎡3   9⎤
+⎢     ⎥
+⎣-6  9⎦
+
+julia&gt; M^2
+         2
+2
+
+julia&gt; M^-1
+⎡1/3  -1/3⎤
+⎢         ⎥
+⎣2/9  1/9 ⎦</code></pre><p>Similarly, <code>M1^(-1)</code> would yield an  error  for  the non-invertible matrix</p><ul><li>There is no broadcasting defined for the <code>SymMatrix</code> type.</li></ul><hr/><p>To take the transpose of a Matrix, use <code>T</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; M = Matrix([[1, 2, 3], [4, 5, 6]])
+    &gt;&gt;&gt; M
+    ⎡1  2  3⎤
+    ⎢       ⎥
+    ⎣4  5  6⎦
+    &gt;&gt;&gt; M.T
+    ⎡1  4⎤
+    ⎢    ⎥
+    ⎢2  5⎥
+    ⎢    ⎥
+    ⎣3  6⎦</code></pre><h5 id="In-Julia:-11"><a class="docs-heading-anchor" href="#In-Julia:-11">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-11" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; M = Sym[1 2 3; 4 5 6]
+2×3 Matrix{Sym}:
+ 1  2  3
+ 4  5  6
+
+julia&gt; M.T
+3×2 Matrix{Sym}:
+ 1  4
+ 2  5
+ 3  6
+</code></pre><hr/><h2 id="Matrix-Constructors"><a class="docs-heading-anchor" href="#Matrix-Constructors">Matrix Constructors</a><a id="Matrix-Constructors-1"></a><a class="docs-heading-anchor-permalink" href="#Matrix-Constructors" title="Permalink"></a></h2><p>Several constructors exist for creating common matrices.  To create an identity matrix, use <code>eye</code>.  The command <code>eye(n)</code> will create an <code>n x n</code> identity matrix:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; eye(3)
+    ⎡1  0  0⎤
+    ⎢       ⎥
+    ⎢0  1  0⎥
+    ⎢       ⎥
+    ⎣0  0  1⎦
+    &gt;&gt;&gt; eye(4)
+    ⎡1  0  0  0⎤
+    ⎢          ⎥
+    ⎢0  1  0  0⎥
+    ⎢          ⎥
+    ⎢0  0  1  0⎥
+    ⎢          ⎥
+    ⎣0  0  0  1⎦</code></pre><h5 id="In-Julia:-12"><a class="docs-heading-anchor" href="#In-Julia:-12">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-12" title="Permalink"></a></h5><ul><li><code>eye</code> is <em>not</em> exported so must qualified:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; sympy.eye(3)
+3×3 Matrix{Sym}:
+ 1  0  0
+ 0  1  0
+ 0  0  1
+
+julia&gt; sympy.eye(4)
+4×4 Matrix{Sym}:
+ 1  0  0  0
+ 0  1  0  0
+ 0  0  1  0
+ 0  0  0  1
+</code></pre><hr/><p>To create a matrix of all zeros, use <code>zeros</code>.  <code>zeros(n, m)</code> creates an <code>n x m</code> matrix of <code>0</code>s.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; zeros(2, 3)
+    ⎡0  0  0⎤
+    ⎢       ⎥
+    ⎣0  0  0⎦</code></pre><h5 id="In-Julia:-13"><a class="docs-heading-anchor" href="#In-Julia:-13">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-13" title="Permalink"></a></h5><ul><li>zeros is extended but the method expects a symbolic first argument.  Either qualify it:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; sympy.zeros(2, 3)
+2×3 Matrix{Sym}:
+ 0  0  0
+ 0  0  0
+</code></pre><p><em>or</em> create a symbolic first value:</p><pre><code class="language-julia-repl hljs">julia&gt; zeros(Sym(2), 3)
+2×3 Matrix{Sym}:
+ 0  0  0
+ 0  0  0
+</code></pre><p><em>or</em> use the <code>Julia</code> constructor:</p><pre><code class="language-julia-repl hljs">julia&gt; zeros(Sym, 2, 3)
+2×3 Matrix{Sym}:
+ 0  0  0
+ 0  0  0
+</code></pre><hr/><p>Similarly, <code>ones</code> creates a matrix of ones.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; ones(3, 2)
+    ⎡1  1⎤
+    ⎢    ⎥
+    ⎢1  1⎥
+    ⎢    ⎥
+    ⎣1  1⎦</code></pre><h5 id="In-Julia:-14"><a class="docs-heading-anchor" href="#In-Julia:-14">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-14" title="Permalink"></a></h5><ul><li>Similarly with <code>ones</code>:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; sympy.ones(3, 2)
+3×2 Matrix{Sym}:
+ 1  1
+ 1  1
+ 1  1
+</code></pre><hr/><p>To create diagonal matrices, use <code>diag</code>.  The arguments to <code>diag</code> can be either numbers or matrices.  A number is interpreted as a <code>1 x 1</code> matrix. The matrices are stacked diagonally.  The remaining elements are filled with <code>0</code>\ s.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; diag(1, 2, 3)
+    ⎡1  0  0⎤
+    ⎢       ⎥
+    ⎢0  2  0⎥
+    ⎢       ⎥
+    ⎣0  0  3⎦
+    &gt;&gt;&gt; diag(-1, ones(2, 2), Matrix([5, 7, 5]))
+    ⎡-1  0  0  0⎤
+    ⎢           ⎥
+    ⎢0   1  1  0⎥
+    ⎢           ⎥
+    ⎢0   1  1  0⎥
+    ⎢           ⎥
+    ⎢0   0  0  5⎥
+    ⎢           ⎥
+    ⎢0   0  0  7⎥
+    ⎢           ⎥
+    ⎣0   0  0  5⎦</code></pre><h5 id="In-Julia:-15"><a class="docs-heading-anchor" href="#In-Julia:-15">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-15" title="Permalink"></a></h5><ul><li>similarly with <code>diag</code>:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; sympy.diag(1, 2, 3)
+3×3 Matrix{Sym}:
+ 1  0  0
+ 0  2  0
+ 0  0  3
+
+julia&gt; sympy.diag(-1, sympy.ones(2, 2), sympy.Matrix([5, 7, 5]))
+6×4 Matrix{Sym}:
+ -1  0  0  0
+  0  1  1  0
+  0  1  1  0
+  0  0  0  5
+  0  0  0  7
+  0  0  0  5
+</code></pre><ul><li>The first one, could also use <code>Julia</code>&#39;s <code>diagm</code> function from the <code>LinearAlgebra</code> package:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; diagm(0 =&gt; Sym[1,2,3])
+3×3 Matrix{Sym}:
+ 1  0  0
+ 0  2  0
+ 0  0  3
+</code></pre><hr/><h2 id="Advanced-Methods"><a class="docs-heading-anchor" href="#Advanced-Methods">Advanced Methods</a><a id="Advanced-Methods-1"></a><a class="docs-heading-anchor-permalink" href="#Advanced-Methods" title="Permalink"></a></h2><h3 id="Determinant"><a class="docs-heading-anchor" href="#Determinant">Determinant</a><a id="Determinant-1"></a><a class="docs-heading-anchor-permalink" href="#Determinant" title="Permalink"></a></h3><p>To compute the determinant of a matrix, use <code>det</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; M = Matrix([[1, 0, 1], [2, -1, 3], [4, 3, 2]])
+    &gt;&gt;&gt; M
+    ⎡1  0   1⎤
+    ⎢        ⎥
+    ⎢2  -1  3⎥
+    ⎢        ⎥
+    ⎣4  3   2⎦
+    &gt;&gt;&gt; M.det()
+    -1</code></pre><h5 id="In-Julia:-16"><a class="docs-heading-anchor" href="#In-Julia:-16">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-16" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; M = Sym[1 0 1; 2 -1 3; 4 3 2]
+3×3 Matrix{Sym}:
+ 1   0  1
+ 2  -1  3
+ 4   3  2
+
+julia&gt; M.det()
+-1
+</code></pre><p>Let</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x
+(x,)
+
+julia&gt; A = Sym[x 1; 1 x]
+2×2 Matrix{Sym}:
+ x  1
+ 1  x
+</code></pre><p>The method for <code>det</code> falls back  the  sympy method:</p><pre><code class="language-julia-repl hljs">julia&gt; det(A)
+ 2
+x  - 1
+</code></pre><p>There is no reason  to,  but generic <code>Julia</code> methods  could be used:</p><pre><code class="language-julia-repl hljs">julia&gt; out  = lu(A)
+LU{Sym, Matrix{Sym}, Vector{Int64}}
+L factor:
+2×2 Matrix{Sym}:
+   1  0
+ 1/x  1
+U factor:
+2×2 Matrix{Sym}:
+ x        1
+ 0  x - 1/x
+
+julia&gt; prod(diag(out.L)) * prod(diag(out.U))
+  ⎛    1⎞
+x⋅⎜x - ─⎟
+  ⎝    x⎠</code></pre><h3 id="RREF"><a class="docs-heading-anchor" href="#RREF">RREF</a><a id="RREF-1"></a><a class="docs-heading-anchor-permalink" href="#RREF" title="Permalink"></a></h3><p>To put a matrix into reduced row echelon form, use <code>rref</code>.  <code>rref</code> returns a tuple of two elements. The first is the reduced row echelon form, and the second is a tuple of indices of the pivot columns.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; M = Matrix([[1, 0, 1, 3], [2, 3, 4, 7], [-1, -3, -3, -4]])
+    &gt;&gt;&gt; M
+    ⎡1   0   1   3 ⎤
+    ⎢              ⎥
+    ⎢2   3   4   7 ⎥
+    ⎢              ⎥
+    ⎣-1  -3  -3  -4⎦
+    &gt;&gt;&gt; M.rref()
+    ⎛⎡1  0   1    3 ⎤        ⎞
+    ⎜⎢              ⎥        ⎟
+    ⎜⎢0  1  2/3  1/3⎥, (0, 1)⎟
+    ⎜⎢              ⎥        ⎟
+    ⎝⎣0  0   0    0 ⎦        ⎠</code></pre><h5 id="In-Julia:-17"><a class="docs-heading-anchor" href="#In-Julia:-17">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-17" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; M = Sym[1 0 1 3; 2 3 4 7; -1 -3 -3 -4]
+3×4 Matrix{Sym}:
+  1   0   1   3
+  2   3   4   7
+ -1  -3  -3  -4
+
+julia&gt; M.rref()
+(Sym[1 0 1 3; 0 1 2/3 1/3; 0 0 0 0], (0, 1))</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>The first element of the tuple returned by <code>rref</code> is of type <code>Matrix</code>. The second is of type <code>tuple</code>.</p></div></div><h2 id="Nullspace"><a class="docs-heading-anchor" href="#Nullspace">Nullspace</a><a id="Nullspace-1"></a><a class="docs-heading-anchor-permalink" href="#Nullspace" title="Permalink"></a></h2><p>To find the nullspace of a matrix, use <code>nullspace</code>. <code>nullspace</code> returns a <code>list</code> of column vectors that span the nullspace of the matrix.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; M = Matrix([[1, 2, 3, 0, 0], [4, 10, 0, 0, 1]])
+    &gt;&gt;&gt; M
+    ⎡1  2   3  0  0⎤
+    ⎢              ⎥
+    ⎣4  10  0  0  1⎦
+    &gt;&gt;&gt; M.nullspace()
+    ⎡⎡-15⎤  ⎡0⎤  ⎡ 1  ⎤⎤
+    ⎢⎢   ⎥  ⎢ ⎥  ⎢    ⎥⎥
+    ⎢⎢ 6 ⎥  ⎢0⎥  ⎢-1/2⎥⎥
+    ⎢⎢   ⎥  ⎢ ⎥  ⎢    ⎥⎥
+    ⎢⎢ 1 ⎥, ⎢0⎥, ⎢ 0  ⎥⎥
+    ⎢⎢   ⎥  ⎢ ⎥  ⎢    ⎥⎥
+    ⎢⎢ 0 ⎥  ⎢1⎥  ⎢ 0  ⎥⎥
+    ⎢⎢   ⎥  ⎢ ⎥  ⎢    ⎥⎥
+    ⎣⎣ 0 ⎦  ⎣0⎦  ⎣ 1  ⎦⎦</code></pre><h5 id="In-Julia:-18"><a class="docs-heading-anchor" href="#In-Julia:-18">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-18" title="Permalink"></a></h5><ul><li>the list is mapped to an array of vectors, otherwise this is identical:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; M = Sym[1 2 3 0 0; 4 10 0 0 1]
+2×5 Matrix{Sym}:
+ 1   2  3  0  0
+ 4  10  0  0  1
+
+julia&gt; M.nullspace()
+3-element Vector{Matrix{Sym}}:
+ [-15; 6; … ; 0; 0;;]
+ [0; 0; … ; 1; 0;;]
+ [1; -1/2; … ; 0; 1;;]
+</code></pre><h2 id="Columnspace"><a class="docs-heading-anchor" href="#Columnspace">Columnspace</a><a id="Columnspace-1"></a><a class="docs-heading-anchor-permalink" href="#Columnspace" title="Permalink"></a></h2><p>To find the columnspace of a matrix, use <code>columnspace</code>. <code>columnspace</code> returns a <code>list</code> of column vectors that span the columnspace of the matrix.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; M = Matrix([[1, 1, 2], [2 ,1 , 3], [3 , 1, 4]])
+    &gt;&gt;&gt; M
+    ⎡1  1  2⎤
+    ⎢       ⎥
+    ⎢2  1  3⎥
+    ⎢       ⎥
+    ⎣3  1  4⎦
+    &gt;&gt;&gt; M.columnspace()
+    ⎡⎡1⎤  ⎡1⎤⎤
+    ⎢⎢ ⎥  ⎢ ⎥⎥
+    ⎢⎢2⎥, ⎢1⎥⎥
+    ⎢⎢ ⎥  ⎢ ⎥⎥
+    ⎣⎣3⎦  ⎣1⎦⎦</code></pre><h5 id="In-Julia:-19"><a class="docs-heading-anchor" href="#In-Julia:-19">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-19" title="Permalink"></a></h5><ul><li>as with <code>nullspace</code>, the return value is a vector of vectors:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; M = Sym[1 1 2; 2 1 3; 3 1 4]
+3×3 Matrix{Sym}:
+ 1  1  2
+ 2  1  3
+ 3  1  4
+
+julia&gt; M.columnspace()
+2-element Vector{Matrix{Sym}}:
+ [1; 2; 3;;]
+ [1; 1; 1;;]
+</code></pre><hr/><h2 id="Eigenvalues,-Eigenvectors,-and-Diagonalization"><a class="docs-heading-anchor" href="#Eigenvalues,-Eigenvectors,-and-Diagonalization">Eigenvalues, Eigenvectors, and Diagonalization</a><a id="Eigenvalues,-Eigenvectors,-and-Diagonalization-1"></a><a class="docs-heading-anchor-permalink" href="#Eigenvalues,-Eigenvectors,-and-Diagonalization" title="Permalink"></a></h2><p>To find the eigenvalues of a matrix, use <code>eigenvals</code>.  <code>eigenvals</code> returns a dictionary of <code>eigenvalue:algebraic multiplicity</code> pairs (similar to the output of :ref:<code>roots &lt;tutorial-roots&gt;</code>).</p><pre><code class="language-python hljs">    &gt;&gt;&gt; M = Matrix([[3, -2,  4, -2], [5,  3, -3, -2], [5, -2,  2, -2], [5, -2, -3,  3]])
+    &gt;&gt;&gt; M
+    ⎡3  -2  4   -2⎤
+    ⎢             ⎥
+    ⎢5  3   -3  -2⎥
+    ⎢             ⎥
+    ⎢5  -2  2   -2⎥
+    ⎢             ⎥
+    ⎣5  -2  -3  3 ⎦
+    &gt;&gt;&gt; M.eigenvals()
+    {-2: 1, 3: 1, 5: 2}</code></pre><h5 id="In-Julia:-20"><a class="docs-heading-anchor" href="#In-Julia:-20">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-20" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; M = Sym[3 -2  4 -2; 5  3 -3 -2; 5 -2  2 -2; 5 -2 -3  3]
+4×4 Matrix{Sym}:
+ 3  -2   4  -2
+ 5   3  -3  -2
+ 5  -2   2  -2
+ 5  -2  -3   3
+
+julia&gt; M.eigenvals()
+Dict{Any, Any} with 3 entries:
+  3  =&gt; 1
+  5  =&gt; 2
+  -2 =&gt; 1
+</code></pre><hr/><p>This means that <code>M</code> has eigenvalues -2, 3, and 5, and that the eigenvalues -2 and 3 have algebraic multiplicity 1 and that the eigenvalue 5 has algebraic multiplicity 2.</p><p>To find the eigenvectors of a matrix, use <code>eigenvects</code>.  <code>eigenvects</code> returns a list of tuples of the form <code>(eigenvalue:algebraic multiplicity, [eigenvectors])</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; M.eigenvects()
+    ⎡⎛       ⎡⎡0⎤⎤⎞  ⎛      ⎡⎡1⎤⎤⎞  ⎛      ⎡⎡1⎤  ⎡0 ⎤⎤⎞⎤
+    ⎢⎜       ⎢⎢ ⎥⎥⎟  ⎜      ⎢⎢ ⎥⎥⎟  ⎜      ⎢⎢ ⎥  ⎢  ⎥⎥⎟⎥
+    ⎢⎜       ⎢⎢1⎥⎥⎟  ⎜      ⎢⎢1⎥⎥⎟  ⎜      ⎢⎢1⎥  ⎢-1⎥⎥⎟⎥
+    ⎢⎜-2, 1, ⎢⎢ ⎥⎥⎟, ⎜3, 1, ⎢⎢ ⎥⎥⎟, ⎜5, 2, ⎢⎢ ⎥, ⎢  ⎥⎥⎟⎥
+    ⎢⎜       ⎢⎢1⎥⎥⎟  ⎜      ⎢⎢1⎥⎥⎟  ⎜      ⎢⎢1⎥  ⎢0 ⎥⎥⎟⎥
+    ⎢⎜       ⎢⎢ ⎥⎥⎟  ⎜      ⎢⎢ ⎥⎥⎟  ⎜      ⎢⎢ ⎥  ⎢  ⎥⎥⎟⎥
+    ⎣⎝       ⎣⎣1⎦⎦⎠  ⎝      ⎣⎣1⎦⎦⎠  ⎝      ⎣⎣0⎦  ⎣1 ⎦⎦⎠⎦</code></pre><h5 id="In-Julia:-21"><a class="docs-heading-anchor" href="#In-Julia:-21">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-21" title="Permalink"></a></h5><ul><li><p>the output is less than desirable, as there is no special <code>show</code> method</p></li><li><p>the <code>eigvals</code> and <code>eigvecs</code> methods present the output in the manner that <code>Julia</code>&#39;s generic functions do:</p></li></ul><pre><code class="language-julia-repl hljs">julia&gt; M.eigenvects()
+3-element Vector{Tuple{Sym, Int64, Vector{Matrix{Sym}}}}:
+ (-2, 1, [[0; 1; 1; 1;;]])
+ (3, 1, [[1; 1; 1; 1;;]])
+ (5, 2, [[1; 1; 1; 0;;], [0; -1; 0; 1;;]])
+</code></pre><p>compare with</p><pre><code class="language-julia-repl hljs">julia&gt; eigvecs(M)
+4×4 Matrix{Sym}:
+ 0  1  1   0
+ 1  1  1  -1
+ 1  1  1   0
+ 1  1  0   1
+</code></pre><hr/><p>This shows us that, for example, the eigenvalue 5 also has geometric multiplicity 2, because it has two eigenvectors.  Because the algebraic and geometric multiplicities are the same for all the eigenvalues, <code>M</code> is diagonalizable.</p><p>To diagonalize a matrix, use <code>diagonalize</code>. <code>diagonalize</code> returns a tuple <code>(P, D)</code>, where <code>D</code> is diagonal and <code>M = PDP^{-1}</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; P, D = M.diagonalize()
+    &gt;&gt;&gt; P
+    ⎡0  1  1  0 ⎤
+    ⎢           ⎥
+    ⎢1  1  1  -1⎥
+    ⎢           ⎥
+    ⎢1  1  1  0 ⎥
+    ⎢           ⎥
+    ⎣1  1  0  1 ⎦
+    &gt;&gt;&gt; D
+    ⎡-2  0  0  0⎤
+    ⎢           ⎥
+    ⎢0   3  0  0⎥
+    ⎢           ⎥
+    ⎢0   0  5  0⎥
+    ⎢           ⎥
+    ⎣0   0  0  5⎦
+    &gt;&gt;&gt; P*D*P**-1
+    ⎡3  -2  4   -2⎤
+    ⎢             ⎥
+    ⎢5  3   -3  -2⎥
+    ⎢             ⎥
+    ⎢5  -2  2   -2⎥
+    ⎢             ⎥
+    ⎣5  -2  -3  3 ⎦
+    &gt;&gt;&gt; P*D*P**-1 == M
+    True</code></pre><h5 id="In-Julia:-22"><a class="docs-heading-anchor" href="#In-Julia:-22">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-22" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; P, D = M.diagonalize()
+(Sym[0 1 1 0; 1 1 1 -1; 1 1 1 0; 1 1 0 1], Sym[-2 0 0 0; 0 3 0 0; 0 0 5 0; 0 0 0 5])
+
+julia&gt; P
+4×4 Matrix{Sym}:
+ 0  1  1   0
+ 1  1  1  -1
+ 1  1  1   0
+ 1  1  0   1
+
+julia&gt; D
+4×4 Matrix{Sym}:
+ -2  0  0  0
+  0  3  0  0
+  0  0  5  0
+  0  0  0  5
+
+julia&gt; P*D*P^-1
+4×4 Matrix{Sym}:
+ 3  -2   4  -2
+ 5   3  -3  -2
+ 5  -2   2  -2
+ 5  -2  -3   3
+
+julia&gt; P*D*P^-1 == M
+true
+</code></pre><div class="admonition is-info"><header class="admonition-header">Quick Tip</header><div class="admonition-body"></div></div><p>As  <code>lambda</code> is a reserved keyword in Python, so to create a Symbol called  λ, while using the same names for SymPy Symbols and Python variables, use <code>lamda</code> (without the <code>b</code>).  It will still pretty print as λ.</p><p>Note that since <code>eigenvects</code> also includes the eigenvalues, you should use it instead of <code>eigenvals</code> if you also want the eigenvectors. However, as computing the eigenvectors may often be costly, <code>eigenvals</code> should be preferred if you only wish to find the eigenvalues.</p><p>If all you want is the characteristic polynomial, use <code>charpoly</code>.  This is more efficient than <code>eigenvals</code>, because sometimes symbolic roots can be expensive to calculate.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; lamda = symbols(&#39;lamda&#39;)
+    &gt;&gt;&gt; p = M.charpoly(lamda)
+    &gt;&gt;&gt; factor(p)
+           2
+    (λ - 5) ⋅(λ - 3)⋅(λ + 2)</code></pre><h5 id="In-Julia:-23"><a class="docs-heading-anchor" href="#In-Julia:-23">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-23" title="Permalink"></a></h5><ul><li>note missing <code>b</code> is not needed with <code>Julia</code>:</li></ul><pre><code class="language-julia hljs">julia&gt; @syms lambda
+(lambda,)
+
+julia&gt; p = M.charpoly(lambda)
+PurePoly(lambda**4 - 11*lambda**3 + 29*lambda**2 + 35*lambda - 150, lambda, domain=&#39;ZZ&#39;)
+
+julia&gt; factor(p) |&gt;  string
+&quot;PurePoly(lambda^4 - 11*lambda^3 + 29*lambda^2 + 35*lambda - 150, lambda, domain=&#39;ZZ&#39;)&quot;</code></pre><p>As an aside, we can get prettier output by adjusting how <code>lambda</code> should print, as follows:</p><pre><code class="language-julia hljs">julia&gt; @syms lambda=&gt;&quot;λ&quot;
+(λ,)
+
+julia&gt; p = M.charpoly(lambda)
+PurePoly(λ**4 - 11*λ**3 + 29*λ**2 + 35*λ - 150, λ, domain=&#39;ZZ&#39;)</code></pre><hr/><div class="admonition is-info"><header class="admonition-header">TODO</header><div class="admonition-body"><p>Add an example for <code>jordan_form</code>, once it is fully implemented.</p></div></div><h2 id="Possible-Issues"><a class="docs-heading-anchor" href="#Possible-Issues">Possible Issues</a><a id="Possible-Issues-1"></a><a class="docs-heading-anchor-permalink" href="#Possible-Issues" title="Permalink"></a></h2><h2 id="Zero-Testing"><a class="docs-heading-anchor" href="#Zero-Testing">Zero Testing</a><a id="Zero-Testing-1"></a><a class="docs-heading-anchor-permalink" href="#Zero-Testing" title="Permalink"></a></h2><p>If your matrix operations are failing or returning wrong answers, the common reasons would likely be from zero testing. If there is an expression not properly zero-tested, it can possibly bring issues in finding pivots for gaussian elimination, or deciding whether the matrix is inversible, or any high level functions which relies on the prior procedures.</p><p>Currently, the SymPy&#39;s default method of zero testing <code>_iszero</code> is only guaranteed to be accurate in some limited domain of numerics and symbols, and any complicated expressions beyond its decidability are treated as <code>None</code>, which behaves similarly to logical <code>False</code>.</p><p>The list of methods using zero testing procedures are as followings.</p><p><code>echelon_form</code> , <code>is_echelon</code> , <code>rank</code> , <code>rref</code> , <code>nullspace</code> , <code>eigenvects</code> , <code>inverse_ADJ</code> , <code>inverse_GE</code> , <code>inverse_LU</code> , <code>LUdecomposition</code> , <code>LUdecomposition_Simple</code> , <code>LUsolve</code></p><p>They have property <code>iszerofunc</code> opened up for user to specify zero testing method, which can accept any function with single input and boolean output, while being defaulted with <code>_iszero</code>.</p><p>Here is an example of solving an issue caused by undertested zero. [#zerotestexampleidea-fn]_ [#zerotestexamplediscovery-fn]_</p><pre><code class="language-python hljs">    &gt;&gt;&gt; from sympy import *
+    &gt;&gt;&gt; q = Symbol(&quot;q&quot;, positive = True)
+    &gt;&gt;&gt; m = Matrix([
+    ... [-2*cosh(q/3),      exp(-q),            1],
+    ... [      exp(q), -2*cosh(q/3),            1],
+    ... [           1,            1, -2*cosh(q/3)]])
+    &gt;&gt;&gt; m.nullspace()
+    []</code></pre><h5 id="In-Julia:-24"><a class="docs-heading-anchor" href="#In-Julia:-24">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-24" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; q = sympy.Symbol(&quot;q&quot;, positive = true)
+q
+
+julia&gt; m = Sym[-2*cosh(q/3) exp(-q) 1; exp(q) -2*cosh(q/3) 1; 1 1 -2*cosh(q/3)]
+3×3 Matrix{Sym}:
+ -2*cosh(q/3)       exp(-q)             1
+       exp(q)  -2*cosh(q/3)             1
+            1             1  -2*cosh(q/3)
+
+julia&gt; m.nullspace()
+1-element Vector{Matrix{Sym}}:
+ [-(-2*exp(q)*cosh(q/3) - 4*cosh(q/3)^2 - 1 - 2*exp(-q)*cosh(q/3))/(4*exp(q)*cosh(q/3)^2 + 4*cosh(q/3) + exp(-q)); -(1 - 4*cosh(q/3)^2)/(2*cosh(q/3) + exp(-q)); 1;;]
+</code></pre><hr/><p>You can trace down which expression is being underevaluated, by injecting a custom zero test with warnings enabled.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; import warnings
+    &gt;&gt;&gt;
+    &gt;&gt;&gt; def my_iszero(x):
+    ...     try:
+    ...         result = x.is_zero
+    ...     except AttributeError:
+    ...         result = None
+    ...
+    ...     # Warnings if evaluated into None
+    ...     if result == None:
+    ...         warnings.warn(&quot;Zero testing of {} evaluated into {}&quot;.format(x, result))
+    ...     return result
+    ...
+    &gt;&gt;&gt; m.nullspace(iszerofunc=my_iszero) # doctest: +SKIP
+    __main__:9: UserWarning: Zero testing of 4*cosh(q/3)**2 - 1 evaluated into None
+    __main__:9: UserWarning: Zero testing of (-exp(q) - 2*cosh(q/3))*(-2*cosh(q/3) - exp(-q)) - (4*cosh(q/3)**2 - 1)**2 evaluated into None
+    __main__:9: UserWarning: Zero testing of 2*exp(q)*cosh(q/3) - 16*cosh(q/3)**4 + 12*cosh(q/3)**2 + 2*exp(-q)*cosh(q/3) evaluated into None
+    __main__:9: UserWarning: Zero testing of -(4*cosh(q/3)**2 - 1)*exp(-q) - 2*cosh(q/3) - exp(-q) evaluated into None
+    []</code></pre><h5 id="In-Julia:-25"><a class="docs-heading-anchor" href="#In-Julia:-25">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-25" title="Permalink"></a></h5><p>Is this available??</p><hr/><p>In this case, <code>(-exp(q) - 2*cosh(q/3))*(-2*cosh(q/3) - exp(-q)) - (4*cosh(q/3)**2 - 1)**2</code> should yield zero, but the zero testing had failed to catch. possibly meaning that a stronger zero test should be introduced. For this specific example, rewriting to exponentials and applying simplify would make zero test stronger for hyperbolics, while being harmless to other polynomials or transcendental functions.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; def my_iszero(x):
+    ...     try:
+    ...         result = x.rewrite(exp).simplify().is_zero
+    ...     except AttributeError:
+    ...         result = None
+    ...
+    ...     # Warnings if evaluated into None
+    ...     if result == None:
+    ...         warnings.warn(&quot;Zero testing of {} evaluated into {}&quot;.format(x, result))
+    ...     return result
+    ...
+    &gt;&gt;&gt; m.nullspace(iszerofunc=my_iszero) # doctest: +SKIP
+    __main__:9: UserWarning: Zero testing of -2*cosh(q/3) - exp(-q) evaluated into None
+    ⎡⎡  ⎛   q         ⎛q⎞⎞  -q         2⎛q⎞    ⎤⎤
+    ⎢⎢- ⎜- ℯ  - 2⋅cosh⎜─⎟⎟⋅ℯ   + 4⋅cosh ⎜─⎟ - 1⎥⎥
+    ⎢⎢  ⎝             ⎝3⎠⎠              ⎝3⎠    ⎥⎥
+    ⎢⎢─────────────────────────────────────────⎥⎥
+    ⎢⎢          ⎛      2⎛q⎞    ⎞     ⎛q⎞       ⎥⎥
+    ⎢⎢        2⋅⎜4⋅cosh ⎜─⎟ - 1⎟⋅cosh⎜─⎟       ⎥⎥
+    ⎢⎢          ⎝       ⎝3⎠    ⎠     ⎝3⎠       ⎥⎥
+    ⎢⎢                                         ⎥⎥
+    ⎢⎢           ⎛   q         ⎛q⎞⎞            ⎥⎥
+    ⎢⎢          -⎜- ℯ  - 2⋅cosh⎜─⎟⎟            ⎥⎥
+    ⎢⎢           ⎝             ⎝3⎠⎠            ⎥⎥
+    ⎢⎢          ────────────────────           ⎥⎥
+    ⎢⎢                   2⎛q⎞                  ⎥⎥
+    ⎢⎢             4⋅cosh ⎜─⎟ - 1              ⎥⎥
+    ⎢⎢                    ⎝3⎠                  ⎥⎥
+    ⎢⎢                                         ⎥⎥
+    ⎣⎣                    1                    ⎦⎦</code></pre><h5 id="In-Julia:-26"><a class="docs-heading-anchor" href="#In-Julia:-26">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-26" title="Permalink"></a></h5><p>Is this available?</p><hr/><p>You can clearly see <code>nullspace</code> returning proper result, after injecting an alternative zero test.</p><p>Note that this approach is only valid for some limited cases of matrices containing only numerics, hyperbolics, and exponentials. For other matrices, you should use different method opted for their domains.</p><p>Possible suggestions would be either taking advantage of rewriting and simplifying, with tradeoff of speed [#zerotestsimplifysolution-fn]_ , or using random numeric testing, with tradeoff of accuracy [#zerotestnumerictestsolution-fn]_ .</p><p>If you wonder why there is no generic algorithm for zero testing that can work with any symbolic entities, it&#39;s because of the constant problem stating that zero testing is undecidable [#constantproblemwikilink-fn]_ , and not only the SymPy, but also other computer algebra systems [#mathematicazero-fn]_ [#matlabzero-fn]_ would face the same fundamental issue.</p><p>However, discovery of any zero test failings can provide some good examples to improve SymPy, so if you have encountered one, you can report the issue to SymPy issue tracker [#sympyissues-fn]_ to get detailed help from the community.</p><div class="admonition is-info"><header class="admonition-header">Footnotes</header><div class="admonition-body"><ul><li>[#zerotestexampleidea-fn] Inspired by https://gitter.im/sympy/sympy?at=5b7c3e8ee5b40332abdb206c</li><li>[#zerotestexamplediscovery-fn] Discovered from https://github.com/sympy/sympy/issues/15141</li><li>[#zerotestsimplifysolution-fn] Suggested from https://github.com/sympy/sympy/issues/10120</li><li>[#zerotestnumerictestsolution-fn] Suggested from https://github.com/sympy/sympy/issues/10279</li><li>[#constantproblemwikilink-fn] https://en.wikipedia.org/wiki/Constant_problem</li><li>[#mathematicazero-fn] How mathematica tests zero https://reference.wolfram.com/language/ref/PossibleZeroQ.html</li><li>[#matlabzero-fn] How matlab tests zero https://www.mathworks.com/help/symbolic/mupad_ref/iszero.html</li><li>[#sympyissues-fn] https://github.com/sympy/sympy/issues</li></ul></div></div></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../solvers/">« Solvers</a><a class="docs-footer-nextpage" href="../manipulation/">Advanced expression  manipulation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.1.0 on <span class="colophon-date" title="Thursday 28 September 2023 14:35">Thursday 28 September 2023</span>. Using Julia version 1.9.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Solvers · SymPy</title><meta name="title" content="Solvers · SymPy"/><meta property="og:title" content="Solvers · SymPy"/><meta property="twitter:title" content="Solvers · SymPy"/><meta name="description" content="Documentation for SymPy."/><meta property="og:description" content="Documentation for SymPy."/><meta property="twitter:description" content="Documentation for SymPy."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">SymPy</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../../introduction/">Examples</a></li><li><span class="tocitem">SymPy tutorial</span><ul><li><a class="tocitem" href="../">About</a></li><li><a class="tocitem" href="../intro/">Introduction</a></li><li><a class="tocitem" href="../gotchas/">Gotchas</a></li><li><a class="tocitem" href="../basic_operations/">Basic operations</a></li><li><a class="tocitem" href="../simplification/">Simplification</a></li><li><a class="tocitem" href="../calculus/">Calculus</a></li><li class="is-active"><a class="tocitem" href>Solvers</a><ul class="internal"><li><a class="tocitem" href="#A-Note-about-Equations"><span>A Note about Equations</span></a></li><li><a class="tocitem" href="#Solving-Equations-Algebraically"><span>Solving Equations Algebraically</span></a></li><li><a class="tocitem" href="#Solving-Differential-Equations"><span>Solving Differential Equations</span></a></li><li><a class="tocitem" href="#Julia-alternative-interface"><span>Julia alternative interface</span></a></li></ul></li><li><a class="tocitem" href="../matrices/">Matrices</a></li><li><a class="tocitem" href="../manipulation/">Advanced expression  manipulation</a></li></ul></li><li><a class="tocitem" href="../../reference/">Reference/API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">SymPy tutorial</a></li><li class="is-active"><a href>Solvers</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Solvers</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaPy/SymPy.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaPy/SymPy.jl/blob/master/docs/src/Tutorial/solvers.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Solvers"><a class="docs-heading-anchor" href="#Solvers">Solvers</a><a id="Solvers-1"></a><a class="docs-heading-anchor-permalink" href="#Solvers" title="Permalink"></a></h1><p><a href="https://docs.sympy.org/latest/tutorial/solvers.html">From</a></p><pre><code class="language-python hljs">    &gt;&gt;&gt; from sympy import *
+    &gt;&gt;&gt; x, y, z = symbols(&quot;x y z&quot;)
+    &gt;&gt;&gt; init_printing(use_unicode=True)</code></pre><h5 id="In-Julia:"><a class="docs-heading-anchor" href="#In-Julia:">In <code>Julia</code>:</a><a id="In-Julia:-1"></a><a class="docs-heading-anchor-permalink" href="#In-Julia:" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; using SymPy
+
+julia&gt; @syms x, y, z
+(x, y, z)</code></pre><hr/><h2 id="A-Note-about-Equations"><a class="docs-heading-anchor" href="#A-Note-about-Equations">A Note about Equations</a><a id="A-Note-about-Equations-1"></a><a class="docs-heading-anchor-permalink" href="#A-Note-about-Equations" title="Permalink"></a></h2><p>Recall from the :ref:<code>gotchas &lt;tutorial_gotchas_equals&gt;</code> section of this tutorial that symbolic equations in SymPy are not represented by <code>=</code> or <code>==</code>, but by <code>Eq</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; Eq(x, y)
+    x = y</code></pre><h5 id="In-Julia:-2"><a class="docs-heading-anchor" href="#In-Julia:-2">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-2" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; Eq(x, y)
+x = y
+</code></pre><hr/><p>However, there is an even easier way.  In SymPy, any expression not in an <code>Eq</code> is automatically assumed to equal 0 by the solving functions.  Since <code>a = b</code> if and only if <code>a - b = 0</code>, this means that instead of using <code>x == y</code>, you can just use <code>x - y</code>.  For example</p><pre><code class="language-python hljs">    &gt;&gt;&gt; solveset(Eq(x**2, 1), x)
+    {-1, 1}
+    &gt;&gt;&gt; solveset(Eq(x**2 - 1, 0), x)
+    {-1, 1}
+    &gt;&gt;&gt; solveset(x**2 - 1, x)
+    {-1, 1}</code></pre><h5 id="In-Julia:-3"><a class="docs-heading-anchor" href="#In-Julia:-3">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-3" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; solveset(Eq(x^2, 1), x)
+{-1, 1}
+
+julia&gt; solveset(Eq(x^2 - 1, 0), x)
+{-1, 1}
+
+julia&gt; solveset(x^2 - 1, x)
+{-1, 1}</code></pre><hr/><p>This is particularly useful if the equation you wish to solve is already equal to 0. Instead of typing <code>solveset(Eq(expr, 0), x)</code>, you can just use <code>solveset(expr, x)</code>.</p><h2 id="Solving-Equations-Algebraically"><a class="docs-heading-anchor" href="#Solving-Equations-Algebraically">Solving Equations Algebraically</a><a id="Solving-Equations-Algebraically-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-Equations-Algebraically" title="Permalink"></a></h2><p>The main function for solving algebraic equations is <code>solveset</code>. The syntax for <code>solveset</code> is <code>solveset(equation, variable=None, domain=S.Complexes)</code> Where <code>equations</code> may be in the form of <code>Eq</code> instances or expressions that are assumed to be equal to zero.</p><p>Please note that there is another function called <code>solve</code> which can also be used to solve equations. The syntax is <code>solve(equations, variables)</code> However, it is recommended to use <code>solveset</code> instead.</p><p>When solving a single equation, the output of <code>solveset</code> is a <code>FiniteSet</code> or an <code>Interval</code> or <code>ImageSet</code> of the solutions.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; solveset(x**2 - x, x)
+    {0, 1}
+    &gt;&gt;&gt; solveset(x - x, x, domain=S.Reals)
+    ℝ
+    &gt;&gt;&gt; solveset(sin(x) - 1, x, domain=S.Reals)
+    ⎧        π        ⎫
+    ⎨2⋅n⋅π + ─ | n ∊ ℤ⎬
+    ⎩        2        ⎭</code></pre><h5 id="In-Julia:-4"><a class="docs-heading-anchor" href="#In-Julia:-4">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-4" title="Permalink"></a></h5><ul><li><code>S</code> is not exported, as it is not a function, so we create an alias:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; const S = sympy.S
+PyObject S
+
+julia&gt; solveset(x^2 - x, x)
+{0, 1}
+
+julia&gt; solveset(x - x, x, domain=S.Reals)
+ℝ
+
+julia&gt; solveset(sin(x) - 1, x, domain=S.Reals)
+⎧        π │      ⎫
+⎨2⋅n⋅π + ─ │ n ∊ ℤ⎬
+⎩        2 │      ⎭</code></pre><hr/><p>If there are no solutions, an <code>EmptySet</code> is returned and if it is not able to find solutions then a <code>ConditionSet</code> is returned.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; solveset(exp(x), x)     # No solution exists
+    ∅
+    &gt;&gt;&gt; solveset(cos(x) - x, x)  # Not able to find solution
+    {x | x ∊ ℂ ∧ -x + cos(x) = 0}</code></pre><h5 id="In-Julia:-5"><a class="docs-heading-anchor" href="#In-Julia:-5">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-5" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; solveset(exp(x), x)     # No solution exists
+∅
+
+julia&gt; solveset(cos(x) - x, x)  # Not able to find solution
+{x │ x ∊ ℂ ∧ (-x + cos(x) = 0)}</code></pre><hr/><p>In the <code>solveset</code> module, the linear system of equations is solved using <code>linsolve</code>. In future we would be able to use linsolve directly from <code>solveset</code>. Following is an example of the syntax of <code>linsolve</code>.</p><ul><li>List of Equations Form:</li></ul><pre><code class="language-python hljs">    &gt;&gt;&gt; linsolve([x + y + z - 1, x + y + 2*z - 3 ], (x, y, z))</code></pre><h5 id="In-Julia:-6"><a class="docs-heading-anchor" href="#In-Julia:-6">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-6" title="Permalink"></a></h5><p>Rather than a vector,  we  pass  a tuple:</p><pre><code class="language-julia-repl hljs">julia&gt; linsolve((x + y + z - 1, x + y + 2*z - 3), (x, y, z))
+{(-y - 1, y, 2)}
+</code></pre><p>A  tuple</p><div class="admonition is-info"><header class="admonition-header">Tuples</header><div class="admonition-body"><p>The <code>linsolve</code> function  expects a list of equations, whereas  <code>PyCall</code>  is instructed to promote the syntax  to   produce  a  list  in  <code>Python</code> into a <code>Array{Sym}</code> object. As  such, we pass  the equations in a tuple above. Similar considerations  are necessary at times for the  <code>sympy.Matrix</code>  constructor. It is suggested, as in the next example, to work around this by passing <code>Julia</code>n arrays to the constructor or bypassing it  altogether.</p></div></div><hr/><ul><li>Augmented</li></ul><p>Matrix Form:</p><pre><code class="language-python hljs">&gt;&gt;&gt; M = Matrix(((1, 1, 1, 1), (1, 1, 2, 3)))
+&gt;&gt;&gt; system = A, b = M[:, :-1], M[:, -1]
+&gt;&gt;&gt; linsolve(system, x, y, z)
+{(-y - 1, y, 2)}</code></pre><h5 id="In-Julia:-7"><a class="docs-heading-anchor" href="#In-Julia:-7">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-7" title="Permalink"></a></h5><p>We use <code>Julia</code>n syntax for matrices:</p><pre><code class="language-julia-repl hljs">julia&gt; A =  [1 1 1; 1  1  2];  b =  [1,3]
+2-element Vector{Int64}:
+ 1
+ 3</code></pre><p>The augmented form is not available</p><pre><code class="nohighlight hljs">julia&gt; aug = [A b]
+2×4 Array{Int64,2}:
+ 1  1  1  1
+ 1  1  2  3
+
+julia&gt; linsolve(sympy.Matrix(aug), (x,y,z)) # not {(-y - 1, y, 2)}!
+∅
+</code></pre><p>In lieu of using <code>sympy.Matrix</code>, the matrix can be created  symbolically,   as:</p><pre><code class="language-julia-repl hljs">julia&gt; A =  Sym[1 1 1; 1  1  2];  b =  [1,3]
+2-element Vector{Int64}:
+ 1
+ 3
+
+julia&gt; aug = [A b]
+2×4 Matrix{Sym}:
+ 1  1  1  1
+ 1  1  2  3
+
+julia&gt; linsolve(aug, (x,y,z)) # {(-y - 1, y, 2)};
+{(-y - 1, y, 2)}
+</code></pre><p>Finally,  linear equations  are  solved in <code>Julia</code>  with  the <code>\</code> (backslash) operator:</p><pre><code class="nohighlight hljs">A \ b</code></pre><p>The variables are generated  within <code>\</code> in  the  sequence  <code>x1</code>, <code>x2</code>,  ...</p><hr/><ul><li>A*x = b Form</li></ul><pre><code class="language-python hljs">	&gt;&gt;&gt; M = Matrix(((1, 1, 1, 1), (1, 1, 2, 3)))
+	&gt;&gt;&gt; system = A, b = M[:, :-1], M[:, -1]
+	&gt;&gt;&gt; linsolve(system, x, y, z)
+	{(-y - 1, y, 2)}</code></pre><h5 id="In-Julia:-8"><a class="docs-heading-anchor" href="#In-Julia:-8">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-8" title="Permalink"></a></h5><p>We  follow the syntax  above to   construct the matrix (tuple of tuples), but  not  the <code>Julia</code>n  matrix  construtor  would be  recommended:</p><pre><code class="language-julia-repl hljs">julia&gt; M = sympy.Matrix(((1, 1, 1, 1), (1, 1, 2, 3)))
+2×4 Matrix{Sym}:
+ 1  1  1  1
+ 1  1  2  3
+
+julia&gt; system = A, b = M[:, 1:end-1], M[:, end]
+(Sym[1 1 1; 1 1 2], Sym[1, 3])
+
+julia&gt; linsolve(system, x, y, z)
+{(-y - 1, y, 2)}
+</code></pre><hr/><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>The order of solution corresponds the order of given symbols.</p></div></div><p>In the <code>solveset</code> module, the non linear system of equations is solved using <code>nonlinsolve</code>. Following are examples of <code>nonlinsolve</code>.</p><ol><li>When only real solution is present:</li></ol><pre><code class="language-python hljs">	&gt;&gt;&gt; a, b, c, d = symbols(&#39;a, b, c, d&#39;, real=True)
+	&gt;&gt;&gt; nonlinsolve([a**2 + a, a - b], [a, b])
+	{(-1, -1), (0, 0)}
+	&gt;&gt;&gt; nonlinsolve([x*y - 1, x - 2], x, y)
+	{(2, 1/2)}</code></pre><h5 id="In-Julia:-9"><a class="docs-heading-anchor" href="#In-Julia:-9">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-9" title="Permalink"></a></h5><ul><li>we pass <code>[a,b]</code> as either <code>a, b</code> or using a tuple, as in <code>(a,b)</code>, but <em>not</em> as a vector, as this gets mapped into a vector of symbolic objects which causes issues with <code>nonlinsolve</code>:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; @syms a::real, b::real, c::real, d::real
+(a, b, c, d)
+
+julia&gt; nonlinsolve([a^2 + a, a - b], a, b)
+{(-1, -1), (0, 0)}
+
+julia&gt; nonlinsolve([x*y - 1, x - 2], x, y)
+{(2, 1/2)}
+</code></pre><hr/><ol><li>When only complex solution is present:</li></ol><pre><code class="language-python hljs">	&gt;&gt;&gt; nonlinsolve([x**2 + 1, y**2 + 1], [x, y])
+	{(-ⅈ, -ⅈ), (-ⅈ, ⅈ), (ⅈ, -ⅈ), (ⅈ, ⅈ)}</code></pre><h5 id="In-Julia:-10"><a class="docs-heading-anchor" href="#In-Julia:-10">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-10" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; nonlinsolve([x^2 + 1, y^2 + 1], (x, y))
+{(-ⅈ, -ⅈ), (-ⅈ, ⅈ), (ⅈ, -ⅈ), (ⅈ, ⅈ)}
+</code></pre><hr/><ol><li>When both real and complex solution is present:</li></ol><pre><code class="language-python hljs">	&gt;&gt;&gt; from sympy import sqrt
+	&gt;&gt;&gt; system = [x**2 - 2*y**2 -2, x*y - 2]
+	&gt;&gt;&gt; vars = [x, y]
+	&gt;&gt;&gt; nonlinsolve(system, vars)
+	{(-2, -1), (2, 1), (-√2⋅ⅈ, √2⋅ⅈ), (√2⋅ⅈ, -√2⋅ⅈ)}
+
+	&gt;&gt;&gt; n = Dummy(&#39;n&#39;)
+	&gt;&gt;&gt; system = [exp(x) - sin(y), 1/y - 3]
+	&gt;&gt;&gt; real_soln = (log(sin(S(1)/3)), S(1)/3)
+	&gt;&gt;&gt; img_lamda = Lambda(n, 2*n*I*pi + Mod(log(sin(S(1)/3)), 2*I*pi))
+	&gt;&gt;&gt; complex_soln = (ImageSet(img_lamda, S.Integers), S(1)/3)
+	&gt;&gt;&gt; soln = FiniteSet(real_soln, complex_soln)
+	&gt;&gt;&gt; nonlinsolve(system, [x, y]) == soln
+	True</code></pre><h5 id="In-Julia:-11"><a class="docs-heading-anchor" href="#In-Julia:-11">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-11" title="Permalink"></a></h5><ul><li>we must remove the spaces within <code>[]</code></li><li>we must pass vars as a tuple:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; system = [x^2-2*y^2-2, x*y-2]
+2-element Vector{Sym}:
+ x^2 - 2*y^2 - 2
+         x⋅y - 2
+
+julia&gt; vars = (x, y)
+(x, y)
+
+julia&gt; nonlinsolve(system, vars)
+{(-2, -1), (2, 1), (-√2⋅ⅈ, √2⋅ⅈ), (√2⋅ⅈ, -√2⋅ⅈ)}
+</code></pre><p>However, the next bit requires some modifications to run:</p><ul><li>the <code>system</code> array definition must have extra spaces removed</li><li><code>Dummy</code>,  <code>Mod</code>, <code>ImageSet</code>, <code>FiniteSet</code> aren&#39;t exported</li><li>we need <code>PI</code>, not <code>pi</code> to have a symbolic value</li><li>we compare manually</li></ul><pre><code class="language-julia-repl hljs">julia&gt; n = sympy.Dummy(&quot;n&quot;)
+n
+
+julia&gt; system = [exp(x)-sin(y), 1/y-3]
+2-element Vector{Sym}:
+ exp(x) - sin(y)
+        -3 + 1/y
+
+julia&gt; real_soln = (log(sin(S(1)/3)), S(1)/3)
+(log(sin(1/3)), 1/3)
+
+julia&gt; img_lamda = Lambda(n, 2*n*IM*PI + sympy.Mod(sin(S(1)/3), 2*IM*PI))
+n ↦ 2⋅n⋅ⅈ⋅π + (sin(1/3) mod 2⋅ⅈ⋅π)
+
+julia&gt; complex_soln = (sympy.ImageSet(img_lamda, S.Integers), S(1)/3)
+(ImageSet(Lambda(_n, 2*_n*I*pi + Mod(sin(1/3), 2*I*pi)), Integers), 1/3)
+
+julia&gt; soln = sympy.FiniteSet(real_soln, complex_soln)
+{(log(sin(1/3)), 1/3), ({2⋅n⋅ⅈ⋅π + (sin(1/3) mod 2⋅ⅈ⋅π) │ n ∊ ℤ}, 1/3)}
+
+julia&gt; nonlinsolve(system, (x, y))
+{({2⋅n⋅ⅈ⋅π + log(sin(1/3)) │ n ∊ ℤ}, 1/3)}
+</code></pre><hr/><ol><li>If non linear system of equations is Positive dimensional system (A system with</li></ol><p>infinitely many solutions is said to be positive-dimensional):</p><pre><code class="language-python hljs">	&gt;&gt;&gt; nonlinsolve([x*y, x*y - x], [x, y])
+	{(0, y)}
+
+	&gt;&gt;&gt; system = [a**2 + a*c, a - b]
+	&gt;&gt;&gt; nonlinsolve(system, [a, b])
+	{(0, 0), (-c, -c)}</code></pre><h5 id="In-Julia:-12"><a class="docs-heading-anchor" href="#In-Julia:-12">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-12" title="Permalink"></a></h5><ul><li>again, we use a tuple for the variables:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; nonlinsolve([x*y, x*y-x], (x, y))
+{(0, y)}
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; system = [a^2+a*c, a-b]
+2-element Vector{Sym}:
+ a^2 + a*c
+     a - b
+
+julia&gt; nonlinsolve(system, (a, b))
+{(0, 0), (-c, -c)}
+</code></pre><hr/><blockquote><p>Note:</p></blockquote><ol><li><p>The order of solution corresponds the order of given symbols.</p></li><li><p>Currently <code>nonlinsolve</code> doesn&#39;t return solution in form of <code>LambertW</code> (if there is solution present in the form of <code>LambertW</code>).</p></li></ol><p><code>solve</code> can be used for such cases:</p><pre><code class="language-python hljs">   &gt;&gt;&gt; solve([x**2 - y**2/exp(x)], [x, y], dict=True)
+   ⎡⎧             ⎛y⎞⎫⎤
+   ⎢⎨x: 2⋅LambertW⎜─⎟⎬⎥
+   ⎣⎩             ⎝2⎠⎭⎦</code></pre><h5 id="In-Julia:-13"><a class="docs-heading-anchor" href="#In-Julia:-13">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-13" title="Permalink"></a></h5><p>it is similar</p><pre><code class="language-julia-repl hljs">julia&gt; u = solve([x^2 - y^2/exp(x)], [x, y], dict=true)
+2-element Vector{Dict{Any, Any}}:
+ Dict(y =&gt; -x*sqrt(exp(x)))
+ Dict(y =&gt; x*sqrt(exp(x)))
+</code></pre><p>To get prettier output, the dict may be converted to have one with symbolic keys:</p><pre><code class="language-julia-repl hljs">julia&gt; convert(Dict{SymPy.Sym, Any}, first(u))
+Dict{Sym, Any} with 1 entry:
+  y =&gt; -x*sqrt(exp(x))
+</code></pre><hr/><ol><li>Currently <code>nonlinsolve</code> is not properly capable of solving the system of equations</li></ol><p>having trigonometric functions.</p><p><code>solve</code> can be used for such cases(not all solution):</p><pre><code class="language-python hljs">   &gt;&gt;&gt; solve([sin(x + y), cos(x - y)], [x, y])
+   ⎡⎛-3⋅π   3⋅π⎞  ⎛-π   π⎞  ⎛π  3⋅π⎞  ⎛3⋅π  π⎞⎤
+   ⎢⎜─────, ───⎟, ⎜───, ─⎟, ⎜─, ───⎟, ⎜───, ─⎟⎥
+   ⎣⎝  4     4 ⎠  ⎝ 4   4⎠  ⎝4   4 ⎠  ⎝ 4   4⎠⎦</code></pre><h5 id="In-Julia:-14"><a class="docs-heading-anchor" href="#In-Julia:-14">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-14" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; solve([sin(x + y), cos(x - y)], [x, y])
+4-element Vector{Tuple{Sym, Sym}}:
+ (-3*pi/4, 3*pi/4)
+ (-pi/4, pi/4)
+ (pi/4, 3*pi/4)
+ (3*pi/4, pi/4)
+</code></pre><hr/><p><code>solveset</code> reports each solution only once.  To get the solutions of a polynomial including multiplicity use <code>roots</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; solveset(x**3 - 6*x**2 + 9*x, x)
+    {0, 3}
+    &gt;&gt;&gt; roots(x**3 - 6*x**2 + 9*x, x)
+    {0: 1, 3: 2}</code></pre><h5 id="In-Julia:-15"><a class="docs-heading-anchor" href="#In-Julia:-15">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-15" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; solveset(x^3 - 6*x^2 + 9*x, x)
+{0, 3}
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; roots(x^3 - 6*x^2 + 9*x, x)  |&gt;  d -&gt; convert(Dict{Sym, Any}, d) # prettier priting
+Dict{Sym, Any} with 2 entries:
+  0 =&gt; 1
+  3 =&gt; 2</code></pre><hr/><p>The output <code>{0: 1, 3: 2}</code> of <code>roots</code> means that <code>0</code> is a root of multiplicity 1 and <code>3</code> is a root of multiplicity 2.</p><blockquote><p>Note:</p></blockquote><p>Currently <code>solveset</code> is not capable of solving the following types of equations:</p><ul><li>Equations solvable by LambertW (Transcendental equation solver).</li></ul><p><code>solve</code> can be used for such cases:</p><pre><code class="language-python hljs">   &gt;&gt;&gt; solve(x*exp(x) - 1, x )
+   [LambertW(1)]</code></pre><h5 id="In-Julia:-16"><a class="docs-heading-anchor" href="#In-Julia:-16">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-16" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; solve(x*exp(x) - 1, x )
+1-element Vector{Sym}:
+ W(1)
+</code></pre><hr/><h2 id="Solving-Differential-Equations"><a class="docs-heading-anchor" href="#Solving-Differential-Equations">Solving Differential Equations</a><a id="Solving-Differential-Equations-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-Differential-Equations" title="Permalink"></a></h2><p>To solve differential equations, use <code>dsolve</code>.  First, create an undefined function by passing <code>cls=Function</code> to the <code>symbols</code> function.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; f, g = symbols(&#39;f g&#39;, cls=Function)</code></pre><h5 id="In-Julia:-17"><a class="docs-heading-anchor" href="#In-Julia:-17">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-17" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; @syms f() g()
+(f, g)
+</code></pre><hr/><p><code>f</code> and <code>g</code> are now undefined functions.  We can call <code>f(x)</code>, and it will represent an unknown function.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; f(x)
+    f(x)</code></pre><h5 id="In-Julia:-18"><a class="docs-heading-anchor" href="#In-Julia:-18">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-18" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; f(x)
+f(x)
+</code></pre><hr/><p>Derivatives of <code>f(x)</code> are unevaluated.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; f(x).diff(x)
+    d
+    ──(f(x))
+    dx</code></pre><h5 id="In-Julia:-19"><a class="docs-heading-anchor" href="#In-Julia:-19">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-19" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; f(x).diff(x)
+d
+──(f(x))
+dx
+</code></pre><hr/><p>(see the :ref:<code>Derivatives &lt;tutorial-derivatives&gt;</code> section for more on derivatives).</p><p>To represent the differential equation <span>$f&#39;&#39;(x) - 2f&#39;(x) + f(x) = \sin(x)$</span>, we would thus use</p><pre><code class="language-python hljs">    &gt;&gt;&gt; diffeq = Eq(f(x).diff(x, x) - 2*f(x).diff(x) + f(x), sin(x))
+    &gt;&gt;&gt; diffeq
+                          2
+             d           d
+    f(x) - 2⋅──(f(x)) + ───(f(x)) = sin(x)
+             dx           2
+                        dx</code></pre><h5 id="In-Julia:-20"><a class="docs-heading-anchor" href="#In-Julia:-20">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-20" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; diffeq = Eq(f(x).diff(x, x) - 2*f(x).diff(x) + f(x), sin(x)); string(diffeq)
+&quot;Eq(f(x) - 2*Derivative(f(x), x) + Derivative(f(x), (x, 2)), sin(x))&quot;
+</code></pre><hr/><p>To solve the ODE, pass it and the function to solve for to <code>dsolve</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; dsolve(diffeq, f(x))
+                        x   cos(x)
+    f(x) = (C₁ + C₂⋅x)⋅ℯ  + ──────
+                              2</code></pre><h5 id="In-Julia:-21"><a class="docs-heading-anchor" href="#In-Julia:-21">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-21" title="Permalink"></a></h5><ul><li>we use <code>dsolve</code> for initial value proplems</li></ul><pre><code class="language-julia-repl hljs">julia&gt; dsolve(diffeq, f(x)) |&gt; string
+&quot;Eq(f(x), (C1 + C2*x)*exp(x) + cos(x)/2)&quot;
+</code></pre><hr/><p><code>dsolve</code> returns an instance of <code>Eq</code>.  This is because in general, solutions to differential equations cannot be solved explicitly for the function.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; dsolve(f(x).diff(x)*(1 - sin(f(x))), f(x))
+    f(x) + cos(f(x)) = C₁</code></pre><h5 id="In-Julia:-22"><a class="docs-heading-anchor" href="#In-Julia:-22">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-22" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; dsolve(f(x).diff(x)*(1 - sin(f(x))), f(x))
+f(x) = C₁
+</code></pre><hr/><p>The arbitrary constants in the solutions from dsolve are symbols of the form <code>C1</code>, <code>C2</code>, <code>C3</code>, and so on.</p><h2 id="Julia-alternative-interface"><a class="docs-heading-anchor" href="#Julia-alternative-interface">Julia alternative interface</a><a id="Julia-alternative-interface-1"></a><a class="docs-heading-anchor-permalink" href="#Julia-alternative-interface" title="Permalink"></a></h2><p><code>SymPy.jl</code> adds a <code>SymFunction</code> class, that makes it a bit easier to set up a differential equation, though not as general.</p><p>We use either the <code>SymFunction</code> constructor</p><pre><code class="language-julia-repl hljs">julia&gt; f = SymFunction(&quot;f&quot;)
+f
+</code></pre><p>or the <code>@syms</code> macro, as in <code>@syms f()</code> to define symbolic functions. The <code>Differential</code> function (who&#39;s functionality is lifted from <code>ModelingToolkit</code>). Can simplify things:</p><pre><code class="language-julia-repl hljs">julia&gt; D = Differential(x);
+
+julia&gt; diffeq = Eq(D(D(f))(x) - 2*D(f)(x) + f(x), sin(x)); string(diffeq)
+&quot;Eq(f(x) - 2*Derivative(f(x), x) + Derivative(f(x), (x, 2)), sin(x))&quot;
+
+julia&gt; dsolve(diffeq, f(x))  |&gt; string
+&quot;Eq(f(x), (C1 + C2*x)*exp(x) + cos(x)/2)&quot;
+</code></pre><p>Or:</p><pre><code class="language-julia-repl hljs">julia&gt; dsolve(D(f)(x)*(1 - sin(f(x))), f(x))
+f(x) = C₁
+</code></pre><p>Initial conditions can be specified using a dictionary.</p><p>For the initial condition <code>f&#39;(x0) = y0</code>, this would be specified as <code>Dict(D(f)(x0) =&gt; y0)</code>.</p><p>For example, to solve the exponential equation <span>$f&#39;(x) = f(x), f(0) = a$</span> we would have:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x, a, f()
+(x, a, f)
+
+julia&gt; dsolve(D(f)(x) - f(x), f(x), ics = Dict(f(0) =&gt; a)) |&gt;  string
+&quot;Eq(f(x), a*exp(x))&quot;
+</code></pre><p>To solve the simple harmonic equation, where two initial conditions are specified, we combine the tuple for each within another tuple:</p><pre><code class="language-julia-repl hljs">julia&gt; ics = Dict(f(0) =&gt; 1, D(f)(0) =&gt; 2);
+
+julia&gt; dsolve(D(D(f))(x) - f(x), f(x), ics=ics) |&gt; string
+&quot;Eq(f(x), 3*exp(x)/2 - exp(-x)/2)&quot;
+</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../calculus/">« Calculus</a><a class="docs-footer-nextpage" href="../matrices/">Matrices »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.1.0 on <span class="colophon-date" title="Thursday 28 September 2023 14:35">Thursday 28 September 2023</span>. Using Julia version 1.9.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

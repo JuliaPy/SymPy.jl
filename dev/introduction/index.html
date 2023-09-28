@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Examples · SymPy</title><meta name="title" content="Examples · SymPy"/><meta property="og:title" content="Examples · SymPy"/><meta property="twitter:title" content="Examples · SymPy"/><meta name="description" content="Documentation for SymPy."/><meta property="og:description" content="Documentation for SymPy."/><meta property="twitter:description" content="Documentation for SymPy."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">SymPy</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>Examples</a><ul class="internal"><li><a class="tocitem" href="#Symbols"><span>Symbols</span></a></li><li><a class="tocitem" href="#Basics-of-SymPy"><span>Basics of SymPy</span></a></li><li><a class="tocitem" href="#Substitution"><span>Substitution</span></a></li><li><a class="tocitem" href="#Simplification"><span>Simplification</span></a></li><li><a class="tocitem" href="#Conversion-from-symbolic-to-numeric"><span>Conversion from symbolic to numeric</span></a></li><li><a class="tocitem" href="#Algebraic-expressions"><span>Algebraic expressions</span></a></li><li><a class="tocitem" href="#Polynomial-and-rational-expressions"><span>Polynomial and rational expressions</span></a></li><li><a class="tocitem" href="#Rational-expressions:-apart,-together,-cancel"><span>Rational expressions: apart, together, cancel</span></a></li><li><a class="tocitem" href="#Powers"><span>Powers</span></a></li><li><a class="tocitem" href="#More-on-polynomials"><span>More on polynomials</span></a></li><li><a class="tocitem" href="#The-Poly-class-in-SymPy"><span>The Poly class in SymPy</span></a></li><li><a class="tocitem" href="#Coefficients"><span>Coefficients</span></a></li><li><a class="tocitem" href="#Polynomial-roots:-solve,-real_roots,-polyroots,-nroots"><span>Polynomial roots: solve, real_roots, polyroots, nroots</span></a></li><li><a class="tocitem" href="#The-solve-function"><span>The solve function</span></a></li><li><a class="tocitem" href="#Plotting"><span>Plotting</span></a></li><li><a class="tocitem" href="#Calculus"><span>Calculus</span></a></li><li><a class="tocitem" href="#Matrices"><span>Matrices</span></a></li><li><a class="tocitem" href="#Differential-equations"><span>Differential equations</span></a></li><li><a class="tocitem" href="#The-lambdify-function"><span>The lambdify function</span></a></li><li><a class="tocitem" href="#Using-other-SymPy-modules"><span>Using other SymPy modules</span></a></li></ul></li><li><span class="tocitem">SymPy tutorial</span><ul><li><a class="tocitem" href="../Tutorial/">About</a></li><li><a class="tocitem" href="../Tutorial/intro/">Introduction</a></li><li><a class="tocitem" href="../Tutorial/gotchas/">Gotchas</a></li><li><a class="tocitem" href="../Tutorial/basic_operations/">Basic operations</a></li><li><a class="tocitem" href="../Tutorial/simplification/">Simplification</a></li><li><a class="tocitem" href="../Tutorial/calculus/">Calculus</a></li><li><a class="tocitem" href="../Tutorial/solvers/">Solvers</a></li><li><a class="tocitem" href="../Tutorial/matrices/">Matrices</a></li><li><a class="tocitem" href="../Tutorial/manipulation/">Advanced expression  manipulation</a></li></ul></li><li><a class="tocitem" href="../reference/">Reference/API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Examples</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Examples</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaPy/SymPy.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaPy/SymPy.jl/blob/master/docs/src/introduction.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="A-SymPy-introduction"><a class="docs-heading-anchor" href="#A-SymPy-introduction">A SymPy introduction</a><a id="A-SymPy-introduction-1"></a><a class="docs-heading-anchor-permalink" href="#A-SymPy-introduction" title="Permalink"></a></h1><p>This document provides an introduction to using <code>SymPy</code> within <code>Julia</code>. It owes an enormous debt to SymPy documentation and the tutorial for using SymPy within Python which may be found <a href="http://docs.sympy.org/dev/tutorial/index.html">here</a>.</p><p>Here we first load the package into <code>Julia</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; using SymPy
+</code></pre><h2 id="Symbols"><a class="docs-heading-anchor" href="#Symbols">Symbols</a><a id="Symbols-1"></a><a class="docs-heading-anchor-permalink" href="#Symbols" title="Permalink"></a></h2><p>At the core of <code>SymPy</code> is the introduction of symbolic variables that differ quite a bit from <code>Julia</code>&#39;s variables. Symbolic variables do not immediately evaluate to a value, rather the &quot;symbolicness&quot; propagates when interacted with. To keep the resulting expressions manageable, SymPy does some simplifications along the way.</p><p>The <code>@syms</code> macro makes creating one or more symbolic variables very easy:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x
+(x,)
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; @syms a b c
+(a, b, c)
+</code></pre><p>This macro creates variables in the local scope, no assignment is needed.</p><p>This example shows that symbols may be Unicode:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms α, β, γ
+(α, β, γ)
+</code></pre><p>Additionally you can specify how the variables are displayed using pair notation:</p><pre><code class="nohighlight hljs">julia&gt; @syms a1=&gt;&quot;α₁&quot; a2=&gt;&quot;α₂&quot;
+(α₁, α₂)
+</code></pre><p>The user can type <code>a1</code>, say, but, as seen, the variable prints as <code>α₁</code>.</p><p>There are other means, described in the following, to create symbolic variables, but the <code>@syms</code> macro is the suggested one to use.</p><p>The <code>sympy.symbols</code> constructor is exported as <code>symbols</code>, as it is a common means for creating symbolic variables in other documentation. Here the variables are passed as a string with names separated by space or commas, allowing the creation of one or more variables:</p><pre><code class="language-julia-repl hljs">julia&gt; a = symbols(&quot;a&quot;)
+a
+
+julia&gt; a, b, c = symbols(&quot;a b c&quot;)
+(a, b, c)
+</code></pre><p>The documentation for the Python function is available from within <code>Julia</code> using the <code>SymPy.@doc</code> macro, as in <code>SymPy.@doc sympy.symbols</code>.</p><p>In <code>Julia</code>, the symbolic expressions are primarily instances of the <code>Sym</code> type, which holds an instance to an underlying <code>PyObject</code>. This type can be used as a constructor in the standard way:</p><pre><code class="language-julia-repl hljs">julia&gt; x = Sym(&quot;x&quot;)
+x
+
+julia&gt; a,b,c = Sym(&quot;a, b, c&quot;)
+(a, b, c)
+</code></pre><p>The <code>sympify</code> function is used by SymPy to convert arbitrary expressions to a type useful within SymPy. It too can be used to create variables (and more):</p><pre><code class="language- hljs">sympify(&quot;x&quot;)  # sympy.sympify is exported</code></pre><h3 id="Ranges-of-symbolic-variables"><a class="docs-heading-anchor" href="#Ranges-of-symbolic-variables">Ranges of symbolic variables</a><a id="Ranges-of-symbolic-variables-1"></a><a class="docs-heading-anchor-permalink" href="#Ranges-of-symbolic-variables" title="Permalink"></a></h3><p>Here are two ways to make sequenced variables:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms xs[1:5]
+(Sym[xs₁, xs₂, xs₃, xs₄, xs₅],)
+
+julia&gt; ys = [Sym(&quot;y$i&quot;) for i in 1:5]
+5-element Vector{Sym}:
+ y₁
+ y₂
+ y₃
+ y₄
+ y₅</code></pre><p>The former much more succinct, but the latter pattern of use when the number of terms is a variable.</p><p>The <code>symbols</code> constructor also has non-Julian range patterns available:</p><pre><code class="language-jldoctext hljs">julia&gt; symbols(&quot;x:3&quot;)
+(x0, x1, x2)
+
+julia&gt; symbols(&quot;x:2:2&quot;)
+(x00, x01, x10, x11)</code></pre><h3 id="Assumptions"><a class="docs-heading-anchor" href="#Assumptions">Assumptions</a><a id="Assumptions-1"></a><a class="docs-heading-anchor-permalink" href="#Assumptions" title="Permalink"></a></h3><p>SymPy has &quot;core assumptions&quot; that can be asserted for a variable. These include being real, positive, etc. A list of possible assumptions is <a href="http://docs.sympy.org/dev/modules/core.html#module-sympy.core.assumptions">here</a>.</p><p>The <code>@syms</code> macro allows annotations, akin to type annotations, to specify assumptions on new variables:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms u1::positive u2::(real, nonzero)
+(u1, u2)</code></pre><p>Skipping ahead, there are some functions from the <code>assumptions</code> module of <code>SymPy</code> to query these properties:</p><pre><code class="language-julia-repl hljs">julia&gt; ask(𝑄.positive(u1)), ask(𝑄.positive(u2)), ask(𝑄.positive(u2^2)), ask(𝑄.real(u2))
+(true, nothing, nothing, true)
+</code></pre><p>Despite it easy to see that a non-zero real variable (<code>u2</code>) when squared will be positive, this is not identified in the assumptions.</p><p>The <code>symbols</code> constructor uses keyword arguments to pass in assumptions. It is illustrated below as they apply to all the variables that are created, which can be more convenient at times.</p><pre><code class="language-julia-repl hljs">julia&gt; u = symbols(&quot;u&quot;)
+u
+
+julia&gt; x = symbols(&quot;x&quot;, real=true)
+x
+
+julia&gt; y1, y2 = symbols(&quot;y1, y2&quot;, positive=true)
+(y1, y2)
+
+julia&gt; alpha = symbols(&quot;alpha&quot;, integer=true, positive=true)
+α
+</code></pre><p>We jump ahead for a second to illustrate, but here we see that <code>solve</code> will respect these assumptions, by failing to find solutions to these equations:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x::real
+(x,)
+
+julia&gt; solve(x^2 + 1)   # ±i are not real
+Any[]
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; @syms x::positive
+(x,)
+
+julia&gt; solve(x + 1)    # -1 is not positive
+Any[]
+</code></pre><div class="admonition is-warning"><header class="admonition-header">Warning</header><div class="admonition-body"><p>SymPy can easily create two variables with the same stringified name but different assumptions and will treat these as distinct.</p></div></div><pre><code class="language-julia-repl hljs">julia&gt; @syms x::real=&gt;&quot;x&quot; y=&gt;&quot;x&quot;
+(x, x)
+
+julia&gt; x, y
+(x, x)
+
+julia&gt; string(x) == string(y)
+true
+
+julia&gt; x == y
+false
+
+julia&gt; hash(x) == hash(y)
+false
+</code></pre><h3 id="Special-constants"><a class="docs-heading-anchor" href="#Special-constants">Special constants</a><a id="Special-constants-1"></a><a class="docs-heading-anchor-permalink" href="#Special-constants" title="Permalink"></a></h3><p><code>Julia</code> has its math constants, like <code>pi</code> and <code>e</code>, <code>SymPy</code> as well. A few of these have <code>Julia</code> counterparts provided by <code>SymPy</code>. For example, these two constants are defined (where <code>oo</code> is for infinity):</p><pre><code class="language-julia-repl hljs">julia&gt; PI, oo
+(pi, oo)
+</code></pre><p>(The pretty printing of SymPy objects does not work for tuples.)</p><p>These are aliases to <code>sympy.pi</code> and <code>sympy.oo</code>. There are a few others.</p><p>Numeric values themselves can be symbolic. This example shows the difference. The first <code>asin</code> call dispatches to <code>Julia</code>&#39;s <code>asin</code> function, the second to <code>SymPy</code>&#39;s:</p><pre><code class="language-julia-repl hljs">julia&gt; [asin(1), asin(Sym(1))]
+2-element Vector{Sym}:
+ 1.57079632679490
+             pi/2
+</code></pre><h2 id="Basics-of-SymPy"><a class="docs-heading-anchor" href="#Basics-of-SymPy">Basics of SymPy</a><a id="Basics-of-SymPy-1"></a><a class="docs-heading-anchor-permalink" href="#Basics-of-SymPy" title="Permalink"></a></h2><p>As seen, SymPy has symbolic variables and numbers can be symbolic. These are used to build symbolic expressions. In <code>SymPy</code> most all of these have the <code>Sym</code> type, a subtype of the <code>SymbolicObject</code> type. The <code>Sym</code> type is immutable; assignment is necessary to modify a variable.</p><p>In the Python library, there are two basic method types for interacting with expressions: ones that are defined in the <code>sympy</code> module and called using <code>fn(args...)</code> style, and ones that are methods of the object and called using Python&#39;s dot call notation <code>obj.fn(args...; kwargs...)</code>.</p><p>The <code>SymPy</code> package essentially merges the Python style and <code>Julia</code>&#39;s style as follows:</p><ul><li>Promotion rules are established to promote <code>Julia</code> number types to symbolic values so that expressions like <code>pi * x</code> will first promote <code>pi</code> and <code>x</code> to two symbolic values (with <code>pi</code> being converted to the exact <code>sympy.pi</code>) and then the SymPy multiplication operator is called on the two symbolic values. The result is wrapped in the <code>Sym</code> type.</li><li>For generic methods in <code>Julia</code>, such as <code>sin</code>, a new method specialized on the first argument being symbolic  is defined to call the underlying <code>sympy</code> function. (Essentially, the method <code>sin(x::Sym) = sympy.sin(x)</code> is added.)</li><li>For a selection of <code>sympy</code> methods, an exported function is defined. (For example a method like <code>simplify(x::Sym) = sympy.simplify(x)</code> is defined and exported.)</li><li>For object methods and properties in Python, the dot-call notation is used to call these methods. There is a selection of methods for which a <code>Julia</code>n style is also added. For example, <code>ex.subs(...)</code> and <code>subs(ex, ...)</code> are both calling styles for the <code>subs</code> method of the expression <code>ex</code>.</li><li>When a SymPy function is called, <code>PyCall</code> converts the arguments to a Python object, which works as desired in most all cases.</li></ul><p>Expressions in SymPy are simplified to some extent but are not immediately evaluated if there are symbols involved. Expressions are stored in a tree-like manner that can be explored using some basic functions. Here we look at <code>x*sin(x^2)</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x
+(x,)
+
+julia&gt; ex = x * sin(x^2); println(ex)
+x*sin(x^2)
+
+julia&gt; SymPy.Introspection.func(ex)
+PyObject &lt;class &#39;sympy.core.mul.Mul&#39;&gt;
+
+julia&gt; a,b = SymPy.Introspection.args(ex)
+(x, sin(x^2))
+
+julia&gt; a.is_Atom
+true
+
+julia&gt; SymPy.Introspection.func(b)
+PyObject sin
+
+julia&gt; b.is_Atom
+false
+
+julia&gt; SymPy.Introspection.args(b)
+(x^2,)
+
+julia&gt; SymPy.Introspection.func(x^2)
+PyObject &lt;class &#39;sympy.core.power.Pow&#39;&gt;</code></pre><p>The point is not to discuss the introspection functions, but rather to show the tree-like structure:</p><pre><code class="nohighlight hljs">x*sin(x^2)
+   / \
+  x  sin
+      |
+     Pow
+	 / \
+	x   2</code></pre><p>SymPy uses the term <code>Atom</code> to describe the leaves of this tree. An atom is an expression with no subexpressions.</p><h2 id="Substitution"><a class="docs-heading-anchor" href="#Substitution">Substitution</a><a id="Substitution-1"></a><a class="docs-heading-anchor-permalink" href="#Substitution" title="Permalink"></a></h2><p>SymPy provides several  means to substitute values in for the symbolic expressions:</p><ul><li><code>subs</code>: substitution of subexpressions as defined by the objects themselves</li><li><code>replace</code>: replace matching subexpressions of <code>self</code> with <code>value</code></li><li><code>xreplace</code>: exact node replacement in expr tree; also capable of using matching rules</li></ul><p>We discuss <code>subs</code> here which uses &quot;old/new&quot; pairs to indicate the substitution.</p><p>The method <code>subs</code> is a method of an object, but for this widely used task, a <code>Julia</code>n method <code>subs</code> is also defined. Consider the simplest case:</p><pre><code class="language-julia-repl hljs">julia&gt; ex = x * sin(x^2); println(ex)
+x*sin(x^2)
+
+julia&gt; subs(ex, x^2, x)
+x⋅sin(x)
+</code></pre><p>Above, the old/new pair is separated by a comma. Pairs notation is suggested instead:</p><pre><code class="language-julia-repl hljs">julia&gt; subs(ex, x =&gt; x^2) |&gt; println
+x^2*sin(x^4)
+</code></pre><p><code>Julia</code>&#39;s call notation is used for substitution, so we can more directly write:</p><pre><code class="language-julia-repl hljs">julia&gt; ex = x^2 + x^4; println(ex)
+x^4 + x^2
+
+julia&gt; ex(x^2 =&gt; x^5) |&gt; println
+x^10 + x^5
+</code></pre><p>Of some note, above <code>x^4</code> is treated like <code>(x^2)^2</code> and so an <code>x^10</code> term is returned after the substitution. The <code>subs</code> method simplifies arguments; <code>xreplace</code> method only replaces exact expressions in syntax tree:</p><pre><code class="language-julia-repl hljs">julia&gt; ex.xreplace(Dict(x^2 =&gt; x^5)) |&gt; println
+x^5 + x^4
+</code></pre><p>For example, this is one way to make a polynomial in a new variable:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x y
+(x, y)
+
+julia&gt; ex = x^2 + 2x + 1
+ 2
+x  + 2⋅x + 1
+
+julia&gt; ex(x =&gt; y)
+ 2
+y  + 2⋅y + 1
+</code></pre><p>Substitution can also be numeric:</p><pre><code class="language-julia-repl hljs">julia&gt; ex(x =&gt; 0)
+1
+</code></pre><p>The output has no free variables, but is still a symbolic quantity.</p><p>Expressions with more than one variables can have multiple substitutions (performed from left to right):</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x,y,z
+(x, y, z)
+
+julia&gt; ex = x + y + z
+x + y + z
+
+julia&gt; ex(x =&gt; 1, y=&gt; PI)
+z + 1 + π
+</code></pre><p>A straight call (e.g. <code>ex(1, PI)</code>)  is also possble, where the order of the variables is determined by <code>free_symbols</code>. While useful for expressions of a single variable, being explicit through the use of paired values is recommended.</p><h2 id="Simplification"><a class="docs-heading-anchor" href="#Simplification">Simplification</a><a id="Simplification-1"></a><a class="docs-heading-anchor-permalink" href="#Simplification" title="Permalink"></a></h2><p>The <code>simplify</code> function in SymPy &quot;simplifies&quot; a given expression. As mentioned in the SymPy documentation, simplification is not a well-defined term and strategies employed may differ between versions. The <code>simplify</code> function depends on over a dozen other functions, such as <code>powsimp</code>, <code>trigsimp</code>, <code>radsimp</code>, <code>logcombine</code>, and <code>together</code>. The <code>simplify</code> function is exported by the <code>SymPy</code> package, the others called through the <code>sympy</code> module.</p><p>To illustrate, we have:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x y;
+
+julia&gt; q = x*y + x*y^2 + x^2*y + x;
+
+julia&gt; simplify(q)
+  ⎛       2        ⎞
+x⋅⎝x⋅y + y  + y + 1⎠
+</code></pre><p>The above uses factoring. Other simplifications are possible. For example, powers:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms m::integer n::integer
+(m, n)
+
+julia&gt; x^m / x^n
+ m  -n
+x ⋅x
+
+julia&gt; simplify(x^m / x^n)
+ m - n
+x
+</code></pre><p>Simplification rules can also be made by hand using <code>Wild</code> to create wild cards. This shows a simple trigonometric substitution:</p><pre><code class="language-julia-repl hljs">julia&gt; x_ = Wild(&quot;x&quot;)
+x
+
+julia&gt; ex = sin(2x)
+sin(2⋅x)
+
+julia&gt; replace(ex, sin(2x_) =&gt; 2sin(x_)*cos(x_))
+2⋅sin(x)⋅cos(x)
+</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>With version 1.9 of <code>Julia</code> an extension for the <code>TermInterface</code> package is provided which allows <code>Metatheory</code> rules to be applied to symbolic expressions.</p></div></div><h3 id="Trigsimp"><a class="docs-heading-anchor" href="#Trigsimp">Trigsimp</a><a id="Trigsimp-1"></a><a class="docs-heading-anchor-permalink" href="#Trigsimp" title="Permalink"></a></h3><p>For trigonometric expressions, <code>simplify</code> will use <code>trigsimp</code> to simplify:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms theta::real
+(theta,)
+
+julia&gt; p = cos(theta)^2 + sin(theta)^2
+   2         2
+sin (θ) + cos (θ)
+</code></pre><p>Calling either <code>simplify</code> or <code>trigsimp</code> will apply the Pythagorean identity:</p><pre><code class="language-julia-repl hljs">julia&gt; simplify(p)
+1
+</code></pre><p>While often forgotten,  the <code>trigsimp</code> function is, of course,  aware of the double angle formulas:</p><pre><code class="language-julia-repl hljs">julia&gt; simplify(sin(2theta) - 2sin(theta)*cos(theta))
+0
+</code></pre><p>Unlike the example above, <code>trigsimp</code> replaces the product with the double angle:</p><pre><code class="language-julia-repl hljs">julia&gt; sympy.trigsimp(2* sin(theta) * cos(theta))
+sin(2⋅θ)
+</code></pre><p>The <code>expand_trig</code> function will expand such expressions:</p><pre><code class="language-julia-repl hljs">julia&gt; sympy.expand_trig(sin(2theta))
+2⋅sin(θ)⋅cos(θ)
+</code></pre><h2 id="Conversion-from-symbolic-to-numeric"><a class="docs-heading-anchor" href="#Conversion-from-symbolic-to-numeric">Conversion from symbolic to numeric</a><a id="Conversion-from-symbolic-to-numeric-1"></a><a class="docs-heading-anchor-permalink" href="#Conversion-from-symbolic-to-numeric" title="Permalink"></a></h2><p>SymPy provides two identical means to convert a symbolic math expression to a number. One is the <code>evalf</code> method, the other the <code>N</code> function. Within <code>Julia</code> we decouple these, using <code>N</code> to also convert to a <code>Julian</code> value and; <code>evalf</code> leaving the conversion as a symbolic object.</p><p>The <code>N</code> function converts symbolic integers, rationals, irrationals, and complex values, while attempting to find an appropriate <code>Julia</code> type for the value.</p><p>To see the difference, we use both on <code>PI</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; N(PI)  # converts to underlying pi Irrational
+π = 3.1415926535897...
+</code></pre><p>Whereas, <code>evalf</code> will produce a symbolic numeric value:</p><pre><code class="language-julia-repl hljs">julia&gt; PI.evalf()
+3.14159265358979
+</code></pre><p>The <code>evalf</code> call allows for a precision argument to be passed through the second argument. This is how <span>$30$</span> digits of <span>$\pi$</span> can be extracted:</p><pre><code class="language-julia-repl hljs">julia&gt; PI.evalf(30)
+3.14159265358979323846264338328
+</code></pre><p>The output of an <code>evalf</code> call is is a symbolic number, not a <code>Julia</code> object. Composing with <code>N</code> we can see the difference:</p><pre><code class="language-julia-repl hljs">julia&gt; N(PI.evalf(30))
+3.141592653589793238462643383279999999999999999999999999999999999999999999999985
+</code></pre><p>Explicit conversion via the <code>convert(T, ex)</code> pattern can also be used to convert a symbolic number to a <code>Julia</code>n one. This is necessary at times when <code>N</code> does not give the desired type.</p><h2 id="Algebraic-expressions"><a class="docs-heading-anchor" href="#Algebraic-expressions">Algebraic expressions</a><a id="Algebraic-expressions-1"></a><a class="docs-heading-anchor-permalink" href="#Algebraic-expressions" title="Permalink"></a></h2><p>As mentioned, <code>SymPy</code> overloads many of <code>Julia</code>&#39;s functions to work with symbolic objects, such as seen above with <code>sin</code> and <code>asin</code>. The usual mathematical operations such as <code>+</code>, <code>*</code>, <code>-</code>, <code>/</code> etc. work through <code>Julia</code>&#39;s promotion mechanism, where numbers are promoted to symbolic objects, others dispatch internally to related <code>SymPy</code> functions.</p><p>In most all  cases, thinking about this distinction between numbers and symbolic numbers is unnecessary, as numeric values passed to <code>SymPy</code> functions are typically promoted to symbolic expressions. This conversion will take math constants to their corresponding <code>SymPy</code> counterpart, rational expressions to rational expressions, and floating point values to floating point values. However there are edge cases. An expression like <code>1//2 * pi * x</code> will differ from the seemingly identical  <code>1//2 * (pi * x)</code>. The former will produce a floating point value from <code>1//2 * pi</code> before being promoted to a symbolic instance. Using the symbolic value <code>PI</code> makes this expression work either way.</p><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>The <code>sympy.nsimplify</code> function can be used to convert floating point values to rational values, but it is suggested to convert rational value in <code>Julia</code> to symbolic values, rather than rely on later conversions.</p></div></div><p>Most of <code>Julia</code>&#39;s <a href="http://julia.readthedocs.org/en/latest/manual/mathematical-operations/#elementary-functions">mathematical</a> functions are overloaded to work with symbolic expressions. <code>Julia</code>&#39;s generic definitions are used, as possible. This also introduces some edge cases. For example, <code>x^(-2)</code> will work, but <code>k=-2; x^l</code> will balk due to the non-literal, negative, integer exponent. However, either <code>k = -2//1</code> or <code>k = Sym(-2)</code> will work as expected with <code>x^k</code>, as the former call first dispatches to a generic definition not defined for negative integer exponents unless <code>x</code> is one, but the latter two expressions do not.</p><h2 id="Polynomial-and-rational-expressions"><a class="docs-heading-anchor" href="#Polynomial-and-rational-expressions">Polynomial and rational expressions</a><a id="Polynomial-and-rational-expressions-1"></a><a class="docs-heading-anchor-permalink" href="#Polynomial-and-rational-expressions" title="Permalink"></a></h2><p><code>SymPy</code> makes it very easy to work with polynomial and rational expressions, as illustrated in the following section.</p><h3 id="The-expand,-factor,-and-collect-functions"><a class="docs-heading-anchor" href="#The-expand,-factor,-and-collect-functions">The expand, factor, and collect functions</a><a id="The-expand,-factor,-and-collect-functions-1"></a><a class="docs-heading-anchor-permalink" href="#The-expand,-factor,-and-collect-functions" title="Permalink"></a></h3><p>A typical polynomial expression in a single variable can be written in two common ways, expanded or factored form. Using <code>factor</code> and <code>expand</code> can move between the two.</p><p>For example,</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x y z
+(x, y, z)
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; p = x^2 + 3x + 2; println(p)
+x^2 + 3*x + 2
+
+julia&gt; factor(p)
+(x + 1)⋅(x + 2)
+
+</code></pre><p>Or</p><pre><code class="language-julia-repl hljs">julia&gt; expand(prod((x-i) for i in 1:5)) |&gt; println
+x^5 - 15*x^4 + 85*x^3 - 225*x^2 + 274*x - 120
+</code></pre><p>The <code>factor</code> function factors over the rational numbers, so something like this with obvious factors is not finished:</p><pre><code class="language-julia-repl hljs">julia&gt; factor(x^2 - 2) |&gt; println
+x^2 - 2
+</code></pre><p>When expressions involve one or more variables, it can be convenient to be able to manipulate them. For example, if we define <code>q</code> by:</p><pre><code class="language-julia-repl hljs">julia&gt; q = x*y + x*y^2 + x^2*y + x
+ 2        2
+x ⋅y + x⋅y  + x⋅y + x
+</code></pre><p>Then we can collect the terms by the variable <code>x</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; collect(q, x)
+ 2       ⎛ 2        ⎞
+x ⋅y + x⋅⎝y  + y + 1⎠
+</code></pre><p>or the variable <code>y</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; collect(q, y)
+   2         ⎛ 2    ⎞
+x⋅y  + x + y⋅⎝x  + x⎠
+</code></pre><p>These are identical expressions, though viewed differently.</p><p>The SymPy tutorial illustrates that <code>expand</code> can also result in simplifications through this example:</p><pre><code class="language-julia-repl hljs">julia&gt; expand((x + 1)*(x - 2) - (x - 1)*x)
+-2
+</code></pre><p>These methods are not restricted to polynomial expressions and will work with other expressions. For example, <code>factor</code> identifies the following as a factorable object in terms of the variable <code>exp(x)</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; factor(exp(2x) + 3exp(x) + 2)
+⎛ x    ⎞ ⎛ x    ⎞
+⎝ℯ  + 1⎠⋅⎝ℯ  + 2⎠
+</code></pre><h2 id="Rational-expressions:-apart,-together,-cancel"><a class="docs-heading-anchor" href="#Rational-expressions:-apart,-together,-cancel">Rational expressions: apart, together, cancel</a><a id="Rational-expressions:-apart,-together,-cancel-1"></a><a class="docs-heading-anchor-permalink" href="#Rational-expressions:-apart,-together,-cancel" title="Permalink"></a></h2><p>When working with rational expressions, SymPy does not do much simplification unless asked. For example this expression is not simplified:</p><pre><code class="language-julia-repl hljs">julia&gt; r = 1/x + 1/x^2
+1   1
+─ + ──
+x    2
+    x
+</code></pre><p>To put the terms of <code>r</code> over a common denominator, the <code>together</code> function is available:</p><pre><code class="language-julia-repl hljs">julia&gt; together(r)
+x + 1
+─────
+   2
+  x
+</code></pre><p>The <code>apart</code> function does the reverse, creating a partial fraction decomposition from a ratio of polynomials:</p><pre><code class="language-julia-repl hljs">julia&gt; apart( (4x^3 + 21x^2 + 10x + 12) /  (x^4 + 5x^3 + 5x^2 + 4x))
+ 2⋅x - 1       1     3
+────────── - ───── + ─
+ 2           x + 4   x
+x  + x + 1
+</code></pre><p>Some times SymPy will cancel factors, as here:</p><pre><code class="language-julia-repl hljs">julia&gt; top = (x-1)*(x-2)*(x-3)
+(x - 3)⋅(x - 2)⋅(x - 1)
+
+julia&gt; bottom = (x-1)*(x-4)
+(x - 4)⋅(x - 1)
+
+julia&gt; top/bottom
+(x - 3)⋅(x - 2)
+───────────────
+     x - 4
+</code></pre><p>(This might make math faculty a bit upset, but it is in line with student thinking.)</p><p>However, with expanded terms, the common factor of <code>(x-1)</code> is not cancelled:</p><pre><code class="language-julia-repl hljs">julia&gt; r = expand(top) / expand(bottom)
+ 3      2
+x  - 6⋅x  + 11⋅x - 6
+────────────────────
+     2
+    x  - 5⋅x + 4
+</code></pre><p>The <code>cancel</code> function instructs SymPy to cancel common factors in a rational expression.</p><pre><code class="language-julia-repl hljs">julia&gt; cancel(r)
+ 2
+x  - 5⋅x + 6
+────────────
+   x - 4
+</code></pre><h2 id="Powers"><a class="docs-heading-anchor" href="#Powers">Powers</a><a id="Powers-1"></a><a class="docs-heading-anchor-permalink" href="#Powers" title="Permalink"></a></h2><p>The SymPy <a href="http://docs.sympy.org/dev/tutorial/simplification.html#powers">tutorial</a> offers a thorough explanation on powers and how the rules of powers are applied during simplification. Basically</p><ul><li><p class="math-container">\[x^a x^b = x^{a+b}\]</p><p>is always true. However</p></li><li><p class="math-container">\[x^a y^a=(xy)^a\]</p><p>is only true with assumptions, such as <span>$x,y \geq 0$</span> and <span>$a$</span> is real, but not in general. For example, <span>$x=y=-1$</span> and <span>$a=1/2$</span> has <span>$x^a \cdot y^a = i \cdot i =  -1$</span>, where as <span>$(xy)^a = 1$</span>.</p></li><li><p class="math-container">\[(x^a)^b = x^{ab}\]</p><p>is only true with assumptions. For example <span>$x=-1, a=2$</span>, and <span>$b=1/2$</span> gives <span>$(x^a)^b = 1^{1/2} = 1$</span>, whereas <span>$x^{ab} = -1^1 = -1$</span>.</p></li></ul><p>We see that with assumptions, the following expression does simplify to <span>$0$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x::nonnegatve y::nonnegative  a::real
+(x, y, a)
+
+julia&gt; simplify(x^a * y^a - (x*y)^a)
+0
+</code></pre><p>However, without assumptions this is not the case</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x, y, a
+(x, y, a)
+
+julia&gt; simplify(x^a * y^a - (x*y)^a)
+ a  a        a
+x ⋅y  - (x⋅y)
+</code></pre><p>The <code>simplify</code> function calls <code>powsimp</code> to simplify powers, as above. The <code>powsimp</code> function has the keyword argument <code>force=true</code> to force simplification even if assumptions are not specified:</p><pre><code class="language-julia-repl hljs">julia&gt; powsimp(x^a * y^a - (x*y)^a, force=true)
+0
+</code></pre><h2 id="More-on-polynomials"><a class="docs-heading-anchor" href="#More-on-polynomials">More on polynomials</a><a id="More-on-polynomials-1"></a><a class="docs-heading-anchor-permalink" href="#More-on-polynomials" title="Permalink"></a></h2><p>(The following section is borrowed almost directly from the SymPy documentation <a href="https://docs.sympy.org/latest/modules/polys/wester.html">Examples from Wester&#39;s Article</a>) and shows more methods for working with polynomial expressions.</p><p>The following are reasonably high-degree polynomials:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x
+(x,)
+
+julia&gt; f = 64*x^34 - 21*x^47 - 126*x^8 - 46*x^5 - 16*x^60 - 81
+      60       47       34        8       5
+- 16⋅x   - 21⋅x   + 64⋅x   - 126⋅x  - 46⋅x  - 81
+
+julia&gt; g = 72*x^60 - 25*x^25 - 19*x^23 - 22*x^39 - 83*x^52 + 54*x^10 + 81
+    60       52       39       25       23       10
+72⋅x   - 83⋅x   - 22⋅x   - 25⋅x   - 19⋅x   + 54⋅x   + 81
+
+julia&gt; h = 34*x^19 - 25*x^16 + 70*x^7 + 20*x^3 - 91*x - 86
+    19       16       7       3
+34⋅x   - 25⋅x   + 70⋅x  + 20⋅x  - 91⋅x - 86</code></pre><p>There are no common divisors of <code>f</code> and <code>g</code>, as <code>gcd</code> illustrates:</p><pre><code class="language-julia-repl hljs">julia&gt; gcd(f,g)
+1
+</code></pre><p>Multiplying both terms by <code>h</code> and expanding gives a known g.c.d. of <code>h</code>, verified through:</p><pre><code class="language-julia-repl hljs">julia&gt; gcd(expand(f*h), expand(g*h)) - h
+0
+</code></pre><p>The resultant of two polynomials is a polynomial expression of their coefficients that is equal to zero if and only if the polynomials have a common root :</p><pre><code class="language-julia-repl hljs">julia&gt; sympy.resultant(expand(f*h), expand(g*h))
+0</code></pre><p>The following shows high-degree polynomials can easily be factored:</p><pre><code class="language-julia-repl hljs">julia&gt; factor(expand(f*g)) |&gt; println
+-(16*x^60 + 21*x^47 - 64*x^34 + 126*x^8 + 46*x^5 + 81)*(72*x^60 - 83*x^52 - 22*x^39 - 25*x^25 - 19*x^23 + 54*x^10 + 81)
+</code></pre><p>Similar functionality extends to multivariable polynomials</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x y z
+(x, y, z)
+
+julia&gt; f = 24*x*y^19*z^8 - 47*x^17*y^5*z^8 + 6*x^15*y^9*z^2 - 3*x^22 + 5
+     22       17  5  8      15  9  2         19  8
+- 3⋅x   - 47⋅x  ⋅y ⋅z  + 6⋅x  ⋅y ⋅z  + 24⋅x⋅y  ⋅z  + 5
+
+julia&gt; g = 34*x^5*y^8*z^13 + 20*x^7*y^7*z^7 + 12*x^9*y^16*z^4 + 80*y^14*z
+    9  16  4       7  7  7       5  8  13       14
+12⋅x ⋅y  ⋅z  + 20⋅x ⋅y ⋅z  + 34⋅x ⋅y ⋅z   + 80⋅y  ⋅z
+
+julia&gt; h = 11*x^12*y^7*z^13 - 23*x^2*y^8*z^10 + 47*x^17*y^5*z^8
+    17  5  8       12  7  13       2  8  10
+47⋅x  ⋅y ⋅z  + 11⋅x  ⋅y ⋅z   - 23⋅x ⋅y ⋅z
+
+julia&gt; gcd(expand(f*h), expand(g*h)) - h
+0
+
+julia&gt; factor(expand(f*g)) |&gt; println
+-2*y^7*z*(6*x^9*y^9*z^3 + 10*x^7*z^6 + 17*x^5*y*z^12 + 40*y^7)*(3*x^22 + 47*x^17*y^5*z^8 - 6*x^15*y^9*z^2 - 24*x*y^19*z^8 - 5)</code></pre><p>Symbolic powers also can be used:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x::real, n::integer
+(x, n)
+
+julia&gt; gcd(x^n - x^(2*n), x^n) |&gt; println
+x^n
+
+julia&gt; sympy.resultant(3*x^4 + 3*x^3 + x^2 - x - 2, x^3 - 3*x^2 + x + 5)
+0
+</code></pre><p>Factoring can be done over different fields, not just the rationals. This shows factoring over complex terms:</p><pre><code class="language-julia-repl hljs">julia&gt; f = 4*x^4 + 8*x^3 + 77*x^2 + 18*x + 153
+   4      3       2
+4⋅x  + 8⋅x  + 77⋅x  + 18⋅x + 153
+
+julia&gt; factor(f, gaussian=true)
+  ⎛    3⋅ⅈ⎞ ⎛    3⋅ⅈ⎞
+4⋅⎜x - ───⎟⋅⎜x + ───⎟⋅(x + 1 - 4⋅ⅈ)⋅(x + 1 + 4⋅ⅈ)
+  ⎝     2 ⎠ ⎝     2 ⎠
+
+julia&gt; factor(f, extension=sympy.I)
+  ⎛    3⋅ⅈ⎞ ⎛    3⋅ⅈ⎞
+4⋅⎜x - ───⎟⋅⎜x + ───⎟⋅(x + 1 - 4⋅ⅈ)⋅(x + 1 + 4⋅ⅈ)
+  ⎝     2 ⎠ ⎝     2 ⎠</code></pre><p>In the following  we make a variable for a symbolic <span>$\sqrt{2}$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; const φ = sqrt(Sym(2))
+√2
+
+julia&gt; f = x^3 + (φ - 2)*x^2 - (2*φ + 3)*x - 3*φ
+ 3    2
+x  + x ⋅(-2 + √2) - x⋅(2⋅√2 + 3) - 3⋅√2
+
+julia&gt; g = x^2 - 2
+ 2
+x  - 2</code></pre><p>Trying to cancel <code>f/g</code> leaves the expression unchanged; to make <code>cancel</code> recognize algebraic properties of <span>$\sqrt{2}$</span> the <code>extension</code> keyword is needed:</p><pre><code class="language-julia-repl hljs">julia&gt; cancel(f/g) |&gt; println
+(x^3 - 2*x^2 + sqrt(2)*x^2 - 3*x - 2*sqrt(2)*x - 3*sqrt(2))/(x^2 - 2)
+
+julia&gt; cancel(f/g, extension=true) |&gt; println
+(x^2 - 2*x - 3)/(x - sqrt(2))
+
+julia&gt; cancel(f/g, extension=φ) |&gt; println
+(x^2 - 2*x - 3)/(x - sqrt(2))
+</code></pre><p>Factoring over modular integers (prime only) is possible using the keyword <code>modulus</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; f = x^4 - 3*x^2 + 1;
+
+julia&gt; factor(f) |&gt; println
+(x^2 - x - 1)*(x^2 + x - 1)
+
+julia&gt; factor(f, modulus=2) |&gt; println
+(x^2 + x + 1)^2
+
+julia&gt; factor(f, modulus=5) |&gt; println
+(x - 2)^2*(x + 2)^2
+</code></pre><h2 id="The-Poly-class-in-SymPy"><a class="docs-heading-anchor" href="#The-Poly-class-in-SymPy">The Poly class in SymPy</a><a id="The-Poly-class-in-SymPy-1"></a><a class="docs-heading-anchor-permalink" href="#The-Poly-class-in-SymPy" title="Permalink"></a></h2><p>The expression <code>x^4 - 3x^2 + 1</code> is stored internally as other expressions are, using the expression tree to build up from the atoms. However, for polynomials, more efficient and advantageous representations are possible. The dense polynomial representation is possible by storing just the coefficients relative to a known basis. For example:</p><pre><code class="language-julia hljs">julia&gt; f = x^4 - 2x^2 + 1
+ 4      2
+x  - 2⋅x  + 1
+
+julia&gt; println(sympy.srepr(f))
+Add(Pow(Symbol(&#39;x&#39;), Integer(4)), Mul(Integer(-1), Integer(2), Pow(Symbol(&#39;x&#39;), Integer(2))), Integer(1))
+
+julia&gt; p = sympy.Poly(f, x)
+Poly(x**4 - 2*x**2 + 1, x, domain=&#39;ZZ&#39;)
+
+julia&gt; p.rep
+PyObject DMP([mpz(1), mpz(0), mpz(-2), mpz(0), mpz(1)], ZZ, None)
+</code></pre><p>Storing <code>p</code> using just coefficients may be more efficient for many task, such as addition and multiplication, but not, as it will be much more efficient to store <code>f^100</code> than <code>p^100</code>.</p><p>One advantage of the <code>Poly</code> class is specific methods become available as the structure is assumed. For example, we will see the <code>coeffs</code> method used to extract the coefficients.</p><p>The domain shown when <code>p</code> is displayed refers to assumptions on the coefficients. Above is a symbol for integers, <code>QQ</code> is for rational numbers, <code>RR</code> for real numbers, <code>CC</code> for complex (along with other variants, like <code>ZZ_I</code> for complex integers.</p><h2 id="Coefficients"><a class="docs-heading-anchor" href="#Coefficients">Coefficients</a><a id="Coefficients-1"></a><a class="docs-heading-anchor-permalink" href="#Coefficients" title="Permalink"></a></h2><p>Returning to polynomials, there are a few functions to find various pieces of the polynomials. First we make a general quadratic polynomial:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms a,b,c,x
+(a, b, c, x)
+
+julia&gt; p = a*x^2 + b*x + c
+   2
+a⋅x  + b⋅x + c
+</code></pre><p>If given a polynomial, like <code>p</code>, there are different means to extract the coefficients:</p><ul><li><p>SymPy provides a <code>coeffs</code> method for <code>Poly</code> objects, but <code>p</code> must first be converted to one.</p></li><li><p>SymPy provides the <code>coeff</code> method for expressions, which allows extration of a coeffiecient for a given monomial</p></li></ul><p>The <code>ex.coeff(monom)</code> call will return the corresponding coefficient of the monomial:</p><pre><code class="language-julia-repl hljs">julia&gt; p.coeff(x^2) # a
+a
+
+julia&gt; p.coeff(x)   # b
+b
+</code></pre><p>The constant can be found through substitution:</p><pre><code class="language-julia-repl hljs">julia&gt; p(x=&gt;0)
+c
+</code></pre><p>Though one could use some trick like this to find all the coefficients:</p><pre><code class="language-julia-repl hljs">julia&gt; Sym[[p.coeff(x^i) for i in N(degree(p,gen=x)):-1:1]; p(x=&gt;0)]
+3-element Vector{Sym}:
+ a
+ b
+ c
+</code></pre><p>that is cumbersome, at best. SymPy has a function <code>coeffs</code>, but it is defined for polynomial types, so will fail on <code>p</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; try p.coeffs() catch err &quot;ERROR: KeyError: key `coeffs` not found&quot; end # wrap p.coeffs() for doctest of error
+&quot;ERROR: KeyError: key `coeffs` not found&quot;</code></pre><p>Polynomials are a special class in SymPy and must be constructed. The <code>Poly</code> constructor can be used. As there is more than one free variable in <code>p</code>, we specify the variable <code>x</code> below:</p><pre><code class="language-julia-repl hljs">julia&gt; q = sympy.Poly(p, x)
+Poly(a*x**2 + b*x + c, x, domain=&#39;ZZ[a,b,c]&#39;)
+
+julia&gt; q.coeffs()
+3-element Vector{Sym}:
+ a
+ b
+ c
+</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>The <code>Poly</code> constructor from SymPy is <em>not</em> a function, so is not exported when <code>SymPy</code> is loaded. To access it, the object must be qualified by its containing module, in this case <code>Poly</code>. Were it to be used frequently, an alias could be used, as in <code>const Poly=sympy.Poly</code> <em>or</em> the <code>import_from</code> function, as in <code>import_from(sympy, :Poly)</code>. The latter has some attempt to avoid naming collisions.</p></div></div><h2 id="Polynomial-roots:-solve,-real_roots,-polyroots,-nroots"><a class="docs-heading-anchor" href="#Polynomial-roots:-solve,-real_roots,-polyroots,-nroots">Polynomial roots: solve, real_roots, polyroots, nroots</a><a id="Polynomial-roots:-solve,-real_roots,-polyroots,-nroots-1"></a><a class="docs-heading-anchor-permalink" href="#Polynomial-roots:-solve,-real_roots,-polyroots,-nroots" title="Permalink"></a></h2><p>SymPy provides functions to find the roots of a polynomial. In general, a polynomial with real coefficients of degree <span>$n$</span> will have <span>$n$</span> roots when multiplicities and complex roots are accounted for. The number of real roots is consequently between <span>$0$</span> and <span>$n$</span>.</p><p>For a <em>univariate</em> polynomial expression (a single variable), the real roots, when available, are returned by <code>real_roots</code>. For example,</p><pre><code class="language-julia-repl hljs">julia&gt; real_roots(x^2 - 2)
+2-element Vector{Sym}:
+ -√2
+  √2
+</code></pre><p>Unlike <code>factor</code> – which only factors over rational factors – <code>real_roots</code> finds the two irrational roots here. It is well known (the <a href="http://en.wikipedia.org/wiki/Abel%E2%80%93Ruffini_theorem">Abel-Ruffini theorem</a>) that for degree 5 polynomials, or higher, it is not always possible to express the roots in terms of radicals. However, when the roots are rational <code>SymPy</code> can have success:</p><pre><code class="language-julia-repl hljs">julia&gt; p = (x-3)^2*(x-2)*(x-1)*x*(x+1)*(x^2 + x + 1);  println(p)
+x*(x - 3)^2*(x - 2)*(x - 1)*(x + 1)*(x^2 + x + 1)
+
+julia&gt; real_roots(p)
+6-element Vector{Sym}:
+ -1
+  0
+  1
+  2
+  3
+  3
+</code></pre><div class="admonition is-info"><header class="admonition-header">Why `println`?</header><div class="admonition-body"><p>The uses of <code>println(p)</code> above and elsewhere throughout the introduction is only for technical reasons related to doctesting and how <code>Documenter.jl</code> parses  the expected output. This usage is not idiomatic, or suggested; it  only allows the cell  to  be tested programatically for  regressions. Similarly, expected errors  are  wrapped in <code>try</code>-<code>catch</code> blocks just  for testing purposes.</p></div></div><p>In this example, the degree of <code>p</code> is 8, but only the 6 real roots returned, the double root of <span>$3$</span> is accounted for. The two complex roots of <code>x^2 + x+ 1</code> are not considered by this function. The complete set of distinct roots can be found with <code>solve</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; solve(p)
+7-element Vector{Sym}:
+                 -1
+                  0
+                  1
+                  2
+                  3
+ -1/2 - sqrt(3)*I/2
+ -1/2 + sqrt(3)*I/2
+</code></pre><p>This finds the complex roots, but does not account for the double root. The <code>roots</code> function of SymPy does.</p><p>The output of calling <code>roots</code> will be a dictionary whose keys are the roots and values the multiplicity.</p><pre><code class="language-julia hljs">julia&gt; roots(p)
+Dict{Any, Any} with 7 entries:
+  -1                 =&gt; 1
+  3                  =&gt; 2
+  1                  =&gt; 1
+  0                  =&gt; 1
+  -1/2 - sqrt(3)*I/2 =&gt; 1
+  2                  =&gt; 1
+  -1/2 + sqrt(3)*I/2 =&gt; 1
+</code></pre><p>When exact answers are not provided, the <code>roots</code> call is contentless:</p><pre><code class="language-julia-repl hljs">julia&gt; p = x^5 - x + 1
+ 5
+x  - x + 1
+
+julia&gt; sympy.roots(p)
+Dict{Any, Any}()
+</code></pre><p>Calling <code>solve</code> seems to produce very little as well:</p><pre><code class="language-julia-repl hljs">julia&gt; rts = solve(p)
+5-element Vector{Sym}:
+ CRootOf(x^5 - x + 1, 0)
+ CRootOf(x^5 - x + 1, 1)
+ CRootOf(x^5 - x + 1, 2)
+ CRootOf(x^5 - x + 1, 3)
+ CRootOf(x^5 - x + 1, 4)
+</code></pre><p>But in fact, <code>rts</code> contains lots of information. We can extract numeric values quite easily with <code>N</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; N.(rts)
+5-element Vector{Number}:
+                     -1.167303978261418684256045899854842180720560371525489039140082449275651903429536
+ -0.18123244446987538 - 1.0839541013177107im
+ -0.18123244446987538 + 1.0839541013177107im
+   0.7648844336005847 - 0.35247154603172626im
+   0.7648844336005847 + 0.35247154603172626im
+</code></pre><p>These are numeric approximations to irrational values. For numeric approximations to polynomial roots, the <code>nroots</code> function is also provided. The answers are still symbolic:</p><pre><code class="language-julia-repl hljs">julia&gt; nroots(p)
+5-element Vector{Sym}:
+                       -1.16730397826142
+ -0.181232444469875 - 1.08395410131771⋅ⅈ
+ -0.181232444469875 + 1.08395410131771⋅ⅈ
+ 0.764884433600585 - 0.352471546031726⋅ⅈ
+ 0.764884433600585 + 0.352471546031726⋅ⅈ
+</code></pre><h2 id="The-solve-function"><a class="docs-heading-anchor" href="#The-solve-function">The solve function</a><a id="The-solve-function-1"></a><a class="docs-heading-anchor-permalink" href="#The-solve-function" title="Permalink"></a></h2><p>The <code>solve</code> function is more general purpose than just finding roots of univariate polynomials. The function tries to solve for when an expression is 0, or a set of expressions are all 0.</p><p>For example, it can be used to solve when <span>$\cos(x) = \sin(x)$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; solve(cos(x) - sin(x))
+1-element Vector{Sym}:
+ pi/4
+</code></pre><p>Though there are infinitely many correct solutions, these are within a certain range.</p><div class="admonition is-info"><header class="admonition-header">Using `~` to specify an equation</header><div class="admonition-body"><p>The above solved an equation <span>$\cos(x) = \sin(x)$</span> by subtracting and solving the mathematically equivalent <span>$\cos(x) - \sin(x) = 0$</span>, the <span>$0$</span> being assumed by <code>SymPy</code> when an explicit equation is not specified. Alternatively, the <code>~</code> can be used in place of <code>=</code> when representing an equation, as in <code>solve(cos(x) ~ sin(x), x)</code>.</p></div></div><p>The <a href="http://docs.sympy.org/latest/modules/solvers/solveset.html">solveset</a> function appeared in version 1.0 of SymPy and is an intended replacement for <code>solve</code>. Here we see it describes all solutions:</p><pre><code class="language-julia-repl hljs">julia&gt; u = solveset(cos(x) ~ sin(x))
+⎧        5⋅π │      ⎫   ⎧        π │      ⎫
+⎨2⋅n⋅π + ─── │ n ∊ ℤ⎬ ∪ ⎨2⋅n⋅π + ─ │ n ∊ ℤ⎬
+⎩         4  │      ⎭   ⎩        4 │      ⎭
+</code></pre><p>The output of <code>solveset</code> is a set, rather than a vector or dictionary. To get the values requires some work. For <em>finite sets</em> we collect the elements with <code>collect</code>, but first we must convert to a <code>Julia</code> <code>Set</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; v = solveset(x^2 ~ 4, x)
+{-2, 2}
+
+julia&gt; collect(Set(v...))
+2-element Vector{Any}:
+  2
+ -2
+</code></pre><p>This composition is done in the <code>elements</code> function:</p><pre><code class="language-julia-repl hljs">julia&gt; elements(v)
+2-element Vector{Sym}:
+  2
+ -2
+</code></pre><p>The <code>elements</code> function does not work for more complicated (non-finite) sets, such as <code>u</code>. For these, the <code>contains</code> method may be useful to query the underlying elements.</p><pre><code class="language-julia-repl hljs">julia&gt; solveset(cos(x) ~ sin(x), x).contains(PI/4)
+True</code></pre><p>The output is a symbolic <code>True</code>. This can be converted via <code>N</code> or compared to <code>rrue</code>, but not directly used within a conditional argument:</p><pre><code class="language-julia-repl hljs">julia&gt; N(True), True == true, True === true
+(true, true, false)
+</code></pre><hr/><p>Solving within Sympy has limits. For example, there is no symbolic solution here:</p><pre><code class="language-julia-repl hljs">julia&gt; try  solve(cos(x) - x)  catch err &quot;error&quot; end # wrap command for doctest of error
+&quot;error&quot;</code></pre><p>(And hence the error message generated.)</p><p>For such an equation, a numeric method would be needed, similar to the <code>Roots</code> package. For example:</p><pre><code class="language-julia-repl hljs">julia&gt; nsolve(cos(x) - x, 1) ≈ 0.73908513321516064165
+true</code></pre><p>Though it can&#39;t solve everything, the <code>solve</code> function can also solve equations of a more general type. For example, here it is used to derive the quadratic equation:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms a::real, b::real, c::real
+(a, b, c)
+
+julia&gt; p = a*x^2 + b*x + c
+   2
+a⋅x  + b⋅x + c</code></pre><pre><code class="nohighlight hljs">julia&gt; solve(p, x)
+2-element Vector{Sym}:
+ (-b + sqrt(-4*a*c + b^2))/(2*a)
+ -(b + sqrt(-4*a*c + b^2))/(2*a)
+</code></pre><p>The extra argument <code>x</code> is passed to <code>solve</code> so that <code>solve</code> knows which variable to solve for.</p><p>The <code>solveset</code> function is similar:</p><pre><code class="language-julia-repl hljs">julia&gt; solveset(p, x)
+⎧           _____________             _____________⎫
+⎪          ╱           2             ╱           2 ⎪
+⎨   b    ╲╱  -4⋅a⋅c + b       b    ╲╱  -4⋅a⋅c + b  ⎬
+⎪- ─── - ────────────────, - ─── + ────────────────⎪
+⎩  2⋅a         2⋅a           2⋅a         2⋅a       ⎭
+</code></pre><p>If the <code>x</code> value is not given, <code>solveset</code> will error and  <code>solve</code> will try to find a solution over all the free variables:</p><pre><code class="nohighlight hljs">julia&gt; solve(p)
+1-element Vector{Dict{Any, Any}}:
+ Dict(a =&gt; -(b*x + c)/x^2)</code></pre><p>Systems of equations can be solved as well. For example, to solve this linear system: <span>$2x + 3y = 6, 3x - 4y=12$</span>, we have:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x::real, y::real
+(x, y)
+
+julia&gt; exs = (2x+3y ~ 6, 3x-4y ~ 12)
+(Eq(2*x + 3*y, 6), Eq(3*x - 4*y, 12))
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; d = solve(exs); # Dict(x=&gt;60/17, y=&gt;-6/17)</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>We formed a tuple of equations above. A matrix of equations is now deprecated within SymPy and the automatic conversion of <code>PyCall</code> does that conversion.</p></div></div><p>We can &quot;check our work&quot; by plugging into each equation. We take advantage of how the <code>subs</code> function, used implicitly, allows us to pass in a dictionary:</p><pre><code class="language-julia-repl hljs">julia&gt; [ex(d) for ex ∈ exs]
+2-element Vector{Sym}:
+ True
+ True
+</code></pre><p>The more <code>Julia</code>n way to solve a linear  equation, like this   would be as follows:</p><pre><code class="language-julia-repl hljs">julia&gt; A = Sym[2 3; 3  -4]; b = Sym[6, 12]
+2-element Vector{Sym}:
+  6
+ 12
+
+julia&gt; A \ b
+2-element Vector{Sym}:
+ 60/17
+ -6/17</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>Rather than use a generic  <code>lu</code> solver through <code>Julia</code> (which  proved slow for larger  systems),  the <code>\</code> operator utilizes  <code>solve</code> to perform this  computation.</p></div></div><p>In the previous example, the system had two equations and two unknowns. When that is not the case, one can specify the variables to solve for in a tuple. In this example, we find a quadratic polynomial that approximates <span>$\cos(x)$</span> near <span>$0$</span>:</p><pre><code class="language-julia hljs">julia&gt; a,b,c,h = symbols(&quot;a,b,c,h&quot;, real=true)
+(a, b, c, h)
+
+julia&gt; p = a*x^2 + b*x + c
+   2
+a⋅x  + b⋅x + c
+
+julia&gt; fn = cos
+cos (generic function with 14 methods)
+
+julia&gt; exs = [fn(0*h)-p(x =&gt; 0), fn(h)-p(x =&gt; h), fn(2h)-p(x =&gt; 2h)]
+3-element Vector{Sym}:
+                           1 - c
+       -a*h^2 - b*h - c + cos(h)
+ -4*a*h^2 - 2*b*h - c + cos(2*h)
+
+julia&gt; d = solve(exs, (a,b,c))
+Dict{Any, Any} with 3 entries:
+  a =&gt; -cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)
+  c =&gt; 1
+  b =&gt; 2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)
+</code></pre><p>Again, a dictionary is returned. The polynomial itself can be found by substituting back in for <code>a</code>, <code>b</code>, and <code>c</code>:</p><pre><code class="language-julia hljs">julia&gt; quad_approx = p.subs(d); println(quad_approx)
+x^2*(-cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)) + x*(2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)) + 1
+</code></pre><p>Taking the &quot;limit&quot; as <span>$h$</span> goes to <span>$0$</span> produces the answer <span>$1 - x^2/2$</span>, as  will be shown later.</p><p>Finally for <code>solve</code>, we show one way to re-express the polynomial <span>$a_2x^2 + a_1x + a_0$</span> as <span>$b_2(x-c)^2 + b_1(x-c) + b_0$</span> using <code>solve</code> (and not, say, an expansion theorem.)</p><pre><code class="language-julia hljs">julia&gt; n = 3
+3
+
+julia&gt; @syms x, c
+(x, c)
+
+julia&gt; @syms as[1:3]
+(Sym[as₁, as₂, as₃],)
+
+julia&gt; @syms bs[1:3]
+(Sym[bs₁, bs₂, bs₃],)
+
+julia&gt; p = sum([as[i+1]*x^i for i in 0:(n-1)]);
+
+julia&gt; q = sum([bs[i+1]*(x-c)^i for i in 0:(n-1)]);
+
+julia&gt; solve(p ~ q, bs)
+Dict{Any, Any} with 3 entries:
+  bs₁ =&gt; as₁ + as₂*c + as₃*c^2
+  bs₂ =&gt; as₂ + 2*as₃*c
+  bs₃ =&gt; as₃
+</code></pre><h3 id="Solving-using-logical-operators"><a class="docs-heading-anchor" href="#Solving-using-logical-operators">Solving using logical operators</a><a id="Solving-using-logical-operators-1"></a><a class="docs-heading-anchor-permalink" href="#Solving-using-logical-operators" title="Permalink"></a></h3><p>The <code>solve</code> function does not need to just solve <code>ex = 0</code>. There are other means to specify an equation. Ideally, it would be nice to say <code>ex1 == ex2</code>, but the interpretation of <code>==</code> is not for this. Rather, <code>SymPy</code> introduces <code>Eq</code> for equality. So this expression</p><pre><code class="language-julia-repl hljs">julia&gt; solve(Eq(x, 1))
+1-element Vector{Sym}:
+ 1
+</code></pre><p>gives 1, as expected from solving <code>x == 1</code>.</p><p>The previously used infix operator <code>~</code> simply calls <code>Eq</code> to construct an equality.</p><p>In addition to <code>Eq</code>, there are <code>Lt</code>, <code>Le</code>, <code>Ge</code>, <code>Gt</code>. The Unicode operators (e.g., <code>\leq</code>  and not  <code>\leq</code>)  are not aliased to these, but there are alternatives <code>\ll[tab]</code>, <code>\leqq[tab]</code>, <code>\Equal[tab]</code>, <code>\geqq[tab]</code>, <code>\gg[tab]</code> and <code>\neg[tab]</code> to negate.</p><p>So, the above could have been written with the following nearly identical expression, though it is entered with <code>\Equal[tab]</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; solve(x ⩵ 1)
+1-element Vector{Sym}:
+ 1
+</code></pre><p>The infix tilde, <code>~</code>,  consistent with the interface from <code>Symbolics</code> , is recommended for readability over <code>⩵</code>.</p><h2 id="Plotting"><a class="docs-heading-anchor" href="#Plotting">Plotting</a><a id="Plotting-1"></a><a class="docs-heading-anchor-permalink" href="#Plotting" title="Permalink"></a></h2><p>The <code>Plots</code> package allows many 2-dimensional plots of <code>SymPy</code> objects to be agnostic as to a backend plotting package.  <code>SymPy</code> provides recipes that allow symbolic expressions to be used where functions are part of the <code>Plots</code> interface. [See the help page for <code>sympy_plotting</code>.]</p><p>In particular, the following methods of <code>plot</code> are defined:</p><ul><li><code>plot(ex::Sym, a, b)</code> will plot the expression of single variable over the interval <code>[a,b]</code></li><li><code>plot!(ex::Sym, a, b)</code> will add to the current plot a plot of  the expression of single variable over the interval <code>[a,b]</code>, or, when not specified, the current plotting limits</li><li><code>plot(ex1, ex2, a, b)</code> will plot a parametric plot of the two expressions over the interval <code>[a,b]</code>.</li><li><code>contour(xs, ys, ex::Sym)</code> will make a contour plot of the expression of two variables over the grid specifed by the <code>xs</code> and <code>ys</code>.</li><li><code>surface(xs, ys, ex::Sym)</code> will make a surface plot of the expression of two variables over the grid specifed by the <code>xs</code> and <code>ys</code>.</li></ul><p>For example:</p><pre><code class="language-julia hljs">using SymPy, Plots
+@syms x
+plot(x^2 - 2, -2, 2)</code></pre><p><img src="../plot-1.svg" alt/></p><p>Or a parametric plot:</p><pre><code class="language-julia hljs">plot(sin(2x), cos(3x), 0, 4pi);</code></pre><p><img src="../plot-2.svg" alt/></p><p>For plotting with other plotting packages, it is generally faster to first call <code>lambdify</code> on the expression and then generate <code>y</code> values with the resulting <code>Julia</code> function. An example might follow this pattern:</p><pre><code class="language-julia hljs">ex = cos(x)^2  +  cos(x^2)
+fn = lambdify(ex)
+xs = range(0, stop=10, length=256)
+plot(xs, fn.(xs))</code></pre><p><img src="../plot-3.svg" alt/></p><hr/><p>In addition, with <code>PyPlot</code> a few other plotting functions from <code>SymPy</code> are available from its interface to <code>MatplotLib</code>:</p><ul><li><p><code>plot3d_parametric_surface(ex1::Sym, ex2::Sym, ex3::Sym), (uvar, a0, b0), (vvar, a1, b1))</code> – make a surface plot of the expressions parameterized by the region <code>[a0,b0] x [a1,b1]</code>. The default region is <code>[-5,5]x[-5,5]</code> where the ordering of the variables is given by <code>free_symbols(ex)</code>.</p></li><li><p><code>plot_implicit(predictate, (xvar, a0, b0), (yvar, a1, b1))</code> – make</p></li></ul><p>an implicit equation plot of the expressions over the region <code>[a0,b0] x [a1,b1]</code>. The default region is <code>[-5,5]x[-5,5]</code> where the ordering of the variables is given by <code>free_symbols(ex)</code>.  To create predicates from the variable, the functions <code>Lt</code>, <code>Le</code>, <code>Eq</code>, <code>Ge</code>, and <code>Gt</code> can be used, as with <code>Lt(x*y, 1)</code>. For infix notation, unicode operators can be used: <code>\ll&lt;tab&gt;</code>, <code>\leqq&lt;tab&gt;</code>, <code>\Equal&lt;tab&gt;</code>, <code>\geqq&lt;tab&gt;</code>, and <code>\gg&lt;tab&gt;</code>. For example, <code>x*y ≪ 1</code>.  To combine terms, the unicode <code>\vee&lt;tab&gt;</code> (for &quot;or&quot;), <code>\wedge&lt;tab&gt;</code> (for &quot;and&quot;) can be used.</p><h2 id="Calculus"><a class="docs-heading-anchor" href="#Calculus">Calculus</a><a id="Calculus-1"></a><a class="docs-heading-anchor-permalink" href="#Calculus" title="Permalink"></a></h2><p><code>SymPy</code> has many of the basic operations of calculus provided through a relatively small handful of functions.</p><h3 id="Limits"><a class="docs-heading-anchor" href="#Limits">Limits</a><a id="Limits-1"></a><a class="docs-heading-anchor-permalink" href="#Limits" title="Permalink"></a></h3><p>Limits are computed by the <code>limit</code> function which takes an expression, a variable and a value, and optionally a direction specified by either <code>dir=&quot;+&quot;</code> or <code>dir=&quot;-&quot;</code>.</p><p>For example, this shows Gauss was right:</p><pre><code class="language-julia-repl hljs">julia&gt; limit(sin(x)/x, x, 0)
+1
+</code></pre><p>Alternatively, the second and third arguments can be specified as a pair:</p><pre><code class="language-julia-repl hljs">julia&gt; limit(sin(x)/x, x =&gt; 0)
+1
+</code></pre><p>Limits at infinity are done by using <code>oo</code> for <span>$\infty$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; limit((1+1/x)^x, x =&gt; oo)
+ℯ
+</code></pre><p>This example computes what L&#39;Hopital reportedly paid a Bernoulli for</p><pre><code class="language-julia-repl hljs">julia&gt; @syms a::positive
+(a,)
+
+julia&gt; ex = (sqrt(2a^3*x-x^4) - a*(a^2*x)^(1//3)) / (a - (a*x^3)^(1//4));  println(ex)
+(-a^(5/3)*x^(1/3) + sqrt(2*a^3*x - x^4))/(-a^(1/4)*(x^3)^(1/4) + a)
+</code></pre><p>Substituting <span>$x=a$</span> gives an indeterminate form:</p><pre><code class="language-julia-repl hljs">julia&gt; ex(x=&gt;a)
+nan
+</code></pre><p>We can see it is of the form <span>$0/0$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; denom(ex)(x =&gt; a), numer(ex)(x =&gt; a)
+(0, 0)
+</code></pre><p>And we get</p><pre><code class="language-julia-repl hljs">julia&gt; limit(ex, x =&gt; a)
+16⋅a
+────
+ 9
+</code></pre><p>In a previous example, we defined <code>quad_approx</code>:</p><pre><code class="language-julia hljs">julia&gt; quad_approx |&gt; println
+x^2*(-cos(h)/h^2 + cos(2*h)/(2*h^2) + 1/(2*h^2)) + x*(2*cos(h)/h - cos(2*h)/(2*h) - 3/(2*h)) + 1
+</code></pre><p>The limit as <code>h</code> goes to <span>$0$</span> gives <code>1 - x^2/2</code>, as expected:</p><pre><code class="language-julia hljs">julia&gt; limit(quad_approx, h =&gt; 0)
+     2
+    x
+1 - ──
+    2
+</code></pre><h4 id="Left-and-right-limits"><a class="docs-heading-anchor" href="#Left-and-right-limits">Left and right limits</a><a id="Left-and-right-limits-1"></a><a class="docs-heading-anchor-permalink" href="#Left-and-right-limits" title="Permalink"></a></h4><p>The limit is defined when both the left and right limits exist and are equal. But left and right limits can exist and not be equal. The <code>sign</code> function is <span>$1$</span> for positive <span>$x$</span>, <span>$-1$</span> for negative <span>$x$</span> and <span>$0$</span> when <span>$x$</span> is 0. It should not have a limit at <span>$0$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; limit(sign(x), x =&gt; 0)
+1
+</code></pre><p>Oops. Well, the left and right limits are different anyways:</p><pre><code class="language-julia-repl hljs">julia&gt; limit(sign(x), x =&gt; 0, dir=&quot;-&quot;), limit(sign(x), x =&gt; 0, dir=&quot;+&quot;)
+(-1, 1)
+</code></pre><p>The <code>limit</code> function finds the <em>right</em> limit by default. The direction <code>&quot;+-&quot;</code> will check both, erroring if the two do not agree, as below with a message of &quot;ValueError(&#39;The limit does not exist since left hand limit = -1 and right hand limit = 1&#39;)&quot;</p><pre><code class="language-julia-repl hljs">julia&gt; try(limit(sign(x), x =&gt; 0, dir=&quot;+-&quot;)) catch err &quot;error&quot; end
+&quot;error&quot;
+</code></pre><h4 id="Numeric-limits"><a class="docs-heading-anchor" href="#Numeric-limits">Numeric limits</a><a id="Numeric-limits-1"></a><a class="docs-heading-anchor-permalink" href="#Numeric-limits" title="Permalink"></a></h4><p>The <code>limit</code> function uses the <a href="http://docs.sympy.org/latest/modules/series.html#the-gruntz-algorithm">Gruntz</a> algorithm. It is far more reliable then simple numeric attempts at limits. An example of Gruntz is the right limit at <span>$0$</span> of the function:</p><pre><code class="language-julia-repl hljs">julia&gt; j(x) = 1/x^(log(log(log(log(1/x)))) - 1)
+j (generic function with 1 method)
+</code></pre><p>A numeric attempt might be done along these lines:</p><pre><code class="language-julia hljs">julia&gt; hs = [10.0^(-i) for i in 6:16]
+11-element Vector{Float64}:
+ 1.0e-6
+ 1.0e-7
+ 1.0e-8
+ 1.0e-9
+ 1.0e-10
+ 1.0e-11
+ 1.0e-12
+ 1.0e-13
+ 1.0e-14
+ 1.0e-15
+ 1.0e-16
+
+julia&gt; ys = [r(h) for h in hs]
+11-element Vector{Float64}:
+ 6.146316238971239e-7
+ 1.4298053954169988e-7
+ 3.4385814272678773e-8
+ 8.529918929292077e-9
+ 2.176869418153584e-9
+ 5.700972891527026e-10
+ 1.528656750900649e-10
+ 4.188388514215749e-11
+ 1.1705748589577942e-11
+ 3.331965462828263e-12
+ 9.64641441953344e-13
+
+julia&gt; [hs ys]
+11×2 Matrix{Float64}:
+ 1.0e-6   6.14632e-7
+ 1.0e-7   1.42981e-7
+ 1.0e-8   3.43858e-8
+ 1.0e-9   8.52992e-9
+ 1.0e-10  2.17687e-9
+ 1.0e-11  5.70097e-10
+ 1.0e-12  1.52866e-10
+ 1.0e-13  4.18839e-11
+ 1.0e-14  1.17057e-11
+ 1.0e-15  3.33197e-12
+ 1.0e-16  9.64641e-13
+</code></pre><p>With a values appearing to approach <span>$0$</span>. However, in fact these values will ultimately head  off to <span>$\infty$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; limit(j(x), x =&gt; 0, dir=&quot;+&quot;)
+∞
+</code></pre><h3 id="Derivatives"><a class="docs-heading-anchor" href="#Derivatives">Derivatives</a><a id="Derivatives-1"></a><a class="docs-heading-anchor-permalink" href="#Derivatives" title="Permalink"></a></h3><p>One <em>could</em> use limits to implement the definition of a derivative:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x::real, h::real
+(x, h)
+
+julia&gt; j(x) = x * exp(x)
+j (generic function with 1 method)
+
+julia&gt; limit((j(x+h) - j(x)) / h, h =&gt; 0) |&gt; println
+x*exp(x) + exp(x)
+</code></pre><p>However, it would be pretty inefficient, as <code>SymPy</code> already does a great job with derivatives. The <code>diff</code> function implements this. The basic syntax is <code>diff(ex, x)</code> to find the first derivative in <code>x</code> of the expression in <code>ex</code>, or its generalization to <span>$k$</span>th derivatives with <code>diff(ex, x, k)</code>.</p><p>The same derivative computed above by a limit could be found with:</p><pre><code class="language-julia-repl hljs">julia&gt; diff(j(x), x)
+   x    x
+x⋅ℯ  + ℯ
+</code></pre><p>Similarly, we can compute other derivatives:</p><pre><code class="language-julia-repl hljs">julia&gt; diff(x^x, x)
+ x
+x ⋅(log(x) + 1)
+</code></pre><p>Or, higher order  derivatives:</p><pre><code class="language-julia-repl hljs">julia&gt; diff(exp(-x^2), (x, 2)) |&gt;  println
+2*(2*x^2 - 1)*exp(-x^2)
+</code></pre><p>As an alternate to specifying the number of derivatives, multiple variables can be passed to <code>diff</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; diff(exp(-x^2), x, x, x) |&gt;  println     # same as diff(..., (x, 3))
+4*x*(3 - 2*x^2)*exp(-x^2)
+</code></pre><p>This could include variables besides <code>x</code>,  as is needed with mixed partial  derivatives.</p><p>The output is a simple expression, so <code>diff</code> can be composed with other functions, such as <code>solve</code>. For example, here we find the critical points where the derivative is <span>$0$</span> of some rational function:</p><pre><code class="language-julia-repl hljs">julia&gt; j(x) = (12x^2 - 1) / (x^3)
+j (generic function with 1 method)
+
+julia&gt; diff(j(x), x) |&gt; solve
+2-element Vector{Sym}:
+ -1/2
+  1/2
+</code></pre><h4 id="Partial-derivatives"><a class="docs-heading-anchor" href="#Partial-derivatives">Partial derivatives</a><a id="Partial-derivatives-1"></a><a class="docs-heading-anchor-permalink" href="#Partial-derivatives" title="Permalink"></a></h4><p>The <code>diff</code> function makes finding partial derivatives as easy as specifying the variable to differentiate in. This  example computes the mixed partials of an expression in <code>x</code> and <code>y</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x y
+(x, y)
+
+julia&gt; ex = x^2*cos(y)
+ 2
+x ⋅cos(y)
+
+julia&gt; [diff(ex, v1, v2) for v1 in [x,y], v2 in [x,y]]  # also hessian(ex, (x,y))
+2×2 Matrix{Sym}:
+    2⋅cos(y)  -2⋅x⋅sin(y)
+ -2⋅x⋅sin(y)  -x^2*cos(y)
+</code></pre><h4 id="Unevaluated-derivatives"><a class="docs-heading-anchor" href="#Unevaluated-derivatives">Unevaluated derivatives</a><a id="Unevaluated-derivatives-1"></a><a class="docs-heading-anchor-permalink" href="#Unevaluated-derivatives" title="Permalink"></a></h4><p>The <code>Derivative</code> constructor provides unevaluated derivatives, useful with differential equations and the output for unknown functions. Here is an example:</p><pre><code class="language-julia-repl hljs">julia&gt; ex = sympy.Derivative(exp(x*y), x, (y, 2))
+   3
+  ∂   ⎛ x⋅y⎞
+──────⎝ℯ   ⎠
+  2
+∂y  ∂x
+</code></pre><p>These expressions are evaluated with the <code>doit</code> method:</p><pre><code class="language-julia-repl hljs">julia&gt; ex.doit() |&gt; println
+x*(x*y + 2)*exp(x*y)
+</code></pre><h4 id="Implicit-derivatives"><a class="docs-heading-anchor" href="#Implicit-derivatives">Implicit derivatives</a><a id="Implicit-derivatives-1"></a><a class="docs-heading-anchor-permalink" href="#Implicit-derivatives" title="Permalink"></a></h4><p>SymPy can be used to find derivatives of implicitly defined functions. For example, the task of finding <span>$dy/dx$</span> for the equation:</p><p class="math-container">\[~
+y^4 - x^4 -y^2 + 2x^2 = 0
+~\]</p><p>As with the mathematical solution, the key is to treat one of the variables as depending on the other. In this case, we think of <span>$y$</span> locally as a function of <span>$x$</span>. SymPy allows us to create symbolic functions, and we will use one to substitute in for <code>y</code>.</p><p>In SymPy, symbolic functions use the class name  &quot;Function&quot;, but in <code>SymPy</code> we use <code>SymFunction</code> to avoid a name collision with one of <code>Julia</code>&#39;s primary types. The constructor can be used as <code>SymFunction(:F)</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; F, G = SymFunction(&quot;F&quot;), SymFunction(&quot;G&quot;)
+(F, G)
+</code></pre><p>The <code>@syms</code> macro can also more naturally be used, in place of <code>SymFunction</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms F(), G()
+(F, G)
+</code></pre><p>We can call these functions, but we get a function expression:</p><pre><code class="language-julia-repl hljs">julia&gt; F(x)
+F(x)
+</code></pre><p>SymPy can differentiate symbolically, again with <code>diff</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; diff(F(x))
+d
+──(F(x))
+dx
+</code></pre><p>To get back to our problem, we have our expression:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x, y
+(x, y)
+
+julia&gt; ex = y^4 - x^4 - y^2 + 2x^2
+   4      2    4    2
+- x  + 2⋅x  + y  - y
+</code></pre><p>Now we substitute:</p><pre><code class="language-julia-repl hljs">julia&gt; ex1 = ex(y=&gt;F(x))
+   4      2    4       2
+- x  + 2⋅x  + F (x) - F (x)
+</code></pre><p>We want to differentiate &quot;both&quot; sides. As the right side is just <span>$0$</span>, there isn&#39;t anything to do here, but mentally keep track. As for the left we have:</p><pre><code class="language-julia-repl hljs">julia&gt; ex2 = diff(ex1, x)
+     3            3    d                 d
+- 4⋅x  + 4⋅x + 4⋅F (x)⋅──(F(x)) - 2⋅F(x)⋅──(F(x))
+                       dx                dx
+</code></pre><p>Now we collect terms and solve in terms of <span>$F&#39;(x)$</span></p><pre><code class="language-julia-repl hljs">julia&gt; ex3 = solve(ex2, F&#39;(x))[1]
+     3
+  2⋅x  - 2⋅x
+──────────────
+   3
+2⋅F (x) - F(x)
+</code></pre><p>Finally, we substitute back into the solution for <span>$F(x)$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; ex4 = ex3(F(x) =&gt; y)
+   3
+2⋅x  - 2⋅x
+──────────
+    3
+ 2⋅y  - y
+</code></pre><h6 id="Example:-A-Norman-Window"><a class="docs-heading-anchor" href="#Example:-A-Norman-Window">Example: A Norman Window</a><a id="Example:-A-Norman-Window-1"></a><a class="docs-heading-anchor-permalink" href="#Example:-A-Norman-Window" title="Permalink"></a></h6><p>A classic calculus problem is to maximize the area of a <a href="http://en.wiktionary.org/wiki/Norman_window">Norman window</a> (in the shape of a rectangle with a half circle atop) when the perimeter is fixed to be <span>$P \geq 0$</span>.</p><p>Label the rectangle with <span>$w$</span> and <span>$h$</span> for width and height and then the half circle has radius <span>$r=w/2$</span>. With this, we can see that the area is <span>$wh+(1/2)\pi r^2$</span> and the perimeter is <span>$w + 2h + \pi r$</span>. This gives:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms w::nonnegative, h::nonnegative, P::nonnegative
+(w, h, P)
+
+julia&gt; r = w/2
+w
+─
+2
+
+julia&gt; A = w*h + 1//2 * (pi * r^2);   println(A)
+h*w + pi*w^2/8
+
+julia&gt; p = w + 2h + pi*r; println(p)
+2*h + w + pi*w/2
+</code></pre><p>(There is a subtlety above: using <code>1//2*pi*r^2</code> will lose exactness, as the products will be done left to right, and <code>1//2*pi</code> will be converted to an approximate floating point value before multiplying <code>r^2</code>. As such we rewrite the terms. It may be easier to use <code>PI</code> instead of <code>pi</code>.)</p><p>We want to solve for <code>h</code> from when <code>p=P</code> (our fixed value) and substitute back into <code>A</code>. We solve taking the first solution.</p><pre><code class="language-julia-repl hljs">julia&gt; h0 =  solve(p ~ P, h)[1]
+P   π⋅w   w
+─ - ─── - ─
+2    4    2
+
+julia&gt; A1 = A(h =&gt; h0)
+   2
+π⋅w      ⎛P   π⋅w   w⎞
+──── + w⋅⎜─ - ─── - ─⎟
+ 8       ⎝2    4    2⎠
+</code></pre><p>Now we note this is a parabola in <code>w</code>, so any maximum will be at  an endpoint or the vertex, provided the leading term is negative. The leading term can be found through:</p><pre><code class="language-julia-repl hljs">julia&gt; sympy.Poly(A1, w).coeffs()
+2-element Vector{Sym}:
+ -1/2 - pi/8
+         P/2
+</code></pre><p>Or without using the <code>Poly</code> methods, we could do this:</p><pre><code class="language-julia-repl hljs">julia&gt; collect(expand(A1), w).coeff(w^2)
+  1   π
+- ─ - ─
+  2   8
+</code></pre><p>Either way, the leading coefficient, <span>$-1/2 - \pi/8$</span>, is negative, so the maximum can only happen at an endpoint or the vertex of the parabola. Now we check that when <span>$w=0$</span> (the left endpoint) the area is <span>$0$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; A1(w =&gt; 0)
+0
+</code></pre><p>The other endpoint is when <span>$h=0$</span>, or</p><pre><code class="language-julia-repl hljs">julia&gt; b = solve((P-p)(h =&gt; 0), w)[1]
+ 2⋅P
+─────
+2 + π
+</code></pre><p>We will need to check the area at <code>b</code> and at the vertex.</p><p>To find the vertex, we can use calculus – it will be when the derivative in <code>w</code> is <span>$0$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; c = solve(diff(A1, w), w)[1]
+ 2⋅P
+─────
+π + 4
+</code></pre><p>The answer will be the larger of <code>A1</code> at <code>b</code> or <code>c</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; atb = A1(w =&gt; b); println(atb)
+pi*P^2/(2*(2 + pi)^2) + 2*P*(-pi*P/(2*(2 + pi)) - P/(2 + pi) + P/2)/(2 + pi)
+
+julia&gt; atc = A1(w =&gt; c);  println(atc)
+pi*P^2/(2*(pi + 4)^2) + 2*P*(-pi*P/(2*(pi + 4)) - P/(pi + 4) + P/2)/(pi + 4)
+</code></pre><p>A simple comparison isn&#39;t revealing:</p><pre><code class="language-julia-repl hljs">julia&gt; atc - atb |&gt; println
+-pi*P^2/(2*(2 + pi)^2) + pi*P^2/(2*(pi + 4)^2) - 2*P*(-pi*P/(2*(2 + pi)) - P/(2 + pi) + P/2)/(2 + pi) + 2*P*(-pi*P/(2*(pi + 4)) - P/(pi + 4) + P/2)/(pi + 4)
+</code></pre><p>But after simplifying, we can see that this expression is positive if <span>$P$</span> is:</p><pre><code class="language-julia-repl hljs">julia&gt; simplify(atc - atb) |&gt; println
+2*P^2/(16 + pi^3 + 20*pi + 8*pi^2)
+</code></pre><p>With this observation, we conclude the maximum area happens at <code>c</code> with area <code>atc</code>.</p><h3 id="Integrals"><a class="docs-heading-anchor" href="#Integrals">Integrals</a><a id="Integrals-1"></a><a class="docs-heading-anchor-permalink" href="#Integrals" title="Permalink"></a></h3><p>Integration is implemented in SymPy through the <code>integrate</code> function. There are two basic calls: <code>integrate(f(x), x)</code> will find the indefinite integral (<span>$\int f(x) dx$</span>) and when endpoints are specified through <code>integrate(f(x), (x, a, b))</code> the definite integral will be found (<span>$\int_a^b f(x) dx$</span>). The special form <code>integrate(ex, x, a, b)</code> can be used for single integrals, but the specification through a tuple is needed for multiple integrals, so isn&#39;t illustrated here.</p><p>Basic integrals are implemented:</p><pre><code class="language-julia-repl hljs">julia&gt; integrate(x^3, x)
+ 4
+x
+──
+4
+</code></pre><p>Or in more generality:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms n::real
+(n,)
+
+julia&gt; ex = integrate(x^n, x)
+⎧ n + 1
+⎪x
+⎪──────  for n ≠ -1
+⎨n + 1
+⎪
+⎪log(x)  otherwise
+⎩
+</code></pre><p>The output here is a <em>piecewise function</em>, performing a substitution will choose a branch in this case:</p><pre><code class="language-julia-repl hljs">julia&gt; ex(n =&gt; 3)
+ 4
+x
+──
+4
+</code></pre><p>Definite integrals are just as easy. Here is Archimedes&#39; answer:</p><pre><code class="language-julia-repl hljs">julia&gt; integrate(x^2, (x, 0, 1))
+1/3
+</code></pre><p>Tedious problems, such as those needing multiple integration-by-parts steps can be done easily:</p><pre><code class="language-julia hljs">julia&gt; integrate(x^5 * sin(x), x)
+   5             4              3              2
+- x ⋅cos(x) + 5⋅x ⋅sin(x) + 20⋅x ⋅cos(x) - 60⋅x ⋅sin(x) - 120⋅x⋅cos(x) + 120⋅sin(x)
+</code></pre><p>The SymPy tutorial says:</p><blockquote><p>&quot;<code>integrate</code> uses powerful algorithms that are always improving to compute both definite and indefinite integrals, including heuristic pattern matching type algorithms, a partial implementation of the Risch algorithm, and an algorithm using Meijer G-functions that is useful for computing integrals in terms of special functions, especially definite integrals.&quot;</p></blockquote><p>The tutorial gives the following example:</p><pre><code class="language-julia hljs">julia&gt; ex = (x^4 + x^2*exp(x) - x^2 - 2*x*exp(x) - 2*x - exp(x))*exp(x)/((x - 1)^2*(x + 1)^2*(exp(x) + 1))
+⎛ 4    2  x    2        x          x⎞  x
+⎝x  + x ⋅ℯ  - x  - 2⋅x⋅ℯ  - 2⋅x - ℯ ⎠⋅ℯ
+────────────────────────────────────────
+              2        2 ⎛ x    ⎞
+       (x - 1) ⋅(x + 1) ⋅⎝ℯ  + 1⎠
+</code></pre><p>With indefinite integral:</p><pre><code class="language-julia hljs">julia&gt; integrate(ex, x) |&gt; println
+log(exp(x) + 1) + exp(x)/(x^2 - 1)
+</code></pre><h4 id="Multiple-integrals"><a class="docs-heading-anchor" href="#Multiple-integrals">Multiple integrals</a><a id="Multiple-integrals-1"></a><a class="docs-heading-anchor-permalink" href="#Multiple-integrals" title="Permalink"></a></h4><p>The <code>integrate</code> function uses a tuple, <code>(var, a, b)</code>, to specify the limits of a definite integral. This syntax lends itself readily to multiple integration.</p><p>For example, the following computes the integral of <span>$xy$</span> over the unit square:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x, y
+(x, y)
+
+julia&gt; integrate(x*y, (y, 0, 1), (x, 0, 1))
+1/4
+</code></pre><p>The innermost terms can depend on outer ones. For example, the following integrates <span>$x^2y$</span> over the upper half of the unit circle:</p><pre><code class="language-julia-repl hljs">julia&gt; integrate(x^2*y, (y, 0, sqrt(1 - x^2)), (x, -1, 1))
+2/15
+</code></pre><h4 id="Unevaluated-integrals"><a class="docs-heading-anchor" href="#Unevaluated-integrals">Unevaluated integrals</a><a id="Unevaluated-integrals-1"></a><a class="docs-heading-anchor-permalink" href="#Unevaluated-integrals" title="Permalink"></a></h4><p>The <code>Integral</code> constructor can stage unevaluated integrals that will be evaluated by calling <code>doit</code>. It is also used when the output is unknown. This example comes from the tutorial:</p><pre><code class="language-julia-repl hljs">julia&gt; integ = sympy.Integral(sin(x^2), x)
+⌠
+⎮    ⎛ 2⎞
+⎮ sin⎝x ⎠ dx
+⌡
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; integ.doit()  |&gt;  println
+3*sqrt(2)*sqrt(pi)*fresnels(sqrt(2)*x/sqrt(pi))*gamma(3/4)/(8*gamma(7/4))
+</code></pre><h3 id="Taylor-series"><a class="docs-heading-anchor" href="#Taylor-series">Taylor series</a><a id="Taylor-series-1"></a><a class="docs-heading-anchor-permalink" href="#Taylor-series" title="Permalink"></a></h3><p>The <code>series</code> function can compute series expansions around a point to a specified order. For example, the following command finds four terms of the series expansion of <code>exp(sin(x))</code> in <code>x</code> about <span>$c=0$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; s1 = series(exp(sin(x)), x, 0, 4); println(s1)
+1 + x + x^2/2 + O(x^4)
+</code></pre><p>The coefficients are from the Taylor expansion (<span>$a_i=f^{i}(c)/i!$</span>). The <a href="http://en.wikipedia.org/wiki/Big_O_notation">big &quot;O&quot;</a> term indicates that the remainder is no bigger in  size than a constant times <span>$x^4$</span>,  as <span>$x\rightarrow  0$</span>.</p><p>Consider what happens when we multiply series of different orders:</p><pre><code class="language-julia-repl hljs">julia&gt; s2 = series(cos(exp(x)), x, 0, 6); println(s2)
+cos(1) - x*sin(1) + x^2*(-sin(1)/2 - cos(1)/2) - x^3*cos(1)/2 + x^4*(-cos(1)/4 + 5*sin(1)/24) + x^5*(-cos(1)/24 + 23*sin(1)/120) + O(x^6)
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; simplify(s1 * s2) |&gt; println
+cos(1) + sqrt(2)*x*cos(pi/4 + 1) - 3*x^2*sin(1)/2 - sqrt(2)*x^3*sin(pi/4 + 1) + O(x^4)
+</code></pre><p>The big &quot;O&quot; term is <span>$x^4$</span>, as smaller order terms in <code>s2</code> are covered in this term. The big &quot;O&quot; notation is sometimes not desired, in which case the <code>removeO</code> function can be employed:</p><pre><code class="language-julia-repl hljs">julia&gt; s1.removeO() |&gt; println
+x^2/2 + x + 1
+</code></pre><h3 id="Sums"><a class="docs-heading-anchor" href="#Sums">Sums</a><a id="Sums-1"></a><a class="docs-heading-anchor-permalink" href="#Sums" title="Permalink"></a></h3><p><code>SymPy</code> can do sums, including some infinite ones. The <code>summation</code> function performs this task. For example, we have</p><pre><code class="language-julia-repl hljs">julia&gt; @syms i, n
+(i, n)
+
+julia&gt; summation(i^2, (i, 1, n)) |&gt; println
+n^3/3 + n^2/2 + n/6
+</code></pre><p>Like <code>Integrate</code> and <code>Derivative</code>, there is also a <code>Sum</code> function to stage the task until the <code>doit</code> function is called to initiate the sum.</p><p>Some famous sums can be computed:</p><pre><code class="language-julia-repl hljs">julia&gt; sn = sympy.Sum(1/i^2, (i, 1, n)); println(sn)
+Sum(i^(-2), (i, 1, n))
+
+julia&gt; sn.doit()
+harmonic(n, 2)
+</code></pre><p>And from this a limit is available:</p><pre><code class="language-julia-repl hljs">julia&gt; limit(sn.doit(), n, oo) |&gt; println
+pi^2/6
+</code></pre><p>This would have also been possible through <code>summation(1/i^2, (i, 1, oo))</code>.</p><h3 id="Vector-valued-functions"><a class="docs-heading-anchor" href="#Vector-valued-functions">Vector-valued functions</a><a id="Vector-valued-functions-1"></a><a class="docs-heading-anchor-permalink" href="#Vector-valued-functions" title="Permalink"></a></h3><p>Julia makes constructing a vector of symbolic objects easy:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x,y
+(x, y)
+
+julia&gt; v = [1,2,x]
+3-element Vector{Sym}:
+ 1
+ 2
+ x
+
+julia&gt; w = [1,y,3]
+3-element Vector{Sym}:
+ 1
+ y
+ 3
+</code></pre><p>The generic definitions of vector operations will work as expected with symbolic objects:</p><pre><code class="language-julia-repl hljs">julia&gt; using LinearAlgebra
+
+julia&gt; dot(v,w) |&gt; println
+2*y + 3*conjugate(x) + 1
+</code></pre><p>Or</p><pre><code class="language-julia-repl hljs">julia&gt; cross(v,w)
+3-element Vector{Sym}:
+ -x⋅y + 6
+    x - 3
+    y - 2
+</code></pre><p>Finding gradients can be done using a comprehension.</p><pre><code class="language-julia-repl hljs">julia&gt; ex = x^2*y - x*y^2
+ 2        2
+x ⋅y - x⋅y
+
+julia&gt; Sym[diff(ex,var) for var in (x,y)]
+2-element Vector{Sym}:
+ 2*x*y - y^2
+ x^2 - 2*x*y
+</code></pre><p>Or through broadcasting:</p><pre><code class="language-julia-repl hljs">julia&gt;  diff.(ex, (x,y))
+(2*x*y - y^2, x^2 - 2*x*y)</code></pre><p>The mixed partials is similarly done by passing two variables to differentiate in to <code>diff</code>, as illustrated previously:</p><pre><code class="language-julia-repl hljs">julia&gt; Sym[diff(ex, v1, v2) for v1 in (x,y), v2 in (x,y)]
+2×2 Matrix{Sym}:
+       2⋅y  2⋅(x - y)
+ 2⋅(x - y)       -2⋅x
+</code></pre><p>For this task, SymPy provides the <code>hessian</code> method:</p><pre><code class="language-julia-repl hljs">julia&gt; hessian(ex, (x,y))
+2×2 Matrix{Sym}:
+       2⋅y  2⋅x - 2⋅y
+ 2⋅x - 2⋅y       -2⋅x
+</code></pre><h2 id="Matrices"><a class="docs-heading-anchor" href="#Matrices">Matrices</a><a id="Matrices-1"></a><a class="docs-heading-anchor-permalink" href="#Matrices" title="Permalink"></a></h2><p><code>Julia</code> has excellent infrastructure to work with generic matrices, such as <code>Matrix{Sym}</code> objects (matrices with symbolic entries). As well, SymPy has a class for matrices. <code>SymPy</code>, through <code>PyCall</code>, automatically maps mutable SymPy matrices into <code>Julia</code>n matrices of type <code>Array{Sym}</code>.</p><p>Constructing matrices with symbolic entries follows <code>Julia</code>&#39;s conventions:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x,y
+(x, y)
+
+julia&gt; M = [1 x; x 1]
+2×2 Matrix{Sym}:
+ 1  x
+ x  1
+</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>However, SymPy may throw a deprecation order when mapping a <code>Matrix{Sym}</code> argument for a function, as the underlying <code>sympy.Matrix</code> class is for symbolic numbers only since this <a href="https://github.com/sympy/sympy/issues/21497">change</a>. The suggestion is to use a &quot;list of lists, TableForm, NumPy array, or some</p></div></div><p>other data structure instead&quot;. A tuple of tuples will map to a list of lists.</p><p>Here is an example of a tuple of tuples forming a matrix:</p><pre><code class="language-julia-repl hljs">julia&gt; A = sympy.Matrix( ((1,x),  (y,2)) )
+2×2 Matrix{Sym}:
+ 1  x
+ y  2</code></pre><p>This is useful if copying SymPy examples, but otherwise unneccesary, these are immediately mapped into <code>Julia</code> arrays by <code>PyCall</code> – <strong>unless</strong> an immutable array is desired, and then the <code>sympy.ImmutableMatrix</code> constructor is used.</p><p>Some more examples:</p><pre><code class="language-julia-repl hljs">julia&gt; diagm(0=&gt;ones(Sym, 5))
+5×5 Matrix{Sym}:
+ 1  0  0  0  0
+ 0  1  0  0  0
+ 0  0  1  0  0
+ 0  0  0  1  0
+ 0  0  0  0  1
+
+julia&gt; M = [1 x; x 1]
+2×2 Matrix{Sym}:
+ 1  x
+ x  1
+
+julia&gt; M^2
+2×2 Matrix{Sym}:
+ x^2 + 1      2⋅x
+     2⋅x  x^2 + 1
+
+julia&gt; det(M)
+     2
+1 - x</code></pre><p>We can call <code>Julia</code>&#39;s generic matrix functions in the usual manner, e.g:</p><pre><code class="language-julia-repl hljs">julia&gt; det(A)
+-x⋅y + 2
+</code></pre><p>We can also call SymPy&#39;s matrix methods using the dot-call syntax:</p><pre><code class="language-julia-repl hljs">julia&gt; A.det()
+-x⋅y + 2
+</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>Actually, <code>det(A)</code> avoids the generic <code>Julia</code> implementation. A better example might be <code>qr(M)</code> versus <code>M.QRdecomposition()</code> to see a generic <code>Julia</code> implementation for <code>Matrix{Sym}</code> against SymPy&#39;s method for matrices.</p></div></div><p>Occasionally, the SymPy method has more content:</p><pre><code class="language-julia-repl hljs">julia&gt; eigvecs(M)
+2×2 Matrix{Sym}:
+ 1  -1
+ 1   1
+</code></pre><p>As compared to SymPy&#39;s <code>eigenvects</code> which yields:</p><pre><code class="language-julia-repl hljs">julia&gt; A.eigenvects()
+2-element Vector{Tuple{Sym, Int64, Vector{Matrix{Sym}}}}:
+ (3/2 - sqrt(4*x*y + 1)/2, 1, [[(3/2 - sqrt(4*x*y + 1)/2)/y - 2/y; 1;;]])
+ (sqrt(4*x*y + 1)/2 + 3/2, 1, [[(sqrt(4*x*y + 1)/2 + 3/2)/y - 2/y; 1;;]])
+</code></pre><p>(This is a bit misleading, as the generic <code>eigvecs</code> fails on <code>M</code>, so the value is basically just repackaged from <code>A.eigenvects()</code>.)</p><p>This example from the SymPy tutorial shows the <code>nullspace</code> method:</p><pre><code class="language-julia-repl hljs">julia&gt; A = Sym[1 2 3 0 0; 4 10 0 0 1]
+2×5 Matrix{Sym}:
+ 1   2  3  0  0
+ 4  10  0  0  1
+
+julia&gt; vs = A.nullspace()
+3-element Vector{Matrix{Sym}}:
+ [-15; 6; … ; 0; 0;;]
+ [0; 0; … ; 1; 0;;]
+ [1; -1/2; … ; 0; 1;;]
+</code></pre><p>This confirms that values found are indeed in the null space of <code>A</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; [A*vs[i] for i in 1:3]
+3-element Vector{Matrix{Sym}}:
+ [0; 0;;]
+ [0; 0;;]
+ [0; 0;;]
+</code></pre><p>Symbolic expressions can be included in the matrices:</p><pre><code class="language-julia-repl hljs">julia&gt; A = [1 x; x 1]
+2×2 Matrix{Sym}:
+ 1  x
+ x  1
+
+julia&gt; P, D = A.diagonalize()  # M = PDP^-1
+(Sym[-1 1; 1 1], Sym[1 - x 0; 0 x + 1])
+
+julia&gt; A - P*D*inv(P)
+2×2 Matrix{Sym}:
+ 0  0
+ 0  0
+</code></pre><h2 id="Differential-equations"><a class="docs-heading-anchor" href="#Differential-equations">Differential equations</a><a id="Differential-equations-1"></a><a class="docs-heading-anchor-permalink" href="#Differential-equations" title="Permalink"></a></h2><p>SymPy has facilities for solving ordinary differential <a href="http://docs.sympy.org/latest/modules/solvers/ode.html">equations</a>. The key is to create a symbolic function expression using <code>SymFunction</code>. Again, this may be done through:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms F()
+(F,)
+</code></pre><p>With this, we can  construct a  differential equation. Following the SymPy tutorial, we solve <span>$f&#39;&#39;(x) - 2f&#39;(x) + f(x) = \sin(x)$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; diffeq = diff(F(x), x, 2) - 2*diff(F(x)) + F(x) ~ sin(x); println(diffeq)
+Eq(F(x) - 2*Derivative(F(x), x) + Derivative(F(x), (x, 2)), sin(x))
+</code></pre><p>With this, we just need the <code>dsolve</code> function. This is called as <code>dsolve(eq)</code> or <code>dsolve(eq, F(x))</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; ex = dsolve(diffeq, F(x)); println(ex)
+Eq(F(x), (C1 + C2*x)*exp(x) + cos(x)/2)
+</code></pre><p>The <code>dsolve</code> function in SymPy has an extensive list of named arguments to control the underlying algorithm. These can be passed through with the appropriate keyword arguments.</p><p>The definition of the differential equation expects the cumbersome <code>diff(ex, var)</code> to provide the derivative. The <code>Differential</code> function lessens the visual noise (with a design taken from <code>ModelingToolkit</code>). The above would be:</p><pre><code class="language-julia-repl hljs">julia&gt; D = Differential(x)
+Differential(x)
+
+julia&gt; diffeq = D(D(F))(x) - 2D(F)(x) + F(x) ~ sin(x); println(diffeq)
+Eq(F(x) - 2*Derivative(F(x), x) + Derivative(F(x), (x, 2)), sin(x))
+
+julia&gt; sympy.dsolve(diffeq, F(x)) |&gt; println
+Eq(F(x), (C1 + C2*x)*exp(x) + cos(x)/2)</code></pre><p>This solution has two constants, <span>$C_1$</span> and <span>$C_2$</span>, that would be found from initial conditions. Say we know <span>$F(0)=0$</span> and <span>$F&#39;(0)=1$</span>, can we find the constants? To work with the returned expression, it is most convenient to get just the right hand side. The <code>rhs</code> method will return the right-hand side of a relation:</p><pre><code class="language-julia-repl hljs">julia&gt; ex1 = rhs(ex); println(ex1)
+(C1 + C2*x)*exp(x) + cos(x)/2
+</code></pre><p>(The <a href="http://docs.sympy.org/dev/modules/core.html#sympy.core.basic.Basic.args">args</a> function also can be used to break up the expression into parts.)</p><p>With this, we can solve for <code>C1</code> through substituting in <span>$0$</span> for <span>$x$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; C1 = first(free_symbols(ex1))
+C₁
+
+julia&gt; solve(ex1(x =&gt; 0), C1)
+1-element Vector{Sym}:
+ -1/2
+</code></pre><p>We see that <span>$C1=-1/2$</span>, which we substitute in:</p><pre><code class="language-julia-repl hljs">julia&gt; ex2 = ex1(C1 =&gt; -Sym(1//2)); println(ex2)
+(C2*x - 1/2)*exp(x) + cos(x)/2
+</code></pre><p>We know that <span>$F&#39;(0)=1$</span> now, so we solve for <code>C2</code> through</p><pre><code class="language-julia-repl hljs">julia&gt; C2 = free_symbols(ex1)[2]
+C₂
+
+julia&gt; solve( diff(ex2, x)(x =&gt; 0) - 1, C2 )
+1-element Vector{Sym}:
+ 3/2</code></pre><p>This gives <code>C2=3/2</code>. Again we substitute in to get our answer:</p><pre><code class="language-julia-repl hljs">julia&gt; ex3 = ex2(Sym(&quot;C2&quot;) =&gt; 3//2); println(ex3)
+(3*x/2 - 1/2)*exp(x) + cos(x)/2
+</code></pre><p>The <code>dsolve</code> function has an <code>ics</code> argument that allows most of the above to be done internally:</p><pre><code class="language-julia-repl hljs">julia&gt; ex4 = dsolve(diffeq, F(x), ics=Dict(F(0)=&gt;0, D(F)(0)=&gt;1));
+
+julia&gt; ex3 - rhs(ex4)  # need rhs to extract the solution
+0
+</code></pre><h6 id="Example"><a class="docs-heading-anchor" href="#Example">Example</a><a id="Example-1"></a><a class="docs-heading-anchor-permalink" href="#Example" title="Permalink"></a></h6><p>This example is borrowed from <a href="http://nbviewer.ipython.org/github/garth-wells/IA-maths-Ipython/blob/master/notebooks/Lecture1.ipynb">here</a>.</p><blockquote><p>Find the variation of speed with time of a parachutist subject to a drag force of <span>$k\cdot v^2$</span>.</p></blockquote><p>The equation is</p><p class="math-container">\[~
+\frac{m}{k} \frac{dv}{dt} = \alpha^2 - v^2.
+~\]</p><p>We proceed through:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms t, m, k, alpha=&gt;&quot;α&quot;, v()
+(t, m, k, α, v)
+
+julia&gt; D = Differential(t);
+
+julia&gt; ex = (m/k)*D(v)(t) ~ alpha^2 - v(t)^2; println(ex)
+Eq(m*Derivative(v(t), t)/k, α^2 - v(t)^2)
+</code></pre><p>We can &quot;classify&quot; this ODE with the method <code>classify_ode</code> function.</p><pre><code class="nohighlight hljs">julia&gt; sympy.classify_ode(ex)
+(&quot;separable&quot;, &quot;1st_exact&quot;, &quot;1st_power_series&quot;, &quot;lie_group&quot;, &quot;separable_Integral&quot;, &quot;1st_exact_Integral&quot;)
+</code></pre><p>It is linear, but not solvable. Proceeding with <code>dsolve</code> gives:</p><pre><code class="nohighlight hljs">julia&gt; u = dsolve(ex, v(t));
+
+julia&gt; println(rhs(u))
+-α/tanh(log(exp(α*(C1*m - 2*k*t)))/(2*m))
+</code></pre><h6 id="Example-2"><a class="docs-heading-anchor" href="#Example-2">Example</a><a class="docs-heading-anchor-permalink" href="#Example-2" title="Permalink"></a></h6><p>We follow an example from <a href="https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html">Wolfram</a>, solving first order ODE: <span>$y&#39;(t) - 3t\cdot y(t) = 1$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms y(), a, x
+(y, a, x)
+
+julia&gt; D = Differential(x);
+
+julia&gt; eqn = D(y)(x) - 3*x*y(x) - 1; println(eqn)
+-3*x*y(x) + Derivative(y(x), x) - 1
+</code></pre><p>We solve the initial value problem with <span>$y(0) = 4$</span> as follows:</p><pre><code class="language-julia-repl hljs">julia&gt; x0, y0 = 0, 4
+(0, 4)
+
+julia&gt; ics = Dict(y(x0) =&gt; y0);
+
+julia&gt; out = dsolve(eqn, ics = ics);
+
+julia&gt; println(rhs(out))
+(sqrt(6)*sqrt(pi)*erf(sqrt(6)*x/2)/6 + 4)*exp(3*x^2/2)
+</code></pre><p>Verifying this requires combining some operations:</p><pre><code class="language-julia-repl hljs">julia&gt; u = rhs(out);
+
+julia&gt; diff(u, x) - 3*x*u - 1
+0
+</code></pre><p>To solve with a general initial condition is similar:</p><pre><code class="language-julia-repl hljs">julia&gt; x0, y0 = 0, a
+(0, a)
+
+julia&gt; ics = Dict(y(x0) =&gt; y0);
+
+julia&gt; out = dsolve(eqn, ics=ics);
+
+julia&gt; println(rhs(out))
+(a + sqrt(6)*sqrt(pi)*erf(sqrt(6)*x/2)/6)*exp(3*x^2/2)
+</code></pre><p>To plot this over a range of values for <code>a</code> we would have:</p><pre><code class="language-julia hljs">as = -2:0.6:2
+fna = lambdify(subs(rhs(out), a=&gt;first(as)))
+xs = range(-1.8, 1.8, length=500)
+p = plot(xs, fna.(xs), legend=false, ylim=(-4,4))
+for aᵢ in as[2:end]
+    fni  = lambdify(subs(rhs(out), a=&gt;aᵢ))
+    plot!(p, xs, fni.(xs))
+end
+p</code></pre><p><img src="../plot-9.svg" alt/></p><p>The comment from the example is &quot;This plots several integral curves of the equation for different values of <span>$a$</span>. The plot shows that the solutions have an inflection point if the parameter  lies between <span>$-1$</span> and <span>$1$</span> , while a global maximum or minimum arises for other values of <span>$a$</span>.&quot;</p><h5 id="Example-3"><a class="docs-heading-anchor" href="#Example-3">Example</a><a class="docs-heading-anchor-permalink" href="#Example-3" title="Permalink"></a></h5><p>We continue with another example from the Wolfram documentation: solving <span>$y&#39;&#39; + 5y&#39; + 6y=0$</span> with values prescribed for both <span>$y$</span> and <span>$y&#39;$</span> at <span>$x_0=0$</span>.</p><pre><code class="language-julia-repl hljs">julia&gt; @syms y(), x
+(y, x)
+
+julia&gt; D = Differential(x); D2 = D ∘ D
+Differential(x) ∘ Differential(x)
+
+julia&gt; eqn = D2(y)(x) + 5D(y)(x) + 6y(x);  println(eqn)
+6*y(x) + 5*Derivative(y(x), x) + Derivative(y(x), (x, 2))
+</code></pre><p>To solve with <span>$y(0) = 1$</span> and <span>$y&#39;(0) = 1$</span> we have:</p><pre><code class="language-julia-repl hljs">julia&gt; ics=Dict(y(0) =&gt; 1, D(y)(0) =&gt; 1);
+
+julia&gt; out = dsolve(eqn, ics=ics); println(rhs(out))
+(4 - 3*exp(-x))*exp(-2*x)
+</code></pre><p>To make a plot, we only need the right-hand-side of the answer:</p><pre><code class="language-julia hljs">plot(rhs(out), -1/3, 2)</code></pre><p><img src="../plot-10.svg" alt/></p><h5 id="Example-4"><a class="docs-heading-anchor" href="#Example-4">Example</a><a class="docs-heading-anchor-permalink" href="#Example-4" title="Permalink"></a></h5><p>Boundary value problems can be solved for, as well, through a similar syntax. Continuing with examples from the <a href="https://reference.wolfram.com/language/tutorial/DSolveLinearBVPs.html">Wolfram</a> page, we solve <span>$y&#39;&#39;(x) +y(x) = e^x$</span> over <span>$[0,1]$</span> with conditions <span>$y(0)=1$</span>, <span>$y(1) = 1/2$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; eqn = D(D(y))(x) + y(x) - exp(x); println(eqn)
+y(x) - exp(x) + Derivative(y(x), (x, 2))
+
+julia&gt; ics = Dict(y(0)=&gt;1, y(1) =&gt; Sym(1//2));
+
+julia&gt; dsolve(eqn, ics=ics) |&gt; println
+Eq(y(x), exp(x)/2 + (-E - cos(1) + 1)*sin(x)/(2*sin(1)) + cos(x)/2)</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>The wrapping of <code>Sym(1//2)</code> is necessary to avoid a premature conversion to floating point when the dictionary, <code>ics</code>, is converted to a Python dictionary by <code>PyCall</code>.</p></div></div><h2 id="The-lambdify-function"><a class="docs-heading-anchor" href="#The-lambdify-function">The lambdify function</a><a id="The-lambdify-function-1"></a><a class="docs-heading-anchor-permalink" href="#The-lambdify-function" title="Permalink"></a></h2><p>The <code>Symbolics</code> documentation describes its <code>build_function</code> method as follows: &quot;<code>build_function</code> is kind of like if <code>lambdify</code> ate its spinach.&quot; This is true, but what is <code>lambdify</code> in the comparison?</p><p>The SymPy docs say it can transform SymPy expressions to lambda functions which can be used to calculate numerical values very fast.</p><p>The typical way to evaluate a symbolic expression at some value and gather the output as a number in Julia would follow this pipeline:</p><pre><code class="nohighlight hljs">x |&gt; ex(x) |&gt; N</code></pre><p>The first step requires a conversion of the value in <code>Julia</code> to a Python object, this is handled by <code>PyCall</code> and is essentially zero-cost.</p><p>The substitution step, is done within SymPy and runs at the speed of Python.</p><p>The last step converts the resulting python object computed by SymPy into a value on the <code>Julia</code> side. The <code>N</code> call is just one way to do this. By default, a mapping takes basic SymPy objects and wraps them in the <code>Sym</code> type for dispatch. The <code>N</code> method makes a <code>Julia</code>n numeric type, essentially calling <code>convert(T,x)</code> for a run-time determined type <code>T</code>.</p><p>While two steps are  mostly zero cost, it can be much more performant to create a native <code>Julia</code> function to do the work directly.</p><p>The <code>SymPy</code> version in this package does not utilize the underlying SymPy <code>lambdify</code> function, rather it walks the expression tree in SymPy, creates a corresponding <code>Julia</code> expression, and then creates a function in <code>Julia</code> from that.</p><p>To see the creation of an expression, we have:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x; ex = x*sin(x - 2)
+x⋅sin(x - 2)
+
+julia&gt; convert(Expr, ex)
+:(x * sin(-2 + x))
+</code></pre><p>The <code>sympy.julia_code</code> function is SymPy&#39;s means to stringify an expression into <code>Julia</code> code, in combination with <code>Meta.parse</code>, this can also create the expression.</p><p>Converting the expression to a function can be done many different ways, some more performant than what is the default with <code>lambdify</code>.</p><p>First, the variables in the expression must be identified, these can be passed in via the <code>vars</code> keyword or will be determined by default with the <code>free_symbols</code> function. The order of the variables is important when calling the create function. Finally, <code>invokelatest</code> is used to create a function object made by combining the variables and the function body.</p><pre><code class="language-julia-repl hljs">julia&gt; l = lambdify(ex);
+
+julia&gt; l(3), ex(3)
+(2.5244129544236893, 3*sin(1))
+</code></pre><h2 id="Using-other-SymPy-modules"><a class="docs-heading-anchor" href="#Using-other-SymPy-modules">Using other SymPy modules</a><a id="Using-other-SymPy-modules-1"></a><a class="docs-heading-anchor-permalink" href="#Using-other-SymPy-modules" title="Permalink"></a></h2><p>The SymPy library has numerous external modules beyond those exposed immediately by <code>SymPy</code>.</p><pre><code class="language-julia-repl hljs">julia&gt; stats = SymPy.PyCall.pyimport_conda(&quot;sympy.stats&quot;, &quot;sympy&quot;);
+</code></pre><p>The <code>stats</code> module holds several probability functions, similar to the <code>Distributions</code> package of <code>Julia</code>. This set of commands creates a normally distributed random variable, <code>X</code>, with symbolic parameters:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms μ, σ::positive;
+
+julia&gt; X = stats.Normal(&quot;X&quot;, μ, σ)
+X
+
+julia&gt; stats.E(X)
+μ
+
+julia&gt; stats.E(X^2)
+ 2    2
+μ  + σ
+
+julia&gt; stats.variance(X)
+ 2
+σ
+</code></pre><p>The methods in the <code>stats</code> module are qualified with the module name above. <code>SymPy</code> provides the <code>import_from</code> function to import all such methods creating functions which dispatch on a symbolic first argument. This is not shown.</p><p>Next we see that statements like <span>$P(X &gt; \mu)$</span> can be answered specifying the inequality using <code>Gt</code> in the following:</p><pre><code class="language-julia-repl hljs">julia&gt; stats.P(Gt(X, μ))
+1/2</code></pre><p>A typical calculation for the normal distribution is the area one or more standard deviations larger than the mean:</p><pre><code class="language-julia-repl hljs">julia&gt; stats.P(Gt(X, μ + 1σ)) |&gt; println
+sqrt(2)*(-sqrt(2)*pi*exp(1/2)*erf(sqrt(2)/2)/2 + sqrt(2)*pi*exp(1/2)/2)*exp(-1/2)/(2*pi)</code></pre><p>The familiar  answer could be found by calling <code>N</code> or <code>evalf</code>.</p><p>We show one more distribution, the uniform over <span>$[a,b]$</span>:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms a::real b::real
+(a, b)
+
+julia&gt; U = stats.Uniform(&quot;U&quot;, a, b)
+U
+
+julia&gt; stats.E(U) |&gt; simplify |&gt; println
+a/2 + b/2
+
+julia&gt; stats.variance(U) |&gt; simplify |&gt; factor |&gt; println
+(a - b)^2/12</code></pre><p>Not all modules are so simple to incorporate. PyCall does a good job of converting the arguments from <code>Julia</code> to Python, but the conversion from a Python (SymPy) structure back to a workable <code>Julia</code> structure can require some massaging.</p><p>For example, the return value of <code>solveset</code> offers a challenge:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x
+(x,)
+
+julia&gt; u = solveset(x^2 - 2, x)
+{-√2, √2}</code></pre><p>Here <code>u</code> has the Python class <code>FiniteSet</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; u.__class__
+PyObject &lt;class &#39;sympy.sets.sets.FiniteSet&#39;&gt;
+</code></pre><p>PyCall is instructed in <code>SymPy</code> to map SymPy objects as <code>Sym</code> objects, so <code>FiniteSet</code> is only relevant when the object is being interacted with using <code>Julia</code> methods, Here <code>collect</code> will fail on <code>u</code>, but <code>Set</code> will work with splatting, as the finite set is iterable. This set can then be collected:</p><pre><code class="language-julia hljs">julia&gt; collect(Set(u...))
+2-element Vector{Any}:
+ -√2
+  √2
+</code></pre><p>The output of many integration problems is a piecewise function:</p><pre><code class="language-julia-repl hljs">julia&gt; @syms n::integer x::real
+(n, x)
+
+julia&gt; u = integrate(x^n, x)
+⎧ n + 1
+⎪x
+⎪──────  for n ≠ -1
+⎨n + 1
+⎪
+⎪log(x)  otherwise
+⎩
+</code></pre><p>The conversion to a <code>Julia</code> object is a bit cumbersome, in the following we work through the <code>args</code> of the expression and pull our the condition and arguments as an underlying <code>ExprCondPair</code> in SymPy for which <code>cond</code> and <code>args</code> are useful properties:</p><pre><code class="language-julia-repl hljs">julia&gt; [c.cond =&gt; c.args for c ∈ u.args]
+2-element Vector{Pair{Sym, Tuple{Sym, Sym}}}:
+ Ne(n, -1) =&gt; (x^(n + 1)/(n + 1), Ne(n, -1))
+      True =&gt; (log(x), True)
+</code></pre><p>Such is not automated. However some conversions are. <code>PyCall</code> allows the definition of a mapping between a python type and a <code>Julia</code> type (<code>pytype_mapping</code>). By default, python objects with class <code>sympy_core.basic.Basic</code> are mapped to <code>Sym</code> objects in <code>Julia</code>, a simple wrapper to control dispatch. More germaine to this example, the <code>combinatorics</code> module is imported by default in <code>SymPy</code>. It required managing the automatic mapping of types so that different dispatch rules could be used to follow the syntax of the module. The rules were:</p><pre><code class="nohighlight hljs">pytype_mapping(sympy.combinatorics.permutations.Permutation, SymPermutation)
+pytype_mapping(combinatorics.perm_groups.PermutationGroup, SymPermutationGroup)</code></pre><p>Here, <code>SymPermutation</code> and <code>SymPermutationGroup</code> are subtypes of the abstract <code>SymbolicObject</code> type.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../Tutorial/">About »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.1.0 on <span class="colophon-date" title="Thursday 28 September 2023 14:35">Thursday 28 September 2023</span>. Using Julia version 1.9.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>

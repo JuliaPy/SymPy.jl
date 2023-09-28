@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Calculus · SymPy</title><meta name="title" content="Calculus · SymPy"/><meta property="og:title" content="Calculus · SymPy"/><meta property="twitter:title" content="Calculus · SymPy"/><meta name="description" content="Documentation for SymPy."/><meta property="og:description" content="Documentation for SymPy."/><meta property="twitter:description" content="Documentation for SymPy."/><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../search_index.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../../">SymPy</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../../">Home</a></li><li><a class="tocitem" href="../../introduction/">Examples</a></li><li><span class="tocitem">SymPy tutorial</span><ul><li><a class="tocitem" href="../">About</a></li><li><a class="tocitem" href="../intro/">Introduction</a></li><li><a class="tocitem" href="../gotchas/">Gotchas</a></li><li><a class="tocitem" href="../basic_operations/">Basic operations</a></li><li><a class="tocitem" href="../simplification/">Simplification</a></li><li class="is-active"><a class="tocitem" href>Calculus</a><ul class="internal"><li><a class="tocitem" href="#Derivatives"><span>Derivatives</span></a></li><li><a class="tocitem" href="#Integrals"><span>Integrals</span></a></li><li><a class="tocitem" href="#Limits"><span>Limits</span></a></li><li><a class="tocitem" href="#Series-Expansion"><span>Series Expansion</span></a></li><li><a class="tocitem" href="#Finite-differences"><span>Finite differences</span></a></li></ul></li><li><a class="tocitem" href="../solvers/">Solvers</a></li><li><a class="tocitem" href="../matrices/">Matrices</a></li><li><a class="tocitem" href="../manipulation/">Advanced expression  manipulation</a></li></ul></li><li><a class="tocitem" href="../../reference/">Reference/API</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">SymPy tutorial</a></li><li class="is-active"><a href>Calculus</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Calculus</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/JuliaPy/SymPy.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/JuliaPy/SymPy.jl/blob/master/docs/src/Tutorial/calculus.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Calculus"><a class="docs-heading-anchor" href="#Calculus">Calculus</a><a id="Calculus-1"></a><a class="docs-heading-anchor-permalink" href="#Calculus" title="Permalink"></a></h1><p><a href="https://docs.sympy.org/latest/tutorial/calculus.html">From</a></p><p>This section covers how to do basic calculus tasks such as derivatives, integrals, limits, and series expansions in SymPy.  If you are not familiar with the math of any part of this section, you may safely skip it.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; from sympy import *
+    &gt;&gt;&gt; x, y, z = symbols(&#39;x y z&#39;)
+    &gt;&gt;&gt; init_printing(use_unicode=True)</code></pre><h5 id="In-Julia"><a class="docs-heading-anchor" href="#In-Julia">In <code>Julia</code></a><a id="In-Julia-1"></a><a class="docs-heading-anchor-permalink" href="#In-Julia" title="Permalink"></a></h5><p>we have</p><ul><li>all functions from <code>sympy</code> are imported by default</li><li>unicode printing is enabled by default</li><li>double quotes are for strings</li></ul><p>so the above can be:</p><pre><code class="language-julia-repl hljs">julia&gt; using SymPy
+
+julia&gt; x, y, z = symbols(&quot;x y z&quot;)
+(x, y, z)</code></pre><p>We primarily will use the convenient <code>@syms</code> macro, as with</p><pre><code class="language-julia-repl hljs">julia&gt; @syms x y z
+(x, y, z)</code></pre><hr/><h2 id="Derivatives"><a class="docs-heading-anchor" href="#Derivatives">Derivatives</a><a id="Derivatives-1"></a><a class="docs-heading-anchor-permalink" href="#Derivatives" title="Permalink"></a></h2><p>To take derivatives, use the <code>diff</code> function.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; diff(cos(x), x)
+    -sin(x)
+    &gt;&gt;&gt; diff(exp(x**2), x)
+         ⎛ 2⎞
+         ⎝x ⎠
+    2⋅x⋅ℯ</code></pre><h5 id="In-Julia-2"><a class="docs-heading-anchor" href="#In-Julia-2">In  <code>Julia</code></a><a class="docs-heading-anchor-permalink" href="#In-Julia-2" title="Permalink"></a></h5><p>save for <code>**</code> becoming <code>^</code> this is the same</p><pre><code class="language-julia-repl hljs">julia&gt; diff(cos(x), x)
+-sin(x)
+
+julia&gt; diff(exp(x^2), x)
+     ⎛ 2⎞
+     ⎝x ⎠
+2⋅x⋅ℯ</code></pre><hr/><p><code>diff</code> can take multiple derivatives at once.  To take multiple derivatives, pass the variable as many times as you wish to differentiate, or pass a number after the variable.  For example, both of the following find the third derivative of <code>x^4</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; diff(x**4, x, x, x)
+    24⋅x
+    &gt;&gt;&gt; diff(x**4, x, 3)
+    24⋅x</code></pre><h5 id="In-Julia-3"><a class="docs-heading-anchor" href="#In-Julia-3">In <code>Julia</code></a><a class="docs-heading-anchor-permalink" href="#In-Julia-3" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; diff(x^4, x, x, x)
+24⋅x
+
+julia&gt; diff(x^4, x, 3)
+24⋅x</code></pre><hr/><p>You can also take derivatives with respect to many variables at once.  Just pass each derivative in order, using the same syntax as for single variable derivatives.  For example, each of the following will compute <span>$\frac{\partial^7}{\partial x\partial y^2\partial z^4} e^{x y z}$</span>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = exp(x*y*z)
+    &gt;&gt;&gt; diff(expr, x, y, y, z, z, z, z)
+     3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+    x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ
+    &gt;&gt;&gt; diff(expr, x, y, 2, z, 4)
+     3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+    x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ
+    &gt;&gt;&gt; diff(expr, x, y, y, z, 4)
+     3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+    x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ</code></pre><h5 id="In-Julia:"><a class="docs-heading-anchor" href="#In-Julia:">In <code>Julia</code>:</a><a id="In-Julia:-1"></a><a class="docs-heading-anchor-permalink" href="#In-Julia:" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr = exp(x*y*z)
+ x⋅y⋅z
+ℯ
+
+julia&gt; diff(expr, x, y, y, z, z, z, z)
+ 3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ
+
+julia&gt; diff(expr, x, y, 2, z, 4)
+ 3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ
+
+julia&gt; diff(expr, x, y, y, z, 4)
+ 3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ</code></pre><hr/><p><code>diff</code> can also be called as a method.  The two ways of calling <code>diff</code> are exactly the same, and are provided only for convenience.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr.diff(x, y, y, z, 4)
+     3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+    x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ</code></pre><h5 id="In-Julia:-2"><a class="docs-heading-anchor" href="#In-Julia:-2">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-2" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr.diff(x, y, y, z, 4)
+ 3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ</code></pre><hr/><p>To create an unevaluated derivative, use the <code>Derivative</code> class.  It has the same syntax as <code>diff</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; deriv = Derivative(expr, x, y, y, z, 4)
+    &gt;&gt;&gt; deriv
+         7
+        ∂     ⎛ x⋅y⋅z⎞
+    ──────────⎝ℯ    ⎠
+        4   2
+      ∂z  ∂y  ∂x</code></pre><h5 id="In-Julia,"><a class="docs-heading-anchor" href="#In-Julia,">In <code>Julia</code>,</a><a id="In-Julia,-1"></a><a class="docs-heading-anchor-permalink" href="#In-Julia," title="Permalink"></a></h5><p>classes are not exported, so we use <code>sympy.Derivative</code>:</p><pre><code class="language-julia-repl hljs">julia&gt; deriv = sympy.Derivative(expr, x, y, y, z, 4)
+     7
+    ∂     ⎛ x⋅y⋅z⎞
+──────────⎝ℯ     ⎠
+  4   2
+∂z  ∂y  ∂x</code></pre><hr/><p>To evaluate an unevaluated derivative, use the <code>doit</code> method.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; deriv.doit()
+     3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+    x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ</code></pre><h5 id="In-Julia:-3"><a class="docs-heading-anchor" href="#In-Julia:-3">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-3" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; deriv.doit()
+ 3  2 ⎛ 3  3  3       2  2  2                ⎞  x⋅y⋅z
+x ⋅y ⋅⎝x ⋅y ⋅z  + 14⋅x ⋅y ⋅z  + 52⋅x⋅y⋅z + 48⎠⋅ℯ</code></pre><hr/><p>These unevaluated objects are useful for delaying the evaluation of the derivative, or for printing purposes.  They are also used when SymPy does not know how to compute the derivative of an expression (for example, if it contains an undefined function, which are described in the :ref:<code>Solving Differential Equations &lt;tutorial-dsolve&gt;</code> section).</p><p>Derivatives of unspecified order can be created using tuple <code>(x, n)</code> where <code>n</code> is the order of the derivative with respect to <code>x</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; m, n, a, b = symbols(&#39;m n a b&#39;)
+    &gt;&gt;&gt; expr = (a*x + b)**m
+    &gt;&gt;&gt; expr.diff((x, n))
+      n
+     ∂ ⎛         m⎞
+    ───⎝(a⋅x + b) ⎠
+      n
+    ∂x</code></pre><h5 id="In-Julia:-4"><a class="docs-heading-anchor" href="#In-Julia:-4">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-4" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; @syms m n a b
+(m, n, a, b)
+
+julia&gt; expr = (a*x + b)^m;  string(expr)
+         m
+m
+
+julia&gt; expr.diff((x, n)) |&gt; string
+&quot;Derivative((a*x + b)^m, (x, n))&quot;</code></pre><hr/><h2 id="Integrals"><a class="docs-heading-anchor" href="#Integrals">Integrals</a><a id="Integrals-1"></a><a class="docs-heading-anchor-permalink" href="#Integrals" title="Permalink"></a></h2><p>To compute an integral, use the <code>integrate</code> function.  There are two kinds of integrals, definite and indefinite.  To compute an indefinite integral, that is, an antiderivative, or primitive, just pass the variable after the expression.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; integrate(cos(x), x)
+    sin(x)</code></pre><h5 id="In-Julia:-5"><a class="docs-heading-anchor" href="#In-Julia:-5">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-5" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; integrate(cos(x), x)
+sin(x)</code></pre><hr/><p>Note that SymPy does not include the constant of integration.  If you want it, you can add one yourself, or rephrase your problem as a differential equation and use <code>dsolve</code> to solve it, which does add the constant (see :ref:<code>tutorial-dsolve</code>).</p><div class="admonition is-info"><header class="admonition-header">Quick tip</header><div class="admonition-body"></div></div><p><span>$\infty$</span> in SymPy is <code>oo</code> (that&#39;s the lowercase letter &quot;oh&quot; twice).  This    is because <code>oo</code> looks like <span>$\infty$</span>, and is easy to type.</p><hr/><p>To compute a definite integral, pass the argument <code>(integration_variable, lower_limit, upper_limit)</code>.  For example, to compute</p><p class="math-container">\[~
+
+   \int_0^\infty e^{-x}\,dx,
+~\]</p><p>we would do</p><pre><code class="language-python hljs">    &gt;&gt;&gt; integrate(exp(-x), (x, 0, oo))
+    1</code></pre><h5 id="In-Julia:-6"><a class="docs-heading-anchor" href="#In-Julia:-6">In Julia:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-6" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; integrate(exp(-x), (x, 0, oo))
+1</code></pre><hr/><p>As with indefinite integrals, you can pass multiple limit tuples to perform a multiple integral.  For example, to compute</p><p class="math-container">\[~
+   \int_{-\infty}^{\infty}\int_{-\infty}^{\infty} e^{- x^{2} - y^{2}}\, dx\, dy,
+~\]</p><p>do</p><pre><code class="language-python hljs">    &gt;&gt;&gt; integrate(exp(-x**2 - y**2), (x, -oo, oo), (y, -oo, oo))
+    π</code></pre><h5 id="In-Julia:-7"><a class="docs-heading-anchor" href="#In-Julia:-7">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-7" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; integrate(exp(-x^2 - y^2), (x, -oo, oo), (y, -oo, oo))
+π</code></pre><hr/><p>If <code>integrate</code> is unable to compute an integral, it returns an unevaluated <code>Integral</code> object.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = integrate(x**x, x)
+    &gt;&gt;&gt; print(expr)
+    Integral(x**x, x)
+    &gt;&gt;&gt; expr
+    ⌠
+    ⎮  x
+    ⎮ x  dx
+    ⌡</code></pre><h5 id="In-Julia:-8"><a class="docs-heading-anchor" href="#In-Julia:-8">In Julia:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-8" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr = integrate(x^x, x)
+⌠
+⎮  x
+⎮ x  dx
+⌡</code></pre><hr/><p>As with <code>Derivative</code>, you can create an unevaluated integral using <code>Integral</code>.  To later evaluate this integral, call <code>doit</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = Integral(log(x)**2, x)
+    &gt;&gt;&gt; expr
+    ⌠
+    ⎮    2
+    ⎮ log (x) dx
+    ⌡
+    &gt;&gt;&gt; expr.doit()
+             2
+    x⋅log (x) - 2⋅x⋅log(x) + 2⋅x</code></pre><h5 id="In-Julia:-9"><a class="docs-heading-anchor" href="#In-Julia:-9">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-9" title="Permalink"></a></h5><p>the <code>Integral</code> class is not exported, so it must be qualified:</p><pre><code class="language-julia-repl hljs">julia&gt; expr = sympy.Integral(log(x)^2, x)
+⌠
+⎮    2
+⎮ log (x) dx
+⌡</code></pre><pre><code class="language-julia-repl hljs">julia&gt; expr.doit()
+     2
+x⋅log (x) - 2⋅x⋅log(x) + 2⋅x</code></pre><hr/><p><code>integrate</code> uses powerful algorithms that are always improving to compute both definite and indefinite integrals, including heuristic pattern matching type algorithms, a partial implementation of the <code>Risch algorithm &lt;http://en.wikipedia.org/wiki/Risch_algorithm&gt;</code>, and an algorithm using <code>Meijer G-functions &lt;http://en.wikipedia.org/wiki/Meijer_g-function&gt;</code> that is useful for computing integrals in terms of special functions, especially definite integrals.  Here is a sampling of some of the power of <code>integrate</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; integ = Integral((x**4 + x**2*exp(x) - x**2 - 2*x*exp(x) - 2*x -
+    ...     exp(x))*exp(x)/((x - 1)**2*(x + 1)**2*(exp(x) + 1)), x)
+    &gt;&gt;&gt; integ
+    ⌠
+    ⎮ ⎛ 4    2  x    2        x          x⎞  x
+    ⎮ ⎝x  + x ⋅ℯ  - x  - 2⋅x⋅ℯ  - 2⋅x - ℯ ⎠⋅ℯ
+    ⎮ ──────────────────────────────────────── dx
+    ⎮               2        2 ⎛ x    ⎞
+    ⎮        (x - 1) ⋅(x + 1) ⋅⎝ℯ  + 1⎠
+    ⌡
+    &gt;&gt;&gt; integ.doit()
+                     x
+       ⎛ x    ⎞     ℯ
+    log⎝ℯ  + 1⎠ + ──────
+                   2
+                  x  - 1
+
+    &gt;&gt;&gt; integ = Integral(sin(x**2), x)
+    &gt;&gt;&gt; integ
+    ⌠
+    ⎮    ⎛ 2⎞
+    ⎮ sin⎝x ⎠ dx
+    ⌡
+    &gt;&gt;&gt; integ.doit()
+                    ⎛√2⋅x⎞
+    3⋅√2⋅√π⋅fresnels⎜────⎟⋅Γ(3/4)
+                    ⎝ √π ⎠
+    ─────────────────────────────
+               8⋅Γ(7/4)
+
+    &gt;&gt;&gt; integ = Integral(x**y*exp(-x), (x, 0, oo))
+    &gt;&gt;&gt; integ
+    ∞
+    ⌠
+    ⎮  y  -x
+    ⎮ x ⋅ℯ   dx
+    ⌡
+    0
+    &gt;&gt;&gt; integ.doit()
+    ⎧ Γ(y + 1)    for -re(y) &lt; 1
+    ⎪
+    ⎪∞
+    ⎪⌠
+    ⎨⎮  y  -x
+    ⎪⎮ x ⋅ℯ   dx    otherwise
+    ⎪⌡
+    ⎪0
+    ⎩</code></pre><h5 id="In-Julia:-10"><a class="docs-heading-anchor" href="#In-Julia:-10">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-10" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; integ = sympy.Integral((x^4 + x^2*exp(x) - x^2 - 2*x*exp(x) - 2*x - exp(x))*exp(x)/((x - 1)^2*(x + 1)^2*(exp(x) + 1)), x)
+⌠
+⎮ ⎛ 4    2  x    2        x          x⎞  x
+⎮ ⎝x  + x ⋅ℯ  - x  - 2⋅x⋅ℯ  - 2⋅x - ℯ ⎠⋅ℯ
+⎮ ──────────────────────────────────────── dx
+⎮               2        2 ⎛ x    ⎞
+⎮        (x - 1) ⋅(x + 1) ⋅⎝ℯ  + 1⎠
+⌡
+
+julia&gt; integ.doit()  |&gt; string
+&quot;log(exp(x) + 1) + exp(x)/(x^2 - 1)&quot;</code></pre><pre><code class="language-julia-repl hljs">julia&gt; integ = sympy.Integral(sin(x^2), x)
+⌠
+⎮    ⎛ 2⎞
+⎮ sin⎝x ⎠ dx
+⌡
+
+julia&gt; integ.doit() |&gt; string
+&quot;3*sqrt(2)*sqrt(pi)*fresnels(sqrt(2)*x/sqrt(pi))*gamma(3/4)/(8*gamma(7/4))&quot;
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; integ = sympy.Integral(x^y*exp(-x), (x, 0, oo))
+∞
+⌠
+⎮  y  -x
+⎮ x ⋅ℯ   dx
+⌡
+0
+
+julia&gt; integ.doit()
+⎧ Γ(y + 1)    for re(y) &gt; -1
+⎪
+⎪∞
+⎪⌠
+⎨⎮  y  -x
+⎪⎮ x ⋅ℯ   dx    otherwise
+⎪⌡
+⎪0
+⎩</code></pre><hr/><p>This last example returned a <code>Piecewise</code> expression because the integral does not converge unless <span>$\Re(y) &gt; 1.$</span></p><h2 id="Limits"><a class="docs-heading-anchor" href="#Limits">Limits</a><a id="Limits-1"></a><a class="docs-heading-anchor-permalink" href="#Limits" title="Permalink"></a></h2><p>SymPy can compute symbolic limits with the <code>limit</code> function.  The syntax to compute</p><p class="math-container">\[~
+   \lim_{x\to x_0} f(x)
+~\]</p><p>is <code>limit(f(x), x, x0)</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; limit(sin(x)/x, x, 0)
+    1</code></pre><h5 id="In-Julia:-11"><a class="docs-heading-anchor" href="#In-Julia:-11">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-11" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; limit(sin(x)/x, x, 0)
+1</code></pre><p>In <code>Julia</code>, a pair can be used to indicate the limit:</p><pre><code class="language-julia-repl hljs">julia&gt; limit(sin(x)/x, x=&gt;0)
+1</code></pre><p>Sometimes, a  symbolic value  is  needed to have a  proper limit:</p><pre><code class="language-julia-repl hljs">julia&gt; limit((pi/2-x-acos(x))/x^3, x=&gt;0)
+∞
+
+julia&gt; limit((PI/2-x-acos(x))/x^3, x=&gt;0)
+1/6
+</code></pre><p>(In the  first case, the numerator is not <code>0</code>  when <code>x=0</code> due  to  roundoff error  in  computing  <code>pi/2</code>.)</p><hr/><p><code>limit</code> should be used instead of <code>subs</code> whenever the point of evaluation is a singularity.  Even though SymPy has objects to represent <span>$\infty$</span>, using them for evaluation is not reliable because they do not keep track of things like rate of growth.  Also, things like <span>$\infty - \infty$</span> and <span>$\frac{\infty}{\infty}$</span> return <span>$\mathrm{nan}$</span> (not-a-number).  For example</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = x**2/exp(x)
+    &gt;&gt;&gt; expr.subs(x, oo)
+    nan
+    &gt;&gt;&gt; limit(expr, x, oo)
+    0</code></pre><h5 id="In-Julia:-12"><a class="docs-heading-anchor" href="#In-Julia:-12">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-12" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr = x^2/exp(x)
+ 2  -x
+x ⋅ℯ
+
+julia&gt; expr.subs(x, oo)
+nan
+
+julia&gt; limit(expr, x, oo)
+0</code></pre><hr/><p>Like <code>Derivative</code> and <code>Integral</code>, <code>limit</code> has an unevaluated counterpart, <code>Limit</code>.  To evaluate it, use <code>doit</code>.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = Limit((cos(x) - 1)/x, x, 0)
+    &gt;&gt;&gt; expr
+         ⎛cos(x) - 1⎞
+     lim ⎜──────────⎟
+    x─→0⁺⎝    x     ⎠
+    &gt;&gt;&gt; expr.doit()
+    0</code></pre><h5 id="In-Julia:-13"><a class="docs-heading-anchor" href="#In-Julia:-13">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-13" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr = sympy.Limit((cos(x) - 1)/x, x, 0)
+     ⎛cos(x) - 1⎞
+ lim ⎜──────────⎟
+x─→0⁺⎝    x     ⎠
+
+julia&gt; expr.doit()
+0</code></pre><p>To evaluate a limit at one side only, pass <code>&#39;+&#39;</code> or <code>&#39;-&#39;</code> as a third argument to <code>limit</code>.  For example, to compute</p><p class="math-container">\[~
+   \lim_{x\to 0^+}\frac{1}{x},
+~\]</p><p>do</p><pre><code class="language-python hljs">    &gt;&gt;&gt; limit(1/x, x, 0, &#39;+&#39;)
+    ∞</code></pre><h5 id="In-Julia:-14"><a class="docs-heading-anchor" href="#In-Julia:-14">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-14" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; limit(1/x, x =&gt; 0, &quot;+&quot;)
+∞</code></pre><hr/><p>As opposed to</p><pre><code class="language-python hljs">    &gt;&gt;&gt; limit(1/x, x, 0, &#39;-&#39;)
+    -∞</code></pre><h5 id="In-Julia:-15"><a class="docs-heading-anchor" href="#In-Julia:-15">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-15" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; limit(1/x, x, 0, &quot;-&quot;)
+-∞</code></pre><hr/><h2 id="Series-Expansion"><a class="docs-heading-anchor" href="#Series-Expansion">Series Expansion</a><a id="Series-Expansion-1"></a><a class="docs-heading-anchor-permalink" href="#Series-Expansion" title="Permalink"></a></h2><p>SymPy can compute asymptotic series expansions of functions around a point. To compute the expansion of <code>f(x)</code> around the point <code>x = x_0</code> terms of order <code>x^n</code>, use <code>f(x).series(x, x0, n)</code>.  <code>x0</code> and <code>n</code> can be omitted, in which case the defaults <code>x0=0</code> and <code>n=6</code> will be used.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr = exp(sin(x))
+    &gt;&gt;&gt; expr.series(x, 0, 4)
+             2
+            x     ⎛ 4⎞
+    1 + x + ── + O⎝x ⎠
+            2</code></pre><h5 id="In-Julia:-16"><a class="docs-heading-anchor" href="#In-Julia:-16">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-16" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr = exp(sin(x))
+ sin(x)
+ℯ
+
+julia&gt; expr.series(x, 0, 4) |&gt; string
+&quot;1 + x + x^2/2 + O(x^4)&quot;</code></pre><hr/><p>The <code>O\left (x^4\right )</code> term at the end represents the Landau order term at <code>x=0</code> (not to be confused with big O notation used in computer science, which generally represents the Landau order term at <span>$x=\infty$</span>).  It means that all x terms with power greater than or equal to <code>x^4</code> are omitted.  Order terms can be created and manipulated outside of <code>series</code>.  They automatically absorb higher order terms.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; x + x**3 + x**6 + O(x**4)
+         3    ⎛ 4⎞
+    x + x  + O⎝x ⎠
+    &gt;&gt;&gt; x*O(1)
+    O(x)</code></pre><h5 id="In-Julia:-17"><a class="docs-heading-anchor" href="#In-Julia:-17">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-17" title="Permalink"></a></h5><p><code>O</code> is not exported, so we must qualify it:</p><pre><code class="language-julia-repl hljs">julia&gt; x + x^3 + x^6 + sympy.O(x^4)
+     3    ⎛ 4⎞
+x + x  + O⎝x ⎠
+</code></pre><pre><code class="language-julia-repl hljs">julia&gt; x*sympy.O(1)
+O(x)
+</code></pre><hr/><p>If you do not want the order term, use the <code>removeO</code> method.</p><pre><code class="language-python hljs">    &gt;&gt;&gt; expr.series(x, 0, 4).removeO()
+     2
+    x
+    ── + x + 1
+    2</code></pre><h5 id="In-Julia:-18"><a class="docs-heading-anchor" href="#In-Julia:-18">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-18" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; expr.series(x, 0, 4).removeO()
+ 2
+x
+── + x + 1
+2
+</code></pre><hr/><p>The <code>O</code> notation supports arbitrary limit points (other than 0):</p><pre><code class="language-python hljs">    &gt;&gt;&gt; exp(x - 6).series(x, x0=6)
+                2          3          4          5
+         (x - 6)    (x - 6)    (x - 6)    (x - 6)         ⎛       6       ⎞
+    -5 + ──────── + ──────── + ──────── + ──────── + x + O⎝(x - 6) ; x → 6⎠
+            2          6          24        120</code></pre><h5 id="In-Julia:-19"><a class="docs-heading-anchor" href="#In-Julia:-19">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-19" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; exp(x - 6).series(x, x0=6) |&gt; string
+&quot;-5 + (x - 6)^2/2 + (x - 6)^3/6 + (x - 6)^4/24 + (x - 6)^5/120 + x + O((x - 6)^6, (x, 6))&quot;
+</code></pre><h2 id="Finite-differences"><a class="docs-heading-anchor" href="#Finite-differences">Finite differences</a><a id="Finite-differences-1"></a><a class="docs-heading-anchor-permalink" href="#Finite-differences" title="Permalink"></a></h2><p>So far we have looked at expressions with analytic derivatives and primitive functions respectively. But what if we want to have an expression to estimate a derivative of a curve for which we lack a closed form representation, or for which we don&#39;t know the functional values for yet. One approach would be to use a finite difference approach.</p><p>The simplest way the differentiate using finite differences is to use the <code>differentiate_finite</code> function:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; f, g = symbols(&#39;f g&#39;, cls=Function)
+    &gt;&gt;&gt; differentiate_finite(f(x)*g(x))
+    -f(x - 1/2)⋅g(x - 1/2) + f(x + 1/2)⋅g(x + 1/2)</code></pre><h5 id="In-Julia:-20"><a class="docs-heading-anchor" href="#In-Julia:-20">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-20" title="Permalink"></a></h5><ul><li><code>differentiate_finite</code> is not exported</li></ul><pre><code class="language-julia-repl hljs">julia&gt; @syms f(), g()
+(f, g)
+
+julia&gt; sympy.differentiate_finite(f(x)*g(x))
+-f(x - 1/2)⋅g(x - 1/2) + f(x + 1/2)⋅g(x + 1/2)
+</code></pre><p>(The functions <code>f</code> and <code>g</code> can also be created with <code>SymFunction</code>.)</p><hr/><p>This form however does not respect the product rule.</p><p>If you already have a <code>Derivative</code> instance, you can use the <code>as_finite_difference</code> method to generate approximations of the derivative to arbitrary order:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; f = Function(&#39;f&#39;)
+    &gt;&gt;&gt; dfdx = f(x).diff(x)
+    &gt;&gt;&gt; dfdx.as_finite_difference()
+    -f(x - 1/2) + f(x + 1/2)</code></pre><h5 id="In-Julia:-21"><a class="docs-heading-anchor" href="#In-Julia:-21">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-21" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; f = sympy.Function(&quot;f&quot;)
+PyObject f
+
+julia&gt; dfdx = f(x).diff(x)
+d
+──(f(x))
+dx
+
+julia&gt; dfdx.as_finite_difference()
+-f(x - 1/2) + f(x + 1/2)
+</code></pre><hr/><p>here the first order derivative was approximated around x using a minimum number of points (2 for 1st order derivative) evaluated equidistantly using a step-size of 1. We can use arbitrary steps (possibly containing symbolic expressions):</p><pre><code class="language-python hljs">    &gt;&gt;&gt; f = Function(&#39;f&#39;)
+    &gt;&gt;&gt; d2fdx2 = f(x).diff(x, 2)
+    &gt;&gt;&gt; h = Symbol(&#39;h&#39;)
+    &gt;&gt;&gt; d2fdx2.as_finite_difference([-3*h,-h,2*h])
+    f(-3⋅h)   f(-h)   2⋅f(2⋅h)
+    ─────── - ───── + ────────
+         2        2        2
+      5⋅h      3⋅h     15⋅h</code></pre><h5 id="In-Julia:-22"><a class="docs-heading-anchor" href="#In-Julia:-22">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-22" title="Permalink"></a></h5><pre><code class="language-julia-repl hljs">julia&gt; f = sympy.Function(&quot;f&quot;)
+PyObject f
+
+julia&gt; d2fdx2 = f(x).diff(x, 2)
+  2
+ d
+───(f(x))
+  2
+dx
+
+julia&gt; h = sympy.Symbol(&quot;h&quot;)
+h</code></pre><pre><code class="language-julia hljs">julia&gt; d2fdx2.as_finite_difference([-3*h,-h,2*h])
+f(-3⋅h)   f(-h)   2⋅f(2⋅h)
+─────── - ───── + ────────
+     2        2        2
+  5⋅h      3⋅h     15⋅h
+</code></pre><hr/><p>If you are just interested in evaluating the weights, you can do so manually:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; finite_diff_weights(2, [-3, -1, 2], 0)[-1][-1]
+    [1/5, -1/3, 2/15]</code></pre><h5 id="In-Julia:-23"><a class="docs-heading-anchor" href="#In-Julia:-23">In <code>Julia</code>:</a><a class="docs-heading-anchor-permalink" href="#In-Julia:-23" title="Permalink"></a></h5><p>the <code>finite_diff_weights</code> function that is not exported:</p><pre><code class="language-julia hljs">julia&gt; sympy.finite_diff_weights(2, [-3, -1, 2], 0)[end][end]
+-2/15</code></pre><hr/><p>note that we only need the last element in the last sublist returned from <code>finite_diff_weights</code>. The reason for this is that the function also generates weights for lower derivatives and using fewer points (see the documentation of <code>finite_diff_weights</code> for more details).</p><p>If using <code>finite_diff_weights</code> directly looks complicated, and the <code>as_finite_difference</code> method of <code>Derivative</code> instances is not flexible enough, you can use <code>apply_finite_diff</code> which takes <code>order</code>, <code>x_list</code>, <code>y_list</code> and <code>x0</code> as parameters:</p><pre><code class="language-python hljs">    &gt;&gt;&gt; x_list = [-3, 1, 2]
+    &gt;&gt;&gt; y_list = symbols(&#39;a b c&#39;)
+    &gt;&gt;&gt; apply_finite_diff(1, x_list, y_list, 0)
+      3⋅a   b   2⋅c
+    - ─── - ─ + ───
+       20   4    5</code></pre><h5 id="In-Julia,-2"><a class="docs-heading-anchor" href="#In-Julia,-2">In <code>Julia</code>,</a><a class="docs-heading-anchor-permalink" href="#In-Julia,-2" title="Permalink"></a></h5><ul><li><code>apply_finite_diff</code> is not exported:</li></ul><pre><code class="language-julia-repl hljs">julia&gt; xs = [-3, 1, 2]
+3-element Vector{Int64}:
+ -3
+  1
+  2
+
+julia&gt; @syms ys[1:3]
+(Sym[ys₁, ys₂, ys₃],)</code></pre><pre><code class="language-julia hljs">julia&gt; sympy.apply_finite_diff(1, xs, ys, 0)
+  3⋅ys₁   ys₂   2⋅ys₃
+- ───── - ─── + ─────
+    20     4      5</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../simplification/">« Simplification</a><a class="docs-footer-nextpage" href="../solvers/">Solvers »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.1.0 on <span class="colophon-date" title="Thursday 28 September 2023 14:35">Thursday 28 September 2023</span>. Using Julia version 1.9.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
