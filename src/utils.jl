@@ -346,7 +346,6 @@ function import_from(sm, meths=nothing;
                      exclude::Union{Nothing, NTuple{N,Symbol}}=nothing
                      ) where {N}
 
-    Base.depwarn("`import_from` is deprecated", :import_from)
 
     if meths == nothing
         _exclude = isa(exclude, Nothing) ? base_exclude : exclude

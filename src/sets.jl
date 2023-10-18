@@ -15,10 +15,7 @@ end
 
 return elements of a set s as an array, unlike `convert(Set,s)`
 """
-function elements(s::Sym)
-    Base.depwarn("`elements` is deprecated", :elements)
-    collect(convert(Set, s))
-end
+elements(s::Sym) = collect(convert(Set, s))
 export elements
 
 # is x in set; avoid ambiguity
