@@ -81,7 +81,6 @@ include("permutations.jl")
 include("plot_recipes.jl")
 include("latexify_recipe.jl")
 
-include("deprecated.jl")
 ##################################################
 
 pynull() = PyCall.PyNULL()

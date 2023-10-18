@@ -30,7 +30,7 @@ Examples:
 @vars a b real=true
 ```
 !!! Note:
-    The `@vars` macro is deprecated and will be removed. Use `@syms`.
+    The `@syms` macro is recommended as it has a more flexible syntax
 """
 macro vars(x...)
     q = Expr(:block)

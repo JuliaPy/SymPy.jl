@@ -201,12 +201,7 @@ rank(p::SymPermutation) = p.rank
 
 
 ## we want perms, not tuples
-function transpositions(p::SymPermutation)
-    Base.depwarn("This function is deprecated",
-                 "Use `map(x -> Permutation([x]), object_meth(p, :transpositions))`",
-                 :transpositions)
-    map(x -> Permutation([x]), object_meth(p, :transpositions))
-end
+transpositions(p::SymPermutation) = map(x -> Permutation([x]), object_meth(p, :transpositions))
 export transpositions
 
 
