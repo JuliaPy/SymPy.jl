@@ -28,12 +28,21 @@ The `convert(Matrix{Sym}, M)` call is useful to covert to a Julia matrix
 """
 mutable struct SymMatrix <: SymbolicObject
     __pyobject__::PyCall.PyObject
+    function SymMatrix(o)
+        Base.depwarn("The `SymMatrix` wrapper type is deprecated", :SymPermuation)
+        new(o)
+    end
+
 end
 
 ## Permutations
 ## A permutation of {0, 1, 2, ..., n} -- 0-based
 struct SymPermutation <: SymbolicObject
-  __pyobject__::PyCall.PyObject
+    __pyobject__::PyCall.PyObject
+    function SymPermutation(o)
+        Base.depwarn("The `SymPermutation` wrapper type is deprecated", :SymPermuation)
+        new(o)
+    end
 end
 export SymPermutation
 Base.convert(::Type{SymPermutation}, o::PyCall.PyObject) = SymPermutation(o)
@@ -41,7 +50,12 @@ Base.convert(::Type{SymPermutation}, o::PyCall.PyObject) = SymPermutation(o)
 
 ## A permutation of {0, 1, 2, ..., n} -- 0-based
 struct SymPermutationGroup <: SymbolicObject
-  __pyobject__::PyCall.PyObject
+    __pyobject__::PyCall.PyObject
+    function SymPermutationGroup(o)
+        Base.depwarn("The `SymPermutationGroup` wrapper type is deprecated", :SymPermuation)
+        new(o)
+    end
+
 end
 export SymPermutationGroup
 Base.convert(::Type{SymPermutationGroup}, o::PyCall.PyObject) = SymPermutationGroup(o)
@@ -49,6 +63,10 @@ Base.convert(::Type{SymPermutationGroup}, o::PyCall.PyObject) = SymPermutationGr
 # a Lambda function
 struct Lambda <: SymbolicObject
     __pyobject__::PyCall.PyObject
+    function Lambda(o)
+        Base.depwarn("`Lambda` is deprecated; use `sympy.Lambda(args,expression)`", :Lambda)
+        new(o)
+    end
 end
 Lambda(args, expression) = Lambda(sympy.Lambda(args, expression).__pyobject__)
 (λ::Lambda)(args...; kwargs...) = λ.__pyobject__(args...; kwargs...)

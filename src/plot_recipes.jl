@@ -181,6 +181,10 @@ plot!(rhs(out))
 struct VectorField
     fx
     fy
+    function VectorField(fx, fy)
+        Base.depwarn("Vectorfield is deprecated", :VectorField)
+        new(fx, fy)
+    end
 end
 VectorField(f) = VectorField((x,y) -> 1.0, f)
 export VectorField
@@ -216,41 +220,43 @@ end
 
 ## surface plot xvar = Tuple(Sym, Real, Real)
 ##
-"""
+# """
 
-Render a parametrically defined surface plot.
+# Render a parametrically defined surface plot.
 
-Example:
-```
-@syms u, v
-plot_parametric_surface((u*v,u-v,u+v), (u,0,1), (v,0,1))
-```
+# Example:
+# ```
+# @syms u, v
+# plot_parametric_surface((u*v,u-v,u+v), (u,0,1), (v,0,1))
+# ```
 
-This uses `PyPlot`, not `Plots` for now.
-"""
-function plot_parametric_surface(exs::Tuple{Sym,Sym,Sym},
-                                 xvar=(-5.0, 5.0),
-                                 yvar=(-5.0, 5.0),
-                                 args...;
-                                 kwargs...)
+# This uses `PyPlot`, not `Plots` for now.
+# """
+# function plot_parametric_surface(exs::Tuple{Sym,Sym,Sym},
+#                                  xvar=(-5.0, 5.0),
+#                                  yvar=(-5.0, 5.0),
+#                                  args...;
+#                                  kwargs...)
 
-    sympy.plotting.plot3d_parametric_surface(exs..., args...; kwargs...)
+#     sympy.plotting.plot3d_parametric_surface(exs..., args...; kwargs...)
 
-end
-export plot_parametric_surface
-
-
+# end
+# export plot_parametric_surface
 
 
 
-"""
-Plot an implicit equation
 
-```
-@syms x y
-plot_implicit(Eq(x^2+ y^2,3), (x, -2, 2), (y, -2, 2))
-```
 
-"""
-plot_implicit(ex, args...; kwargs...) = sympy.plotting.plot_implicit(ex, args...; kwargs...)
-export plot_implicit
+# """
+# Plot an implicit equation
+
+# ```
+# @syms x y
+# plot_implicit(Eq(x^2+ y^2,3), (x, -2, 2), (y, -2, 2))
+# ```
+
+# """
+# function plot_implicit(ex, args...; kwargs...)
+#     sympy.plotting.plot_implicit(ex, args...; kwargs...)
+# end
+# export plot_implicit
