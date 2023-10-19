@@ -116,13 +116,16 @@ global oo = Sym(pynull())
 "zoo complex inifinity"
 global zoo = Sym(pynull())
 
-"True from SymPy"
-global True = Sym(pynull())
-"False from SymPy"
-global False = Sym(pynull())
+Base.@deprecate True Sym(true) true
+Base.@deprecate False Sym(false) true
 
-#Base.@deprecate True Sym(true) true
-#Base.@deprecate False Sym(false) true
+## for internal usage only
+## this TRUE/FALSE is pythons, not SymPy's
+"True from SymPy"
+global TRUE = Sym(pynull())
+"False from SymPy"
+global FALSE = Sym(pynull())
+
 
 
 # Can not actually initiate many things until `sympy` is defined, so not until runtime
@@ -137,8 +140,8 @@ function __init__()
     copy!(oo.__pyobject__, sympy.oo)
     copy!(zoo.__pyobject__, sympy.zoo)
 
-    copy!(True.__pyobject__, PyCall.PyObject(true))
-    copy!(False.__pyobject__, PyCall.PyObject(false))
+    copy!(TRUE.__pyobject__, PyCall.PyObject(true))
+    copy!(FALSE.__pyobject__, PyCall.PyObject(false))
 
 
     # mpmath

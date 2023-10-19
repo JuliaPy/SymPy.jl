@@ -10,7 +10,7 @@ Examples:
 ```jldoctest utils
 julia> using SymPy
 
-julia> i,j = sympy.symbols("i j", integer=True)
+julia> i,j = sympy.symbols("i j", integer=true)
 (i, j)
 
 julia> x = sympy.IndexedBase("x")
