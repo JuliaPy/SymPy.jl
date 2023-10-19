@@ -116,8 +116,13 @@ global oo = Sym(pynull())
 "zoo complex inifinity"
 global zoo = Sym(pynull())
 
-Base.@deprecate True Sym(true) true
-Base.@deprecate False Sym(false) true
+"True from SymPy"
+global True = Sym(pynull())
+"False from SymPy"
+global False = Sym(pynull())
+
+#Base.@deprecate True Sym(true) true
+#Base.@deprecate False Sym(false) true
 
 
 # Can not actually initiate many things until `sympy` is defined, so not until runtime
@@ -132,6 +137,9 @@ function __init__()
     copy!(oo.__pyobject__, sympy.oo)
     copy!(zoo.__pyobject__, sympy.zoo)
 
+    copy!(True.__pyobject__, PyCall.PyObject(true))
+    copy!(False.__pyobject__, PyCall.PyObject(false))
+
 
     # mpmath
     try
@@ -141,7 +149,7 @@ function __init__()
        # can't load
     end
 
-    # pull in alibrary
+    # pull in a library
     copy!(combinatorics, PyCall.pyimport_conda("sympy.combinatorics", "sympy"))
 
 
