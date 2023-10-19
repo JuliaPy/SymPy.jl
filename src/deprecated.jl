@@ -1,7 +1,5 @@
 # in SymPy, not SymPyCall
 
-#Base.@deprecate_binding False FALSE
-#Base.@deprecate_binding True  TRUE
 #Base.@deprecate_binding sympy_core sympy.core
 #Base.@deprecate_binding sympy_matrices sympy.matrices
 
