@@ -119,12 +119,6 @@ global zoo = Sym(pynull())
 Base.@deprecate True Sym(true) true
 Base.@deprecate False Sym(false) true
 
-## for internal usage only
-## this TRUE/FALSE is pythons, not SymPy's
-"True from SymPy"
-global TRUE = Sym(pynull())
-"False from SymPy"
-global FALSE = Sym(pynull())
 
 
 
@@ -139,10 +133,6 @@ function __init__()
     copy!(IM.__pyobject__, sympy.I)
     copy!(oo.__pyobject__, sympy.oo)
     copy!(zoo.__pyobject__, sympy.zoo)
-
-    copy!(TRUE.__pyobject__, PyCall.PyObject(true))
-    copy!(FALSE.__pyobject__, PyCall.PyObject(false))
-
 
     # mpmath
     try

@@ -10,13 +10,13 @@ iterate(x::Sym) = (x.__pyobject__, 0)
 iterate(x::Sym, state) = nothing
 
 
-Base.isless(a::Sym, b::Sym) = (a != sympy.nan && b != sympy.nan) && sympy.Lt(a,b) == TRUE
+Base.isless(a::Sym, b::Sym) = (a != sympy.nan && b != sympy.nan) && sympy.Lt(a,b) == Sym(true)
 Base.isless(a::Sym, b::Number) = isless(promote(a,b)...)
 Base.isless(a::Number, b::Sym) = isless(promote(a,b)...)
 
-Base.isequal(a::Sym, b::Sym) = Eq(a,b) == TRUE
-Base.isequal(a::Sym, b::Number) = Eq(promote(a,b)...) == TRUE
-Base.isequal(a::Number, b::Sym) = Eq(promote(a,b)...) == TRUE
+Base.isequal(a::Sym, b::Sym) = Eq(a,b) == Sym(true)
+Base.isequal(a::Sym, b::Number) = Eq(promote(a,b)...) == Sym(true)
+Base.isequal(a::Number, b::Sym) = Eq(promote(a,b)...) == Sym(true)
 
 
 # Floating point bits

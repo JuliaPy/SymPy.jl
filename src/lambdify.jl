@@ -248,7 +248,7 @@ function  lambdify(ex::Sym, vars=free_symbols(ex);
     if isempty(vars)
         # can't call N(ex) here...
         v = ex.evalf()
-        if v.is_real == TRUE
+        if v.is_real == Sym(true)
             val = convert(Real, v)
         else
             val = Complex(convert(Real, real(v)), convert(Real, imag(v)))
