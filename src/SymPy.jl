@@ -115,8 +115,9 @@ global IM = Sym(pynull())
 global oo = Sym(pynull())
 "zoo complex inifinity"
 global zoo = Sym(pynull())
-
+"True from SymPy"
 global True = Sym(pynull())
+"False from SymPy"
 global False = Sym(pynull())
 
 
