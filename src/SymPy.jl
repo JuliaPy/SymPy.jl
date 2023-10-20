@@ -116,8 +116,8 @@ global oo = Sym(pynull())
 "zoo complex inifinity"
 global zoo = Sym(pynull())
 
-Base.@deprecate True Sym(true) true
-Base.@deprecate False Sym(false) true
+global True = Sym(pynull())
+global False = Sym(pynull())
 
 
 
@@ -133,6 +133,9 @@ function __init__()
     copy!(IM.__pyobject__, sympy.I)
     copy!(oo.__pyobject__, sympy.oo)
     copy!(zoo.__pyobject__, sympy.zoo)
+    copy!(True.__pyobject__, PyCall.PyObject(true))
+    copy!(False.__pyobject__, PyCall.PyObject(false))
+
 
     # mpmath
     try
