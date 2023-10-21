@@ -168,7 +168,7 @@ end
 Thanks to `@alhirzel` for the contribution.
 
 !!! Note:
-    The `@symfuns` macro will be deprecated. The more general [`@syms`](@ref) macro should be used for constructing symbolic functions of type `SymFunction` and `symbols` can be used to construct symbolic functions in general.
+    The `@symfuns` macro is deprecated. The more general [`@syms`](@ref) macro should be used for constructing symbolic functions of type `SymFunction` and `symbols` can be used to construct symbolic functions in general.
 
 """
 macro symfuns(x...)

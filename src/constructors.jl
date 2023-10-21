@@ -30,7 +30,7 @@ Examples:
 @vars a b real=true
 ```
 !!! Note:
-    The `@syms` macro is recommended as it has a more flexible syntax
+    The `@vars` macro is deprecated and will be removed. Use `@syms`.
 """
 macro vars(x...)
     q = Expr(:block)
@@ -144,6 +144,7 @@ end
 
 ## avoid PyObject conversion as possible
 Sym(x::T) where {T <: Number} = sympify(x)
+Sym(x::Bool) = Sym(PyObject(x))
 Sym(x::Rational{T}) where {T} = Sym(numerator(x))/Sym(denominator(x))
 function Sym(x::Complex{Bool})
     !x.re && x.im && return IM

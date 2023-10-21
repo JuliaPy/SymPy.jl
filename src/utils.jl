@@ -10,7 +10,7 @@ Examples:
 ```jldoctest utils
 julia> using SymPy
 
-julia> i,j = sympy.symbols("i j", integer=True)
+julia> i,j = sympy.symbols("i j", integer=true)
 (i, j)
 
 julia> x = sympy.IndexedBase("x")
@@ -346,6 +346,7 @@ function import_from(sm, meths=nothing;
                      exclude::Union{Nothing, NTuple{N,Symbol}}=nothing
                      ) where {N}
 
+    Base.depwarn("`import_from` is deprecated", :import_from)
 
     if meths == nothing
         _exclude = isa(exclude, Nothing) ? base_exclude : exclude

@@ -3,6 +3,16 @@
 [![](https://img.shields.io/badge/docs-dev-blue.svg)](https://juliapy.github.io/SymPy.jl/dev/)
 
 
+> **Note**
+> `SymPy` is on the move... Well, actually, the `SymPy.jl` package is planned to utilize
+> the new [SymPyCore](https://github.com/jverzani/SymPyCore.jl) backend, which is used by [SymPyPythonCall](https://github.com/jverzani/SymPyPythonCall.jl) and (temporarily) by the unregistered [SymPyPyCall](https://github.com/jverzani/SymPyPyCall.jl).
+>
+> The plan is:
+>
+> * `v"1.2.0"` will include most all deprecations. See `src/deprecated.jl` for details
+>
+> * `v"2.0.0"` will be what is currently `SymPyPyCall`. It is expected that most all code will continue to work as is, though if a few of the dustier corners are used, there may need to be some modest adjustments.
+
 
 # SymPy Package to bring Python's `SymPy` functionality into `Julia` via `PyCall`
 

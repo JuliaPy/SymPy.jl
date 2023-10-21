@@ -81,6 +81,7 @@ include("permutations.jl")
 include("plot_recipes.jl")
 include("latexify_recipe.jl")
 
+include("deprecated.jl")
 ##################################################
 
 pynull() = PyCall.PyNULL()
@@ -121,6 +122,7 @@ global False = Sym(pynull())
 
 
 
+
 # Can not actually initiate many things until `sympy` is defined, so not until runtime
 function __init__()
 
@@ -144,7 +146,7 @@ function __init__()
        # can't load
     end
 
-    # pull in alibrary
+    # pull in a library
     copy!(combinatorics, PyCall.pyimport_conda("sympy.combinatorics", "sympy"))
 
 
