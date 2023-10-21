@@ -1,8 +1,24 @@
-# in SymPy, not SymPyCall
-
-#Base.@deprecate_binding sympy_core sympy.core
-#Base.@deprecate_binding sympy_matrices sympy.matrices
-
+# This file contains numerous deprecations for `SymPy`
+#
+# `SymPy` took a pretty lenient approach to what it wrapped -- it if was a member
+# of the `sympy` object, essentially it got wrapped. (cf. `importexport.jl`)
+# The `SymPyCore` backend takes a much more selective approach, consequently not
+# adding `Julia` methods for many `sympy` functions.
+#
+# This file contains many deprecations. There are a few others utilizing `Base.depwarn`
+# elswhere.
+#
+# The following are to be deprecated, but didn't easily fit with `Julia`'s deprecations:
+#
+# * `True` and `False` are deprecated in favor of `Sym(true)` and `Sym(false)`. (`SymPy` didn't properly wrap `BooleanTrue` or `BooleanFalse`.
+#
+# * The python object `sympy_core` can just be `sympy.core`. Similarly `sympy_matrices` is sjust `sympy.matrices`.
+#
+# * The macro `@vars` is deprecated in favor of `@syms`; `@symfuns` is deprecated, as `@syms` can be used.
+#
+# * the `import_from` method to import all functions and wrap them from some module is deprecated.
+#
+# That should be it, but if not. Apologies.
 
 Base.@deprecate conjugate(x::Sym, args...; kwargs...)  conj(x, args...; kwargs...)  true
 
@@ -118,80 +134,3 @@ function e1(ex::SymbolicObject, args...; kwargs...)
     mpmath.e1(ex, args...; kwargs...)
 end
 export e1
-
-
-
-# mull over
-#XXX intersection -> intersect
-#XXX cse
-#XXX flatten, unflatten
-#XXX interpolate
-#XXX intervals
-# (:isolate
-# ,:isprime
-# ,:line_integrate
-# ,:ln
-# ,:monitor
-# ,:prime)
-
-## Done
-# # in mpmath
-# #XXX expj
-# (:expjpi
-# ,:fac
-# ,:nint
-# ,:fib
-# ,:monitor
-# ,:bernfrac
-# ,:doctests
-# ,:ei
-# ,:timing
-# ,:rgamma
-# ,:expjpi
-# ,:e1)
-
-# add depwarns
-# SymMatrix
-# Base.@deprecate_binding Removed
-#Base.@deprecate_binding SymPermutation nothing
-#Base.@deprecate_binding SymPermutationGroup nothing
-# transpositions
-# sympy_plotting
-# plot_implicit
-# plot_parametric_surface
-# import_from
-# VectorField
-# elements
-# :Lambda
-
-# # # use sympy.XXX
-# (:Abs
-# ,:And
-# ,:DiracDelta
-# ,:Equality
-# ,:GreaterThan
-# ,:LessThan
-# ,:Max
-# ,:Min
-# ,:Not
-# ,:Or
-# ,:StrictGreaterThan
-# ,:StrictLessThan
-# ,:Unequality
-# ,:Xor)
-
-# (:real_root
-# ,:root
-# ,:rootof
-# ,:rsolve
-# ,:srepr
-# ,:multiplicity
-# ,:nsimplify
-# ,:numer
-# ,:denom
-# ,:ode_order
-# ,:pdsolve)
-
-# document
-# @symfuns
-# @vars
