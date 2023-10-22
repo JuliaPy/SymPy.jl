@@ -16,7 +16,7 @@ _pyimport_conda(a,b) = PyCall.pyimport_conda(a, b)
 _pyobject(x) = PyCall.PyObject(x)
 _pytype_mapping(typ,a)  = PyCall.pytype_mapping(typ, a)
 
-core_src_path = joinpath(pathof(SymPyPyCall.SymPyCore), "../../src/SymPy")
+core_src_path = joinpath(pathof(SymPy.SymPyCore), "../../src/SymPy")
 include(joinpath(core_src_path, "sympy.jl"))
 
 include("python_connection.jl")
