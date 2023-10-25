@@ -3,10 +3,19 @@ Base.convert(::Type{S}, x::Sym{T}) where {T<:PyCall.PyObject, S<:Sym} = x
 Base.convert(::Type{S}, x::T) where {T<:PyCall.PyObject, S <: SymbolicObject} = Sym(x)
 
 SymPyCore._convert(::Type{T}, x) where {T} = convert(T, x)
+function SymPyCore._convert(::Type{Bool}, x::PyObject)
+    x == _sympy_.logic.boolalg.BooleanTrue && return true
+    x == _sympy_.logic.boolalg.BooleanFalse && return false
+    x == PyObject(true) && return true
+    x == PyObject(false) && return false
+    error("Can't convert $x to boolean")
+end
 
 
 ## Modifications for ↓, ↑
 Sym(x::Nothing) = Sym(PyCall.PyObject(nothing))
+Sym(x::Bool) = Sym(PyObject(x))
+
 SymPyCore.:↓(x::PyCall.PyObject) = x
 SymPyCore.:↓(d::Dict) = Dict(↓(k) => ↓(v) for (k,v) ∈ pairs(d))
 SymPyCore.:↓(x::Set) = _sympy_.sets.FiniteSet((↓(xi) for xi ∈ x)...)
@@ -44,38 +53,41 @@ end
 
 # should we also have different code path for a::String like  PyCall?
 function Base.getproperty(x::SymbolicObject{T}, a::Symbol) where {T <: PyCall.PyObject}
+
     a == :o && return getfield(x,a)
-    val = ↓(x)
-    if hasproperty(val, a)
-        meth = PyCall.__getproperty(val, a)
-        (meth == PyObject(nothing)) && return nothing
-
-        if hasproperty(meth, :is_Boolean)
-            o = Sym(meth.is_Boolean)
-            o == Sym(true) && return true
-            a == :is_Boolean && return o == Sym(False) ? false : nothing
-        end
-
-        if hasproperty(meth, :__class__) && meth.__class__.__name__ == "bool"
-            a = Sym(meth)
-            return a == Sym(true) ? true :
-                a == Sym(false) ? false : nothing
-        end
-
-        # treat modules, callsm others differently
-        if hasproperty(meth, :__class__) && meth.__class__.__name__ == "module"
-            return Sym(meth)
-        end
-
-        if hasproperty(meth, :__call__)
-           # meth = getproperty(meth, "__call__")
-
-            return SymPyCore.SymbolicCallable(meth)
-        end
-        return ↑(convert(PyCall.PyAny, meth))
+    if a == :__pyobject__
+        Base.depwarn("The field `.__pyobject__` has been renamed `.o`", :getproperty)
+        return getfield(x, :o)
     end
-    # nothing?
-    nothing
+
+    val = ↓(x)
+    !hasproperty(val, a) && return nothing
+
+    meth = PyCall.__getproperty(val, a)
+
+    (meth == PyObject(nothing)) && return nothing
+
+    if hasproperty(meth, :is_Boolean)
+        o = convert(SymPyCore.Bool3, Sym(meth))
+        o == true && return true
+        o == false && return false
+    end
+
+    if hasproperty(meth, :__class__) && meth.__class__.__name__ == "bool"
+        return convert(Bool, meth)
+    end
+
+    # treat modules, calls others differently
+    if hasproperty(meth, :__class__) && meth.__class__.__name__ == "module"
+        return Sym(meth)
+    end
+
+    if hasproperty(meth, :__call__)
+        return SymPyCore.SymbolicCallable(meth)
+    end
+
+    return ↑(convert(PyCall.PyAny, meth))
+
 end
 
 
