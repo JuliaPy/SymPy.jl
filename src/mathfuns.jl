@@ -353,3 +353,12 @@ end
 ## For System Of Ordinary Differential Equations
 ## may need to collect return values
 # dsolve(eqs::Union{Array, Tuple}, args...; kwargs...) = sympy.dsolve(eqs, args...; kwargs...)
+
+
+##
+CommonEq.Lt(a::T,b::T) where {T <: SymbolicObject} = sympy.Lt(a,b)
+CommonEq.Le(a::T,b::T) where {T <: SymbolicObject} = sympy.Le(a,b)
+CommonEq.Eq(a::T,b::T) where {T <: SymbolicObject} = sympy.Eq(a,b)
+CommonEq.Ne(a::T,b::T) where {T <: SymbolicObject} = sympy.Ne(a,b)
+CommonEq.Ge(a::T,b::T) where {T <: SymbolicObject} = sympy.Ge(a,b)
+CommonEq.Gt(a::T,b::T) where {T <: SymbolicObject} = sympy.Gt(a,b)

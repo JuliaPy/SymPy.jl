@@ -19,7 +19,7 @@ SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 SymPySymbolicUtilsExt = "SymbolicUtils"
 
 [compat]
-CommonEq = "=0.2.0"
+CommonEq = "0.2.1"
 CommonSolve = "0.2"
 Latexify = "0.15, 0.16"
 PyCall = "1.91"

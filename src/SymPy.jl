@@ -59,6 +59,10 @@ export SymMatrix, SymFunction
 export PI, IM, oo, zoo, True, False
 export N, subs, doit
 
+import CommonEq: Lt, ≪, Le, ≦, Eq, ⩵, Ne, ≶, ≷, Ge, ≫, Gt, ≧
+export  Lt, ≪, Le, ≦, Eq, ⩵, Ne, ≶, ≷, Ge, ≫, Gt, ≧
+
+
 export sympy, sympy_core, sympy_matrices, import_from#, import_sympy
 export free_symbols
 
