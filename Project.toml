@@ -13,7 +13,6 @@ SymPyCore = "458b697b-88f0-4a86-b56b-78b75cfb3531"
 [compat]
 CommonEq = "0.2.1"
 CommonSolve = "0.2"
-Latexify = "0.15, 0.16"
 LinearAlgebra = "1.6"
 Markdown = "<0.0.1, 1"
 PyCall = "1.91"
