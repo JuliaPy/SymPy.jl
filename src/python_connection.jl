@@ -14,27 +14,28 @@ end
 
 ## Modifications for ↓, ↑
 Sym(x::Nothing) = Sym(PyCall.PyObject(nothing))
-Sym(x::Bool) = Sym(PyObject(x))
+#Sym(x::Bool) = Sym(PyObject(x))
 
 SymPyCore.:↓(x::PyCall.PyObject) = x
 SymPyCore.:↓(d::Dict) = Dict(↓(k) => ↓(v) for (k,v) ∈ pairs(d))
 SymPyCore.:↓(x::Set) = _sympy_.sets.FiniteSet((↓(xi) for xi ∈ x)...)
 
-SymPyCore.:↑(::Type{<:AbstractString}, x) = PyObject(x)
-# Create a symbolic type. There are various containers to recurse in to be
-# caught here
+SymPyCore.:↑(::Type{<:AbstractString}, x) = Sym(PyObject(x))
 function SymPyCore.:↑(::Type{PyCall.PyObject}, x)
-    class_nm = SymPyCore.classname(x)
-    class_nm == "set"   && return Set(Sym.(collect(x)))
-    class_nm == "tuple" && return Tuple(↑(xᵢ) for xᵢ ∈ x)
-    class_nm == "list"  && return [↑(xᵢ) for xᵢ ∈ x]
-    class_nm == "dict"  && return Dict(↑(k) => ↑(x[k]) for k ∈ x)
+    # check if container type
+    # pybuiltin("set") allocates, as PyObject does
+    #pyisinstance(x, pybuiltin("set")) && return Set(Sym.(collect(x)))
+    pyisinstance(x, _pyset_)   && return Set(collect(Sym, x))
+    pyisinstance(x, _pytuple_) && return Tuple(↑(xᵢ) for xᵢ ∈ x)
+    pyisinstance(x, _pylist_)  && return [↑(xᵢ) for xᵢ ∈ x]
+    pyisinstance(x, _pydict_)  && return Dict(↑(k) => ↑(x[k]) for k ∈ x)
 
-    class_nm == "FiniteSet" && return Set(Sym.(collect(x)))
-    class_nm == "MutableDenseMatrix" && return _up_matrix(x) #map(↑, x.tolist())
+    #return rand(1:2) == 1 ? _FiniteSet_ : _MutableDenseMatrix_
+    # # add more sympy containers in sympy.jl and here
+    pyisinstance(x, _FiniteSet_) && return Set(collect(Sym, x))
+    pyisinstance(x, _MutableDenseMatrix_) && return _up_matrix(x) #map(↑, x.tolist())
 
-    # others ... more hands on than pytype_mapping
-
+    # not a container, so call Sym
     Sym(x)
 end
 
@@ -61,29 +62,22 @@ function Base.getproperty(x::SymbolicObject{T}, a::Symbol) where {T <: PyCall.Py
     end
 
     val = ↓(x)
-    !hasproperty(val, a) && return nothing
 
+    hasproperty(val, a) || return nothing
     meth = PyCall.__getproperty(val, a)
 
-    (meth == PyObject(nothing)) && return nothing
-
-    if hasproperty(meth, :is_Boolean)
-        o = convert(SymPyCore.Bool3, Sym(meth))
-        o == true && return true
-        o == false && return false
+    ## __call__
+    if hasproperty(meth, :__call__)
+        return SymPyCore.SymbolicCallable(meth)
     end
 
-    if hasproperty(meth, :__class__) && meth.__class__.__name__ == "bool"
+    # __class__ dispatch
+    if pyisinstance(meth, _bool_) #pybuiltin("bool"))
         return convert(Bool, meth)
     end
 
-    # treat modules, calls others differently
-    if hasproperty(meth, :__class__) && meth.__class__.__name__ == "module"
+    if pyisinstance(meth, _ModuleType_)
         return Sym(meth)
-    end
-
-    if hasproperty(meth, :__call__)
-        return SymPyCore.SymbolicCallable(meth)
     end
 
     return ↑(convert(PyCall.PyAny, meth))
