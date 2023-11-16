@@ -2,7 +2,6 @@ name = "SymPy"
 uuid = "24249f21-da20-56a4-8eb1-6a02cf4ae2e6"
 version = "1.2.1"
 
-
 [deps]
 CommonEq = "3709ef60-1bee-4518-9f2f-acd86f176c50"
 CommonSolve = "38540f10-b2f7-11e9-35d8-d573e4eb0ff2"
@@ -20,7 +19,7 @@ SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
 SymPySymbolicUtilsExt = "SymbolicUtils"
 
 [compat]
-CommonEq = "=0.2.0"
+CommonEq = "=0.2.0, 0.2"
 CommonSolve = "0.2"
 Latexify = "0.15, 0.16"
 LinearAlgebra = "<0.0.1, 1"
@@ -32,8 +31,8 @@ SymbolicUtils = "1"
 julia = "1.0"
 
 [extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 SymbolicUtils = "d1185830-fcd6-423d-90d6-eec64667417b"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
 test = ["SymbolicUtils", "Test"]
