@@ -1,4 +1,14 @@
 ## PyCall specific usage
+#
+# there are 3 main functions used often
+# ↓ - take object to noe passable to python. WOuld be PyObject, but matrix is tricke
+# ↑ - take PyObject to Sym or Bool or ... This should be as efficient as possible now
+# getindex(::SymObject, :a) - used often to access underlying PyObject, or function in `sympy`, or method of
+# some object. Seems to be efficient. The CallableMethod approach is a bit slower than it need be
+# as their is a conversion step (using ↓) that PyCall could also handle, thought special cases of
+# PyObject are needed for that.
+
+
 Base.convert(::Type{S}, x::Sym{T}) where {T<:PyCall.PyObject, S<:Sym} = x
 Base.convert(::Type{S}, x::T) where {T<:PyCall.PyObject, S <: SymbolicObject} = Sym(x)
 
@@ -14,17 +24,21 @@ end
 
 ## Modifications for ↓, ↑
 Sym(x::Nothing) = Sym(PyCall.PyObject(nothing))
-#Sym(x::Bool) = Sym(PyObject(x))
+Sym(x::Bool) = Sym(PyObject(x))
+Sym(x::Integer) = Sym(_sympy_.Integer(x))   # slight improvement over sympify
+Sym(x::AbstractFloat) = Sym(_sympy_.Float(x))
+
 
 SymPyCore.:↓(x::PyCall.PyObject) = x
 SymPyCore.:↓(d::Dict) = Dict(↓(k) => ↓(v) for (k,v) ∈ pairs(d))
 SymPyCore.:↓(x::Set) = _sympy_.sets.FiniteSet((↓(xi) for xi ∈ x)...)
 
 SymPyCore.:↑(::Type{<:AbstractString}, x) = Sym(PyObject(x))
+SymPyCore.:↑(::Type{<:Bool}, x) = Sym(x)
+
 function SymPyCore.:↑(::Type{PyCall.PyObject}, x)
     # check if container type
     # pybuiltin("set") allocates, as PyObject does
-    #pyisinstance(x, pybuiltin("set")) && return Set(Sym.(collect(x)))
     pyisinstance(x, _pyset_)   && return Set(collect(Sym, x))
     pyisinstance(x, _pytuple_) && return Tuple(↑(xᵢ) for xᵢ ∈ x)
     pyisinstance(x, _pylist_)  && return [↑(xᵢ) for xᵢ ∈ x]
@@ -83,7 +97,3 @@ function Base.getproperty(x::SymbolicObject{T}, a::Symbol) where {T <: PyCall.Py
     return ↑(convert(PyCall.PyAny, meth))
 
 end
-
-
-# do we need this conversion?
-#Base.convert(::Type{T}, o::Py) where {T <: Sym} = T(o)
