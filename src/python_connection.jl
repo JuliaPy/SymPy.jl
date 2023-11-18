@@ -44,7 +44,6 @@ function SymPyCore.:↑(::Type{PyCall.PyObject}, x)
     pyisinstance(x, _pylist_)  && return [↑(xᵢ) for xᵢ ∈ x]
     pyisinstance(x, _pydict_)  && return Dict(↑(k) => ↑(x[k]) for k ∈ x)
 
-    #return rand(1:2) == 1 ? _FiniteSet_ : _MutableDenseMatrix_
     # # add more sympy containers in sympy.jl and here
     pyisinstance(x, _FiniteSet_) && return Set(collect(Sym, x))
     pyisinstance(x, _MutableDenseMatrix_) && return _up_matrix(x) #map(↑, x.tolist())
@@ -78,6 +77,7 @@ function Base.getproperty(x::SymbolicObject{T}, a::Symbol) where {T <: PyCall.Py
     val = ↓(x)
 
     hasproperty(val, a) || return nothing
+
     meth = PyCall.__getproperty(val, a)
 
     ## __call__
