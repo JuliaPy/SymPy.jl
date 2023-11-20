@@ -8,30 +8,31 @@
 # as their is a conversion step (using ↓) that PyCall could also handle, thought special cases of
 # PyObject are needed for that.
 
-
-Base.convert(::Type{S}, x::Sym{T}) where {T<:PyCall.PyObject, S<:Sym} = x
-Base.convert(::Type{S}, x::T) where {T<:PyCall.PyObject, S <: SymbolicObject} = Sym(x)
+Base.convert(::Type{S}, x::Sym{T}) where {T<:PyObject, S<:Sym} = x
+Base.convert(::Type{S}, x::T)      where {T<:PyObject, S <: SymbolicObject} = Sym(x)
 
 SymPyCore._convert(::Type{T}, x) where {T} = convert(T, x)
 function SymPyCore._convert(::Type{Bool}, x::PyObject)
-    x == _sympy_.logic.boolalg.BooleanTrue && return true
+    x == _sympy_.logic.boolalg.BooleanTrue  && return true
     x == _sympy_.logic.boolalg.BooleanFalse && return false
-    x == PyObject(true) && return true
+
+    x == PyObject(true)  && return true
     x == PyObject(false) && return false
+
     error("Can't convert $x to boolean")
 end
 
 
 ## Modifications for ↓, ↑
-Sym(x::Nothing) = Sym(PyCall.PyObject(nothing))
-Sym(x::Bool) = Sym(PyObject(x))
-Sym(x::Integer) = Sym(_sympy_.Integer(x))   # slight improvement over sympify
+Sym(x::Nothing)       = Sym(PyObject(nothing))
+Sym(x::Bool)          = Sym(PyObject(x))
+Sym(x::Integer)       = Sym(_sympy_.Integer(x))   # slight improvement over sympify
 Sym(x::AbstractFloat) = Sym(_sympy_.Float(x))
 
 
-SymPyCore.:↓(x::PyCall.PyObject) = x
+SymPyCore.:↓(x::PyObject) = x
 SymPyCore.:↓(d::Dict) = Dict(↓(k) => ↓(v) for (k,v) ∈ pairs(d))
-SymPyCore.:↓(x::Set) = _sympy_.sets.FiniteSet((↓(xi) for xi ∈ x)...)
+SymPyCore.:↓(x::Set)  = _sympy_.sets.FiniteSet((↓(xi) for xi ∈ x)...)
 
 SymPyCore.:↑(::Type{<:AbstractString}, x) = Sym(PyObject(x))
 SymPyCore.:↑(::Type{<:Bool}, x) = Sym(x)
@@ -86,7 +87,7 @@ function Base.getproperty(x::SymbolicObject{T}, a::Symbol) where {T <: PyCall.Py
     end
 
     # __class__ dispatch
-    if pyisinstance(meth, _bool_) #pybuiltin("bool"))
+    if pyisinstance(meth, _bool_) # _bool_ allocates less than using pybuiltin
         return convert(Bool, meth)
     end
 
