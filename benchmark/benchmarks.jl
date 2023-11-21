@@ -20,10 +20,9 @@ SUITE["creation"]["Sym","number"] = @benchmarkable Sym(2)
 SUITE["creation"]["Sym","boolean"] = @benchmarkable Sym(true)
 
 
-@syms x::real
-SUITE["expand"]["expression","call"] = @benchmarkable sin(x)
-SUITE["expand"]["expression","sympy call"] = @benchmarkable sympy.expand_trig(sin(2x))
-SUITE["expand"]["expression","promotion"] = @benchmarkable x^2 - x + inv(x) - 1/x^2
+SUITE["expand"]["expression","call"] = @benchmarkable sin(x) setup=(x=symbols("x"))
+SUITE["expand"]["expression","sympy call"] = @benchmarkable sympy.expand_trig(sin(2x)) setup=(x=symbols("x"))
+SUITE["expand"]["expression","promotion"] = @benchmarkable x^2 - x + inv(x) - 1/x^2 setup=(x=symbols("x"))
 
-SUITE["expand"]["n",5] = @benchmarkable expand((x-a)^5)
-SUITE["expand"]["n",50] = @benchmarkable expand((x-a)^50)
+SUITE["expand"]["n",5] = @benchmarkable expand((x-a)^5) setup=(x=symbols("x"))
+SUITE["expand"]["n",50] = @benchmarkable expand((x-a)^50) setup=(x=symbols("x"))
