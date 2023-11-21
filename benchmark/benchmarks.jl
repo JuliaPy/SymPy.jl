@@ -24,5 +24,5 @@ SUITE["expand"]["expression","call"] = @benchmarkable sin(x) setup=(x=symbols("x
 SUITE["expand"]["expression","sympy call"] = @benchmarkable sympy.expand_trig(sin(2x)) setup=(x=symbols("x"))
 SUITE["expand"]["expression","promotion"] = @benchmarkable x^2 - x + inv(x) - 1/x^2 setup=(x=symbols("x"))
 
-SUITE["expand"]["n",5] = @benchmarkable expand((x-a)^5) setup=(x=symbols("x"))
-SUITE["expand"]["n",50] = @benchmarkable expand((x-a)^50) setup=(x=symbols("x"))
+SUITE["expand"]["n",5] = @benchmarkable expand((x-a)^5) setup=(x=symbols("x");a=symbols("a"))
+SUITE["expand"]["n",50] = @benchmarkable expand((x-a)^50) setup=(x=symbols("x");a=symbols("a"))
