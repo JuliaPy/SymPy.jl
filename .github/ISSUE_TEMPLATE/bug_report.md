@@ -7,6 +7,14 @@ assignees: ''
 
 ---
 
+**Wait**
+
+Most all issues are actually issues with [SymPyCore](https://github.com/jverzani/SymPyCore.jl/issues). If so please report them there.
+
+`SymPy` contains very little code. Basically only that necessary to support the "glue" package `PyCall` to interop `Julia` with `Python`.
+
+
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
