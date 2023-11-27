@@ -1,31 +1,55 @@
 ## PyCall specific usage
-Base.convert(::Type{S}, x::Sym{T}) where {T<:PyCall.PyObject, S<:Sym} = x
-Base.convert(::Type{S}, x::T) where {T<:PyCall.PyObject, S <: SymbolicObject} = Sym(x)
+#
+# there are 3 main functions used often
+# ↓ - take object to noe passable to python. WOuld be PyObject, but matrix is tricke
+# ↑ - take PyObject to Sym or Bool or ... This should be as efficient as possible now
+# getindex(::SymObject, :a) - used often to access underlying PyObject, or function in `sympy`, or method of
+# some object. Seems to be efficient. The CallableMethod approach is a bit slower than it need be
+# as their is a conversion step (using ↓) that PyCall could also handle, thought special cases of
+# PyObject are needed for that.
+
+Base.convert(::Type{S}, x::Sym{T}) where {T<:PyObject, S<:Sym} = x
+Base.convert(::Type{S}, x::T)      where {T<:PyObject, S <: SymbolicObject} = Sym(x)
 
 SymPyCore._convert(::Type{T}, x) where {T} = convert(T, x)
+function SymPyCore._convert(::Type{Bool}, x::PyObject)
+    x == _sympy_.logic.boolalg.BooleanTrue  && return true
+    x == _sympy_.logic.boolalg.BooleanFalse && return false
+
+    x == PyObject(true)  && return true
+    x == PyObject(false) && return false
+
+    error("Can't convert $x to boolean")
+end
 
 
 ## Modifications for ↓, ↑
-Sym(x::Nothing) = Sym(PyCall.PyObject(nothing))
-SymPyCore.:↓(x::PyCall.PyObject) = x
+Sym(x::Nothing)       = Sym(PyObject(nothing))
+Sym(x::Bool)          = Sym(PyObject(x))
+Sym(x::Integer)       = Sym(_sympy_.Integer(x))   # slight improvement over sympify
+Sym(x::AbstractFloat) = Sym(_sympy_.Float(x))
+
+
+SymPyCore.:↓(x::PyObject) = x
 SymPyCore.:↓(d::Dict) = Dict(↓(k) => ↓(v) for (k,v) ∈ pairs(d))
-SymPyCore.:↓(x::Set) = _sympy_.sets.FiniteSet((↓(xi) for xi ∈ x)...)
+SymPyCore.:↓(x::Set)  = _sympy_.sets.FiniteSet((↓(xi) for xi ∈ x)...)
 
-SymPyCore.:↑(::Type{<:AbstractString}, x) = PyObject(x)
-# Create a symbolic type. There are various containers to recurse in to be
-# caught here
+SymPyCore.:↑(::Type{<:AbstractString}, x) = Sym(PyObject(x))
+SymPyCore.:↑(::Type{<:Bool}, x) = Sym(x)
+
 function SymPyCore.:↑(::Type{PyCall.PyObject}, x)
-    class_nm = SymPyCore.classname(x)
-    class_nm == "set"   && return Set(Sym.(collect(x)))
-    class_nm == "tuple" && return Tuple(↑(xᵢ) for xᵢ ∈ x)
-    class_nm == "list"  && return [↑(xᵢ) for xᵢ ∈ x]
-    class_nm == "dict"  && return Dict(↑(k) => ↑(x[k]) for k ∈ x)
+    # check if container type
+    # pybuiltin("set") allocates, as PyObject does
+    pyisinstance(x, _pyset_)   && return Set(collect(Sym, x))
+    pyisinstance(x, _pytuple_) && return Tuple(↑(xᵢ) for xᵢ ∈ x)
+    pyisinstance(x, _pylist_)  && return [↑(xᵢ) for xᵢ ∈ x]
+    pyisinstance(x, _pydict_)  && return Dict(↑(k) => ↑(x[k]) for k ∈ x)
 
-    class_nm == "FiniteSet" && return Set(Sym.(collect(x)))
-    class_nm == "MutableDenseMatrix" && return _up_matrix(x) #map(↑, x.tolist())
+    # # add more sympy containers in sympy.jl and here
+    pyisinstance(x, _FiniteSet_) && return Set(collect(Sym, x))
+    pyisinstance(x, _MutableDenseMatrix_) && return _up_matrix(x) #map(↑, x.tolist())
 
-    # others ... more hands on than pytype_mapping
-
+    # not a container, so call Sym
     Sym(x)
 end
 
@@ -44,40 +68,33 @@ end
 
 # should we also have different code path for a::String like  PyCall?
 function Base.getproperty(x::SymbolicObject{T}, a::Symbol) where {T <: PyCall.PyObject}
+
     a == :o && return getfield(x,a)
-    val = ↓(x)
-    if hasproperty(val, a)
-        meth = PyCall.__getproperty(val, a)
-        (meth == PyObject(nothing)) && return nothing
-
-        if hasproperty(meth, :is_Boolean)
-            o = Sym(meth.is_Boolean)
-            o == Sym(true) && return true
-            a == :is_Boolean && return o == Sym(False) ? false : nothing
-        end
-
-        if hasproperty(meth, :__class__) && meth.__class__.__name__ == "bool"
-            a = Sym(meth)
-            return a == Sym(true) ? true :
-                a == Sym(false) ? false : nothing
-        end
-
-        # treat modules, callsm others differently
-        if hasproperty(meth, :__class__) && meth.__class__.__name__ == "module"
-            return Sym(meth)
-        end
-
-        if hasproperty(meth, :__call__)
-           # meth = getproperty(meth, "__call__")
-
-            return SymPyCore.SymbolicCallable(meth)
-        end
-        return ↑(convert(PyCall.PyAny, meth))
+    if a == :__pyobject__
+        Base.depwarn("The field `.__pyobject__` has been renamed `.o`", :getproperty)
+        return getfield(x, :o)
     end
-    # nothing?
-    nothing
+
+    val = ↓(x)
+
+    hasproperty(val, a) || return nothing
+
+    meth = PyCall.__getproperty(val, a)
+
+    ## __call__
+    if hasproperty(meth, :__call__)
+        return SymPyCore.SymbolicCallable(meth)
+    end
+
+    # __class__ dispatch
+    if pyisinstance(meth, _bool_) # _bool_ allocates less than using pybuiltin
+        return convert(Bool, meth)
+    end
+
+    if pyisinstance(meth, _ModuleType_)
+        return Sym(meth)
+    end
+
+    return ↑(convert(PyCall.PyAny, meth))
+
 end
-
-
-# do we need this conversion?
-#Base.convert(::Type{T}, o::Py) where {T <: Sym} = T(o)
