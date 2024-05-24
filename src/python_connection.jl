@@ -9,9 +9,11 @@
 # PyObject are needed for that.
 
 Base.convert(::Type{S}, x::Sym{T}) where {T<:PyObject, S<:Sym} = x
+Base.convert(::Type{S}, x::Sym{T}) where {T<:PyObject, S<:Sym{PyObject}} = x
 Base.convert(::Type{S}, x::T)      where {T<:PyObject, S <: SymbolicObject} = Sym(x)
 
 SymPyCore._convert(::Type{T}, x) where {T} = convert(T, x)
+
 function SymPyCore._convert(::Type{Bool}, x::PyObject)
     x == _sympy_.logic.boolalg.BooleanTrue  && return true
     x == _sympy_.logic.boolalg.BooleanFalse && return false
@@ -22,13 +24,20 @@ function SymPyCore._convert(::Type{Bool}, x::PyObject)
     error("Can't convert $x to boolean")
 end
 
-
-## Modifications for ↓, ↑
-Sym(x::Nothing)       = Sym(PyObject(nothing))
-Sym(x::Bool)          = Sym(PyObject(x))
-Sym(x::Integer)       = Sym(_sympy_.Integer(x))   # slight improvement over sympify
-Sym(x::AbstractFloat) = Sym(_sympy_.Float(x))
-
+function SymPyCore.Bool3(x::Sym{T}) where {T <: PyObject}
+    y = ↓(x)
+    isnothing(y) && return nothing
+    if hasproperty(y, "is_Boolean")
+        if convert(Bool, y.is_Boolean)
+            return SymPyCore._convert(Bool, y)
+        end
+    elseif hasproperty(y, "__bool__")
+        if convert(Bool, y != ↓(Sym(nothing)))
+            return convert(Bool, y.__bool__())
+        end
+    end
+    return nothing
+end
 
 SymPyCore.:↓(x::PyObject) = x
 SymPyCore.:↓(d::Dict) = Dict(↓(k) => ↓(v) for (k,v) ∈ pairs(d))
