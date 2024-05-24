@@ -168,7 +168,6 @@ include(joinpath(core_src_path, "gen_methods_sympy.jl"))
 include(joinpath(core_src_path, "additional_methods_sympy.jl"))
 include(joinpath(core_src_path, "show_sympy.jl"))
 
-
 include("python_connection.jl")
 
 end # module
