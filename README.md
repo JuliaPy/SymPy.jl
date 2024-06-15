@@ -18,13 +18,28 @@ To use this package, both Python and its SymPy library must be
 installed on your system. If `PyCall` is installed using `Conda`
 (which is the default if no system `python` is found), then the
 underlying SymPy library will be installed via `Conda` when the
-package is first loaded. Otherwise, installing both Python and the
+package is first loaded.
+
+If there are issues, you might try installing `PyCall` first, along the lines of :
+
+```
+julia> using Pkg
+julia> ENV["PYTHON"]=""
+julia> Pkg.build("PyCall")
+julia> Pkg.add("SymPy")
+julia> using SymPy
+```
+
+
+Otherwise, installing both Python and the
 SymPy library can be done by other means.
 In this case, the `Anaconda` distribution is suggested, as it provides a single
 installation of Python that includes SymPy and many other
 scientific libraries that can be profitably accessed within `Julia`
 via `PyCall`. (Otherwise, install Python then download the SymPy
 library from https://github.com/sympy/sympy/releases and install.)
+
+
 
 To upgrade the underlying `sympy` library, which has new releases at a
 rate similar to `Julia`, when installed with `Conda`, the following commands
