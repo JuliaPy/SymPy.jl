@@ -17,12 +17,14 @@ LinearAlgebra = "<0.0.1, 1.6"
 PyCall = "1.96.2"
 SpecialFunctions = "0.7, 0.8, 0.8, 0.10, 1, 2"
 SymPyCore = "0.2.5, 1"
+TermInterface = "2"
 julia = "1.6"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+TermInterface = "8ea1fca8-c5ef-4a55-8b96-4e9afe9c9a3c"
 
 [targets]
-test = ["Test", "LinearAlgebra", "SpecialFunctions"]
+test = ["Test", "LinearAlgebra", "SpecialFunctions","TermInterface"]
