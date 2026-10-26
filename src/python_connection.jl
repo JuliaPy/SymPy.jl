@@ -69,12 +69,8 @@ _up_matrix(m) = map(↑, m.tolist())
 
 
 
-# hash (work around pending PyCall release with its own hash)
-function Base.hash(x::SymbolicObject{T}, h::UInt) where {T <: PyCall.PyObject}
-    o = ↓(x)
-    px = ccall((PyCall.@pysym :PyObject_Hash), PyCall.Py_hash_t, (PyCall.PyPtr,), o) # from PyCall.jl
-    reinterpret(UInt, Int(px)) - 3h                                                  # from PythonCall.jl
-end
+# hash: defer to PyCall (≥ 1.97), which acquires the GIL before calling PyObject_Hash
+Base.hash(x::SymbolicObject{T}, h::UInt) where {T <: PyCall.PyObject} = hash(↓(x), h)
 
 
 # should we also have different code path for a::String like  PyCall?
