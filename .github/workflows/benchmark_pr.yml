@@ -22,7 +22,7 @@ jobs:
               id: extract-package-name
               run: |
                 PACKAGE_NAME=$(grep "^name" Project.toml | sed 's/^name = "\(.*\)"$/\1/')
-                echo "::set-output name=package_name::$PACKAGE_NAME"
+                echo "package_name=$PACKAGE_NAME" >> "$GITHUB_OUTPUT"
             - name: Build SymPy
               env:
                 JULIA_NUM_THREADS: 2
