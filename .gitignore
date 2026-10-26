@@ -7,3 +7,5 @@ Manifest.toml
 appveyor.yml
 .travis.yml
 default.profraw
+.idea/
+*.iml
