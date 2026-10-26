@@ -46,10 +46,12 @@ SymPyCore.:↓(x::Set)  = _sympy_.sets.FiniteSet((↓(xi) for xi ∈ x)...)
 SymPyCore.:↑(::Type{<:AbstractString}, x) = Sym(PyObject(x))
 SymPyCore.:↑(::Type{<:Bool}, x) = Sym(x)
 
-function SymPyCore.:↑(::Type{PyCall.PyObject}, x)
+_Set(x) = Set(x)
+_Set(xs...) = Set(xs)
+function SymPyCore.:↑(u::Type{PyCall.PyObject}, x)
     # check if container type
     # pybuiltin("set") allocates, as PyObject does
-    pyisinstance(x, _pyset_)   && return Set(collect(Sym, x))
+    pyisinstance(x, _pyset_)   && return _Set(collect(map(Sym, x))...)
     pyisinstance(x, _pytuple_) && return Tuple(↑(xᵢ) for xᵢ ∈ x)
     pyisinstance(x, _pylist_)  && return [↑(xᵢ) for xᵢ ∈ x]
     pyisinstance(x, _pydict_)  && return Dict(↑(k) => ↑(x[k]) for k ∈ x)
